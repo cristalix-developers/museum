@@ -2,6 +2,7 @@ package ru.func.museum.player;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import ru.func.museum.element.Element;
+import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
@@ -13,6 +14,10 @@ public interface Archaeologist {
     String getUuid();
 
     String getName();
+
+    ExcavationType getLastExcavation();
+
+    void setLastExcavation(ExcavationType excavation);
 
     double getMoney();
 

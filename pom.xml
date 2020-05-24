@@ -83,5 +83,12 @@
             <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bukkit.craftbukkit</groupId>
+            <artifactId>CraftBukkit</artifactId>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>C:/Users/func/Downloads/serv/craftbukkit-1.12.2.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>

@@ -19,4 +19,9 @@ public class DefaultExcavation implements Excavation {
     private Location mineCenter;
     private double depth;
     private int breakCount;
+
+    @Override
+    public boolean canBreak(Location location) {
+        return mineCenter.distance(location) <= depth;
+    }
 }

@@ -8,12 +8,13 @@ import ru.func.museum.excavation.generator.GeneratorType;
 @Getter
 @AllArgsConstructor
 public enum ExcavationType {
+    NOOP(null, null),
     DIRT(new DefaultExcavation(
             "Раскопки древнего динозавра",
             100,
             1,
-            new Location(null, 0, 0, 0),
-            new Location(null, 0, 0, 0),
+            new Location(Excavation.WORLD, -50, 83, 242),
+            new Location(Excavation.WORLD, -50, 83, 242),
             25,
             50
     ), GeneratorType.DEFAULT),;

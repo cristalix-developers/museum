@@ -46,5 +46,14 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm-commons:6.1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm-tree:6.1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm-analysis:6.1.1" level="project" />
+    <orderEntry type="module-library">
+      <library name="Maven: org.bukkit.craftbukkit:CraftBukkit:1.12.2-R0.1-SNAPSHOT">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Downloads/serv/craftbukkit-1.12.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

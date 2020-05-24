@@ -2,6 +2,7 @@ package ru.func.museum.player;
 
 import lombok.*;
 import ru.func.museum.element.Element;
+import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
@@ -23,6 +24,7 @@ public class PlayerData implements Archaeologist {
     private String uuid;
     private double money;
     private int level;
+    private ExcavationType lastExcavation;
     private boolean onExcavation;
     private List<UUID> friendList;
     private PickaxeType pickaxeType;

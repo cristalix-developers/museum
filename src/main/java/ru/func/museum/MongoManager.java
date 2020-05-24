@@ -12,6 +12,7 @@ import org.bson.codecs.pojo.ClassModel;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.Museum;
 import ru.func.museum.museum.collector.CollectorType;
@@ -65,6 +66,7 @@ public class MongoManager {
                     .name(player.getName())
                     .uuid(player.getUniqueId().toString())
                     .money(1000)
+                    .lastExcavation(ExcavationType.NOOP)
                     .onExcavation(false)
                     .pickaxeType(PickaxeType.DEFAULT)
                     .museumList(Collections.singletonList(
