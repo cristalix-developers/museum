@@ -1,0 +1,3 @@
+uri: 'mongodb+srv://root:admin@cluster0-vnynx.mongodb.net/test?retryWrites=true&w=majority'
+database: 'data'
+collection: 'museum'

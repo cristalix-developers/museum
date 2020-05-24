@@ -1,0 +1,5 @@
+name: Museum
+version: ${project.version}
+main: ru.func.museum.App
+authors: [func]
+website: funcid.ru
