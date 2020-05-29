@@ -1,11 +1,7 @@
 package ru.func.museum.player.pickaxe;
 
-import net.minecraft.server.v1_12_R1.Block;
-import net.minecraft.server.v1_12_R1.IBlockData;
-import net.minecraft.server.v1_12_R1.World;
-import org.bukkit.Location;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.entity.Player;
 import ru.func.museum.excavation.Excavation;
 
 import java.util.Random;
@@ -19,5 +15,13 @@ public interface Pickaxe {
 
     World WORLD = ((CraftWorld) Excavation.WORLD).getHandle();
 
-    Location[] dig(Player player, org.bukkit.block.Block block);
+    void dig(PlayerConnection connection, Excavation excavation, org.bukkit.block.Block block);
+
+    default void breakBlock(PlayerConnection connection, Excavation excavation, BlockPosition position) {
+        if (excavation.getExcavationGenerator().fastCanBreak(position.getX(), position.getY(), position.getZ())) {
+            PacketPlayOutBlockChange blockChange = new PacketPlayOutBlockChange(WORLD, position);
+            blockChange.block = AIR_DATA;
+            connection.sendPacket(blockChange);
+        }
+    }
 }

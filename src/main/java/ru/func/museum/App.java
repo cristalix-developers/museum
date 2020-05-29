@@ -3,8 +3,8 @@ package ru.func.museum;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -64,14 +64,9 @@ public final class App extends JavaPlugin implements Listener {
         // Игрок на раскопках, блок находится в шахте и блок над - воздух.
         if (archaeologist.isOnExcavation() &&
                 !lastExcavation.equals(ExcavationType.NOOP) &&
-                excavation.getExcavationGenerator().fastCanBreak(blockLocation.getBlockX(), blockLocation.getBlockY(), blockLocation.getBlockZ()) &&
-                blockLocation.subtract(0, -1, 0).getBlock().getType().equals(Material.AIR)
+                excavation.getExcavationGenerator().fastCanBreak(blockLocation.getBlockX(), blockLocation.getBlockY(), blockLocation.getBlockZ())
         ) {
-            Location[] locations = archaeologist.getPickaxeType().getPickaxe().dig(player, block);
-            if (locations != null)
-                for (Location location : archaeologist.getPickaxeType().getPickaxe().dig(player, block))
-                    if (excavation.getExcavationGenerator().fastCanBreak(location.getBlockX(), location.getBlockY(), location.getBlockZ()) && location.subtract(0, -1, 0).getBlock().getType().equals(Material.AIR))
-                        location.subtract(0, 1, 0).getBlock().setType(Material.AIR);
+            archaeologist.getPickaxeType().getPickaxe().dig(((CraftPlayer) player).getHandle().playerConnection, excavation, block);
         } else
             e.setCancelled(true);
     }

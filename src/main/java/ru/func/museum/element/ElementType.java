@@ -16,18 +16,15 @@ public enum ElementType {
     BONE_DINOSAUR_LEG_LEFT(
             "Кость левой ноги динозавра",
             100,
-            360,
-            360,
-            360,
             SpaceType.DINOSAUR,
             ElementRare.USUAL
     ) {
         @Override
         public void show(PlayerConnection connection, Location location) {
             Vector3f vector = new Vector3f(
-                    Pickaxe.RANDOM.nextFloat() * getMaxXRotation(),
-                    Pickaxe.RANDOM.nextFloat() * getMaxYRotation(),
-                    Pickaxe.RANDOM.nextFloat() * getMaxZRotation()
+                    Pickaxe.RANDOM.nextFloat() * 360,
+                    Pickaxe.RANDOM.nextFloat() * 360,
+                    Pickaxe.RANDOM.nextFloat() * 360
             );
             ElementType.sendSingle(connection, location.subtract(0, .6, 0), getTitle(), Material.QUARTZ_BLOCK, vector);
             ElementType.sendSingle(connection, location.subtract(.2, -.4, .3), getTitle(), Material.QUARTZ_BLOCK, vector);
@@ -37,9 +34,6 @@ public enum ElementType {
 
     private String title;
     private double cost;
-    private float maxXRotation;
-    private float maxYRotation;
-    private float maxZRotation;
     private SpaceType spaceType;
     // Тип поля, на который можно поставить элемент
     private ElementRare elementRare;

@@ -1,8 +1,9 @@
 package ru.func.museum.player.pickaxe;
 
-import org.bukkit.Location;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import ru.func.museum.excavation.Excavation;
 
 /**
  * @author func 24.05.2020
@@ -10,12 +11,17 @@ import org.bukkit.entity.Player;
  */
 public class UltraPickaxe implements Pickaxe {
     @Override
-    public Location[] dig(Player player, Block block) {
-        return new Location[]{
-                block.getLocation().subtract(0, 0, 1),
-                block.getLocation().subtract(0, 0, -1),
-                block.getLocation().subtract(1, 0, 0),
-                block.getLocation().subtract(-1, 0, 0),
-        };
+    public void dig(PlayerConnection connection, Excavation excavation, Block block) {
+        BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
+        for (BlockPosition position : new BlockPosition[]{
+                blockPosition.east(),
+                blockPosition.north(),
+                blockPosition.down(),
+                blockPosition.south(),
+                blockPosition.west()
+        }) {
+            if (RANDOM.nextInt(2) == 1)
+                breakBlock(connection, excavation, position);
+        }
     }
 }
