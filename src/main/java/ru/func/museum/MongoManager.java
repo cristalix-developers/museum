@@ -24,7 +24,10 @@ import ru.func.museum.player.PlayerData;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.function.Supplier;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.pojo.Conventions.ANNOTATION_CONVENTION;
@@ -36,6 +39,15 @@ import static org.bson.codecs.pojo.Conventions.CLASS_AND_PROPERTY_CONVENTION;
  */
 public class MongoManager {
     private static MongoCollection<Archaeologist> mongoCollection;
+    private static Supplier<List<Element>> elementTemplate;
+
+    static {
+        Element[] temp = new Element[ElementType.values().length];
+        for(int i = 0; i < temp.length; i++) {
+            temp[i] = new Element(ElementType.values()[i], null, 0);
+        }
+        elementTemplate = () -> Arrays.asList(temp);
+    }
 
     public static void connect(String uri, String database, String collection) {
         PojoCodecProvider codecProvider = PojoCodecProvider.builder()
@@ -74,11 +86,8 @@ public class MongoManager {
                             "Музей в честь " + player.getName(),
                             MuseumTemplateType.DEFAULT,
                             CollectorType.DEFAULT
-                    ))).elementList(Collections.singletonList(new Element(
-                            ElementType.BONE_DINOSAUR_LEG_LEFT,
-                            null,
-                            1
-                    ))).friendList(new ArrayList<>())
+                    ))).elementList(elementTemplate.get())
+                    .friendList(new ArrayList<>())
                     .build();
             mongoCollection.insertOne(found);
         }

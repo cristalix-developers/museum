@@ -14,6 +14,8 @@ import ru.func.museum.player.pickaxe.Pickaxe;
 @AllArgsConstructor
 public enum ElementType {
     BONE_DINOSAUR_LEG_LEFT(
+            1,
+            2,
             "Кость левой ноги динозавра",
             100,
             SpaceType.DINOSAUR,
@@ -26,21 +28,25 @@ public enum ElementType {
                     Pickaxe.RANDOM.nextFloat() * 360,
                     Pickaxe.RANDOM.nextFloat() * 360
             );
-            ElementType.sendSingle(connection, location.subtract(0, .6, 0), getTitle(), Material.QUARTZ_BLOCK, vector);
-            ElementType.sendSingle(connection, location.subtract(.2, -.4, .3), getTitle(), Material.QUARTZ_BLOCK, vector);
+            int group = 10000 + Pickaxe.RANDOM.nextInt(90000);
+            ElementType.sendSingle(connection, this, location.subtract(0, .6, 0), Material.QUARTZ_BLOCK, vector, group, 0);
+            ElementType.sendSingle(connection, this, location.subtract(.2, -.4, .3), Material.QUARTZ_BLOCK, vector, group, 1);
         }
     },
     ;
 
+    private int id;
+    private int pieces;
     private String title;
     private double cost;
     private SpaceType spaceType;
     // Тип поля, на который можно поставить элемент
     private ElementRare elementRare;
 
-    private static void sendSingle(PlayerConnection connection, Location location, String name, Material material, Vector3f vector) {
+    private static void sendSingle(PlayerConnection connection, ElementType element, Location location, Material material, Vector3f vector, int group, int subGroupId) {
         EntityArmorStand armorStand = new EntityArmorStand(Pickaxe.WORLD);
-        armorStand.setCustomName(name);
+        armorStand.setCustomName(element.getTitle());
+        armorStand.id = new Integer(group + "" + (subGroupId + 10) + "" + element.getId());
         armorStand.setInvisible(true);
         armorStand.setPosition(
                 location.getX() + .5,
@@ -54,6 +60,15 @@ public enum ElementType {
                 EnumItemSlot.HEAD,
                 CraftItemStack.asNMSCopy(new ItemStack(material))
         ));
+    }
+
+    public static ElementType findTypeById(int nonParsedInt) {
+        if (nonParsedInt < 100000)
+            return null;
+        for (ElementType type : ElementType.values())
+            if ((type.getId() + "").equals((nonParsedInt + "").substring(7)))
+                return type;
+        return null;
     }
 
     public abstract void show(PlayerConnection connection, Location location);
