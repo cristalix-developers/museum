@@ -2,21 +2,17 @@ package ru.func.museum.element;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import ru.func.museum.museum.space.Space;
-import ru.func.museum.museum.space.SpaceType;
-
-import java.util.Optional;
 
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class Element {
+    private ElementType type;
     // То, где расположен элемент
     private Space space;
-    // Тип поля, на который можно поставить элемент
-    private SpaceType spaceType;
-    private double cost;
-    private String title;
+    private int count;
 }

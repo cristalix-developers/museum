@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import ru.func.museum.museum.space.Space;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author func 22.05.2020
@@ -14,7 +15,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class DefaultMuseum implements MuseumTemplate {
-    private List<Space> matrix;
+    private Supplier<List<Space>> matrix;
     private String title;
     private Location[] collectorRoute;
 }

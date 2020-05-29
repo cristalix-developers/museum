@@ -12,6 +12,8 @@ import org.bson.codecs.pojo.ClassModel;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import ru.func.museum.element.Element;
+import ru.func.museum.element.ElementType;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.Museum;
@@ -60,8 +62,6 @@ public class MongoManager {
         Archaeologist found = mongoCollection.find(eq("uuid", player.getUniqueId().toString())).first();
         if (found == null) {
             found = PlayerData.builder()
-                    .elementList(new ArrayList<>())
-                    .friendList(new ArrayList<>())
                     .level(1)
                     .name(player.getName())
                     .uuid(player.getUniqueId().toString())
@@ -69,13 +69,17 @@ public class MongoManager {
                     .lastExcavation(ExcavationType.NOOP)
                     .onExcavation(false)
                     .pickaxeType(PickaxeType.DEFAULT)
-                    .museumList(Collections.singletonList(
-                            new Museum(
-                                    MuseumTemplateType.DEFAULT.getMuseumTemplate().getMatrix(),
-                                    "Музей в честь " + player.getName(),
-                                    MuseumTemplateType.DEFAULT,
-                                    CollectorType.DEFAULT)
-                    )).build();
+                    .museumList(Collections.singletonList(new Museum(
+                            MuseumTemplateType.DEFAULT.getMuseumTemplate().getMatrix().get(),
+                            "Музей в честь " + player.getName(),
+                            MuseumTemplateType.DEFAULT,
+                            CollectorType.DEFAULT
+                    ))).elementList(Collections.singletonList(new Element(
+                            ElementType.BONE_DINOSAUR_LEG_LEFT,
+                            null,
+                            1
+                    ))).friendList(new ArrayList<>())
+                    .build();
             mongoCollection.insertOne(found);
         }
         Bukkit.getConsoleSender().sendMessage("§aLogged: " + found.toString());

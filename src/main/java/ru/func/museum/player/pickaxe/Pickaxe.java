@@ -10,6 +10,7 @@ import ru.func.museum.excavation.Excavation;
 
 import java.util.Random;
 
+@FunctionalInterface
 public interface Pickaxe {
 
     Random RANDOM = new Random();
