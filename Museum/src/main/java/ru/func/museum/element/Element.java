@@ -14,5 +14,4 @@ public class Element {
     private ElementType type;
     // То, где расположен элемент
     private Space space;
-    private int count;
 }
