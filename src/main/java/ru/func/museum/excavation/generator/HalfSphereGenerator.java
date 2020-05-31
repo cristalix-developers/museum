@@ -31,9 +31,9 @@ public class HalfSphereGenerator implements ExcavationGenerator {
 
         int index = 0;
         Location[] temp = new Location[(int) (4 * radius * radius * radius * Math.PI / 3 - 3 * radius * radius + 3 * radius - 1) / 2];
-        for (int x = -radius; x < radius; x++) {
-            for (int z = -radius; z < radius; z++) {
-                for (int y = -radius; y < 0; y++) {
+        for (int y = -radius; y < 0; y++) {
+            for (int x = -radius; x < radius; x++) {
+                for (int z = -radius; z < radius; z++) {
                     if (index == temp.length)
                         break;
                     if (y + center.getBlockY() < 1)
@@ -61,7 +61,6 @@ public class HalfSphereGenerator implements ExcavationGenerator {
     public void generateAndShow(Player player) {
         PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
         for (Location location : blockAble) {
-
             PacketPlayOutBlockChange block = new PacketPlayOutBlockChange(
                     world,
                     new BlockPosition(

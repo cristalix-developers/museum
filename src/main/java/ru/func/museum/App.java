@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.func.museum.element.Element;
+import org.bukkit.scheduler.BukkitRunnable;
 import ru.func.museum.element.ElementType;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.excavation.ExcavationType;
@@ -26,6 +26,8 @@ import ru.func.museum.player.Archaeologist;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class App extends JavaPlugin implements Listener {
 
@@ -48,29 +50,55 @@ public final class App extends JavaPlugin implements Listener {
         Archaeologist archaeologist = MongoManager.load(player);
         archaeologistMap.put(player.getUniqueId(), archaeologist);
         PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+        App plugin = this;
+        final AtomicBoolean playerLocked = new AtomicBoolean(false);
         connection.networkManager.channel.pipeline().addBefore(
                 "packet_handler",
                 player.getName(),
                 new ChannelDuplexHandler() {
                     @Override
                     public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                        // Bukkit.getServer().getConsoleSender().sendMessage("PACKET READ: " + packet.toString());
-                        if (packet instanceof PacketPlayInUseEntity) {
-                            int entityId = ((PacketPlayInUseEntity) packet).a;
-                            ElementType type = ElementType.findTypeById(entityId);
+                        if (packet instanceof PacketPlayInUseEntity && !playerLocked.get()) {
+                            PacketPlayInUseEntity useEntity = (PacketPlayInUseEntity) packet;
+                            // 1234_01_xxx -> 1234_00_xxx
+                            System.out.println(useEntity.a);
+                            int entityId = useEntity.a / 100000 * 100000 + 10000 + useEntity.a % 1000;
+                            System.out.println(entityId);
+                            ElementType type = ElementType.findTypeById(entityId % 1000);
                             if (type != null) {
-                                for (Element element : archaeologist.getElementList()) {
-                                    if (element.getType().equals(type)) {
-                                        element.setCount(element.getCount() + 1);
-                                        break;
-                                    }
-                                }
-                                player.sendMessage("Вы получили " + type.getTitle() + ", его редкость: " + type.getElementRare().getName());
+                                archaeologist.getElementList().stream()
+                                        .filter(element -> element.getType().equals(type))
+                                        .findFirst()
+                                        .ifPresent(element -> element.setCount(element.getCount() + 1));
+                                player.sendMessage("§6Вы нашли " + type.getTitle() + ", его редкость: " + type.getElementRare().getName());
+                                player.sendTitle("§l§6Находка!", "§eобнаружен " + type.getElementRare().getWord() + " фрагмент");
                                 int[] ids = new int[type.getPieces()];
-                                for (int i = 0; i < ids.length; i++)
-                                    ids[i] = new Integer(("" + entityId).substring(0, 5) + (10 + i) + "" + type.getId());
-                                MinecraftServer.getServer().postToMainThread(() ->
-                                        connection.sendPacket(new PacketPlayOutEntityDestroy(ids)));
+                                for (int i = 0; i < type.getPieces(); i++)
+                                    ids[i] = entityId + i * 1000;
+                                AtomicInteger integer = new AtomicInteger(0);
+                                MinecraftServer.getServer().postToMainThread(() -> {
+                                    playerLocked.set(true);
+                                    new BukkitRunnable() {
+                                        @Override
+                                        public void run() {
+                                            if (integer.getAndIncrement() < 22) {
+                                                for (int id : ids) {
+                                                    connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMove(
+                                                            id, 0, 408, 0, false
+                                                    ));
+                                                    byte angle = (byte) (5 * integer.get() % 128) ;
+                                                    connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(
+                                                            id, angle, (byte) 0, false
+                                                    ));
+                                                }
+                                            } else {
+                                                connection.sendPacket(new PacketPlayOutEntityDestroy(ids));
+                                                playerLocked.set(false);
+                                                cancel();
+                                            }
+                                        }
+                                    }.runTaskTimerAsynchronously(plugin, 5L, 3L);
+                                });
                             }
                         }
                         super.channelRead(channelHandlerContext, packet);

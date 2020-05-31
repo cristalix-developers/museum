@@ -6,12 +6,13 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ElementRare {
-    USUAL(2, "Обыная"),
-    RARE(3, "Редкая"),
-    AMAZING(5, "Финоминальная"),
-    FANTASTIC(8, "Неизведанная"),
+    USUAL(2, "Обыная", "новый"),
+    RARE(3, "Редкая", "редкий"),
+    AMAZING(5, "Финоминальная", "финоминальный"),
+    FANTASTIC(8, "Неизведанная", "ранее неизвестный"),
     ;
 
     private int rareScale;
     private String name;
+    private String word;
 }

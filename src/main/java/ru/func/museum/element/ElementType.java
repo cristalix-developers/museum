@@ -28,7 +28,7 @@ public enum ElementType {
                     Pickaxe.RANDOM.nextFloat() * 360,
                     Pickaxe.RANDOM.nextFloat() * 360
             );
-            int group = 10000 + Pickaxe.RANDOM.nextInt(90000);
+            int group = 1000 + Pickaxe.RANDOM.nextInt(9000);
             ElementType.sendSingle(connection, this, location.subtract(0, .6, 0), Material.QUARTZ_BLOCK, vector, group, 0);
             ElementType.sendSingle(connection, this, location.subtract(.2, -.4, .3), Material.QUARTZ_BLOCK, vector, group, 1);
         }
@@ -46,13 +46,14 @@ public enum ElementType {
     private static void sendSingle(PlayerConnection connection, ElementType element, Location location, Material material, Vector3f vector, int group, int subGroupId) {
         EntityArmorStand armorStand = new EntityArmorStand(Pickaxe.WORLD);
         armorStand.setCustomName(element.getTitle());
-        armorStand.id = new Integer(group + "" + (subGroupId + 10) + "" + element.getId());
+        armorStand.id = group * 100000 + (subGroupId + 10) * 1000 + element.getId();
         armorStand.setInvisible(true);
         armorStand.setPosition(
                 location.getX() + .5,
                 location.getY() - 1,
                 location.getZ() + .5
         );
+        armorStand.setNoGravity(true);
         armorStand.setHeadPose(vector);
         connection.sendPacket(new PacketPlayOutSpawnEntityLiving(armorStand));
         connection.sendPacket(new PacketPlayOutEntityEquipment(
@@ -62,11 +63,9 @@ public enum ElementType {
         ));
     }
 
-    public static ElementType findTypeById(int nonParsedInt) {
-        if (nonParsedInt < 100000)
-            return null;
+    public static ElementType findTypeById(int lastDigits) {
         for (ElementType type : ElementType.values())
-            if ((type.getId() + "").equals((nonParsedInt + "").substring(7)))
+            if (lastDigits == type.getId())
                 return type;
         return null;
     }
