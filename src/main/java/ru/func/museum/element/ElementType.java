@@ -48,6 +48,7 @@ public enum ElementType {
         armorStand.setCustomName(element.getTitle());
         armorStand.id = group * 100000 + (subGroupId + 10) * 1000 + element.getId();
         armorStand.setInvisible(true);
+        armorStand.setCustomNameVisible(true);
         armorStand.setPosition(
                 location.getX() + .5,
                 location.getY() - 1,

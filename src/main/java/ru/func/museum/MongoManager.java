@@ -5,6 +5,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
+import javafx.util.Pair;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -70,8 +71,9 @@ public class MongoManager {
         Bukkit.getConsoleSender().sendMessage("§aConnected to database successfully.");
     }
 
-    public static Archaeologist load(Player player) {
+    public static Pair<Archaeologist, Boolean> load(Player player) {
         Archaeologist found = mongoCollection.find(eq("uuid", player.getUniqueId().toString())).first();
+        boolean newPlayer = false;
         if (found == null) {
             found = PlayerData.builder()
                     .level(1)
@@ -90,9 +92,10 @@ public class MongoManager {
                     .friendList(new ArrayList<>())
                     .build();
             mongoCollection.insertOne(found);
+            newPlayer = true;
         }
         Bukkit.getConsoleSender().sendMessage("§aLogged: " + found.toString());
-        return found;
+        return new Pair<>(found, newPlayer);
     }
 
     public static Archaeologist save(Archaeologist archaeologist) {
