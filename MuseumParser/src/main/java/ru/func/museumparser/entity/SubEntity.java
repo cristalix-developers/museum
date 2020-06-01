@@ -2,6 +2,7 @@ package ru.func.museumparser.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.util.EulerAngle;
 
@@ -12,11 +13,7 @@ import org.bukkit.util.EulerAngle;
 @Getter
 @AllArgsConstructor
 public class SubEntity {
-    private int groupId;
     private String title;
-    private double vectorX;
-    private double vectorY;
-    private double vectorZ;
-    private EulerAngle headRotation;
-    private Material material;
+    @Setter
+    private Piece[] pieces;
 }

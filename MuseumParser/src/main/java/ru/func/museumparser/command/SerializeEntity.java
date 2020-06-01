@@ -41,8 +41,7 @@ public class SerializeEntity implements CommandExecutor {
             plugin.getConfig().set("data", gson.toJson(new MuseumEntity(
                     player.getLocation(),
                     Integer.parseInt(args[0]),
-                    Integer.parseInt(args[1]),
-                    ElementRare.valueOf(args[2]),
+                    ElementRare.valueOf(args[1]),
                     title
             )));
             plugin.saveConfig();

@@ -1,17 +1,13 @@
 package ru.func.museum.museum.space;
 
-import org.bukkit.Location;
 import ru.func.museum.museum.AbstractMuseum;
+import ru.func.museum.museum.space.viewer.SpaceViewer;
 
 public interface Space {
 
     AbstractMuseum getMuseum();
 
-    SpaceType getSpaceType();
+    SpaceViewer getSpaceViewer();
 
-    void setSpaceType(SpaceType spaceType);
-
-    Location getStartPosition();
-
-    Location getEndpoint();
+    void setSpaceViewer(SpaceViewer spaceViewer);
 }

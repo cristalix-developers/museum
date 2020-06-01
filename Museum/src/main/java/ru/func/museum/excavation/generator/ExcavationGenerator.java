@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
  */
 public interface ExcavationGenerator {
 
+    int[] getElementsId();
+
     void generateAndShow(Player player);
 
     boolean fastCanBreak(int x, int y, int z);

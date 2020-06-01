@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import ru.func.museum.element.ElementType;
 import ru.func.museum.player.pickaxe.Pickaxe;
 
 /**
@@ -19,14 +18,14 @@ public class HalfSphereGenerator implements ExcavationGenerator {
     private int radius;
     private Location[] blockAble;
     private Material[] ableBlockType;
-    private ElementType[] elements;
+    private int[] ableEntity;
     private World world;
 
-    public HalfSphereGenerator(Location center, int radius, Material[] ableBlockType, ElementType[] elements) {
+    public HalfSphereGenerator(Location center, int radius, Material[] ableBlockType, int... ableEntity) {
         this.center = center;
         this.radius = radius;
         this.ableBlockType = ableBlockType;
-        this.elements = elements;
+        this.ableEntity = ableEntity;
         world = ((CraftWorld) center.getWorld()).getHandle();
 
         int index = 0;
@@ -58,6 +57,11 @@ public class HalfSphereGenerator implements ExcavationGenerator {
     }
 
     @Override
+    public int[] getElementsId() {
+        return ableEntity;
+    }
+
+    @Override
     public void generateAndShow(Player player) {
         PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
         for (Location location : blockAble) {
@@ -72,11 +76,6 @@ public class HalfSphereGenerator implements ExcavationGenerator {
             Material material = ableBlockType[Pickaxe.RANDOM.nextInt(ableBlockType.length)];
             block.block = Block.getByCombinedId(material.getId());
             connection.sendPacket(block);
-
-            ElementType element = elements[Pickaxe.RANDOM.nextInt(elements.length)];
-            int bingo = (int) Math.pow(10, element.getElementRare().getRareScale());
-            if (Pickaxe.RANDOM.nextInt(bingo) + 1 == bingo)
-                element.show(connection, location);
         }
     }
 

@@ -1,3 +1,5 @@
 uri: 'mongodb+srv://root:admin@cluster0-vnynx.mongodb.net/test?retryWrites=true&w=majority'
 database: 'data'
 collection: 'museum'
+entity:
+  - '{"title":"hfjhf fhjh","subs":[{"title":"НеТолик","pieces":[{"vectorX":0.909635208649263,"vectorY":1.0,"vectorZ":-3.2649127793051775,"headRotation":{"x":0.0,"y":0.0,"z":0.0},"material":"DIAMOND_HELMET"},{"vectorX":0.567919688587466,"vectorY":1.0,"vectorZ":-4.500420113223754,"headRotation":{"x":0.0,"y":0.0,"z":0.0},"material":"DIAMOND_HELMET"},{"vectorX":-0.3646042906246407,"vectorY":1.0,"vectorZ":-3.5268287400865574,"headRotation":{"x":0.0,"y":0.0,"z":0.0},"material":"DIAMOND_HELMET"}]},{"title":"Толик","pieces":[{"vectorX":-0.16495022179854857,"vectorY":1.0,"vectorZ":-1.8049418928612226,"headRotation":{"x":0.0,"y":0.0,"z":0.0},"material":"CHAINMAIL_HELMET"}]}],"rare":"USUAL"}'

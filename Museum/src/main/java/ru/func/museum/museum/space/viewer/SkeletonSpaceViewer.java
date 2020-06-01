@@ -9,7 +9,7 @@ import ru.func.museum.player.Archaeologist;
  */
 public class SkeletonSpaceViewer implements SpaceViewer {
     @Override
-    public void show(Archaeologist owner, Player quest) {
+    public void show(Archaeologist owner, Player guest) {
 
     }
 }

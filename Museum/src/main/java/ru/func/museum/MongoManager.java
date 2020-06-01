@@ -13,8 +13,6 @@ import org.bson.codecs.pojo.ClassModel;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import ru.func.museum.element.Element;
-import ru.func.museum.element.ElementType;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.Museum;
@@ -25,10 +23,7 @@ import ru.func.museum.player.PlayerData;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.function.Supplier;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.pojo.Conventions.ANNOTATION_CONVENTION;
@@ -40,15 +35,6 @@ import static org.bson.codecs.pojo.Conventions.CLASS_AND_PROPERTY_CONVENTION;
  */
 public class MongoManager {
     private static MongoCollection<Archaeologist> mongoCollection;
-    private static Supplier<List<Element>> elementTemplate;
-
-    static {
-        Element[] temp = new Element[ElementType.values().length];
-        for(int i = 0; i < temp.length; i++) {
-            temp[i] = new Element(ElementType.values()[i], null, 0);
-        }
-        elementTemplate = () -> Arrays.asList(temp);
-    }
 
     public static void connect(String uri, String database, String collection) {
         PojoCodecProvider codecProvider = PojoCodecProvider.builder()
@@ -88,7 +74,7 @@ public class MongoManager {
                             "Музей в честь " + player.getName(),
                             MuseumTemplateType.DEFAULT,
                             CollectorType.DEFAULT
-                    ))).elementList(elementTemplate.get())
+                    ))).elementList(new ArrayList<>())
                     .friendList(new ArrayList<>())
                     .build();
             mongoCollection.insertOne(found);

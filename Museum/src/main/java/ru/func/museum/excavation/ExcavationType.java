@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import ru.func.museum.element.ElementType;
 import ru.func.museum.excavation.generator.HalfSphereGenerator;
 
 @Getter
@@ -19,7 +18,7 @@ public enum ExcavationType {
                             Material.SANDSTONE,
                             Material.SAND,
                             Material.RED_SANDSTONE,
-                    }, new ElementType[]{ElementType.BONE_DINOSAUR_LEG_LEFT}
+                    }, 0
             ), "Раскопки древнего динозавра",
             100,
             1,
