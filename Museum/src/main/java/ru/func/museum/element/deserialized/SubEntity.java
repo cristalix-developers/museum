@@ -22,6 +22,11 @@ public class SubEntity {
 
     public void show(PlayerConnection connection, Location location, int parentId, int subEntity) {
         int i = 0;
+
+        float randomXAngle = Pickaxe.RANDOM.nextFloat() * 360;
+        float randomYAngle = Pickaxe.RANDOM.nextFloat() * 360;
+        float randomZAngle = Pickaxe.RANDOM.nextFloat() * 360;
+
         int noise = 1 + Pickaxe.RANDOM.nextInt(9);
         for(Piece piece : pieces) {
             EntityArmorStand armorStand = new EntityArmorStand(Pickaxe.WORLD);
@@ -36,9 +41,9 @@ public class SubEntity {
             );
             armorStand.setNoGravity(true);
             armorStand.setHeadPose(new Vector3f(
-                    (float) piece.getHeadRotation().getX(),
-                    (float) piece.getHeadRotation().getY(),
-                    (float) piece.getHeadRotation().getZ()
+                    (float) piece.getHeadRotation().getX() + randomXAngle,
+                    (float) piece.getHeadRotation().getY() + randomYAngle,
+                    (float) piece.getHeadRotation().getZ() + randomZAngle
             ));
             connection.sendPacket(new PacketPlayOutSpawnEntityLiving(armorStand));
             connection.sendPacket(new PacketPlayOutEntityEquipment(

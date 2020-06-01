@@ -38,19 +38,15 @@ public class BeforePacketHandler implements Prepare {
                                 System.out.println(useEntity.a);
                                 int clearId = useEntity.a - useEntity.a % 10;
                                 int parentId = useEntity.a % 100_000_000 / 100_000;
-
-                                System.out.println("clear: " + clearId);
-                                System.out.println("parentId: " + parentId);
-
+                                int id = useEntity.a % 10_000 / 100;
                                 MuseumEntity entity = App.getApp().getMuseumEntities()[parentId];
-                                System.out.println("len: " + entity.getSubs().length);
-                                System.out.println(useEntity.a % 1000);
-                                SubEntity subEntity = entity.getSubs()[useEntity.a % 10_000 / 100];
+
+                                SubEntity subEntity = entity.getSubs()[id];
 
                                 AtomicBoolean clone = new AtomicBoolean(false);
 
                                 archaeologist.getElementList().stream()
-                                        .filter(element -> element.getPiece().equals(subEntity))
+                                        .filter(element -> element.getParentId() == parentId && element.getId() == id)
                                         .findFirst()
                                         .ifPresent(element -> {
                                             clone.set(true);
@@ -74,7 +70,7 @@ public class BeforePacketHandler implements Prepare {
                                     player.sendMessage("§6Вы нашли " + subEntity.getTitle() + ", его редкость: " + entity.getRare().getName());
                                     player.sendTitle("§l§6Находка!", "§eобнаружен " + entity.getRare().getWord() + " фрагмент");
 
-                                    archaeologist.getElementList().add(new Element(subEntity, null));
+                                    archaeologist.getElementList().add(new Element(parentId, id, null));
                                 }
                                 int[] ids = new int[subEntity.getPieces().size()];
                                 for (int i = 0; i < subEntity.getPieces().size(); i++)
