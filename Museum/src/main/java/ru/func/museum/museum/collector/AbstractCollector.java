@@ -1,15 +1,12 @@
 package ru.func.museum.museum.collector;
 
-import org.bukkit.Location;
-import ru.func.museum.museum.Museum;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
 
 public interface AbstractCollector {
-
-    Museum getMuseum();
 
     int getSpeed();
 
     double getCost();
 
-    void move(Location point);
+    void move(PlayerConnection connection, int id, int dx, int dy, int dz, int angle);
 }

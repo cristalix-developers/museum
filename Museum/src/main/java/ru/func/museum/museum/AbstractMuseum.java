@@ -2,6 +2,7 @@ package ru.func.museum.museum;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bukkit.entity.Player;
+import ru.func.museum.App;
 import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.museum.template.MuseumTemplateType;
@@ -14,7 +15,7 @@ public interface AbstractMuseum {
 
     List<Space> getMatrix();
 
-    void show(Archaeologist archaeologist, Player guest);
+    void show(App plugin, Archaeologist archaeologist, Player guest);
 
     String getTitle();
 

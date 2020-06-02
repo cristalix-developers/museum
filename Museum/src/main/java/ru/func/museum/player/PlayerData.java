@@ -22,6 +22,7 @@ import java.util.UUID;
 public class PlayerData implements Archaeologist {
     private String name;
     private String uuid;
+    private long exp;
     private double money;
     private int level;
     private ExcavationType lastExcavation;

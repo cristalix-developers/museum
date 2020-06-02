@@ -19,6 +19,10 @@ public interface Archaeologist {
 
     void setLastExcavation(ExcavationType excavation);
 
+    long getExp();
+
+    void setExp(long exp);
+
     double getMoney();
 
     void setMoney(double money);
