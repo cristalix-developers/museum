@@ -17,5 +17,5 @@ import java.util.function.Supplier;
 public class DefaultMuseum implements MuseumTemplate {
     private Supplier<List<Space>> matrix;
     private String title;
-    private Location[] collectorRoute;
+    private List<Location> collectorRoute;
 }

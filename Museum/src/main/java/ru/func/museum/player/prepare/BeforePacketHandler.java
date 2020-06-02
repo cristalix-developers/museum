@@ -33,9 +33,11 @@ public class BeforePacketHandler implements Prepare {
                     @Override
                     public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) {
                         try {
-                            if (packet instanceof PacketPlayInUseEntity && !playerLocked.get()) {
+                            if (packet instanceof PacketPlayInUseEntity &&
+                                    !playerLocked.get() &&
+                                    ((PacketPlayInUseEntity) packet).a > 100_000_000
+                            ) {
                                 PacketPlayInUseEntity useEntity = (PacketPlayInUseEntity) packet;
-                                System.out.println(useEntity.a);
                                 int clearId = useEntity.a - useEntity.a % 10;
                                 int parentId = useEntity.a % 100_000_000 / 100_000;
                                 int id = useEntity.a % 10_000 / 100;

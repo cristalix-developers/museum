@@ -1,13 +1,11 @@
 package ru.func.museum.museum.space;
 
-import ru.func.museum.museum.AbstractMuseum;
-import ru.func.museum.museum.space.viewer.SpaceViewer;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bukkit.entity.Player;
+import ru.func.museum.player.Archaeologist;
 
+@BsonDiscriminator
 public interface Space {
 
-    AbstractMuseum getMuseum();
-
-    SpaceViewer getSpaceViewer();
-
-    void setSpaceViewer(SpaceViewer spaceViewer);
+    void show(Archaeologist owner, Player guest);
 }

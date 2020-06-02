@@ -14,6 +14,7 @@ public enum ExcavationType {
             new HalfSphereGenerator(
                     new Location(Excavation.WORLD, -72, 88, 260),
                     10,
+                    10,
                     new Material[]{
                             Material.SANDSTONE,
                             Material.SAND,

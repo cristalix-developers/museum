@@ -61,6 +61,7 @@ public final class App extends JavaPlugin implements Listener {
         Archaeologist archaeologist = MongoManager.load(player).getKey();
         archaeologistMap.put(player.getUniqueId(), archaeologist);
         playerPrepares.forEach(prepare -> prepare.execute(player, archaeologist, this));
+        archaeologist.getMuseumList().get(0).show(archaeologist, player);
     }
 
     @EventHandler

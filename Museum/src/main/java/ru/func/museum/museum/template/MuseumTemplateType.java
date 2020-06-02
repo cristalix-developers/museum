@@ -2,9 +2,11 @@ package ru.func.museum.museum.template;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.bukkit.Location;
+import ru.func.museum.museum.space.SkeletonSpaceViewer;
+import ru.func.museum.museum.space.SpaceReflectType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author func 22.05.2020
@@ -15,9 +17,16 @@ import java.util.ArrayList;
 public enum MuseumTemplateType {
 
     DEFAULT(new DefaultMuseum(
-            ArrayList::new,
-            "Музей динозавров",
-            new Location[]{}
+            () -> Arrays.asList(new SkeletonSpaceViewer(
+                    -88, 91, 262,
+                    SpaceReflectType.EAST,
+                    0
+            ), new SkeletonSpaceViewer(
+                    -94, 91, 266,
+                    SpaceReflectType.WEST,
+                    0
+            )), "Музей динозавров",
+            new ArrayList<>()
     )),
     ;
 

@@ -13,17 +13,22 @@ import org.bson.codecs.pojo.ClassModel;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.Museum;
 import ru.func.museum.museum.collector.CollectorType;
+import ru.func.museum.museum.space.SkeletonSpaceViewer;
+import ru.func.museum.museum.space.Space;
 import ru.func.museum.museum.template.MuseumTemplateType;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.PlayerData;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.pojo.Conventions.ANNOTATION_CONVENTION;
@@ -43,6 +48,8 @@ public class MongoManager {
                         ClassModel.builder(Archaeologist.class).enableDiscriminator(true).build(),
                         ClassModel.builder(PlayerData.class).enableDiscriminator(true).build(),
                         ClassModel.builder(AbstractMuseum.class).enableDiscriminator(true).build(),
+                        ClassModel.builder(Space.class).enableDiscriminator(true).build(),
+                        ClassModel.builder(SkeletonSpaceViewer.class).enableDiscriminator(true).build(),
                         ClassModel.builder(Museum.class).enableDiscriminator(true).build()
                 ).automatic(true)
                 .build();
@@ -61,6 +68,7 @@ public class MongoManager {
         Archaeologist found = mongoCollection.find(eq("uuid", player.getUniqueId().toString())).first();
         boolean newPlayer = false;
         if (found == null) {
+            List<Space> spaces = MuseumTemplateType.DEFAULT.getMuseumTemplate().getMatrix().get();
             found = PlayerData.builder()
                     .level(1)
                     .name(player.getName())
@@ -69,13 +77,23 @@ public class MongoManager {
                     .lastExcavation(ExcavationType.NOOP)
                     .onExcavation(false)
                     .pickaxeType(PickaxeType.DEFAULT)
-                    .museumList(Collections.singletonList(new Museum(
-                            MuseumTemplateType.DEFAULT.getMuseumTemplate().getMatrix().get(),
+                    .elementList(Arrays.asList(
+                            new Element(0, 0, spaces.get(0)),
+                            new Element(0, 1, spaces.get(0)),
+                            new Element(0, 2, spaces.get(0)),
+                            new Element(0, 3, spaces.get(0)),
+                            new Element(0, 4, spaces.get(0)),
+                            new Element(0, 0, spaces.get(1)),
+                            new Element(0, 1, spaces.get(1)),
+                            new Element(0, 2, spaces.get(1)),
+                            new Element(0, 3, spaces.get(1)),
+                            new Element(0, 4, spaces.get(1))
+                    )).museumList(Collections.singletonList(new Museum(
+                            spaces,
                             "Музей в честь " + player.getName(),
                             MuseumTemplateType.DEFAULT,
                             CollectorType.DEFAULT
-                    ))).elementList(new ArrayList<>())
-                    .friendList(new ArrayList<>())
+                    ))).friendList(new ArrayList<>())
                     .build();
             mongoCollection.insertOne(found);
             newPlayer = true;

@@ -2,10 +2,9 @@ package ru.func.museum.element.deserialized;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
+import net.minecraft.server.v1_12_R1.Vector3f;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.inventory.ItemStack;
 import ru.func.museum.player.pickaxe.Pickaxe;
 
 import java.util.List;
@@ -29,28 +28,16 @@ public class SubEntity {
 
         int noise = 1 + Pickaxe.RANDOM.nextInt(9);
         for(Piece piece : pieces) {
-            EntityArmorStand armorStand = new EntityArmorStand(Pickaxe.WORLD);
-            armorStand.setCustomName(title);
-            armorStand.id = noise * 100_000_000 + parentId * 100_000 + subEntity * 100 + i;
-            armorStand.setInvisible(true);
-            armorStand.setCustomNameVisible(true);
-            armorStand.setPosition(
-                    location.getBlockX() + Math.abs(piece.getVectorX()) % 1,
-                    location.getBlockY() + Math.abs(piece.getVectorY()) % 1 - 1,
-                    location.getBlockZ() + Math.abs(piece.getVectorZ()) % 1
+            piece.single(
+                    connection,
+                    title,
+                    location,
+                    new Vector3f(randomXAngle, randomYAngle, randomZAngle),
+                    noise,
+                    parentId,
+                    subEntity,
+                    i
             );
-            armorStand.setNoGravity(true);
-            armorStand.setHeadPose(new Vector3f(
-                    (float) piece.getHeadRotation().getX() + randomXAngle,
-                    (float) piece.getHeadRotation().getY() + randomYAngle,
-                    (float) piece.getHeadRotation().getZ() + randomZAngle
-            ));
-            connection.sendPacket(new PacketPlayOutSpawnEntityLiving(armorStand));
-            connection.sendPacket(new PacketPlayOutEntityEquipment(
-                    armorStand.id,
-                    EnumItemSlot.HEAD,
-                    CraftItemStack.asNMSCopy(new ItemStack(piece.getMaterial()))
-            ));
             i++;
         }
     }
