@@ -20,7 +20,6 @@ public class DefaultCollector implements AbstractCollector {
                 id, dx, dy, dz, false
         ));
         if (angle % 90 == 0) {
-            System.out.println(angle);
             connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook(
                     id, 0, 0, 0, (byte) (angle * 256 / 360), (byte) 0, true
             ));

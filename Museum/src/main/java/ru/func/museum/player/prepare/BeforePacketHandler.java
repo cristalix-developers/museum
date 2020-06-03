@@ -2,6 +2,7 @@ package ru.func.museum.player.prepare;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -10,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.func.museum.App;
 import ru.func.museum.element.Element;
-import ru.func.museum.element.deserialized.MuseumEntity;
 import ru.func.museum.element.deserialized.SubEntity;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.excavation.ExcavationType;
@@ -30,8 +30,8 @@ public class BeforePacketHandler implements Prepare {
 
     @Override
     public void execute(Player player, Archaeologist archaeologist, App app) {
-        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
-        final AtomicBoolean playerLocked = new AtomicBoolean(false);
+        val connection = ((CraftPlayer) player).getHandle().playerConnection;
+        val playerLocked = new AtomicBoolean(false);
         connection.networkManager.channel.pipeline().addBefore(
                 "packet_handler",
                 player.getName(),
@@ -43,15 +43,15 @@ public class BeforePacketHandler implements Prepare {
                                     !playerLocked.get() &&
                                     ((PacketPlayInUseEntity) packet).a > 100_000_000
                             ) {
-                                PacketPlayInUseEntity useEntity = (PacketPlayInUseEntity) packet;
+                                val useEntity = (PacketPlayInUseEntity) packet;
                                 int clearId = useEntity.a - useEntity.a % 10;
                                 int parentId = useEntity.a % 100_000_000 / 100_000;
                                 int id = useEntity.a % 10_000 / 100;
-                                MuseumEntity entity = App.getApp().getMuseumEntities()[parentId];
+                                val entity = App.getApp().getMuseumEntities()[parentId];
 
-                                SubEntity subEntity = entity.getSubs()[id];
+                                val subEntity = entity.getSubs()[id];
 
-                                AtomicBoolean clone = new AtomicBoolean(false);
+                                val clone = new AtomicBoolean(false);
 
                                 archaeologist.getElementList().stream()
                                         .filter(element -> element.getParentId() == parentId && element.getId() == id)
@@ -83,7 +83,7 @@ public class BeforePacketHandler implements Prepare {
                                 int[] ids = new int[subEntity.getPieces().size()];
                                 for (int i = 0; i < subEntity.getPieces().size(); i++)
                                     ids[i] = clearId + i;
-                                AtomicInteger integer = new AtomicInteger(0);
+                                val integer = new AtomicInteger(0);
                                 MinecraftServer.getServer().postToMainThread(() -> {
                                     playerLocked.set(true);
                                     new BukkitRunnable() {
@@ -108,7 +108,7 @@ public class BeforePacketHandler implements Prepare {
                                     }.runTaskTimerAsynchronously(app, 5L, 3L);
                                 });
                             } else if (packet instanceof PacketPlayInUseItem && archaeologist.isOnExcavation()) {
-                                PacketPlayInUseItem pc = (PacketPlayInUseItem) packet;
+                                val pc = (PacketPlayInUseItem) packet;
                                 if (pc.c.equals(EnumHand.OFF_HAND) || archaeologist.getLastExcavation()
                                         .getExcavation()
                                         .getExcavationGenerator()
@@ -117,9 +117,9 @@ public class BeforePacketHandler implements Prepare {
                                     // Genius
                                     pc.a = dump;
                             } else if (packet instanceof PacketPlayInBlockDig) {
-                                PacketPlayInBlockDig bd = (PacketPlayInBlockDig) packet;
-                                ExcavationType lastExcavation = archaeologist.getLastExcavation();
-                                Excavation excavation = lastExcavation.getExcavation();
+                                val bd = (PacketPlayInBlockDig) packet;
+                                val lastExcavation = archaeologist.getLastExcavation();
+                                val excavation = lastExcavation.getExcavation();
 
                                 boolean valid = archaeologist.isOnExcavation() &&
                                         !lastExcavation.equals(ExcavationType.NOOP) &&
@@ -129,7 +129,7 @@ public class BeforePacketHandler implements Prepare {
                                     archaeologist.giveExp(player, 5);
                                     int[] ids = excavation.getExcavationGenerator().getElementsId();
                                     int parentId = ids[Pickaxe.RANDOM.nextInt(ids.length)];
-                                    MuseumEntity parent = App.getApp().getMuseumEntities()[parentId];
+                                    val parent = App.getApp().getMuseumEntities()[parentId];
                                     int bingo = (int) Math.pow(10, parent.getRare().getRareScale());
                                     MinecraftServer.getServer().postToMainThread(() -> {
                                         archaeologist.getPickaxeType().getPickaxe().dig(((CraftPlayer) player).getHandle().playerConnection, excavation, bd.a);

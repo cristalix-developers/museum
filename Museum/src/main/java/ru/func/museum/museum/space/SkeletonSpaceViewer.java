@@ -1,9 +1,6 @@
 package ru.func.museum.museum.space;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import net.minecraft.server.v1_12_R1.Vector3f;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -12,7 +9,6 @@ import org.bukkit.util.EulerAngle;
 import ru.func.museum.App;
 import ru.func.museum.element.Element;
 import ru.func.museum.element.deserialized.Piece;
-import ru.func.museum.element.deserialized.SubEntity;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.pickaxe.Pickaxe;
 
@@ -38,7 +34,7 @@ public class SkeletonSpaceViewer implements Space {
     public void show(Archaeologist owner, Player guest) {
         if (entity < 0)
             return;
-        SubEntity[] subEntities = App.getApp().getMuseumEntities()[entity].getSubs();
+        val subEntities = App.getApp().getMuseumEntities()[entity].getSubs();
         for (int i = 0; i < subEntities.length; i++) {
             List<Piece> pieces = subEntities[i].getPieces();
             for (int j = 0; j < pieces.size(); j++) {

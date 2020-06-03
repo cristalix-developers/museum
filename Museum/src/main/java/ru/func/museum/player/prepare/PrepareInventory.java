@@ -1,5 +1,6 @@
 package ru.func.museum.player.prepare;
 
+import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -27,9 +28,10 @@ public class PrepareInventory implements Prepare {
 
     @Override
     public void execute(Player player, Archaeologist archaeologist, App app) {
-        player.getInventory().clear();
-        player.getInventory().setItem(0, menu);
-        player.getInventory().setItem(1, archaeologist.getPickaxeType().getPickaxe()
+        val inventory = player.getInventory();
+        inventory.clear();
+        inventory.setItem(0, menu);
+        inventory.setItem(1, archaeologist.getPickaxeType().getPickaxe()
                 .getItem()
                 .get()
                 .displayName("§f>> §l§6Кирки [§fПКМ§6] §f<<")

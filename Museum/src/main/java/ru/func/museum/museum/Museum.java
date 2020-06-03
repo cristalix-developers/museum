@@ -1,12 +1,11 @@
 package ru.func.museum.museum;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import net.minecraft.server.v1_12_R1.*;
+import lombok.*;
+import net.minecraft.server.v1_12_R1.EntityArmorStand;
+import net.minecraft.server.v1_12_R1.EnumItemSlot;
+import net.minecraft.server.v1_12_R1.PacketPlayOutEntityEquipment;
+import net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityLiving;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
@@ -39,7 +38,7 @@ public class Museum implements AbstractMuseum {
     @Override
     public void show(App plugin, Archaeologist archaeologist, Player guest) {
         matrix.forEach(space -> space.show(archaeologist, guest));
-        List<Location> locations = museumTemplateType.getMuseumTemplate().getCollectorRoute();
+        val locations = museumTemplateType.getMuseumTemplate().getCollectorRoute();
         int[] vertex = new int[]{
                 Integer.MIN_VALUE,
                 Integer.MAX_VALUE,
@@ -47,9 +46,9 @@ public class Museum implements AbstractMuseum {
                 Integer.MAX_VALUE,
         };
 
-        PlayerConnection connection = ((CraftPlayer) guest).getHandle().playerConnection;
+        val connection = ((CraftPlayer) guest).getHandle().playerConnection;
 
-        EntityArmorStand armorStand = new EntityArmorStand(Pickaxe.WORLD);
+        val armorStand = new EntityArmorStand(Pickaxe.WORLD);
         armorStand.setCustomName("братик, не ругайся!");
         armorStand.id = armorStand.hashCode();
         armorStand.setInvisible(true);
@@ -67,7 +66,7 @@ public class Museum implements AbstractMuseum {
                 CraftItemStack.asNMSCopy(new ItemStack(Material.WORKBENCH))
         ));
 
-        for (Location location : locations) {
+        for (val location : locations) {
             if (location.getBlockX() > vertex[0])
                 vertex[0] = location.getBlockX();
             else if (location.getBlockX() < vertex[1])
@@ -83,7 +82,7 @@ public class Museum implements AbstractMuseum {
         int dZ = vertex[2] - vertex[3];
         int p = (dX + dZ) * 2;
 
-        AtomicInteger counter = new AtomicInteger(0);
+        val counter = new AtomicInteger(0);
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             int dx = 0;

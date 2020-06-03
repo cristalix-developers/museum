@@ -5,9 +5,9 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
+import lombok.val;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
-import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.ClassModel;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bukkit.Bukkit;
@@ -41,7 +41,7 @@ public class MongoManager {
     private static MongoCollection<Archaeologist> mongoCollection;
 
     public static void connect(String uri, String database, String collection) {
-        PojoCodecProvider codecProvider = PojoCodecProvider.builder()
+        val codecProvider = PojoCodecProvider.builder()
                 .conventions(ImmutableList.of(CLASS_AND_PROPERTY_CONVENTION, ANNOTATION_CONVENTION))
                 .register(
                         ClassModel.builder(Archaeologist.class).enableDiscriminator(true).build(),
@@ -52,7 +52,7 @@ public class MongoManager {
                         ClassModel.builder(Museum.class).enableDiscriminator(true).build()
                 ).automatic(true)
                 .build();
-        CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
+        val codecRegistry = CodecRegistries.fromRegistries(
                 MongoClientSettings.getDefaultCodecRegistry(),
                 CodecRegistries.fromProviders(codecProvider)
         );

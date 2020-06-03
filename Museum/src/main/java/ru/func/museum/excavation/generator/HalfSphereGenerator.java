@@ -1,5 +1,6 @@
 package ru.func.museum.excavation.generator;
 
+import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +41,7 @@ public class HalfSphereGenerator implements ExcavationGenerator {
                     if (y + center.getBlockY() < 1)
                         continue;
                     if (fastCanBreak(center.getBlockX() + x, center.getBlockY() + y, center.getBlockZ() + z)) {
-                        Location tempLocation = center.subtract(x, -y, z);
+                        val tempLocation = center.subtract(x, -y, z);
                         temp[index] = new Location(
                                 tempLocation.getWorld(),
                                 tempLocation.getX(),
@@ -65,14 +66,14 @@ public class HalfSphereGenerator implements ExcavationGenerator {
 
     @Override
     public void generateAndShow(Player player) {
-        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
-        for (Location location : blockAble) {
+        val connection = ((CraftPlayer) player).getHandle().playerConnection;
+        for (val location : blockAble) {
             PacketPlayOutBlockChange block = new PacketPlayOutBlockChange(world, new BlockPosition(
                     location.getX(),
                     location.getY(),
                     location.getZ()
             ));
-            Material material = ableBlockType[Pickaxe.RANDOM.nextInt(ableBlockType.length)];
+            val material = ableBlockType[Pickaxe.RANDOM.nextInt(ableBlockType.length)];
             block.block = Block.getByCombinedId(material.getId());
             connection.sendPacket(block);
         }

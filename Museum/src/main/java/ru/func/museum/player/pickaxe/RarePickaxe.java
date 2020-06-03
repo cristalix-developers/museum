@@ -1,5 +1,6 @@
 package ru.func.museum.player.pickaxe;
 
+import lombok.val;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayOutBlockBreakAnimation;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
@@ -24,7 +25,7 @@ public class RarePickaxe implements Pickaxe {
 
     @Override
     public void dig(PlayerConnection connection, Excavation excavation, BlockPosition blockPosition) {
-        for (BlockPosition position : new BlockPosition[]{
+        for (val position : new BlockPosition[]{
                 blockPosition.east(),
                 blockPosition.north(),
                 blockPosition.down(),
