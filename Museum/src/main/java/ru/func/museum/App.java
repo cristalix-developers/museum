@@ -5,10 +5,9 @@ import lombok.Getter;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.inventory.IInventoryService;
@@ -17,19 +16,20 @@ import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 import ru.func.museum.element.deserialized.EntityDeserializer;
 import ru.func.museum.element.deserialized.MuseumEntity;
+import ru.func.museum.excavation.Excavation;
+import ru.func.museum.listener.CancelEvent;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.prepare.PreparePlayer;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Stream;
 
+@Getter
 public final class App extends JavaPlugin implements Listener {
 
     @Getter
     private static App app;
     private Map<UUID, Archaeologist> archaeologistMap = Maps.newHashMap();
-    @Getter
     private MuseumEntity[] museumEntities;
 
     @Override
@@ -40,6 +40,7 @@ public final class App extends JavaPlugin implements Listener {
         CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
         Bukkit.getPluginManager().registerEvents(this, this);
+        Bukkit.getPluginManager().registerEvents(new CancelEvent(), this);
 
         MongoManager.connect(
                 getConfig().getString("uri"),
@@ -49,17 +50,32 @@ public final class App extends JavaPlugin implements Listener {
 
         // Десериализация данных о существах
         museumEntities = new EntityDeserializer().execute(getConfig().getStringList("entity"));
+
+        Excavation.WORLD.setGameRuleValue("mobGriefing", "false");
+
+
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         val player = e.getPlayer();
-        val archaeologist = MongoManager.load(player);
-        archaeologistMap.put(player.getUniqueId(), archaeologist);
-        Stream.of(PreparePlayer.values())
-                .map(PreparePlayer::getPrepare)
-                .forEach(prepare -> prepare.execute(player, archaeologist, this));
+        for (val prepare : PreparePlayer.values())
+            prepare.getPrepare().execute(player, archaeologistMap.get(player.getUniqueId()), this);
         e.setJoinMessage(null);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerLogin(PlayerLoginEvent e) {
+        if (!e.getResult().equals(PlayerLoginEvent.Result.ALLOWED))
+            archaeologistMap.remove(e.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void preLoadPlayerEvent(AsyncPlayerPreLoginEvent e) {
+        if (!e.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.ALLOWED))
+            return;
+        val archaeologist = MongoManager.load(e.getName(), e.getUniqueId().toString());
+        archaeologistMap.put(e.getUniqueId(), archaeologist);
     }
 
     @EventHandler
@@ -72,10 +88,7 @@ public final class App extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent e) {
-        archaeologistMap.get(e.getPlayer().getUniqueId())
-                .getLastExcavation()
-                .getExcavation()
-                .getExcavationGenerator()
-                .generateAndShow(e.getPlayer());
+        Archaeologist archaeologist = archaeologistMap.get(e.getPlayer().getUniqueId());
+        archaeologist.getLastExcavation().getExcavation().load(archaeologist, e.getPlayer());
     }
 }

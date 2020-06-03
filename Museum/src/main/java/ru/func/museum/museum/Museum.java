@@ -5,12 +5,12 @@ import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import net.minecraft.server.v1_12_R1.PacketPlayOutEntityEquipment;
 import net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityLiving;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import ru.func.museum.App;
 import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.museum.space.Space;
@@ -38,7 +38,7 @@ public class Museum implements AbstractMuseum {
     @Override
     public void show(App plugin, Archaeologist archaeologist, Player guest) {
         matrix.forEach(space -> space.show(archaeologist, guest));
-        val locations = museumTemplateType.getMuseumTemplate().getCollectorRoute();
+
         int[] vertex = new int[]{
                 Integer.MIN_VALUE,
                 Integer.MAX_VALUE,
@@ -46,9 +46,10 @@ public class Museum implements AbstractMuseum {
                 Integer.MAX_VALUE,
         };
 
+        val locations = museumTemplateType.getMuseumTemplate().getCollectorRoute();
         val connection = ((CraftPlayer) guest).getHandle().playerConnection;
-
         val armorStand = new EntityArmorStand(Pickaxe.WORLD);
+
         armorStand.setCustomName("братик, не ругайся!");
         armorStand.id = armorStand.hashCode();
         armorStand.setInvisible(true);
@@ -84,32 +85,38 @@ public class Museum implements AbstractMuseum {
 
         val counter = new AtomicInteger(0);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            int dx = 0;
-            int dz = 0;
-            int angle = 1;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!guest.isOnline() || archaeologist.isOnExcavation())
+                    cancel();
 
-            int count = counter.get();
-            if (count < dX) {
-                dx = 4000;
-                if (count + 1 == dX)
-                    angle = 0;
-            } else if (count - dX < dZ) {
-                dz = 4000;
-                if (count - dX + 1 == dZ)
-                    angle = 90;
-            } else if (count - dX - dZ < dX) {
-                dx = -4000;
-                if (count - dX - dZ + 1 == dX)
-                    angle = 180;
-            } else {
-                if (count - dX - dZ - dX + 1 == dZ)
-                    angle = -90;
-                dz = -4000;
+                int dx = 0;
+                int dz = 0;
+                int angle = 1;
+
+                int count = counter.get();
+                if (count < dX) {
+                    dx = 4000;
+                    if (count + 1 == dX)
+                        angle = 0;
+                } else if (count - dX < dZ) {
+                    dz = 4000;
+                    if (count - dX + 1 == dZ)
+                        angle = 90;
+                } else if (count - dX - dZ < dX) {
+                    dx = -4000;
+                    if (count - dX - dZ + 1 == dX)
+                        angle = 180;
+                } else {
+                    if (count - dX - dZ - dX + 1 == dZ)
+                        angle = -90;
+                    dz = -4000;
+                }
+                collectorType.getCollector().move(connection, armorStand.id, dx, 0, dz, angle);
+
+                counter.set(counter.incrementAndGet() % p);
             }
-            collectorType.getCollector().move(connection, armorStand.id, dx, 0, dz, angle);
-
-            counter.set(counter.incrementAndGet() % p);
-        }, 10, 5);
+        }.runTaskTimerAsynchronously(plugin, 5, 5);
     }
 }

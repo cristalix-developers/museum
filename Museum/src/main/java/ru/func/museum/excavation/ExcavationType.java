@@ -20,7 +20,7 @@ public enum ExcavationType {
                             Material.SAND,
                             Material.RED_SANDSTONE,
                     }, 0
-            ), "Раскопки древнего динозавра",
+            ), "раскопки древнего динозавра",
             100,
             1,
             new Location(Excavation.WORLD, -50, 83, 242),

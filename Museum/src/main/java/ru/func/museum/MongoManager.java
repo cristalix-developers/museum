@@ -11,7 +11,6 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.pojo.ClassModel;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
@@ -63,14 +62,14 @@ public class MongoManager {
         Bukkit.getConsoleSender().sendMessage("§aConnected to database successfully.");
     }
 
-    public static Archaeologist load(Player player) {
-        Archaeologist found = mongoCollection.find(eq("uuid", player.getUniqueId().toString())).first();
+    public static Archaeologist load(String name, String uuid) {
+        Archaeologist found = mongoCollection.find(eq("uuid", uuid)).first();
         if (found == null) {
             List<Space> spaces = MuseumTemplateType.DEFAULT.getMuseumTemplate().getMatrix().get();
             found = PlayerData.builder()
                     .level(1)
-                    .name(player.getName())
-                    .uuid(player.getUniqueId().toString())
+                    .name(name)
+                    .uuid(uuid)
                     .money(1000)
                     .exp(0)
                     .currentMuseum(0)
@@ -90,7 +89,7 @@ public class MongoManager {
                             new Element(0, 4, spaces.get(1))
                     )).museumList(Collections.singletonList(new Museum(
                             spaces,
-                            "Музей в честь " + player.getName(),
+                            "Музей в честь " + name,
                             MuseumTemplateType.DEFAULT,
                             CollectorType.DEFAULT
                     ))).friendList(new ArrayList<>())
