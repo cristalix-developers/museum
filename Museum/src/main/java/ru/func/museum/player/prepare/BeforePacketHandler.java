@@ -132,13 +132,13 @@ public class BeforePacketHandler implements Prepare {
                                     val parent = App.getApp().getMuseumEntities()[parentId];
                                     int bingo = (int) Math.pow(10, parent.getRare().getRareScale());
                                     MinecraftServer.getServer().postToMainThread(() -> {
-                                        archaeologist.getPickaxeType().getPickaxe().dig(((CraftPlayer) player).getHandle().playerConnection, excavation, bd.a);
+                                        archaeologist.getPickaxeType().getPickaxe().dig(connection, excavation, bd.a);
                                         if (Pickaxe.RANDOM.nextInt(bingo) + 1 == bingo) {
                                             archaeologist.giveExp(player, 25);
                                             SubEntity[] subEntity = parent.getSubs();
                                             int id = Pickaxe.RANDOM.nextInt(subEntity.length);
                                             subEntity[id].show(
-                                                    ((CraftPlayer) player).getHandle().playerConnection,
+                                                    connection,
                                                     new Location(Excavation.WORLD, bd.a.getX(), bd.a.getY(), bd.a.getZ()),
                                                     parentId,
                                                     id

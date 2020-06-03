@@ -10,6 +10,11 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.cristalix.core.CoreApi;
+import ru.cristalix.core.inventory.IInventoryService;
+import ru.cristalix.core.inventory.InventoryService;
+import ru.cristalix.core.scoreboard.IScoreboardService;
+import ru.cristalix.core.scoreboard.ScoreboardService;
 import ru.func.museum.element.deserialized.EntityDeserializer;
 import ru.func.museum.element.deserialized.MuseumEntity;
 import ru.func.museum.player.Archaeologist;
@@ -31,8 +36,8 @@ public final class App extends JavaPlugin implements Listener {
     public void onEnable() {
         app = this;
 
-        //CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
-        //CoreApi.get().registerService(IInventoryService.class, new InventoryService());
+        CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
+        CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
         Bukkit.getPluginManager().registerEvents(this, this);
 
