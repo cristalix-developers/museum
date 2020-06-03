@@ -18,4 +18,5 @@ public class DefaultMuseum implements MuseumTemplate {
     private Supplier<List<Space>> matrix;
     private String title;
     private List<Location> collectorRoute;
+    private Location spawn;
 }

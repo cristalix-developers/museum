@@ -32,7 +32,7 @@ public enum MuseumTemplateType {
                     new Location(Excavation.WORLD, -91, 90, 257),
                     new Location(Excavation.WORLD, -91, 90, 278),
                     new Location(Excavation.WORLD, -93, 90, 278)
-            )
+            ), new Location(Excavation.WORLD, -91, 90, 251)
     )),
     ;
 

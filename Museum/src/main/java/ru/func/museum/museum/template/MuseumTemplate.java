@@ -16,4 +16,6 @@ public interface MuseumTemplate {
     String getTitle();
 
     List<Location> getCollectorRoute();
+
+    Location getSpawn();
 }

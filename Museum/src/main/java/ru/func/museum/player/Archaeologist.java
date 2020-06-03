@@ -1,6 +1,7 @@
 package ru.func.museum.player;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
@@ -13,6 +14,8 @@ import java.util.UUID;
 public interface Archaeologist {
     String getUuid();
 
+    int getCurrentMuseum();
+
     String getName();
 
     ExcavationType getLastExcavation();
@@ -21,7 +24,11 @@ public interface Archaeologist {
 
     long getExp();
 
-    void setExp(long exp);
+    void noticeUpgrade(Player player);
+    
+    void giveExp(Player player, long exp);
+    
+    long expNeed();
 
     double getMoney();
 

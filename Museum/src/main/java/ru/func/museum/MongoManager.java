@@ -5,7 +5,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
-import javafx.util.Pair;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -64,9 +63,8 @@ public class MongoManager {
         Bukkit.getConsoleSender().sendMessage("§aConnected to database successfully.");
     }
 
-    public static Pair<Archaeologist, Boolean> load(Player player) {
+    public static Archaeologist load(Player player) {
         Archaeologist found = mongoCollection.find(eq("uuid", player.getUniqueId().toString())).first();
-        boolean newPlayer = false;
         if (found == null) {
             List<Space> spaces = MuseumTemplateType.DEFAULT.getMuseumTemplate().getMatrix().get();
             found = PlayerData.builder()
@@ -74,8 +72,10 @@ public class MongoManager {
                     .name(player.getName())
                     .uuid(player.getUniqueId().toString())
                     .money(1000)
-                    .lastExcavation(ExcavationType.NOOP)
-                    .onExcavation(false)
+                    .exp(0)
+                    .currentMuseum(0)
+                    .lastExcavation(ExcavationType.DIRT)
+                    .onExcavation(true)
                     .pickaxeType(PickaxeType.DEFAULT)
                     .elementList(Arrays.asList(
                             new Element(0, 0, spaces.get(0)),
@@ -96,13 +96,13 @@ public class MongoManager {
                     ))).friendList(new ArrayList<>())
                     .build();
             mongoCollection.insertOne(found);
-            newPlayer = true;
         }
         Bukkit.getConsoleSender().sendMessage("§aLogged: " + found.toString());
-        return new Pair<>(found, newPlayer);
+        return found;
     }
 
     public static Archaeologist save(Archaeologist archaeologist) {
+        //archaeologist.setOnExcavation(false);
         mongoCollection.updateOne(eq("uuid", archaeologist.getUuid()), new Document("$set", archaeologist));
         Bukkit.getConsoleSender().sendMessage("§aSaved: " + archaeologist.toString());
         return archaeologist;

@@ -1,6 +1,7 @@
 package ru.func.museum.player;
 
 import lombok.*;
+import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
@@ -31,4 +32,24 @@ public class PlayerData implements Archaeologist {
     private PickaxeType pickaxeType;
     private List<AbstractMuseum> museumList;
     private List<Element> elementList;
+    private int currentMuseum;
+
+    @Override
+    public void noticeUpgrade(Player player) {
+        player.sendMessage("§7[§l§bi§7] Вы достигли §l§b" + level + " §7уровеня! До следующего уровня осталось §l§b" + expNeed() + "§7 опыта.");
+    }
+
+    @Override
+    public void giveExp(Player player, long exp) {
+        this.exp += exp;
+        if (expNeed() <= 0) {
+            level++;
+            noticeUpgrade(player);
+        }
+    }
+
+    @Override
+    public long expNeed() {
+        return (long) (Math.pow(level, 2) * 10 - level * 5) * 10 - this.exp;
+    }
 }
