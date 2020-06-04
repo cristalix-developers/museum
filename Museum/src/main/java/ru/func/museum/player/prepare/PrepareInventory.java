@@ -20,7 +20,6 @@ public class PrepareInventory implements Prepare {
             .loreLines(
                     "",
                     "§7Это меню, с помощью которого,",
-                    "§7вы можете выбирать экспидицию,",
                     "§7настраивать музей, приглашать",
                     "§7друзей, а так же смотреть",
                     "§7подробную статистику."
@@ -34,8 +33,13 @@ public class PrepareInventory implements Prepare {
         inventory.setItem(1, archaeologist.getPickaxeType().getPickaxe()
                 .getItem()
                 .get()
-                .displayName("§f>> §l§6Кирки [§fПКМ§6] §f<<")
-                .loreLines("", "§7Нажмите правую кнопку", "§7мыши, что бы открыть", "§7меню с магазином.")
-                .build());
+                .displayName("§f>> §l§6Раскопки [§fПКМ§6] §f<<")
+                .loreLines(
+                        "",
+                        "§7Нажмите правую кнопку",
+                        "§7мыши, что бы открыть",
+                        "§7меню, где вы можете",
+                        "§7выбирать экспидицию и кирку"
+                ).build());
     }
 }

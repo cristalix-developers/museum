@@ -32,7 +32,8 @@ public class PlayerData implements Archaeologist {
     private PickaxeType pickaxeType;
     private List<AbstractMuseum> museumList;
     private List<Element> elementList;
-    private int currentMuseum;
+    private transient AbstractMuseum currentMuseum;
+    private int excavationCount;
 
     @Override
     public void noticeUpgrade(Player player) {

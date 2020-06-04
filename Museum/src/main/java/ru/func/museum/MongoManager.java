@@ -15,7 +15,7 @@ import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.Museum;
-import ru.func.museum.museum.collector.CollectorType;
+import ru.func.museum.museum.CollectorType;
 import ru.func.museum.museum.space.SkeletonSpaceViewer;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.museum.template.MuseumTemplateType;
@@ -23,10 +23,7 @@ import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.PlayerData;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.pojo.Conventions.ANNOTATION_CONVENTION;
@@ -72,7 +69,7 @@ public class MongoManager {
                     .uuid(uuid)
                     .money(1000)
                     .exp(0)
-                    .currentMuseum(0)
+                    .excavationCount(0)
                     .lastExcavation(ExcavationType.DIRT)
                     .onExcavation(true)
                     .pickaxeType(PickaxeType.DEFAULT)
@@ -88,10 +85,11 @@ public class MongoManager {
                             new Element(0, 3, spaces.get(1)),
                             new Element(0, 4, spaces.get(1))
                     )).museumList(Collections.singletonList(new Museum(
+                            new Date(),
                             spaces,
                             "Музей в честь " + name,
                             MuseumTemplateType.DEFAULT,
-                            CollectorType.DEFAULT
+                            CollectorType.NONE
                     ))).friendList(new ArrayList<>())
                     .build();
             mongoCollection.insertOne(found);
@@ -101,7 +99,6 @@ public class MongoManager {
     }
 
     public static Archaeologist save(Archaeologist archaeologist) {
-        //archaeologist.setOnExcavation(false);
         mongoCollection.updateOne(eq("uuid", archaeologist.getUuid()), new Document("$set", archaeologist));
         Bukkit.getConsoleSender().sendMessage("§aSaved: " + archaeologist.toString());
         return archaeologist;

@@ -1,23 +1,20 @@
 package ru.func.museum.museum;
 
 import lombok.*;
-import net.minecraft.server.v1_12_R1.EntityArmorStand;
-import net.minecraft.server.v1_12_R1.EnumItemSlot;
-import net.minecraft.server.v1_12_R1.PacketPlayOutEntityEquipment;
-import net.minecraft.server.v1_12_R1.PacketPlayOutSpawnEntityLiving;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import ru.cristalix.core.item.Items;
 import ru.func.museum.App;
-import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.museum.template.MuseumTemplateType;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.pickaxe.Pickaxe;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -27,17 +24,30 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Setter
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 @NoArgsConstructor
 public class Museum implements AbstractMuseum {
+    @NonNull
+    private Date date;
+    private long views;
+    private transient Archaeologist owner;
+    @NonNull
     private List<Space> matrix;
+    @NonNull
     private String title;
+    @NonNull
     private MuseumTemplateType museumTemplateType;
+    @NonNull
     private CollectorType collectorType;
 
     @Override
-    public void show(App plugin, Archaeologist archaeologist, Player guest) {
+    public void load(App plugin, Archaeologist archaeologist, Player guest) {
+        owner = archaeologist;
+        views++;
+        System.out.println(1);
         matrix.forEach(space -> space.show(archaeologist, guest));
+        System.out.println(2);
+        guest.teleport(museumTemplateType.getMuseumTemplate().getSpawn());
 
         int[] vertex = new int[]{
                 Integer.MIN_VALUE,
@@ -46,12 +56,31 @@ public class Museum implements AbstractMuseum {
                 Integer.MAX_VALUE,
         };
 
+        val guestArchaeologist = plugin.getArchaeologistMap().get(guest.getUniqueId());
+        guestArchaeologist.setCurrentMuseum(this);
+
+        guest.getInventory().remove(Material.SADDLE);
+
+        if (!guestArchaeologist.equals(owner)) {
+            guest.getInventory().setItem(8, Items.builder()
+                    .type(Material.SADDLE)
+                    .displayName("§bВернуться")
+                    .loreLines(
+                            "",
+                            "§7Нажмите ПКМ, что бы вернуться."
+                    ).build()
+            );
+        }
+
+        if (collectorType.equals(CollectorType.NONE))
+            return;
+
         val locations = museumTemplateType.getMuseumTemplate().getCollectorRoute();
         val connection = ((CraftPlayer) guest).getHandle().playerConnection;
         val armorStand = new EntityArmorStand(Pickaxe.WORLD);
 
-        armorStand.setCustomName("братик, не ругайся!");
-        armorStand.id = armorStand.hashCode();
+        armorStand.setCustomName("§6Коллектор " + collectorType.getName());
+        armorStand.id = 999;
         armorStand.setInvisible(true);
         armorStand.setCustomNameVisible(true);
         armorStand.setPosition(
@@ -64,7 +93,7 @@ public class Museum implements AbstractMuseum {
         connection.sendPacket(new PacketPlayOutEntityEquipment(
                 armorStand.id,
                 EnumItemSlot.HEAD,
-                CraftItemStack.asNMSCopy(new ItemStack(Material.WORKBENCH))
+                CraftItemStack.asNMSCopy(collectorType.getHead())
         ));
 
         for (val location : locations) {
@@ -84,11 +113,12 @@ public class Museum implements AbstractMuseum {
         int p = (dX + dZ) * 2;
 
         val counter = new AtomicInteger(0);
+        val id = guestArchaeologist.getCurrentMuseum();
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!guest.isOnline() || archaeologist.isOnExcavation())
+                if (!guest.isOnline() || archaeologist.isOnExcavation() || id != guestArchaeologist.getCurrentMuseum())
                     cancel();
 
                 int dx = 0;
@@ -113,10 +143,16 @@ public class Museum implements AbstractMuseum {
                         angle = -90;
                     dz = -4000;
                 }
-                collectorType.getCollector().move(connection, armorStand.id, dx, 0, dz, angle);
+                collectorType.move(connection, armorStand.id, dx, 0, dz, angle);
 
                 counter.set(counter.incrementAndGet() % p);
             }
-        }.runTaskTimerAsynchronously(plugin, 5, 5);
+        }.runTaskTimerAsynchronously(plugin, 5, 20 - collectorType.getSpeed());
+    }
+
+    @Override
+    public void unload(App plugin, Archaeologist archaeologist, Player guest) {
+        matrix.forEach(space -> space.hide(archaeologist, guest));
+        ((CraftPlayer) guest).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(999));
     }
 }

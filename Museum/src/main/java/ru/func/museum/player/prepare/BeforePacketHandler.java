@@ -47,10 +47,9 @@ public class BeforePacketHandler implements Prepare {
                                 int clearId = useEntity.a - useEntity.a % 10;
                                 int parentId = useEntity.a % 100_000_000 / 100_000;
                                 int id = useEntity.a % 10_000 / 100;
+
                                 val entity = App.getApp().getMuseumEntities()[parentId];
-
                                 val subEntity = entity.getSubs()[id];
-
                                 val clone = new AtomicBoolean(false);
 
                                 archaeologist.getElementList().stream()
@@ -124,7 +123,7 @@ public class BeforePacketHandler implements Prepare {
                                 boolean valid = archaeologist.isOnExcavation() &&
                                         !lastExcavation.equals(ExcavationType.NOOP) &&
                                         excavation.getExcavationGenerator().fastCanBreak(bd.a.getX(), bd.a.getY(), bd.a.getZ());
-                                if (valid && bd.c.equals(PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK)) {
+                                if (valid && bd.c == PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK) {
                                     // Игрок на раскопках, блок находится в шахте
                                     archaeologist.giveExp(player, 5);
                                     int[] ids = excavation.getExcavationGenerator().getElementsId();
@@ -145,7 +144,7 @@ public class BeforePacketHandler implements Prepare {
                                             );
                                         }
                                     });
-                                } else if (!valid && bd.c.equals(PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK)) {
+                                } else if (!valid && bd.c == PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK) {
                                     // Genius
                                     bd.c = PacketPlayInBlockDig.EnumPlayerDigType.ABORT_DESTROY_BLOCK;
                                 }

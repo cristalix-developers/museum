@@ -10,10 +10,11 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum PickaxeType {
-    DEFAULT(new DefaultPickaxe()),
-    RARE(new RarePickaxe()),
-    ULTRA(new UltraPickaxe())
+    DEFAULT("любительская", new DefaultPickaxe()),
+    RARE("профессиональная", new RarePickaxe()),
+    ULTRA("престижная", new UltraPickaxe())
     ;
 
+    private String name;
     private Pickaxe pickaxe;
 }

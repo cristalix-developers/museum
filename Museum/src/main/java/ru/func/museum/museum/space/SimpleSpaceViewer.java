@@ -12,4 +12,9 @@ public class SimpleSpaceViewer implements Space {
     public void show(Archaeologist owner, Player quest) {
 
     }
+
+    @Override
+    public void hide(Archaeologist owner, Player guest) {
+
+    }
 }

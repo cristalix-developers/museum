@@ -1,6 +1,7 @@
 package ru.func.museum.museum.space;
 
 import lombok.*;
+import net.minecraft.server.v1_12_R1.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_12_R1.Vector3f;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -13,6 +14,7 @@ import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.pickaxe.Pickaxe;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author func 22.05.2020
@@ -21,19 +23,31 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SkeletonSpaceViewer implements Space {
 
+    @NonNull
     private int startDotX;
+    @NonNull
     private int startDotY;
+    @NonNull
     private int startDotZ;
+    @NonNull
     private SpaceReflectType reflection;
+    @NonNull
     private int entity;
+    private transient int seed;
+    private transient int amount = 0;
+    private transient Random random;
 
     @Override
     public void show(Archaeologist owner, Player guest) {
         if (entity < 0)
             return;
+
+        seed = Pickaxe.RANDOM.nextInt(999);
+        random = new Random(seed);
+
         val subEntities = App.getApp().getMuseumEntities()[entity].getSubs();
         for (int i = 0; i < subEntities.length; i++) {
             List<Piece> pieces = subEntities[i].getPieces();
@@ -55,11 +69,23 @@ public class SkeletonSpaceViewer implements Space {
                                         (float) angle.getY(),
                                         (float) angle.getZ()
                                 ), 0, 0, 0,
-                                Pickaxe.RANDOM.nextInt(1_000_000)
+                                random.nextInt(1000) + 1000
                         );
+                        amount++;
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public void hide(Archaeologist owner, Player guest) {
+        int[] ids = new int[amount];
+        amount = 0;
+        random.setSeed(seed);
+        for (int i = 0; i < ids.length; i++)
+            ids[i] = random.nextInt(1000) + 1000;
+        ((CraftPlayer) guest).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(ids));
+        amount = 0;
     }
 }

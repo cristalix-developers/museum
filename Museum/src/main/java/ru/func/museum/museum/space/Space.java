@@ -8,4 +8,6 @@ import ru.func.museum.player.Archaeologist;
 public interface Space {
 
     void show(Archaeologist owner, Player guest);
+
+    void hide(Archaeologist owner, Player guest);
 }

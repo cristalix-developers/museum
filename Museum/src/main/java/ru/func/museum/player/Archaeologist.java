@@ -14,13 +14,19 @@ import java.util.UUID;
 public interface Archaeologist {
     String getUuid();
 
-    int getCurrentMuseum();
+    AbstractMuseum getCurrentMuseum();
+
+    void setCurrentMuseum(AbstractMuseum currentMuseum);
 
     String getName();
 
     ExcavationType getLastExcavation();
 
     void setLastExcavation(ExcavationType excavation);
+
+    int getExcavationCount();
+
+    void setExcavationCount(int excavationCount);
 
     long getExp();
 

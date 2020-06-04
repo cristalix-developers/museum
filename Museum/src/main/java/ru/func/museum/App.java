@@ -14,10 +14,12 @@ import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
+import ru.func.museum.command.MuseumCommand;
 import ru.func.museum.element.deserialized.EntityDeserializer;
 import ru.func.museum.element.deserialized.MuseumEntity;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.listener.CancelEvent;
+import ru.func.museum.listener.MuseumItemHandler;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.prepare.PreparePlayer;
 
@@ -41,6 +43,7 @@ public final class App extends JavaPlugin implements Listener {
 
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new CancelEvent(), this);
+        Bukkit.getPluginManager().registerEvents(new MuseumItemHandler(this), this);
 
         MongoManager.connect(
                 getConfig().getString("uri"),
@@ -53,7 +56,7 @@ public final class App extends JavaPlugin implements Listener {
 
         Excavation.WORLD.setGameRuleValue("mobGriefing", "false");
 
-
+        Bukkit.getPluginCommand("museum").setExecutor(new MuseumCommand(this));
     }
 
     @EventHandler
@@ -66,13 +69,13 @@ public final class App extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerLogin(PlayerLoginEvent e) {
-        if (!e.getResult().equals(PlayerLoginEvent.Result.ALLOWED))
+        if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
             archaeologistMap.remove(e.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void preLoadPlayerEvent(AsyncPlayerPreLoginEvent e) {
-        if (!e.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.ALLOWED))
+        if (e.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED)
             return;
         val archaeologist = MongoManager.load(e.getName(), e.getUniqueId().toString());
         archaeologistMap.put(e.getUniqueId(), archaeologist);

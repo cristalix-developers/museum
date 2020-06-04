@@ -4,3 +4,6 @@ main: ru.func.museum.App
 authors: [func]
 website: funcid.ru
 depend: [CoreAPI]
+commands:
+  museum:
+    usage:

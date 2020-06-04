@@ -20,7 +20,7 @@ public class PrepareScoreBoard implements Prepare {
         objective.startGroup("Игрок")
                 .record("Уровень", () -> archaeologist.getLevel() + "")
                 .record("Осталось", () -> archaeologist.expNeed() + " опыта")
-                .record("Валюта", () -> String.format("%.2f", archaeologist.getMoney()) + "$");
+                .record("Валюта", () -> String.format("%.2f$", archaeologist.getMoney()));
         objective.startGroup("Сервер")
                 .record("Онлайн", () -> Bukkit.getOnlinePlayers().size() + "");
 
