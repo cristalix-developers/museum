@@ -124,6 +124,18 @@ public class BeforePacketHandler implements Prepare {
                                         !lastExcavation.equals(ExcavationType.NOOP) &&
                                         excavation.getExcavationGenerator().fastCanBreak(bd.a.getX(), bd.a.getY(), bd.a.getZ());
                                 if (valid && bd.c == PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK) {
+                                    // Возвращение игрока в музей
+                                    archaeologist.setBreakLess(archaeologist.getBreakLess() - 1);
+                                    if (archaeologist.getBreakLess() == 0) {
+                                        player.sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
+                                        player.sendMessage("§7[§l§bi§7] §7Раскопки подошли к концу, сейчас вернем вас в музей!");
+                                        Bukkit.getScheduler().runTaskLater(app, () -> {
+                                            archaeologist.setOnExcavation(false);
+                                            PreparePlayer.INVENTORY.getPrepare().execute(player, archaeologist, app);
+                                            archaeologist.getCurrentMuseum().load(app, archaeologist, player);
+                                        }, 10 * 20L);
+                                        return;
+                                    }
                                     // Игрок на раскопках, блок находится в шахте
                                     archaeologist.giveExp(player, 5);
                                     int[] ids = excavation.getExcavationGenerator().getElementsId();

@@ -84,14 +84,14 @@ public final class App extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         e.setQuitMessage(null);
-        archaeologistMap.remove(UUID.fromString(
-                MongoManager.save(archaeologistMap.get(e.getPlayer().getUniqueId())).getUuid()
-        ));
-    }
 
-    @EventHandler
-    public void onItemDrop(PlayerDropItemEvent e) {
-        Archaeologist archaeologist = archaeologistMap.get(e.getPlayer().getUniqueId());
-        archaeologist.getLastExcavation().getExcavation().load(archaeologist, e.getPlayer());
+        val archaeologist = archaeologistMap.get(e.getPlayer().getUniqueId());
+
+        archaeologist.setBreakLess(0);
+        archaeologist.setOnExcavation(false);
+
+        MongoManager.save(archaeologist);
+
+        archaeologistMap.remove(e.getPlayer().getUniqueId());
     }
 }

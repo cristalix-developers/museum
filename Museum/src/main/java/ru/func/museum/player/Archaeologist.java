@@ -20,6 +20,10 @@ public interface Archaeologist {
 
     String getName();
 
+    int getBreakLess();
+
+    void setBreakLess(int breakLess);
+
     ExcavationType getLastExcavation();
 
     void setLastExcavation(ExcavationType excavation);

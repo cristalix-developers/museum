@@ -10,10 +10,10 @@ import org.bukkit.inventory.ItemStack;
 @Getter
 @AllArgsConstructor
 public enum CollectorType {
-    NONE("отсутствует", null, 0, 0, 0),
-    LOVED("любительский", new ItemStack(Material.WORKBENCH), 5, 99, -1),
-    PROFESSIONAL("профиссиольный", new ItemStack(Material.WORKBENCH), 10, 99, 69),
-    PRESTIGE("престижный", new ItemStack(Material.WORKBENCH), 15, 99, 420);
+    NONE("отсутствует", new ItemStack(Material.PAPER), 0, 0, -10),
+    LOVED("любительский", new ItemStack(Material.WORKBENCH), 5, 100_000, -1),
+    PROFESSIONAL("профиссиольный", new ItemStack(Material.WORKBENCH), 10, 400_000, 69),
+    PRESTIGE("престижный", new ItemStack(Material.WORKBENCH), 15, 750_000, 99);
 
     private String name;
     private ItemStack head;

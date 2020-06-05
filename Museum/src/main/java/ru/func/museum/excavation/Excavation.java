@@ -21,6 +21,8 @@ public interface Excavation {
     default void load(Archaeologist archaeologist, Player player) {
         Excavation excavation = archaeologist.getLastExcavation()
                 .getExcavation();
+        player.getInventory().clear();
+        player.getInventory().addItem(archaeologist.getPickaxeType().getItem());
         player.teleport(excavation.getStartLocation());
         player.sendTitle("§6Прибытие!", getTitle());
         player.sendMessage("§7[§l§bi§7] Вы прибыли на §l§b" + getTitle() + ".");

@@ -16,7 +16,7 @@ public class PrepareInventory implements Prepare {
 
     private ItemStack menu = Items.builder()
             .type(Material.PAPER)
-            .displayName("§f>> §l§6Меню [§fПКМ§6] §f<<")
+            .displayName("§f>> §l§6Меню §f<<")
             .loreLines(
                     "",
                     "§7Это меню, с помощью которого,",
@@ -25,21 +25,22 @@ public class PrepareInventory implements Prepare {
                     "§7подробную статистику."
             ).build();
 
+    private ItemStack excavations = Items.builder()
+            .type(Material.EMERALD)
+            .displayName("§f>> §l§6Раскопки §f<<")
+            .loreLines(
+                    "",
+                    "§7Нажмите правую кнопку",
+                    "§7мыши, что бы открыть",
+                    "§7меню, где вы можете",
+                    "§7выбирать экспидицию и кирку"
+            ).build();
+
     @Override
     public void execute(Player player, Archaeologist archaeologist, App app) {
         val inventory = player.getInventory();
         inventory.clear();
         inventory.setItem(0, menu);
-        inventory.setItem(1, archaeologist.getPickaxeType().getPickaxe()
-                .getItem()
-                .get()
-                .displayName("§f>> §l§6Раскопки [§fПКМ§6] §f<<")
-                .loreLines(
-                        "",
-                        "§7Нажмите правую кнопку",
-                        "§7мыши, что бы открыть",
-                        "§7меню, где вы можете",
-                        "§7выбирать экспидицию и кирку"
-                ).build());
+        inventory.setItem(1, excavations);
     }
 }

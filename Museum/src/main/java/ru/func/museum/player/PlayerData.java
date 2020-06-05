@@ -26,6 +26,7 @@ public class PlayerData implements Archaeologist {
     private long exp;
     private double money;
     private int level;
+    private transient int breakLess;
     private ExcavationType lastExcavation;
     private boolean onExcavation;
     private List<UUID> friendList;

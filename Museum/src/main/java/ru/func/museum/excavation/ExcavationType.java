@@ -9,7 +9,7 @@ import ru.func.museum.excavation.generator.HalfSphereGenerator;
 @Getter
 @AllArgsConstructor
 public enum ExcavationType {
-    NOOP(null),
+    NOOP(null, null),
     DIRT(new DefaultExcavation(
             new HalfSphereGenerator(
                     new Location(Excavation.WORLD, -72, 88, 260),
@@ -23,10 +23,11 @@ public enum ExcavationType {
             ), "раскопки древнего динозавра",
             100,
             1,
-            new Location(Excavation.WORLD, -50, 83, 242),
+            new Location(Excavation.WORLD, -71, 88, 273),
             50
-    )),
+    ), Material.DIRT),
     ;
 
     private Excavation excavation;
+    private Material icon;
 }
