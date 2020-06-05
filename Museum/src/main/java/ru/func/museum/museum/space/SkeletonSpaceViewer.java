@@ -24,8 +24,8 @@ import java.util.Random;
 @Getter
 @NoArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class SkeletonSpaceViewer implements Space {
-
     @NonNull
     private int startDotX;
     @NonNull
@@ -39,6 +39,17 @@ public class SkeletonSpaceViewer implements Space {
     private transient int seed;
     private transient int amount = 0;
     private transient Random random;
+/*    @NonNull
+    private int manipulatorX;
+    @NonNull
+    private int manipulatorY;
+    @NonNull
+    private int manipulatorZ;*/
+
+/*    @Override
+    public Location getManipulator() {
+        return new Location(Excavation.WORLD, 0, 0, 0);
+    }*/
 
     @Override
     public void show(Archaeologist owner, Player guest) {

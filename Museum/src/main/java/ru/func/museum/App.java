@@ -7,7 +7,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.inventory.IInventoryService;
@@ -19,19 +22,22 @@ import ru.func.museum.element.deserialized.EntityDeserializer;
 import ru.func.museum.element.deserialized.MuseumEntity;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.listener.CancelEvent;
+import ru.func.museum.listener.ManipulatorHandler;
 import ru.func.museum.listener.MuseumItemHandler;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.prepare.PreparePlayer;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
-@Getter
 public final class App extends JavaPlugin implements Listener {
 
     @Getter
     private static App app;
+    @Getter
     private Map<UUID, Archaeologist> archaeologistMap = Maps.newHashMap();
+    @Getter
     private MuseumEntity[] museumEntities;
 
     @Override
@@ -44,6 +50,7 @@ public final class App extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new CancelEvent(), this);
         Bukkit.getPluginManager().registerEvents(new MuseumItemHandler(this), this);
+        Bukkit.getPluginManager().registerEvents(new ManipulatorHandler(this), this);
 
         MongoManager.connect(
                 getConfig().getString("uri"),
@@ -62,8 +69,11 @@ public final class App extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         val player = e.getPlayer();
+        val archaeologist = archaeologistMap.get(player.getUniqueId());
+
         for (val prepare : PreparePlayer.values())
-            prepare.getPrepare().execute(player, archaeologistMap.get(player.getUniqueId()), this);
+            prepare.getPrepare().execute(player, archaeologist, this);
+
         e.setJoinMessage(null);
     }
 
@@ -74,11 +84,14 @@ public final class App extends JavaPlugin implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void preLoadPlayerEvent(AsyncPlayerPreLoginEvent e) {
+    public void preLoadPlayerEvent(AsyncPlayerPreLoginEvent e) throws ExecutionException, InterruptedException {
         if (e.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED)
             return;
-        val archaeologist = MongoManager.load(e.getName(), e.getUniqueId().toString());
-        archaeologistMap.put(e.getUniqueId(), archaeologist);
+
+        val uuid = e.getUniqueId();
+        val archaeologist = MongoManager.load(e.getName(), uuid.toString()).get(); // Block method
+
+        archaeologistMap.put(uuid, archaeologist);
     }
 
     @EventHandler

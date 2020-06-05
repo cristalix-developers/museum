@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 public enum CollectorType {
     NONE("отсутствует", new ItemStack(Material.PAPER), 0, 0, -10),
     LOVED("любительский", new ItemStack(Material.WORKBENCH), 5, 100_000, -1),
-    PROFESSIONAL("профиссиольный", new ItemStack(Material.WORKBENCH), 10, 400_000, 69),
+    PROFESSIONAL("профессиольный", new ItemStack(Material.WORKBENCH), 10, 400_000, 69),
     PRESTIGE("престижный", new ItemStack(Material.WORKBENCH), 15, 750_000, 99);
 
     private String name;

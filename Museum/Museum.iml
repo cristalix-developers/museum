@@ -22,7 +22,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.projectlombok:lombok:1.18.12" level="project" />
-    <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver:3.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver-async:3.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:bson:3.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver-core:3.7.1" level="project" />
     <orderEntry type="module-library">

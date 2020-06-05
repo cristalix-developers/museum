@@ -7,6 +7,8 @@ import ru.func.museum.player.Archaeologist;
 @BsonDiscriminator
 public interface Space {
 
+   // Location getManipulator();
+
     void show(Archaeologist owner, Player guest);
 
     void hide(Archaeologist owner, Player guest);

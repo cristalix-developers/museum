@@ -1,10 +1,9 @@
 package ru.func.museum;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.MongoClient;
 import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoClientURI;
-import com.mongodb.client.MongoCollection;
+import com.mongodb.async.client.MongoClients;
+import com.mongodb.async.client.MongoCollection;
 import lombok.val;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -14,8 +13,8 @@ import org.bukkit.Bukkit;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
-import ru.func.museum.museum.Museum;
 import ru.func.museum.museum.CollectorType;
+import ru.func.museum.museum.Museum;
 import ru.func.museum.museum.space.SkeletonSpaceViewer;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.museum.template.MuseumTemplateType;
@@ -24,6 +23,7 @@ import ru.func.museum.player.PlayerData;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.pojo.Conventions.ANNOTATION_CONVENTION;
@@ -52,55 +52,73 @@ public class MongoManager {
                 MongoClientSettings.getDefaultCodecRegistry(),
                 CodecRegistries.fromProviders(codecProvider)
         );
-        mongoCollection = new MongoClient(new MongoClientURI(uri))
+        mongoCollection = MongoClients.create(uri)
                 .getDatabase(database)
                 .withCodecRegistry(codecRegistry)
                 .getCollection(collection, Archaeologist.class);
         Bukkit.getConsoleSender().sendMessage("§aConnected to database successfully.");
     }
 
-    public static Archaeologist load(String name, String uuid) {
-        Archaeologist found = mongoCollection.find(eq("uuid", uuid)).first();
-        if (found == null) {
-            List<Space> spaces = MuseumTemplateType.DEFAULT.getMuseumTemplate().getMatrix().get();
-            found = PlayerData.builder()
-                    .level(1)
-                    .name(name)
-                    .uuid(uuid)
-                    .money(1000)
-                    .exp(0)
-                    .excavationCount(0)
-                    .lastExcavation(ExcavationType.DIRT)
-                    .onExcavation(true)
-                    .pickaxeType(PickaxeType.DEFAULT)
-                    .elementList(Arrays.asList(
-                            new Element(0, 0, spaces.get(0)),
-                            new Element(0, 1, spaces.get(0)),
-                            new Element(0, 2, spaces.get(0)),
-                            new Element(0, 3, spaces.get(0)),
-                            new Element(0, 4, spaces.get(0)),
-                            new Element(0, 0, spaces.get(1)),
-                            new Element(0, 1, spaces.get(1)),
-                            new Element(0, 2, spaces.get(1)),
-                            new Element(0, 3, spaces.get(1)),
-                            new Element(0, 4, spaces.get(1))
-                    )).museumList(Collections.singletonList(new Museum(
-                            new Date(),
-                            spaces,
-                            "Музей в честь " + name,
-                            MuseumTemplateType.DEFAULT,
-                            CollectorType.NONE
-                    ))).friendList(new ArrayList<>())
-                    .build();
-            mongoCollection.insertOne(found);
-        }
-        Bukkit.getConsoleSender().sendMessage("§aLogged: " + found.toString());
-        return found;
+    public static CompletableFuture<Archaeologist> load(String name, String uuid) {
+        CompletableFuture<Archaeologist> archaeologist = new CompletableFuture<>();
+        List<Space> spaces = MuseumTemplateType.DEFAULT.getMuseumTemplate().getMatrix().get();
+
+        mongoCollection.find(eq("uuid", uuid)).first((result, t) -> {
+            if (result == null) {
+                AbstractMuseum museum = new Museum(
+                        new Date(),
+                        spaces,
+                        "Музей в честь " + name,
+                        MuseumTemplateType.DEFAULT,
+                        CollectorType.NONE
+                );
+                result = PlayerData.builder()
+                        .level(1)
+                        .name(name)
+                        .uuid(uuid)
+                        .money(1_000_000)
+                        .exp(0)
+                        .excavationCount(0)
+                        .breakLess(0)
+                        .lastExcavation(ExcavationType.DIRT)
+                        .onExcavation(false)
+                        .pickaxeType(PickaxeType.DEFAULT)
+                        .currentMuseum(museum)
+                        .elementList(Arrays.asList(
+                                new Element(0, 0, spaces.get(0)),
+                                new Element(0, 1, spaces.get(0)),
+                                new Element(0, 2, spaces.get(0)),
+                                new Element(0, 3, spaces.get(0)),
+                                new Element(0, 4, spaces.get(0)),
+                                new Element(0, 0, spaces.get(1)),
+                                new Element(0, 1, spaces.get(1)),
+                                new Element(0, 2, spaces.get(1)),
+                                new Element(0, 3, spaces.get(1)),
+                                new Element(0, 4, spaces.get(1))
+                        )).friendList(new ArrayList<>())
+                        .museumList(Collections.singletonList(museum))
+                        .build();
+                Bukkit.getConsoleSender().sendMessage("§aLogged: " + result);
+
+                archaeologist.complete(result);
+
+                mongoCollection.insertOne(
+                        result,
+                        (resultVoid, th) -> {
+                            Bukkit.getConsoleSender().sendMessage("§aLogged: " + resultVoid);
+                        }
+                );
+            } else
+                archaeologist.complete(result);
+        });
+        return archaeologist;
     }
 
-    public static Archaeologist save(Archaeologist archaeologist) {
-        mongoCollection.updateOne(eq("uuid", archaeologist.getUuid()), new Document("$set", archaeologist));
-        Bukkit.getConsoleSender().sendMessage("§aSaved: " + archaeologist.toString());
-        return archaeologist;
+    public static void save(Archaeologist archaeologist) {
+        mongoCollection.updateOne(
+                eq("uuid", archaeologist.getUuid()),
+                new Document("$set", archaeologist),
+                (result, t) -> Bukkit.getConsoleSender().sendMessage("§aSaved: " + archaeologist.toString())
+        );
     }
 }

@@ -16,16 +16,17 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public enum MuseumTemplateType {
-
     DEFAULT(new DefaultMuseum(
             () -> Arrays.asList(new SkeletonSpaceViewer(
                     -89, 91, 267,
                     SpaceReflectType.SOUTH,
-                    0
+                    0//,
+                    //-87, 90, 261
             ), new SkeletonSpaceViewer(
                     -94, 91, 262,
                     SpaceReflectType.NORTH,
-                    0
+                    0//,
+                    //-95, 90, 261
             )), "Музей динозавров",
             Arrays.asList(
                     new Location(Excavation.WORLD, -93, 90, 257),

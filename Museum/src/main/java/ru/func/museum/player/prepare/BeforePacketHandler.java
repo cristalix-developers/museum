@@ -133,6 +133,7 @@ public class BeforePacketHandler implements Prepare {
                                             archaeologist.setOnExcavation(false);
                                             PreparePlayer.INVENTORY.getPrepare().execute(player, archaeologist, app);
                                             archaeologist.getCurrentMuseum().load(app, archaeologist, player);
+                                            archaeologist.setExcavationCount(archaeologist.getExcavationCount() + 1);
                                         }, 10 * 20L);
                                         return;
                                     }
@@ -140,7 +141,9 @@ public class BeforePacketHandler implements Prepare {
                                     archaeologist.giveExp(player, 5);
                                     int[] ids = excavation.getExcavationGenerator().getElementsId();
                                     int parentId = ids[Pickaxe.RANDOM.nextInt(ids.length)];
+
                                     val parent = App.getApp().getMuseumEntities()[parentId];
+
                                     int bingo = (int) Math.pow(10, parent.getRare().getRareScale());
                                     MinecraftServer.getServer().postToMainThread(() -> {
                                         archaeologist.getPickaxeType().getPickaxe().dig(connection, excavation, bd.a);

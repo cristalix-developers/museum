@@ -8,6 +8,7 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.core.item.Items;
+import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.func.museum.App;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.museum.template.MuseumTemplateType;
@@ -44,9 +45,10 @@ public class Museum implements AbstractMuseum {
     public void load(App plugin, Archaeologist archaeologist, Player guest) {
         owner = archaeologist;
         views++;
-        System.out.println(1);
+
+        IScoreboardService.get().setCurrentObjective(guest.getUniqueId(), "main");
+
         matrix.forEach(space -> space.show(archaeologist, guest));
-        System.out.println(2);
         guest.teleport(museumTemplateType.getMuseumTemplate().getSpawn());
 
         int[] vertex = new int[]{

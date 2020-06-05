@@ -1,4 +1,4 @@
-uri: 'mongodb+srv://root:admin@cluster0-vnynx.mongodb.net/test?retryWrites=true&w=majority'
+uri: 'mongodb+srv://root:admin@cluster0-vnynx.mongodb.net/test?retryWrites=true&w=majority&ssl=true&streamType=netty'
 database: 'data'
 collection: 'museum'
 entity:

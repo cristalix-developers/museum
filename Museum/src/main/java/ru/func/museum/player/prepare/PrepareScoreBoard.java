@@ -12,18 +12,30 @@ import ru.func.museum.player.Archaeologist;
  * @project Museum
  */
 public class PrepareScoreBoard implements Prepare {
+
+    private String title = "Музей археологии";
+
     @Override
     public void execute(Player player, Archaeologist archaeologist, App app) {
-         SimpleBoardObjective objective = IScoreboardService.get().getPlayerObjective(player.getUniqueId(), "main");
-
-        objective.setDisplayName("Музей археологии");
-        objective.startGroup("Игрок")
+        SimpleBoardObjective main = IScoreboardService.get().getPlayerObjective(player.getUniqueId(), "main");
+        main.startGroup("Игрок")
                 .record("Уровень", () -> archaeologist.getLevel() + "")
                 .record("Осталось", () -> archaeologist.expNeed() + " опыта")
-                .record("Валюта", () -> String.format("%.2f$", archaeologist.getMoney()));
-        objective.startGroup("Сервер")
-                .record("Онлайн", () -> Bukkit.getOnlinePlayers().size() + "");
+                .record("Денег", () -> String.format("%.2f$", archaeologist.getMoney()));
+        template(main);
+
+        SimpleBoardObjective excavation = IScoreboardService.get().getPlayerObjective(player.getUniqueId(), "excavation");
+        excavation.startGroup("Раскопки")
+                .record("Ударов", () -> Math.max(archaeologist.getBreakLess(), 0) + " осталось")
+                .record("Опыта", () -> archaeologist.expNeed() + " осталось");
+        template(excavation);
 
         IScoreboardService.get().setCurrentObjective(player.getUniqueId(), "main");
+    }
+
+    private void template(SimpleBoardObjective objective) {
+        objective.setDisplayName(title);
+        objective.startGroup("Сервер")
+                .record("Онлайн", () -> Bukkit.getOnlinePlayers().size() + "");
     }
 }

@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -84,7 +85,7 @@ public class MuseumItemHandler implements Listener {
                 public void init(Player player, InventoryContents contents) {
                     contents.resetMask("XXXXXXXXX", "OSSSSSSSO", "XXXXBXXXX");
 
-                    val archaeologist = App.getApp().getArchaeologistMap().get(player.getUniqueId());
+                    val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
                     for (ExcavationType excavationType : ExcavationType.values()) {
                         if (excavationType == ExcavationType.NOOP)
                             continue;
@@ -133,9 +134,10 @@ public class MuseumItemHandler implements Listener {
                 public void init(Player player, InventoryContents contents) {
                     contents.resetMask("XXXXXXXXX", "OOSOSOSOO", "XXXXBXXXX");
                     for (PickaxeType pickaxeType : PickaxeType.values()) {
-                        ClickableItem item;
-                        val archaeologist = App.getApp().getArchaeologistMap().get(player.getUniqueId());
+                        val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
                         val itemStack = pickaxeType.getItem().clone();
+
+                        ClickableItem item;
 
                         ItemMeta meta = itemStack.getItemMeta();
                         meta.setDisplayName(meta.getDisplayName() +
@@ -193,12 +195,18 @@ public class MuseumItemHandler implements Listener {
             .provider(new InventoryProvider() {
                 @Override
                 public void init(Player player, InventoryContents contents) {
-                    val archaeologist = App.getApp().getArchaeologistMap().get(player.getUniqueId());
+                    val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
                     val museum = archaeologist.getCurrentMuseum();
 
-                    contents.resetMask("XXXXXXXXX", "OSOSOSOSO", "XXXXBXXXX");
+                    contents.resetMask("XXXXXXXXX", "SOSOTOSOS", "XXXXBXXXX");
 
                     contents.add('B', ClickableItem.of(backItem, event -> museumUI.open(player)));
+                    contents.add('T', ClickableItem.empty(Items.builder()
+                            .type(Material.PAPER)
+                            .displayName("§bКоллекторы")
+                            .lore("", "§fКупить за игрокую валюту - [ЛКМ],", "§fза кристалики - двойной клик [ЛКМ]")
+                            .build()
+                    ));
 
                     for (CollectorType collectorType : CollectorType.values()) {
                         ClickableItem item = alreadyHave;
@@ -227,7 +235,19 @@ public class MuseumItemHandler implements Listener {
                                     event -> {
                                         if (museum.getCollectorType() == collectorType)
                                             return;
-                                        // Покупка§f[§bАктивен§f]
+                                        if (event.getClick().equals(ClickType.LEFT)) {
+                                            if (archaeologist.getMoney() < collectorType.getCost()) {
+                                                player.sendMessage("§7[§l§bi§7] У вас не достаточно средств. 㬏");
+                                                player.closeInventory();
+                                                return;
+                                            }
+                                            player.sendMessage("§7[§l§bi§7] Вы приобрели " + collectorType.getName() + " коллектор, перезайдите на режим.");
+                                            archaeologist.setMoney(archaeologist.getMoney() - collectorType.getCost());
+                                            museum.setCollectorType(collectorType);
+                                            player.closeInventory();
+                                        } else if (event.getClick().equals(ClickType.DOUBLE_CLICK)) {
+                                            player.sendMessage("Лол");
+                                        }
                                     }
                             );
                         }
@@ -245,7 +265,7 @@ public class MuseumItemHandler implements Listener {
             .provider(new InventoryProvider() {
                 @Override
                 public void init(Player player, InventoryContents contents) {
-                    val archaeologist = App.getApp().getArchaeologistMap().get(player.getUniqueId());
+                    val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
                     val museum = archaeologist.getCurrentMuseum();
 
                     contents.resetMask("XXXXXXXXX", "OFOSMTOAO", "XXXXXXXXX");
