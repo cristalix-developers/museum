@@ -2,8 +2,12 @@ package ru.func.museum.museum.space;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import ru.func.museum.element.Element;
 import ru.func.museum.player.Archaeologist;
+
+import java.util.List;
 
 /**
  * @author func 22.05.2020
@@ -13,10 +17,10 @@ import ru.func.museum.player.Archaeologist;
 @AllArgsConstructor
 public class SimpleSpaceViewer implements Space {
 
- /*   @Override
-    public Location getManipulator() {
-        return null;
-    }*/
+    @Override
+    public boolean isManipulator(Location location) {
+        return false;
+    }
 
     @Override
     public void show(Archaeologist owner, Player quest) {
@@ -26,5 +30,10 @@ public class SimpleSpaceViewer implements Space {
     @Override
     public void hide(Archaeologist owner, Player guest) {
 
+    }
+
+    @Override
+    public List<Element> getElements() {
+        return null;
     }
 }

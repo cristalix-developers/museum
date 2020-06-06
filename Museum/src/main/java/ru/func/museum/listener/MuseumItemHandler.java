@@ -241,9 +241,13 @@ public class MuseumItemHandler implements Listener {
                                                 player.closeInventory();
                                                 return;
                                             }
-                                            player.sendMessage("§7[§l§bi§7] Вы приобрели " + collectorType.getName() + " коллектор, перезайдите на режим.");
+                                            player.sendMessage("§7[§l§bi§7] Вы приобрели " + collectorType.getName() + " коллектор!");
                                             archaeologist.setMoney(archaeologist.getMoney() - collectorType.getCost());
                                             museum.setCollectorType(collectorType);
+
+                                            // Перезагрузка музея
+                                            museum.unload(app, archaeologist, player);
+                                            museum.load(app, archaeologist, player);
                                             player.closeInventory();
                                         } else if (event.getClick().equals(ClickType.DOUBLE_CLICK)) {
                                             player.sendMessage("Лол");

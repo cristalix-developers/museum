@@ -25,6 +25,10 @@ public interface AbstractMuseum {
 
     void unload(App plugin, Archaeologist archaeologist, Player guest);
 
+    void updateIncrease();
+
+    double getSummaryIncrease();
+
     String getTitle();
 
     void setTitle(String title);

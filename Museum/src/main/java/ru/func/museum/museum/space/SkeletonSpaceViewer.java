@@ -39,17 +39,21 @@ public class SkeletonSpaceViewer implements Space {
     private transient int seed;
     private transient int amount = 0;
     private transient Random random;
-/*    @NonNull
-    private int manipulatorX;
     @NonNull
-    private int manipulatorY;
+    private int x;
     @NonNull
-    private int manipulatorZ;*/
+    private int y;
+    @NonNull
+    private int z;
+    @NonNull
+    private List<Element> elements;
 
-/*    @Override
-    public Location getManipulator() {
-        return new Location(Excavation.WORLD, 0, 0, 0);
-    }*/
+    @Override
+    public boolean isManipulator(Location location) {
+        return Math.abs(location.getBlockX() - x) < 2 &&
+                Math.abs(location.getBlockY() - y) < 2 &&
+                Math.abs(location.getBlockZ() - z) < 2;
+    }
 
     @Override
     public void show(Archaeologist owner, Player guest) {
@@ -60,13 +64,13 @@ public class SkeletonSpaceViewer implements Space {
         random = new Random(seed);
 
         val subEntities = App.getApp().getMuseumEntities()[entity].getSubs();
+
         for (int i = 0; i < subEntities.length; i++) {
-            List<Piece> pieces = subEntities[i].getPieces();
-            for (int j = 0; j < pieces.size(); j++) {
-                for (Element element : owner.getElementList()) {
-                    if (element.getParentId() == entity && element.getId() == i) {
-                        EulerAngle angle = pieces.get(j).getHeadRotation();
-                        pieces.get(j).single(
+            for (Element element : elements) {
+                if (element.getParentId() == entity && i == element.getId()) {
+                    for (Piece piece : subEntities[i].getPieces()) {
+                        EulerAngle angle = piece.getHeadRotation();
+                        piece.single(
                                 ((CraftPlayer) guest).getHandle().playerConnection,
                                 subEntities[i].getTitle(),
                                 reflection.rotate(new Location(
@@ -74,7 +78,7 @@ public class SkeletonSpaceViewer implements Space {
                                         startDotX,
                                         startDotY,
                                         startDotZ
-                                ), pieces.get(j)),
+                                ), piece),
                                 new Vector3f(
                                         (float) angle.getX(),
                                         (float) angle.getY(),
@@ -98,5 +102,10 @@ public class SkeletonSpaceViewer implements Space {
             ids[i] = random.nextInt(1000) + 1000;
         ((CraftPlayer) guest).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(ids));
         amount = 0;
+    }
+
+    @Override
+    public List<Element> getElements() {
+        return elements;
     }
 }

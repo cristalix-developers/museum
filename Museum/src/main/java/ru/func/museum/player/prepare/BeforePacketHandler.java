@@ -77,7 +77,7 @@ public class BeforePacketHandler implements Prepare {
                                     player.sendMessage("§7[§l§bi§7] §7Вы откопали новый фрагмент: §l" + subEntity.getTitle() + "§7!");
                                     player.sendTitle("§l§6Находка!", "§eобнаружен " + entity.getRare().getWord() + " фрагмент");
 
-                                    archaeologist.getElementList().add(new Element(parentId, id, null));
+                                    archaeologist.getElementList().add(new Element(parentId, id, false, entity.getRare().getIncrease()));
                                 }
                                 int[] ids = new int[subEntity.getPieces().size()];
                                 for (int i = 0; i < subEntity.getPieces().size(); i++)

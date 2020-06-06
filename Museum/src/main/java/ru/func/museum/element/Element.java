@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.func.museum.museum.space.Space;
 
 @Getter
 @Setter
@@ -13,6 +12,6 @@ import ru.func.museum.museum.space.Space;
 public class Element {
     private int parentId;
     private int id;
-    // То, где расположен элемент
-    private Space space;
+    private boolean locked;
+    private double increase;
 }

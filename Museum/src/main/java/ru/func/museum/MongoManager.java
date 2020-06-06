@@ -10,7 +10,6 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.pojo.ClassModel;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bukkit.Bukkit;
-import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.CollectorType;
@@ -22,7 +21,10 @@ import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.PlayerData;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -84,18 +86,8 @@ public class MongoManager {
                         .onExcavation(false)
                         .pickaxeType(PickaxeType.DEFAULT)
                         .currentMuseum(museum)
-                        .elementList(Arrays.asList(
-                                new Element(0, 0, spaces.get(0)),
-                                new Element(0, 1, spaces.get(0)),
-                                new Element(0, 2, spaces.get(0)),
-                                new Element(0, 3, spaces.get(0)),
-                                new Element(0, 4, spaces.get(0)),
-                                new Element(0, 0, spaces.get(1)),
-                                new Element(0, 1, spaces.get(1)),
-                                new Element(0, 2, spaces.get(1)),
-                                new Element(0, 3, spaces.get(1)),
-                                new Element(0, 4, spaces.get(1))
-                        )).friendList(new ArrayList<>())
+                        .elementList(new ArrayList<>())
+                        .friendList(new ArrayList<>())
                         .museumList(Collections.singletonList(museum))
                         .build();
                 Bukkit.getConsoleSender().sendMessage("§aLogged: " + result);

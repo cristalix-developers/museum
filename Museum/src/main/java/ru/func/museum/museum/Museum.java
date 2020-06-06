@@ -10,6 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.core.item.Items;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.func.museum.App;
+import ru.func.museum.element.Element;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.museum.template.MuseumTemplateType;
 import ru.func.museum.player.Archaeologist;
@@ -40,11 +41,14 @@ public class Museum implements AbstractMuseum {
     private MuseumTemplateType museumTemplateType;
     @NonNull
     private CollectorType collectorType;
+    private transient double summaryIncrease;
 
     @Override
     public void load(App plugin, Archaeologist archaeologist, Player guest) {
         owner = archaeologist;
         views++;
+
+        updateIncrease();
 
         IScoreboardService.get().setCurrentObjective(guest.getUniqueId(), "main");
 
@@ -156,5 +160,13 @@ public class Museum implements AbstractMuseum {
     public void unload(App plugin, Archaeologist archaeologist, Player guest) {
         matrix.forEach(space -> space.hide(archaeologist, guest));
         ((CraftPlayer) guest).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(999));
+    }
+
+    @Override
+    public void updateIncrease() {
+        summaryIncrease = 0;
+        for (Space space : matrix)
+            for (Element element : space.getElements())
+                summaryIncrease += element.getIncrease();
     }
 }
