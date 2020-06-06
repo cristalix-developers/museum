@@ -83,7 +83,7 @@ public class BeforePacketHandler implements Prepare {
             }, 10 * 20L);
             return true;
         }
-        return false;
+        return archaeologist.getBreakLess() < 0;
     }
 
     private void acceptedBreak(Player player, Archaeologist archaeologist, Excavation excavation, PacketPlayInBlockDig bd, PlayerConnection connection, App app) {
@@ -104,11 +104,14 @@ public class BeforePacketHandler implements Prepare {
         int[] ableIds = excavation.getExcavationGenerator().getElementsId();
         int parentId = ableIds[Pickaxe.RANDOM.nextInt(ableIds.length)];
 
-        val parent = App.getApp().getMuseumEntities()[parentId];
+        val parent = app.getMuseumEntities()[parentId];
+        val generator = excavation.getExcavationGenerator();
 
-        int bingo = (int) Math.pow(10, parent.getRare().getRareScale());
-        if (Pickaxe.RANDOM.nextInt(bingo) + 1 == bingo) {
+        double luckyBuffer = (double) (generator.getCenter().getBlockY() - player.getLocation().getBlockY()) / generator.getDepth(); // no zero
 
+        double bingo = luckyBuffer / parent.getRare().getRareScale() / 10;
+        if (bingo > Pickaxe.RANDOM.nextDouble()) {
+            // Если повезло, то будет проиграна анимация и тд
             archaeologist.giveExp(player, 25);
             SubEntity[] subEntities = parent.getSubs();
 
@@ -117,7 +120,7 @@ public class BeforePacketHandler implements Prepare {
 
             int[] ids = new int[subEntity.getPieces().size()];
 
-            int noise = Pickaxe.RANDOM.nextInt(10_000);
+            int noise = Pickaxe.RANDOM.nextInt(100_000);
 
             for (int i = 0; i < subEntity.getPieces().size(); i++)
                 ids[i] = noise * 100 + i;
@@ -134,6 +137,7 @@ public class BeforePacketHandler implements Prepare {
 
             boolean[] exists = new boolean[]{false};
 
+            // Проверка на дубликат
             archaeologist.getElementList().stream()
                     .filter(element -> element.getParentId() == parentId && element.getId() == id)
                     .findFirst()

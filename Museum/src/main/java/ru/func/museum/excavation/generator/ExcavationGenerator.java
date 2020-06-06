@@ -1,5 +1,6 @@
 package ru.func.museum.excavation.generator;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 /**
@@ -7,6 +8,10 @@ import org.bukkit.entity.Player;
  * @project Museum
  */
 public interface ExcavationGenerator {
+
+    int getDepth();
+
+    Location getCenter();
 
     int[] getElementsId();
 

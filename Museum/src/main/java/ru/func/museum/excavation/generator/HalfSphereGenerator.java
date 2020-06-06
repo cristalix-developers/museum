@@ -1,5 +1,6 @@
 package ru.func.museum.excavation.generator;
 
+import lombok.Getter;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
@@ -15,9 +16,11 @@ import ru.func.museum.player.pickaxe.Pickaxe;
  */
 public class HalfSphereGenerator implements ExcavationGenerator {
 
+    @Getter
     private Location center;
-    private int radius;
+    @Getter
     private int depth;
+    private int radius;
     private Location[] blockAble;
     private Material[] ableBlockType;
     private int[] ableEntity;
