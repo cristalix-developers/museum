@@ -1,5 +1,6 @@
 package ru.func.museum.player.prepare;
 
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.IScoreboardService;
@@ -22,6 +23,10 @@ public class PrepareScoreBoard implements Prepare {
                 .record("Уровень", () -> archaeologist.getLevel() + "")
                 .record("Осталось", () -> archaeologist.expNeed() + " опыта")
                 .record("Денег", () -> String.format("%.2f$", archaeologist.getMoney()));
+        val museum = archaeologist.getCurrentMuseum();
+        main.startGroup("Музей")
+                .record("Заработок", () -> String.format("%.2f$/сек", museum.getSummaryIncrease()))
+                .record("Посещений", () -> museum.getViews() + "");
         template(main);
 
         SimpleBoardObjective excavation = IScoreboardService.get().getPlayerObjective(player.getUniqueId(), "excavation");

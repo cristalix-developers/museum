@@ -38,7 +38,7 @@ public class ManipulatorHandler implements Listener {
 
     private ItemStack clear = Items.builder()
             .displayName("§cОсвободить витрину")
-            .lore("", "§7Ваши экспонаты не исчезнут!", "§7Вы их сможете поставить", "§7на другую витрину.")
+            .lore("", "§7Ваши экспонаты НЕ исчезнут!", "§7Вы их сможете поставить", "§7на другую витрину.")
             .type(Material.BARRIER)
             .build();
 
@@ -57,12 +57,15 @@ public class ManipulatorHandler implements Listener {
                                 @Override
                                 public void init(Player player, InventoryContents contents) {
                                     contents.set(0, ClickableItem.of(clear, event -> {
-                                        space.getElements().forEach(element -> element.setLocked(false));
-                                        space.getElements().clear();
+                                        for (Element playerElement : archaeologist.getElementList())
+                                            for (Element spaceElement : space.getElements())
+                                                if (playerElement.equals(spaceElement))
+                                                    playerElement.setLocked(false);
                                         space.hide(archaeologist, player);
-                                        museum.updateIncrease();
                                         player.closeInventory();
                                         player.sendMessage("§7[§l§bi§7] Витрина освобождена!");
+                                        space.getElements().clear();
+                                        museum.updateIncrease();
                                     }));
 
                                     for (int i = 0; i < app.getMuseumEntities().length; i++) {
@@ -105,7 +108,8 @@ public class ManipulatorHandler implements Listener {
                                             clickableItem = ClickableItem.of(item.displayName("" +
                                                             "§b" + entity.getTitle() +
                                                             "§f " + elements.size() +
-                                                            "/" + (fragments.length - 1)
+                                                            "/" + (fragments.length - 1) +
+                                                            " фрагментов"
                                                     ).lore(fragments).build(), event -> {
                                                         if (elements.get(0).isLocked()) {
                                                             player.sendMessage("§7[§l§bi§7] Вы не можете выбрать экспонат, он занят другой витриной.");
@@ -121,7 +125,7 @@ public class ManipulatorHandler implements Listener {
                                                         space.hide(archaeologist, player);
                                                         space.show(archaeologist, player);
                                                         player.closeInventory();
-                                                        player.sendMessage("§7[§l§bi§7] Экспонат уже на витрине!");
+                                                        player.sendMessage("§7[§l§bi§7] Экспонат поставлен на витрину!");
                                                     }
                                             );
                                         }
