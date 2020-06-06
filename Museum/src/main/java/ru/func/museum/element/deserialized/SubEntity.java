@@ -20,14 +20,14 @@ public class SubEntity {
     private List<Piece> pieces;
     private String title;
 
-    public void show(PlayerConnection connection, Location location, int parentId, int subEntity) {
+    public void show(PlayerConnection connection, Location location, int parentId, int subEntity, boolean offNoise) {
         int i = 0;
 
         val randomXAngle = Pickaxe.RANDOM.nextFloat() * 360;
         val randomYAngle = Pickaxe.RANDOM.nextFloat() * 360;
         val randomZAngle = Pickaxe.RANDOM.nextFloat() * 360;
 
-        int noise = 1 + Pickaxe.RANDOM.nextInt(9);
+        int noise = offNoise ? 0 : 1 + Pickaxe.RANDOM.nextInt(9);
         for(val piece : pieces) {
             piece.single(
                     connection,

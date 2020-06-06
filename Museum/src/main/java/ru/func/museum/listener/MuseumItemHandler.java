@@ -49,13 +49,6 @@ public class MuseumItemHandler implements Listener {
             .displayName("§cВернуться")
             .build();
 
-    private ClickableItem space = ClickableItem.empty(Items.builder()
-            .displayName("§7пустота")
-            .type(Material.STAINED_GLASS_PANE)
-            .damage((short) 0)
-            .build()
-    );
-
     private ClickableItem alreadyHave = ClickableItem.empty(Items.builder()
             .displayName("§bПусто")
             .loreLines(
@@ -83,7 +76,7 @@ public class MuseumItemHandler implements Listener {
             .provider(new InventoryProvider() {
                 @Override
                 public void init(Player player, InventoryContents contents) {
-                    contents.resetMask("XXXXXXXXX", "OSSSSSSSO", "XXXXBXXXX");
+                    contents.resetMask("SSSSSSSSB");
 
                     val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
                     for (ExcavationType excavationType : ExcavationType.values()) {
@@ -114,16 +107,15 @@ public class MuseumItemHandler implements Listener {
                                         archaeologist.setOnExcavation(true);
                                         archaeologist.setLastExcavation(excavationType);
 
+                                        archaeologist.getCurrentMuseum().unload(app, archaeologist, player);
                                         excavation.load(archaeologist, player);
                                     }
                             ));
                         }
                     }
                     contents.add('B', ClickableItem.of(backItem, event -> pickaxeUI.open(player)));
-                    contents.fillMask('X', space);
-                    contents.fillMask('O', null);
                 }
-            }).rows(3)
+            }).rows(1)
             .title("Экспедиции")
             .type(InventoryType.CHEST)
             .build();
@@ -132,30 +124,29 @@ public class MuseumItemHandler implements Listener {
             .provider(new InventoryProvider() {
                 @Override
                 public void init(Player player, InventoryContents contents) {
-                    contents.resetMask("XXXXXXXXX", "OOSOSOSOO", "XXXXBXXXX");
+                    update(player, contents);
+                }
+
+                @Override
+                public void update(Player player, InventoryContents contents) {
+                    contents.resetMask("OOOOSOOOB");
+
+                    val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
+
+                    contents.add('B', ClickableItem.of(backItem, event -> pickaxeUI.open(player)));
+                    contents.fillMask('O', null);
+
+                    ItemStack itemStack = null;
                     for (PickaxeType pickaxeType : PickaxeType.values()) {
-                        val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
-                        val itemStack = pickaxeType.getItem().clone();
-
-                        ClickableItem item;
-
-                        ItemMeta meta = itemStack.getItemMeta();
-                        meta.setDisplayName(meta.getDisplayName() +
-                                " §f/ " +
-                                (archaeologist.getPickaxeType() == pickaxeType ? "Выбрано" : "Купить")
-                        );
-                        itemStack.setItemMeta(meta);
-
-                        if (archaeologist.getPickaxeType() == pickaxeType) {
-                            item = ClickableItem.empty(itemStack);
-                        } else
-                            item = ClickableItem.of(itemStack, event -> {
+                        itemStack = pickaxeType.getItem().clone();
+                        if (pickaxeType.getPrice() > archaeologist.getPickaxeType().getPrice()) {
+                            contents.add('S', ClickableItem.of(itemStack, event -> {
                                 if (archaeologist.getMoney() < pickaxeType.getPrice()) {
                                     player.sendMessage("§7[§l§bi§7] У вас не достаточно средств. 㬏");
                                     player.closeInventory();
                                     return;
                                 }
-                                if (archaeologist.getPickaxeType().getPrice() > pickaxeType.getPrice()) {
+                                if (archaeologist.getPickaxeType().getPrice() >= pickaxeType.getPrice()) {
                                     player.sendMessage("§7[§l§bi§7] Эта кирка хуже вашей, вам не продадим! 㬏");
                                     player.closeInventory();
                                     return;
@@ -163,14 +154,14 @@ public class MuseumItemHandler implements Listener {
                                 player.sendMessage("§7[§l§bi§7] Вы приобрели. Новое снаряжение!");
                                 archaeologist.setPickaxeType(pickaxeType);
                                 archaeologist.setMoney(archaeologist.getMoney() - pickaxeType.getPrice());
-                            });
-                        contents.add('S', item);
+                                update(player, contents);
+                            }));
+                            return;
+                        }
                     }
-                    contents.fillMask('X', space);
-                    contents.add('B', ClickableItem.of(backItem, event -> pickaxeUI.open(player)));
-                    contents.fillMask('O', null);
+                    contents.add('S', ClickableItem.empty(itemStack));
                 }
-            }).rows(3)
+            }).rows(1)
             .title("Кирки")
             .type(InventoryType.CHEST)
             .build();
@@ -179,14 +170,13 @@ public class MuseumItemHandler implements Listener {
             .provider(new InventoryProvider() {
                 @Override
                 public void init(Player player, InventoryContents contents) {
-                    contents.resetMask("XXXXXXXXX", "OOSOOOSOO", "XXXXXXXXX");
+                    contents.resetMask("OOSOOOSOO");
                     contents.add('S', ClickableItem.of(gotoExcavationsItem, event -> excavationUI.open(player)));
                     contents.add('S', ClickableItem.of(gotoPickaxesItem, event -> pickaxeBuyUI.open(player)));
 
-                    contents.fillMask('X', space);
                     contents.fillMask('O', null);
                 }
-            }).rows(3)
+            }).rows(1)
             .title("Раскопки и снаряжение")
             .type(InventoryType.CHEST)
             .build();
@@ -198,7 +188,7 @@ public class MuseumItemHandler implements Listener {
                     val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
                     val museum = archaeologist.getCurrentMuseum();
 
-                    contents.resetMask("XXXXXXXXX", "SOSOTOSOS", "XXXXBXXXX");
+                    contents.resetMask("SOSOSOOTB");
 
                     contents.add('B', ClickableItem.of(backItem, event -> museumUI.open(player)));
                     contents.add('T', ClickableItem.empty(Items.builder()
@@ -209,6 +199,8 @@ public class MuseumItemHandler implements Listener {
                     ));
 
                     for (CollectorType collectorType : CollectorType.values()) {
+                        if (collectorType == CollectorType.NONE)
+                            continue;
                         ClickableItem item = alreadyHave;
                         if (museum.getCollectorType().getCost() <= collectorType.getCost()) {
 
@@ -257,11 +249,10 @@ public class MuseumItemHandler implements Listener {
                         }
                         contents.add('S', item);
                     }
-                    contents.fillMask('X', space);
                     contents.fillMask('O', null);
                 }
             }).title("Коллекторы")
-            .rows(3)
+            .rows(1)
             .type(InventoryType.CHEST)
             .build();
 
@@ -272,7 +263,7 @@ public class MuseumItemHandler implements Listener {
                     val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
                     val museum = archaeologist.getCurrentMuseum();
 
-                    contents.resetMask("XXXXXXXXX", "OFOSMTOAO", "XXXXXXXXX");
+                    contents.resetMask("OFOSMTOAO");
 
                     contents.add('F', ClickableItem.empty(Items.builder()
                             .type(Material.PAPER)
@@ -282,7 +273,7 @@ public class MuseumItemHandler implements Listener {
                                     "§fУровень: " + archaeologist.getLevel(),
                                     String.format("§fДенег: %.2f$", archaeologist.getMoney()),
                                     "§fОпыт: " + archaeologist.getExp(),
-                                    "§fОпыта осталось: " + archaeologist.expNeed(),
+                                    "§fОпыта осталось: " + archaeologist.expNeed(archaeologist.getExp()),
                                     "§fКирка: " + archaeologist.getPickaxeType().getName(),
                                     "§fРаскопок: " + archaeologist.getExcavationCount(),
                                     "§fФрагментов: " + archaeologist.getElementList().size(),
@@ -346,11 +337,10 @@ public class MuseumItemHandler implements Listener {
                                 player.sendMessage("§7[§l§bi§7] Вы написали пустую строку. Так музей не называют. 㬏");
                             })
                     ));
-                    contents.fillMask('X', space);
                     contents.fillMask('O', null);
                 }
             }).title("Меню")
-            .rows(3)
+            .rows(1)
             .type(InventoryType.CHEST)
             .build();
 
@@ -395,7 +385,7 @@ public class MuseumItemHandler implements Listener {
     private ItemStack getMuseumItem(AbstractMuseum museum) {
         if (museumItem == null) {
             museumItem = Items.builder()
-                    .displayName("§bМузея")
+                    .displayName("§bМузей")
                     .type(Material.CLAY_BALL)
                     .build();
             net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(museumItem);

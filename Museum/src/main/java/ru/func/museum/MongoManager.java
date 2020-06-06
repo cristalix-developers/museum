@@ -96,9 +96,7 @@ public class MongoManager {
 
                 mongoCollection.insertOne(
                         result,
-                        (resultVoid, th) -> {
-                            Bukkit.getConsoleSender().sendMessage("§aLogged: " + resultVoid);
-                        }
+                        (resultVoid, th) -> Bukkit.getConsoleSender().sendMessage("§aLogged: " + resultVoid)
                 );
             } else
                 archaeologist.complete(result);

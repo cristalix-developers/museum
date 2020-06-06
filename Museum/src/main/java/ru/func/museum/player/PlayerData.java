@@ -39,21 +39,20 @@ public class PlayerData implements Archaeologist {
     private int excavationCount;
 
     @Override
-    public void noticeUpgrade(Player player) {
-        player.sendMessage("§7[§l§bi§7] Вы достигли §l§b" + level + " §7уровеня! До следующего уровня осталось §l§b" + expNeed() + "§7 опыта.");
-    }
-
-    @Override
     public void giveExp(Player player, long exp) {
         this.exp += exp;
-        if (expNeed() <= 0) {
+        if (expNeed(this.exp) <= 0) {
             level++;
-            noticeUpgrade(player);
+            player.sendMessage(String.format(
+                    "§7[§l§bi§7] Вы достигли §l§b%d §7уровеня! До следующего уровня осталось §l§b%d§7 опыта.",
+                    level,
+                    expNeed(this.exp)
+            ));
         }
     }
 
     @Override
-    public long expNeed() {
-        return (long) (Math.pow(level, 2) * 10 - level * 5) * 10 - this.exp;
+    public long expNeed(long haveExp) {
+        return (long) (Math.pow(level, 2) * 10 - level * 5) * 10 - haveExp;
     }
 }

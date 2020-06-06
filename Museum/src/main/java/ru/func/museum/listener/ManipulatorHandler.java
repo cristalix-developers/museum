@@ -44,7 +44,7 @@ public class ManipulatorHandler implements Listener {
                                       for (Element spaceElement : space.getElements())
                                           if (element.getId() == spaceElement.getId() && element.getParentId() == spaceElement.getParentId())
                                               element.setLocked(false);
-                                       
+
                                   space.hide(archaeologist, player);
                                   player.closeInventory();
                                   player.sendMessage("§7[§l§bi§7] Витрина освобождена!");

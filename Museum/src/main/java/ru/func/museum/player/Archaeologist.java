@@ -38,12 +38,10 @@ public interface Archaeologist {
     void setExcavationCount(int excavationCount);
 
     long getExp();
-
-    void noticeUpgrade(Player player);
     
     void giveExp(Player player, long exp);
     
-    long expNeed();
+    long expNeed(long haveExp);
 
     double getMoney();
 
