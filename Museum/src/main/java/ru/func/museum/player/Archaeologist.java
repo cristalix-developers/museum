@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
+import ru.func.museum.museum.space.Space;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.List;
@@ -17,6 +18,10 @@ public interface Archaeologist {
     AbstractMuseum getCurrentMuseum();
 
     void setCurrentMuseum(AbstractMuseum currentMuseum);
+
+    Space getCurrentSpace();
+
+    void setCurrentSpace(Space space);
 
     String getName();
 

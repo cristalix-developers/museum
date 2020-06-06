@@ -113,8 +113,7 @@ public class BeforePacketHandler implements Prepare {
                                         .getExcavationGenerator()
                                         .fastCanBreak(pc.a.getX(), pc.a.getY(), pc.a.getZ())
                                 )
-                                    // Genius
-                                    pc.a = dump;
+                                    pc.a = dump; // Genius
                             } else if (packet instanceof PacketPlayInBlockDig) {
                                 val bd = (PacketPlayInBlockDig) packet;
                                 val lastExcavation = archaeologist.getLastExcavation();
