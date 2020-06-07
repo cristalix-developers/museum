@@ -1,4 +1,4 @@
-package ru.func.museum.museum.template;
+package ru.func.museum.museum.hall.template;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,8 +16,8 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum MuseumTemplateType {
-    DEFAULT(new DefaultMuseum(
+public enum HallTemplateType {
+    DEFAULT(new DefaultHall(
             () -> Arrays.asList(new SkeletonSpaceViewer(
                     -89, 91, 267,
                     SpaceReflectType.SOUTH,
@@ -32,13 +32,17 @@ public enum MuseumTemplateType {
                     new ArrayList<>()
             )), "Музей динозавров",
             Arrays.asList(
-                    new Location(Excavation.WORLD, -93, 90, 257),
-                    new Location(Excavation.WORLD, -91, 90, 257),
-                    new Location(Excavation.WORLD, -91, 90, 278),
-                    new Location(Excavation.WORLD, -93, 90, 278)
+                    new Location(Excavation.WORLD, -92.5, 90, 267.5),
+                    new Location(Excavation.WORLD, -92.5, 94, 262.5),
+                    new Location(Excavation.WORLD, -92.5, 94, 257.5),
+                    new Location(Excavation.WORLD, -90.5, 94, 257.5),
+                    new Location(Excavation.WORLD, -90.5, 94, 262.5),
+                    new Location(Excavation.WORLD, -90.5, 90, 267.5),
+                    new Location(Excavation.WORLD, -90.5, 90, 278.5),
+                    new Location(Excavation.WORLD, -92.5, 90, 278.5)
             ), new Location(Excavation.WORLD, -91, 90, 251)
     )),
     ;
 
-    private MuseumTemplate museumTemplate;
+    private HallTemplate hallTemplate;
 }

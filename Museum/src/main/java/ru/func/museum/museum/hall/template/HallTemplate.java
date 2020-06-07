@@ -1,4 +1,4 @@
-package ru.func.museum.museum.template;
+package ru.func.museum.museum.hall.template;
 
 import org.bukkit.Location;
 import ru.func.museum.museum.space.Space;
@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  * @author func 22.05.2020
  * @project Museum
  */
-public interface MuseumTemplate {
+public interface HallTemplate {
     Supplier<List<Space>> getMatrix();
 
     String getTitle();

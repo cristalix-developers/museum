@@ -12,7 +12,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -27,11 +26,13 @@ import ru.func.museum.App;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
-import ru.func.museum.museum.CollectorType;
+import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.player.pickaxe.PickaxeType;
 import ru.func.museum.util.VirtualSign;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author func 04.06.2020
@@ -107,7 +108,7 @@ public class MuseumItemHandler implements Listener {
                                         archaeologist.setOnExcavation(true);
                                         archaeologist.setLastExcavation(excavationType);
 
-                                        archaeologist.getCurrentMuseum().unload(app, archaeologist, player);
+                                        archaeologist.getCurrentMuseum().unload(archaeologist, player);
                                         excavation.load(archaeologist, player);
                                     }
                             ));
@@ -136,30 +137,31 @@ public class MuseumItemHandler implements Listener {
                     contents.add('B', ClickableItem.of(backItem, event -> pickaxeUI.open(player)));
                     contents.fillMask('O', null);
 
-                    ItemStack itemStack = null;
-                    for (PickaxeType pickaxeType : PickaxeType.values()) {
-                        itemStack = pickaxeType.getItem().clone();
-                        if (pickaxeType.getPrice() > archaeologist.getPickaxeType().getPrice()) {
-                            contents.add('S', ClickableItem.of(itemStack, event -> {
-                                if (archaeologist.getMoney() < pickaxeType.getPrice()) {
-                                    player.sendMessage("§7[§l§bi§7] У вас не достаточно средств. 㬏");
-                                    player.closeInventory();
-                                    return;
-                                }
-                                if (archaeologist.getPickaxeType().getPrice() >= pickaxeType.getPrice()) {
-                                    player.sendMessage("§7[§l§bi§7] Эта кирка хуже вашей, вам не продадим! 㬏");
-                                    player.closeInventory();
-                                    return;
-                                }
-                                player.sendMessage("§7[§l§bi§7] Вы приобрели. Новое снаряжение!");
-                                archaeologist.setPickaxeType(pickaxeType);
-                                archaeologist.setMoney(archaeologist.getMoney() - pickaxeType.getPrice());
-                                update(player, contents);
-                            }));
-                            return;
+                    if (archaeologist.getPickaxeType() == PickaxeType.PRESTIGE) {
+                        contents.add('S', ClickableItem.empty(archaeologist.getPickaxeType().getItem()));
+                    } else {
+                        for (PickaxeType pickaxeType : PickaxeType.values()) {
+                            if (pickaxeType.getPrice() > archaeologist.getPickaxeType().getPrice()) {
+                                contents.add('S', ClickableItem.of(pickaxeType.getItem(), event -> {
+                                    if (archaeologist.getMoney() < pickaxeType.getPrice()) {
+                                        player.sendMessage("§7[§l§bi§7] У вас не достаточно средств. 㬏");
+                                        player.closeInventory();
+                                        return;
+                                    }
+                                    if (archaeologist.getPickaxeType().getPrice() >= pickaxeType.getPrice()) {
+                                        player.sendMessage("§7[§l§bi§7] Эта кирка хуже вашей, вам не продадим! 㬏");
+                                        player.closeInventory();
+                                        return;
+                                    }
+                                    player.sendMessage("§7[§l§bi§7] Вы приобрели. Новое снаряжение!");
+                                    archaeologist.setPickaxeType(pickaxeType);
+                                    archaeologist.setMoney(archaeologist.getMoney() - pickaxeType.getPrice());
+                                    update(player, contents);
+                                }));
+                                break;
+                            }
                         }
                     }
-                    contents.add('S', ClickableItem.empty(itemStack));
                 }
             }).rows(1)
             .title("Кирки")
@@ -186,7 +188,7 @@ public class MuseumItemHandler implements Listener {
                 @Override
                 public void init(Player player, InventoryContents contents) {
                     val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
-                    val museum = archaeologist.getCurrentMuseum();
+                    val hall = archaeologist.getCurrentMuseum();
 
                     contents.resetMask("SOSOSOOTB");
 
@@ -202,7 +204,7 @@ public class MuseumItemHandler implements Listener {
                         if (collectorType == CollectorType.NONE)
                             continue;
                         ClickableItem item = alreadyHave;
-                        if (museum.getCollectorType().getCost() <= collectorType.getCost()) {
+                      /*  if (museum.getCollectorType().getCost() <= collectorType.getCost()) {
 
                             List<String> lore = new ArrayList<>();
 
@@ -246,7 +248,7 @@ public class MuseumItemHandler implements Listener {
                                         }
                                     }
                             );
-                        }
+                        }*/
                         contents.add('S', item);
                     }
                     contents.fillMask('O', null);
@@ -370,7 +372,7 @@ public class MuseumItemHandler implements Listener {
                     return;
                 }
 
-                museum.unload(app, ownerArchaeologist, user);
+                museum.unload(ownerArchaeologist, user);
                 player.getMuseumList().get(0).load(app, player, user);
                 val owner = Bukkit.getPlayer(UUID.fromString(ownerArchaeologist.getUuid()));
 
@@ -401,8 +403,8 @@ public class MuseumItemHandler implements Listener {
                 "§fНазвание: " + museum.getTitle(),
                 "§fДоход: ",
                 "§fПосещений: " + museum.getViews(),
-                "§fКоллектор: " + museum.getCollectorType().getName(),
-                "§fВитрин: " + museum.getMatrix().size(),
+                "§fКоллектор: " + museum.getHalls().get(0).getCollectorType().getName(),
+                "§fВитрин: " + museum.getHalls().get(0).getMatrix().size(), // заменить на hall
                 "",
                 "§7Создан " + (date.getTime() - museum.getDate().getTime()) / 3600_000 / 24 + " дней(я) назад"
         ));

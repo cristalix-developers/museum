@@ -12,19 +12,17 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bukkit.Bukkit;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
-import ru.func.museum.museum.CollectorType;
+import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.museum.Museum;
+import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.museum.space.SkeletonSpaceViewer;
 import ru.func.museum.museum.space.Space;
-import ru.func.museum.museum.template.MuseumTemplateType;
+import ru.func.museum.museum.hall.template.HallTemplateType;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.PlayerData;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -63,16 +61,16 @@ public class MongoManager {
 
     public static CompletableFuture<Archaeologist> load(String name, String uuid) {
         CompletableFuture<Archaeologist> archaeologist = new CompletableFuture<>();
-        List<Space> spaces = MuseumTemplateType.DEFAULT.getMuseumTemplate().getMatrix().get();
 
         mongoCollection.find(eq("uuid", uuid)).first((result, t) -> {
             if (result == null) {
                 AbstractMuseum museum = new Museum(
                         new Date(),
-                        spaces,
-                        "Музей в честь " + name,
-                        MuseumTemplateType.DEFAULT,
-                        CollectorType.NONE
+                        Collections.singletonList(new Hall(
+                                HallTemplateType.DEFAULT.getHallTemplate().getMatrix().get(),
+                                HallTemplateType.DEFAULT,
+                                CollectorType.PRESTIGE
+                        )), "Музей в честь " + name
                 );
                 result = PlayerData.builder()
                         .level(1)

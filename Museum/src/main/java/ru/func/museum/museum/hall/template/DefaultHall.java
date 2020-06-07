@@ -1,4 +1,4 @@
-package ru.func.museum.museum.template;
+package ru.func.museum.museum.hall.template;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  */
 @Getter
 @AllArgsConstructor
-public class DefaultMuseum implements MuseumTemplate {
+public class DefaultHall implements HallTemplate {
     private Supplier<List<Space>> matrix;
     private String title;
     private List<Location> collectorRoute;
