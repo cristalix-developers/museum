@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
+import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
@@ -36,6 +37,7 @@ public class PlayerData implements Archaeologist {
     private List<AbstractMuseum> museumList;
     private List<Element> elementList;
     private transient AbstractMuseum currentMuseum;
+    private transient Hall currentHall;
     private int excavationCount;
 
     @Override

@@ -47,6 +47,7 @@ public class Museum implements AbstractMuseum {
         // Подготовка игрока
         val guestA = plugin.getArchaeologistMap().get(guest.getUniqueId());
         guestA.setCurrentMuseum(this);
+        guestA.setCurrentHall(halls.get(0));
 
         guest.getInventory().remove(Material.SADDLE);
 

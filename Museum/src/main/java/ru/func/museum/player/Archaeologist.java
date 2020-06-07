@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
+import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
@@ -16,6 +17,10 @@ public interface Archaeologist {
     String getUuid();
 
     AbstractMuseum getCurrentMuseum();
+
+    void setCurrentHall(Hall hall);
+
+    Hall getCurrentHall();
 
     void setCurrentMuseum(AbstractMuseum currentMuseum);
 
@@ -48,8 +53,6 @@ public interface Archaeologist {
     void setMoney(double money);
 
     int getLevel();
-
-    void setLevel(int level);
 
     boolean isOnExcavation();
 

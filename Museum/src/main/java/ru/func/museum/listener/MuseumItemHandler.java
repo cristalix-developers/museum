@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -27,12 +28,13 @@ import ru.func.museum.excavation.Excavation;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.collector.CollectorType;
+import ru.func.museum.museum.hall.Hall;
+import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.pickaxe.PickaxeType;
 import ru.func.museum.util.VirtualSign;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.UUID;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  * @author func 04.06.2020
@@ -44,6 +46,8 @@ public class MuseumItemHandler implements Listener {
     @NonNull
     private App app;
     private ItemStack museumItem;
+
+    private static DecimalFormat numberFormat = new DecimalFormat("###,###,###,###,###,###.##$");
 
     private ItemStack backItem = Items.builder()
             .type(Material.BARRIER)
@@ -188,7 +192,8 @@ public class MuseumItemHandler implements Listener {
                 @Override
                 public void init(Player player, InventoryContents contents) {
                     val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
-                    val hall = archaeologist.getCurrentMuseum();
+                    val hall = archaeologist.getCurrentHall();
+                    val museum = archaeologist.getCurrentMuseum();
 
                     contents.resetMask("SOSOSOOTB");
 
@@ -200,11 +205,13 @@ public class MuseumItemHandler implements Listener {
                             .build()
                     ));
 
+                    val collector = hall.getCollectorType();
+
                     for (CollectorType collectorType : CollectorType.values()) {
                         if (collectorType == CollectorType.NONE)
                             continue;
                         ClickableItem item = alreadyHave;
-                      /*  if (museum.getCollectorType().getCost() <= collectorType.getCost()) {
+                        if (collector.getCost() <= collectorType.getCost()) {
 
                             List<String> lore = new ArrayList<>();
 
@@ -222,12 +229,11 @@ public class MuseumItemHandler implements Listener {
                                             .displayName("§b" +
                                                     collectorType.getName().toUpperCase().charAt(0) +
                                                     collectorType.getName().substring(1) +
-                                                    (museum.getCollectorType() == collectorType ? " §l§f/ Выбрано" : "")
-                                            )
-                                            .lore(lore)
+                                                    (collector == collectorType ? " §l§f/ Выбрано" : "")
+                                            ).lore(lore)
                                             .build(),
                                     event -> {
-                                        if (museum.getCollectorType() == collectorType)
+                                        if (collector == collectorType)
                                             return;
                                         if (event.getClick().equals(ClickType.LEFT)) {
                                             if (archaeologist.getMoney() < collectorType.getCost()) {
@@ -237,10 +243,10 @@ public class MuseumItemHandler implements Listener {
                                             }
                                             player.sendMessage("§7[§l§bi§7] Вы приобрели " + collectorType.getName() + " коллектор!");
                                             archaeologist.setMoney(archaeologist.getMoney() - collectorType.getCost());
-                                            museum.setCollectorType(collectorType);
+                                            hall.setCollectorType(collectorType);
 
                                             // Перезагрузка музея
-                                            museum.unload(app, archaeologist, player);
+                                            museum.unload(archaeologist, player);
                                             museum.load(app, archaeologist, player);
                                             player.closeInventory();
                                         } else if (event.getClick().equals(ClickType.DOUBLE_CLICK)) {
@@ -248,7 +254,7 @@ public class MuseumItemHandler implements Listener {
                                         }
                                     }
                             );
-                        }*/
+                        }
                         contents.add('S', item);
                     }
                     contents.fillMask('O', null);
@@ -282,7 +288,7 @@ public class MuseumItemHandler implements Listener {
                                     "§fДрузей: " + archaeologist.getFriendList().size()
                             ).build()
                     ));
-                    contents.add('M', ClickableItem.empty(getMuseumItem(museum)));
+                    contents.add('M', ClickableItem.empty(getMuseumItem(archaeologist)));
                     contents.add('A', ClickableItem.of(Items.builder()
                                     .displayName("§bПригласить друга")
                                     .type(Material.BOOK_AND_QUILL)
@@ -384,7 +390,7 @@ public class MuseumItemHandler implements Listener {
         }
     }
 
-    private ItemStack getMuseumItem(AbstractMuseum museum) {
+    private ItemStack getMuseumItem(Archaeologist archaeologist) {
         if (museumItem == null) {
             museumItem = Items.builder()
                     .displayName("§bМузей")
@@ -394,6 +400,9 @@ public class MuseumItemHandler implements Listener {
             nmsItem.tag.setString("other", "guild_bank");
             museumItem.setItemMeta(CraftItemStack.getItemMeta(nmsItem));
         }
+        val museum = archaeologist.getCurrentMuseum();
+        val hall = archaeologist.getCurrentHall();
+
         ItemStack clone = museumItem.clone();
         ItemMeta meta = clone.getItemMeta();
         Date date = new Date();
@@ -401,10 +410,15 @@ public class MuseumItemHandler implements Listener {
                 "",
                 "§fХозяин: " + museum.getOwner().getName(),
                 "§fНазвание: " + museum.getTitle(),
-                "§fДоход: ",
+                "§fДоход: " + numberFormat.format(museum.getSummaryIncrease()),
+                "§fЗаллов: " + museum.getHalls().size(),
                 "§fПосещений: " + museum.getViews(),
-                "§fКоллектор: " + museum.getHalls().get(0).getCollectorType().getName(),
-                "§fВитрин: " + museum.getHalls().get(0).getMatrix().size(), // заменить на hall
+                "§fКоллектор: " + hall.getCollectorType().getName(),
+                "§fВитрин: " + museum.getHalls().stream()
+                        .map(Hall::getMatrix)
+                        .map(List::size)
+                        .mapToInt(Integer::valueOf)
+                        .sum(),
                 "",
                 "§7Создан " + (date.getTime() - museum.getDate().getTime()) / 3600_000 / 24 + " дней(я) назад"
         ));
