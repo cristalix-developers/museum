@@ -28,7 +28,6 @@ import ru.func.museum.excavation.Excavation;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.collector.CollectorType;
-import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.pickaxe.PickaxeType;
 import ru.func.museum.util.VirtualSign;
@@ -112,7 +111,7 @@ public class MuseumItemHandler implements Listener {
                                         archaeologist.setOnExcavation(true);
                                         archaeologist.setLastExcavation(excavationType);
 
-                                        archaeologist.getCurrentMuseum().unload(archaeologist, player);
+                                        archaeologist.getCurrentMuseum().unload(app, archaeologist, player);
                                         excavation.load(archaeologist, player);
                                     }
                             ));
@@ -218,6 +217,8 @@ public class MuseumItemHandler implements Listener {
                             lore.add("");
                             if (collectorType.getSpeed() > 0)
                                 lore.add("§fСкорость: " + collectorType.getSpeed() * 6);
+                            if (collectorType.getRadius() > 0)
+                                lore.add("§fРадиус сбора: " + collectorType.getRadius());
                             if (collectorType.getCost() > 0)
                                 lore.add("§fИгровая цена: " + collectorType.getCost());
                             if (collectorType.getCristalixCost() > 0)
@@ -246,7 +247,7 @@ public class MuseumItemHandler implements Listener {
                                             hall.setCollectorType(collectorType);
 
                                             // Перезагрузка музея
-                                            museum.unload(archaeologist, player);
+                                            museum.unload(app, archaeologist, player);
                                             museum.load(app, archaeologist, player);
                                             player.closeInventory();
                                         } else if (event.getClick().equals(ClickType.DOUBLE_CLICK)) {
@@ -322,7 +323,7 @@ public class MuseumItemHandler implements Listener {
                                     "§fХороший коллектор способен",
                                     "§fсобрать больше монет!",
                                     "",
-                                    "§f[§bДЛЯ ЭТОГО МУЗЕЯ§f]"
+                                    "§f[§bдля этого залла§f]"
                             ).build(), event -> collectorUI.open(player)
                     ));
                     contents.add('T', ClickableItem.of(Items.builder()
@@ -378,7 +379,7 @@ public class MuseumItemHandler implements Listener {
                     return;
                 }
 
-                museum.unload(ownerArchaeologist, user);
+                museum.unload(app, ownerArchaeologist, user);
                 player.getMuseumList().get(0).load(app, player, user);
                 val owner = Bukkit.getPlayer(UUID.fromString(ownerArchaeologist.getUuid()));
 
@@ -407,18 +408,15 @@ public class MuseumItemHandler implements Listener {
         ItemMeta meta = clone.getItemMeta();
         Date date = new Date();
         meta.setLore(Arrays.asList(
-                "",
                 "§fХозяин: " + museum.getOwner().getName(),
                 "§fНазвание: " + museum.getTitle(),
-                "§fДоход: " + numberFormat.format(museum.getSummaryIncrease()),
                 "§fЗаллов: " + museum.getHalls().size(),
                 "§fПосещений: " + museum.getViews(),
+                "",
+                "§b > Залл",
+                "§fДоход: " + numberFormat.format(museum.getSummaryIncrease()),
                 "§fКоллектор: " + hall.getCollectorType().getName(),
-                "§fВитрин: " + museum.getHalls().stream()
-                        .map(Hall::getMatrix)
-                        .map(List::size)
-                        .mapToInt(Integer::valueOf)
-                        .sum(),
+                "§fВитрин: " + archaeologist.getCurrentHall().getMatrix().size(),
                 "",
                 "§7Создан " + (date.getTime() - museum.getDate().getTime()) / 3600_000 / 24 + " дней(я) назад"
         ));

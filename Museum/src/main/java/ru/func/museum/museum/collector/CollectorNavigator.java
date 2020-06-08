@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.ToString;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.util.NumberConversions;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,12 +53,12 @@ public class CollectorNavigator {
         Location from = node.location;
         Location to = node.next.location;
         float yaw = (float) Math.toDegrees(Math.atan2(to.getX() - from.getX(), from.getZ() - to.getZ()));
-        float pitch = (float) Math.toDegrees(Math.atan2(to.getY() - from.getY(), Math.sqrt(NumberConversions.square(to.getX() - from.getX()) + NumberConversions.square(to.getZ() - from.getZ()))));
+        //float pitch = (float) Math.toDegrees(Math.atan2(to.getY() - from.getY(), Math.sqrt(NumberConversions.square(to.getX() - from.getX()) + NumberConversions.square(to.getZ() - from.getZ()))));
         double localPart = (part - p) / node.part;
         double x = (to.getX() - from.getX()) * localPart;
         double y = (to.getY() - from.getY()) * localPart;
         double z = (to.getZ() - from.getZ()) * localPart;
-        return new Location(world, x + to.getX(), y + to.getY(), z + to.getZ(), yaw, pitch);
+        return new Location(world, x + to.getX(), y + to.getY(), z + to.getZ(), yaw, 0); // pitch
     }
 
     @Data

@@ -17,5 +17,12 @@ public interface HallTemplate {
 
     List<Location> getCollectorRoute();
 
-    Location getSpawn();
+    Location getStartDot();
+
+    Location getEndDot();
+
+    default boolean isInside(Location location) {
+        return getStartDot().getBlockX() < location.getBlockX() && getStartDot().getBlockZ() < location.getBlockZ()
+                && getEndDot().getBlockX() > location.getBlockX() && getEndDot().getBlockZ() > getEndDot().getBlockZ();
+    }
 }

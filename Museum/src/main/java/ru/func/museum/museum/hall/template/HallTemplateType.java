@@ -40,7 +40,8 @@ public enum HallTemplateType {
                     new Location(Excavation.WORLD, -90.5, 90, 267.5),
                     new Location(Excavation.WORLD, -90.5, 90, 278.5),
                     new Location(Excavation.WORLD, -92.5, 90, 278.5)
-            ), new Location(Excavation.WORLD, -91, 90, 251)
+            ), new Location(Excavation.WORLD, -101, 90, 245), // minimum
+            new Location(Excavation.WORLD, -85, 101, 286) // maximum
     )),
     ;
 

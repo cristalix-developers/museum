@@ -9,15 +9,16 @@ import org.bukkit.inventory.ItemStack;
 @Getter
 @AllArgsConstructor
 public enum CollectorType {
-    NONE("отсутствует", new ItemStack(Material.PAPER), 0, 0, -10),
-    LOVED("любительский", new ItemStack(Material.WORKBENCH), 1, 100_000, -1),
-    PROFESSIONAL("профессиольный", new ItemStack(Material.WORKBENCH), 2, 400_000, 69),
-    PRESTIGE("престижный", new ItemStack(Material.WORKBENCH), 4, 750_000, 99);
+    NONE("отсутствует", new ItemStack(Material.PAPER), 0, 0, 0,  -10),
+    LOVED("любительский", new ItemStack(Material.WORKBENCH), 1, 100_000, 1.5, -1),
+    PROFESSIONAL("профессиольный", new ItemStack(Material.WORKBENCH), 2, 400_000, 2,69),
+    PRESTIGE("престижный", new ItemStack(Material.WORKBENCH), 4, 750_000, 3, 99);
 
     private String name;
     private ItemStack head;
     private int speed;
     private int cost;
+    private double radius;
     private int cristalixCost;
 
     public void move(PlayerConnection connection, EntityArmorStand armorStand, double dx, double dy, double dz, float yaw, float pitch) {

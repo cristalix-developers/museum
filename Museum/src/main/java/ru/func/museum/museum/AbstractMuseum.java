@@ -1,6 +1,7 @@
 package ru.func.museum.museum;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import ru.func.museum.App;
 import ru.func.museum.museum.hall.Hall;
@@ -22,7 +23,7 @@ public interface AbstractMuseum {
 
     void load(App plugin, Archaeologist archaeologist, Player guest);
 
-    void unload(Archaeologist archaeologist, Player guest);
+    void unload(App app, Archaeologist archaeologist, Player guest);
 
     void updateIncrease();
 

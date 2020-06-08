@@ -13,10 +13,7 @@ import ru.func.museum.command.MuseumCommand;
 import ru.func.museum.element.deserialized.EntityDeserializer;
 import ru.func.museum.element.deserialized.MuseumEntity;
 import ru.func.museum.excavation.Excavation;
-import ru.func.museum.listener.CancelEvent;
-import ru.func.museum.listener.ManipulatorHandler;
-import ru.func.museum.listener.MuseumItemHandler;
-import ru.func.museum.listener.PlayerConnectionListener;
+import ru.func.museum.listener.*;
 import ru.func.museum.player.Archaeologist;
 
 import java.util.Arrays;
@@ -43,7 +40,8 @@ public final class App extends JavaPlugin {
                 new CancelEvent(),
                 new MuseumItemHandler(this),
                 new ManipulatorHandler(this),
-                new PlayerConnectionListener(this)
+                new PlayerConnectionListener(this),
+                new MoveListener(this)
         ).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
 
         MongoManager.connect(

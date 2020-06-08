@@ -9,6 +9,7 @@ import ru.func.museum.museum.collector.CollectorNavigator;
 import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.museum.hall.template.HallTemplateType;
 import ru.func.museum.museum.space.Space;
+import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.pickaxe.Pickaxe;
 
 import java.util.List;
@@ -32,13 +33,15 @@ public class Hall {
     private transient Location previousLocation;
     private transient CollectorNavigator navigator;
 
-    public void moveCollector(PlayerConnection connection, double iteration) {
+    public void moveCollector(Archaeologist archaeologist, PlayerConnection connection, double iteration) {
         if (collectorType.equals(CollectorType.NONE))
             return;
 
         iteration = iteration / 500 * collectorType.getSpeed();
 
         val location = navigator.getLocation(iteration);
+
+        archaeologist.getCoins().removeIf(coin -> coin.pickUp(connection, archaeologist, location, collectorType.getRadius()));
 
         collectorType.move(
                 connection,
@@ -81,5 +84,9 @@ public class Hall {
         ));
         this.armorStand = armorStand;
         previousLocation = armorStand.getBukkitEntity().getLocation();
+    }
+
+    public boolean isInside(Location location) {
+        return hallTemplateType.getHallTemplate().isInside(location);
     }
 }

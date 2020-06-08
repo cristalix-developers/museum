@@ -1,6 +1,7 @@
 package ru.func.museum.museum;
 
 import lombok.*;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -9,12 +10,17 @@ import ru.cristalix.core.item.Items;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.func.museum.App;
 import ru.func.museum.element.Element;
+import ru.func.museum.excavation.Excavation;
+import ru.func.museum.museum.coin.AbstractCoin;
 import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.player.Archaeologist;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author func 22.05.2020
@@ -34,6 +40,12 @@ public class Museum implements AbstractMuseum {
     private transient double summaryIncrease;
     @NonNull
     private String title;
+    @NonNull
+    private int spawnX;
+    @NonNull
+    private int spawnY;
+    @NonNull
+    private int spawnZ;
 
     @Override
     public void load(App plugin, Archaeologist archaeologist, Player guest) {
@@ -46,8 +58,11 @@ public class Museum implements AbstractMuseum {
 
         // Подготовка игрока
         val guestA = plugin.getArchaeologistMap().get(guest.getUniqueId());
+
         guestA.setCurrentMuseum(this);
         guestA.setCurrentHall(halls.get(0));
+
+        guestA.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
 
         guest.getInventory().remove(Material.SADDLE);
 
@@ -62,7 +77,7 @@ public class Museum implements AbstractMuseum {
             );
         }
 
-        guest.teleport(halls.get(0).getHallTemplateType().getHallTemplate().getSpawn());
+        guest.teleport(new Location(Excavation.WORLD, spawnX, spawnY, spawnZ));
         val connection = ((CraftPlayer) guest).getHandle().playerConnection;
 
         // Поготовка заллов
@@ -74,14 +89,13 @@ public class Museum implements AbstractMuseum {
         val id = guestA.getCurrentMuseum().getDate();
 
         new BukkitRunnable() {
-
             int counter = 0;
 
             @Override
             public void run() {
                 if (!guest.isOnline() || archaeologist.isOnExcavation() || !id.equals(guestA.getCurrentMuseum().getDate()))
                     cancel();
-                halls.forEach(hall -> hall.moveCollector(connection, counter));
+                halls.forEach(hall -> hall.moveCollector(archaeologist, connection, counter));
 
                 counter = ++counter % 500;
             }
@@ -89,12 +103,17 @@ public class Museum implements AbstractMuseum {
     }
 
     @Override
-    public void unload(Archaeologist archaeologist, Player guest) {
+    public void unload(App app, Archaeologist archaeologist, Player guest) {
         val connection = ((CraftPlayer) guest).getHandle().playerConnection;
+        // Очстка витрин, коллекторов
         halls.forEach(hall -> {
             hall.getMatrix().forEach(space -> space.hide(archaeologist, guest));
             hall.removeCollector(connection);
         });
+        // Очистка монет
+        Set<AbstractCoin> coins = app.getArchaeologistMap().get(guest.getUniqueId()).getCoins();
+        coins.forEach(coin -> coin.remove(connection));
+        coins.clear();
     }
 
     @Override

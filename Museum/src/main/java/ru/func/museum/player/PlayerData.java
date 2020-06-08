@@ -5,11 +5,13 @@ import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
+import ru.func.museum.museum.coin.AbstractCoin;
 import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -30,14 +32,15 @@ public class PlayerData implements Archaeologist {
     private int level;
     private transient int breakLess;
     private ExcavationType lastExcavation;
-    private transient Space currentSpace;
     private boolean onExcavation;
     private List<UUID> friendList;
     private PickaxeType pickaxeType;
     private List<AbstractMuseum> museumList;
     private List<Element> elementList;
+    private transient Space currentSpace;
     private transient AbstractMuseum currentMuseum;
     private transient Hall currentHall;
+    private transient Set<AbstractCoin> coins;
     private int excavationCount;
 
     @Override

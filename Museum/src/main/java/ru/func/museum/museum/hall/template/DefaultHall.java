@@ -18,5 +18,6 @@ public class DefaultHall implements HallTemplate {
     private Supplier<List<Space>> matrix;
     private String title;
     private List<Location> collectorRoute;
-    private Location spawn;
+    private Location startDot; // all is minimum
+    private Location endDot;
 }

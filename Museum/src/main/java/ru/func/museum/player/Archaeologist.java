@@ -5,11 +5,13 @@ import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
+import ru.func.museum.museum.coin.AbstractCoin;
 import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.museum.space.Space;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @BsonDiscriminator
@@ -17,6 +19,10 @@ public interface Archaeologist {
     String getUuid();
 
     AbstractMuseum getCurrentMuseum();
+
+    Set<AbstractCoin> getCoins();
+
+    void setCoins(Set<AbstractCoin> coins);
 
     void setCurrentHall(Hall hall);
 
