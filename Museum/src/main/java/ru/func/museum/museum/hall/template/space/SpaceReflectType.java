@@ -1,4 +1,4 @@
-package ru.func.museum.museum.space;
+package ru.func.museum.museum.hall.template.space;
 
 import lombok.AllArgsConstructor;
 import org.bukkit.Location;

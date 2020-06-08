@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Location;
 import ru.func.museum.excavation.Excavation;
-import ru.func.museum.museum.space.SkeletonSpaceViewer;
-import ru.func.museum.museum.space.SpaceReflectType;
+import ru.func.museum.museum.hall.template.space.SkeletonSpaceViewer;
+import ru.func.museum.museum.hall.template.space.SpaceReflectType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,13 +23,15 @@ public enum HallTemplateType {
                     SpaceReflectType.SOUTH,
                     0,
                     -87, 90, 261,
-                    new ArrayList<>()
+                    new ArrayList<>(),
+                    new int[]{0}
             ), new SkeletonSpaceViewer(
                     -94, 91, 262,
                     SpaceReflectType.NORTH,
                     0,
                     -95, 90, 261,
-                    new ArrayList<>()
+                    new ArrayList<>(),
+                    new int[]{0}
             )), "Музей динозавров",
             Arrays.asList(
                     new Location(Excavation.WORLD, -92.5, 90, 267.5),

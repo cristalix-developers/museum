@@ -7,7 +7,7 @@ import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.coin.AbstractCoin;
 import ru.func.museum.museum.hall.Hall;
-import ru.func.museum.museum.space.Space;
+import ru.func.museum.museum.hall.template.space.Space;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.List;
@@ -33,7 +33,6 @@ public class PlayerData implements Archaeologist {
     private transient int breakLess;
     private ExcavationType lastExcavation;
     private boolean onExcavation;
-    private List<UUID> friendList;
     private PickaxeType pickaxeType;
     private List<AbstractMuseum> museumList;
     private List<Element> elementList;

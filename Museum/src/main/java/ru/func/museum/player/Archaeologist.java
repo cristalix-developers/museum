@@ -7,7 +7,7 @@ import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.coin.AbstractCoin;
 import ru.func.museum.museum.hall.Hall;
-import ru.func.museum.museum.space.Space;
+import ru.func.museum.museum.hall.template.space.Space;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.List;
@@ -63,8 +63,6 @@ public interface Archaeologist {
     boolean isOnExcavation();
 
     void setOnExcavation(boolean onExcavation);
-
-    List<UUID> getFriendList();
 
     PickaxeType getPickaxeType();
 

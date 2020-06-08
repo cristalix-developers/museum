@@ -16,8 +16,8 @@ import ru.func.museum.museum.Museum;
 import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.museum.hall.template.HallTemplateType;
-import ru.func.museum.museum.space.SkeletonSpaceViewer;
-import ru.func.museum.museum.space.Space;
+import ru.func.museum.museum.hall.template.space.SkeletonSpaceViewer;
+import ru.func.museum.museum.hall.template.space.Space;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.PlayerData;
 import ru.func.museum.player.pickaxe.PickaxeType;
@@ -78,7 +78,6 @@ public class MongoManager {
                         .onExcavation(false)
                         .pickaxeType(PickaxeType.DEFAULT)
                         .elementList(new ArrayList<>())
-                        .friendList(new ArrayList<>())
                         .museumList(Collections.singletonList(new Museum(
                                 new Date(),
                                 Collections.singletonList(new Hall(

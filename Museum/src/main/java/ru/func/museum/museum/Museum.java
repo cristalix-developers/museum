@@ -13,7 +13,7 @@ import ru.func.museum.element.Element;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.museum.coin.AbstractCoin;
 import ru.func.museum.museum.hall.Hall;
-import ru.func.museum.museum.space.Space;
+import ru.func.museum.museum.hall.template.space.Space;
 import ru.func.museum.player.Archaeologist;
 
 import java.util.Collections;

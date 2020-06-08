@@ -1,4 +1,4 @@
-package ru.func.museum.museum.space;
+package ru.func.museum.museum.hall.template.space;
 
 import lombok.*;
 import net.minecraft.server.v1_12_R1.PacketPlayOutEntityDestroy;
@@ -47,6 +47,8 @@ public class SkeletonSpaceViewer implements Space {
     private int z;
     @NonNull
     private List<Element> elements;
+    @NonNull
+    private int[] accessEntities;
 
     @Override
     public boolean isManipulator(Location location) {

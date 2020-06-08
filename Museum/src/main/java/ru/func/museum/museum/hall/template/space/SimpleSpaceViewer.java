@@ -1,4 +1,4 @@
-package ru.func.museum.museum.space;
+package ru.func.museum.museum.hall.template.space;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,5 +35,10 @@ public class SimpleSpaceViewer implements Space {
     @Override
     public List<Element> getElements() {
         return null;
+    }
+
+    @Override
+    public int[] getAccessEntities() {
+        return new int[0];
     }
 }

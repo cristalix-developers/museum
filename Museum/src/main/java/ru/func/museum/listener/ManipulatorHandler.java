@@ -35,11 +35,20 @@ public class ManipulatorHandler implements Listener {
             .provider(new InventoryProvider() {
                           @Override
                           public void init(Player player, InventoryContents contents) {
+                              contents.resetMask(
+                                      "OXXXXXXXX",
+                                      "XXXXXXXXX",
+                                      "XXXXXXXXX",
+                                      "XXXXXXXXX",
+                                      "XXXXXXXXX",
+                                      "XXXXXXXXX"
+                              );
+
                               val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
                               val museum = archaeologist.getCurrentMuseum();
                               val space = archaeologist.getCurrentSpace();
 
-                              contents.set(0, ClickableItem.of(clear, event -> {
+                              contents.add('O', ClickableItem.of(clear, event -> {
                                   for (Element element : archaeologist.getElementList())
                                       for (Element spaceElement : space.getElements())
                                           if (element.getId() == spaceElement.getId() && element.getParentId() == spaceElement.getParentId())
@@ -53,6 +62,19 @@ public class ManipulatorHandler implements Listener {
                               }));
 
                               for (int i = 0; i < app.getMuseumEntities().length; i++) {
+                                  // Проверка на то, является ли динозавр разрешенным
+                                  boolean forbidden = true;
+
+                                  for (int able : space.getAccessEntities()) {
+                                      if (able == i) {
+                                          forbidden = false;
+                                          break;
+                                      }
+                                  }
+
+                                  if (forbidden)
+                                      continue;
+
                                   val entity = app.getMuseumEntities()[i];
                                   val parentId = i;
 
@@ -84,7 +106,6 @@ public class ManipulatorHandler implements Listener {
                                                   break;
                                               }
                                           }
-
                                           fragments[j + 1] = "§" + (contains ? "a + " : "c - ") + "§f" +
                                                   entity.getSubs()[j].getTitle();
                                       }
@@ -113,7 +134,7 @@ public class ManipulatorHandler implements Listener {
                                               }
                                       );
                                   }
-                                  contents.set(i + 1, clickableItem);
+                                  contents.add('X', clickableItem);
                               }
                           }
                       }

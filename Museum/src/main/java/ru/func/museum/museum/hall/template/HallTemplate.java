@@ -1,7 +1,7 @@
 package ru.func.museum.museum.hall.template;
 
 import org.bukkit.Location;
-import ru.func.museum.museum.space.Space;
+import ru.func.museum.museum.hall.template.space.Space;
 
 import java.util.List;
 import java.util.function.Supplier;

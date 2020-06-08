@@ -1,4 +1,4 @@
-package ru.func.museum.museum.space;
+package ru.func.museum.museum.hall.template.space;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bukkit.Location;
@@ -18,4 +18,6 @@ public interface Space {
     void hide(Archaeologist owner, Player guest);
 
     List<Element> getElements();
+
+    int[] getAccessEntities();
 }

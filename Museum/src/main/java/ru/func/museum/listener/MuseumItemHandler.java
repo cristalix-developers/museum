@@ -280,13 +280,12 @@ public class MuseumItemHandler implements Listener {
                             .loreLines(
                                     "",
                                     "§fУровень: " + archaeologist.getLevel(),
-                                    String.format("§fДенег: %.2f$", archaeologist.getMoney()),
+                                    "§fДенег: " + numberFormat.format(archaeologist.getMoney()),
                                     "§fОпыт: " + archaeologist.getExp(),
                                     "§fОпыта осталось: " + archaeologist.expNeed(archaeologist.getExp()),
                                     "§fКирка: " + archaeologist.getPickaxeType().getName(),
                                     "§fРаскопок: " + archaeologist.getExcavationCount(),
-                                    "§fФрагментов: " + archaeologist.getElementList().size(),
-                                    "§fДрузей: " + archaeologist.getFriendList().size()
+                                    "§fФрагментов: " + archaeologist.getElementList().size()
                             ).build()
                     ));
                     contents.add('M', ClickableItem.empty(getMuseumItem(archaeologist)));

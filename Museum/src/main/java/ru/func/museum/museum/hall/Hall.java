@@ -8,7 +8,7 @@ import ru.func.museum.excavation.Excavation;
 import ru.func.museum.museum.collector.CollectorNavigator;
 import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.museum.hall.template.HallTemplateType;
-import ru.func.museum.museum.space.Space;
+import ru.func.museum.museum.hall.template.space.Space;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.pickaxe.Pickaxe;
 

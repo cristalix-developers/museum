@@ -3,7 +3,7 @@ package ru.func.museum.museum.hall.template;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Location;
-import ru.func.museum.museum.space.Space;
+import ru.func.museum.museum.hall.template.space.Space;
 
 import java.util.List;
 import java.util.function.Supplier;
