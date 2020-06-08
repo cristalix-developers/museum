@@ -147,7 +147,7 @@ public class BeforePacketHandler implements Prepare {
 
                         String value = String.format("%.2f", prize) + "$";
                         player.sendMessage("" +
-                                "§7[§l§bi§7] §7Вы нашли §l§6" +
+                                "§7[§l§bi§7] Вы нашли §b" +
                                 subEntity.getTitle() +
                                 ", §7этот фрагмент - дубликат, его цена §l§6+" +
                                 value
@@ -160,7 +160,7 @@ public class BeforePacketHandler implements Prepare {
                     });
 
             if (!exists[0]) {
-                player.sendMessage("§7[§l§bi§7] §7Вы откопали новый фрагмент: §l" + subEntity.getTitle() + "§7!");
+                player.sendMessage("§7[§l§bi§7] Вы откопали новый фрагмент: §b" + subEntity.getTitle() + "§7!");
                 player.sendTitle("§l§6Находка!", "§eобнаружен " + parent.getRare().getWord() + " фрагмент");
 
                 archaeologist.getElementList().add(new Element(parentId, id, false, parent.getRare().getIncrease()));

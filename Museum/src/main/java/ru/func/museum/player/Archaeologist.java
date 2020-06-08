@@ -12,13 +12,10 @@ import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @BsonDiscriminator
 public interface Archaeologist {
     String getUuid();
-
-    AbstractMuseum getCurrentMuseum();
 
     Set<AbstractCoin> getCoins();
 
@@ -27,6 +24,8 @@ public interface Archaeologist {
     void setCurrentHall(Hall hall);
 
     Hall getCurrentHall();
+
+    AbstractMuseum getCurrentMuseum();
 
     void setCurrentMuseum(AbstractMuseum currentMuseum);
 

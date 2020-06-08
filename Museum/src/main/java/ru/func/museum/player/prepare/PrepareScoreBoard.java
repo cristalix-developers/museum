@@ -27,7 +27,7 @@ public class PrepareScoreBoard implements Prepare {
         val museum = archaeologist.getCurrentMuseum();
         main.startGroup("Музей")
                 .record("Заработок", () -> "§b" + numberFormat.format(archaeologist.getCurrentMuseum().getSummaryIncrease()))
-                .record("Посещений", () -> museum.getViews() + "");
+                .record("Посещений", () -> "§b" + museum.getViews());
         template(main);
 
         SimpleBoardObjective excavation = IScoreboardService.get().getPlayerObjective(player.getUniqueId(), "excavation");

@@ -5,7 +5,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.core.item.Items;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.func.museum.App;
@@ -85,21 +84,6 @@ public class Museum implements AbstractMuseum {
             hall.getMatrix().forEach(space -> space.show(archaeologist, guest));
             hall.generateCollector(connection);
         });
-
-        val id = guestA.getCurrentMuseum().getDate();
-
-        new BukkitRunnable() {
-            int counter = 0;
-
-            @Override
-            public void run() {
-                if (!guest.isOnline() || archaeologist.isOnExcavation() || !id.equals(guestA.getCurrentMuseum().getDate()))
-                    cancel();
-                halls.forEach(hall -> hall.moveCollector(archaeologist, connection, counter));
-
-                counter = ++counter % 500;
-            }
-        }.runTaskTimerAsynchronously(plugin, 0, 1);
     }
 
     @Override
@@ -118,7 +102,7 @@ public class Museum implements AbstractMuseum {
 
     @Override
     public void updateIncrease() {
-        summaryIncrease = 0;
+        summaryIncrease = .1;
         for (Hall hall : halls)
             for (Space space : hall.getMatrix())
                 for (Element element : space.getElements())

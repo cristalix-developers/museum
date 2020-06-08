@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import ru.func.museum.App;
@@ -22,12 +21,12 @@ public class MoveListener implements Listener {
 
     private App app;
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler
     public void onMove(PlayerMoveEvent e) {
         val from = e.getFrom();
         val to = e.getTo();
 
-        if (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ()) {
+       // if (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ()) {
             val player = e.getPlayer();
             val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
 
@@ -44,11 +43,10 @@ public class MoveListener implements Listener {
                 }
             }
 
-
             val connection = ((CraftPlayer) player).getHandle().playerConnection;
 
             // Попытка скушать монетки
-            archaeologist.getCoins().removeIf(coin -> coin.pickUp(connection, archaeologist, to, 1.7));
+            archaeologist.getCoins().removeIf(coin -> coin.pickUp(player, archaeologist, to, 1.7));
 
             // Test
             AbstractCoin coin = new Coin(to.clone().subtract(
@@ -59,6 +57,6 @@ public class MoveListener implements Listener {
 
             coin.create(connection);
             archaeologist.getCoins().add(coin);
-        }
+        //}
     }
 }
