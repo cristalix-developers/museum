@@ -13,11 +13,10 @@ public interface AbstractCoin {
 
     ItemStack COIN = CraftItemStack.asNMSCopy(Items.builder()
             .type(Material.DOUBLE_PLANT)
-            .displayName("Монета")
             .build()
     );
 
-    int SECONDS_LIVE = 25;
+    int SECONDS_LIVE = 15;
 
     long getTimestamp();
 

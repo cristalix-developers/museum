@@ -14,6 +14,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 /**
@@ -48,6 +49,11 @@ public class CancelEvent implements Listener {
 
     @EventHandler
     public void onFromTo(BlockFromToEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onVillangerClick(PlayerInteractEntityEvent event) {
         event.setCancelled(true);
     }
 

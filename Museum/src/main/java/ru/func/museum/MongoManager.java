@@ -74,6 +74,7 @@ public class MongoManager {
                         .exp(0)
                         .excavationCount(0)
                         .breakLess(0)
+                        .pickedCoinsCount(0)
                         .lastExcavation(ExcavationType.DIRT)
                         .onExcavation(false)
                         .pickaxeType(PickaxeType.DEFAULT)

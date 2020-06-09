@@ -7,3 +7,5 @@ depend: [CoreAPI]
 commands:
   museum:
     usage:
+  visitor:
+    usage:

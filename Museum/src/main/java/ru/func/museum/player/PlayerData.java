@@ -1,6 +1,7 @@
 package ru.func.museum.player;
 
 import lombok.*;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
@@ -39,7 +40,14 @@ public class PlayerData implements Archaeologist {
     private transient AbstractMuseum currentMuseum;
     private transient Hall currentHall;
     private transient Set<AbstractCoin> coins;
+    private transient PlayerConnection connection;
     private int excavationCount;
+    private long pickedCoinsCount;
+
+    @Override
+    public void incPickedCoinsCount() {
+        pickedCoinsCount++;
+    }
 
     @Override
     public void giveExp(Player player, long exp) {

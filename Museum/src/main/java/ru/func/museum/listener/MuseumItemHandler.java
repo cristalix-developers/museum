@@ -7,6 +7,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Statistic;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -283,6 +284,8 @@ public class MuseumItemHandler implements Listener {
                                     "§fДенег: " + numberFormat.format(archaeologist.getMoney()),
                                     "§fОпыт: " + archaeologist.getExp(),
                                     "§fОпыта осталось: " + archaeologist.expNeed(archaeologist.getExp()),
+                                    "§fЧасов сыграно: " + player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000,
+                                    "§fМонет собрано: " + archaeologist.getPickedCoinsCount(),
                                     "§fКирка: " + archaeologist.getPickaxeType().getName(),
                                     "§fРаскопок: " + archaeologist.getExcavationCount(),
                                     "§fФрагментов: " + archaeologist.getElementList().size()

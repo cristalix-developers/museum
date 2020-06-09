@@ -1,5 +1,6 @@
 package ru.func.museum.player;
 
+import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
@@ -28,6 +29,14 @@ public interface Archaeologist {
     AbstractMuseum getCurrentMuseum();
 
     void setCurrentMuseum(AbstractMuseum currentMuseum);
+
+    PlayerConnection getConnection();
+
+    void setConnection(PlayerConnection connection);
+
+    long getPickedCoinsCount();
+
+    void incPickedCoinsCount();
 
     Space getCurrentSpace();
 

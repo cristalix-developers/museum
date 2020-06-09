@@ -60,7 +60,7 @@ public class BeforePacketHandler implements Prepare {
                                 if (tryReturnPlayer(player, archaeologist, app))
                                     return;
                                 // Игрок на раскопках, блок находится в шахте
-                                acceptedBreak(player, archaeologist, excavation, bd, connection, app);
+                                acceptedBreak(player, archaeologist, excavation, bd, app);
                             } else if (!valid && bd.c == PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK)
                                 bd.c = PacketPlayInBlockDig.EnumPlayerDigType.ABORT_DESTROY_BLOCK; // Genius
                         }
@@ -86,21 +86,21 @@ public class BeforePacketHandler implements Prepare {
         return archaeologist.getBreakLess() < 0;
     }
 
-    private void acceptedBreak(Player player, Archaeologist archaeologist, Excavation excavation, PacketPlayInBlockDig bd, PlayerConnection connection, App app) {
+    private void acceptedBreak(Player player, Archaeologist archaeologist, Excavation excavation, PacketPlayInBlockDig bd, App app) {
         archaeologist.giveExp(player, 5);
 
         MinecraftServer.getServer().postToMainThread(() -> {
             for (PickaxeType pickaxeType : PickaxeType.values()) {
                 if (pickaxeType.getPrice() <= archaeologist.getPickaxeType().getPrice()) {
-                    List<BlockPosition> positions = pickaxeType.getPickaxe().dig(connection, excavation, bd.a);
+                    List<BlockPosition> positions = pickaxeType.getPickaxe().dig(archaeologist.getConnection(), excavation, bd.a);
                     if (positions != null)
-                        positions.forEach(position -> generateFragments(player, archaeologist, excavation, position, connection, app));
+                        positions.forEach(position -> generateFragments(player, archaeologist, excavation, position, app));
                 }
             }
         });
     }
 
-    private void generateFragments(Player player, Archaeologist archaeologist, Excavation excavation, BlockPosition position, PlayerConnection connection, App app) {
+    private void generateFragments(Player player, Archaeologist archaeologist, Excavation excavation, BlockPosition position, App app) {
         int[] ableIds = excavation.getExcavationGenerator().getElementsId();
         int parentId = ableIds[Pickaxe.RANDOM.nextInt(ableIds.length)];
 
@@ -126,14 +126,14 @@ public class BeforePacketHandler implements Prepare {
                 ids[i] = noise * 100 + i;
 
             subEntity.show(
-                    connection,
+                    archaeologist.getConnection(),
                     new Location(Excavation.WORLD, position.getX(), position.getY(), position.getZ()),
                     0,
                     noise,
                     true
             );
 
-            animateFragments(connection, ids, app);
+            animateFragments(archaeologist.getConnection(), ids, app);
 
             boolean[] exists = new boolean[]{false};
 

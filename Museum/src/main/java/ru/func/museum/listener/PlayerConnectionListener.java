@@ -2,6 +2,7 @@ package ru.func.museum.listener;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -28,6 +29,8 @@ public class PlayerConnectionListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         val player = e.getPlayer();
         val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
+
+        archaeologist.setConnection(((CraftPlayer) player).getHandle().playerConnection);
 
         for (val prepare : PreparePlayer.values())
             prepare.getPrepare().execute(player, archaeologist, app);

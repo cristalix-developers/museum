@@ -3,12 +3,8 @@ package ru.func.museum.museum.coin;
 import lombok.Getter;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import ru.func.museum.App;
 import ru.func.museum.player.Archaeologist;
@@ -56,10 +52,12 @@ public class Coin implements AbstractCoin {
             val format = Math.floor(money * 100) / 100;
             entityItem.setCustomName("§6+ " + format + "$");
 
-            val connection = ((CraftPlayer) player).getHandle().playerConnection;
+            val connection = archaeologist.getConnection();
 
             connection.sendPacket(new PacketPlayOutEntityVelocity(entityItem.getId(), 0, .05, 0));
             connection.sendPacket(new PacketPlayOutEntityMetadata(entityItem.getId(), entityItem.getDataWatcher(), false));
+
+            archaeologist.incPickedCoinsCount();
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(App.getApp(), () -> {
                 remove(connection);
