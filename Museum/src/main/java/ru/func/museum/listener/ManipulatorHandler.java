@@ -17,6 +17,7 @@ import ru.cristalix.core.inventory.InventoryProvider;
 import ru.cristalix.core.item.Items;
 import ru.func.museum.App;
 import ru.func.museum.element.Element;
+import ru.func.museum.util.MessageUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class ManipulatorHandler implements Listener {
 
                                   space.hide(archaeologist, player);
                                   player.closeInventory();
-                                  player.sendMessage("§7[§l§bi§7] Витрина освобождена!");
+                                  MessageUtil.find("freestand").send(player);
                                   space.getElements().clear();
                                   museum.updateIncrease();
                               }));
@@ -117,7 +118,7 @@ public class ManipulatorHandler implements Listener {
                                                       " фрагментов"
                                               ).lore(fragments).build(), event -> {
                                                   if (elements.get(0).isLocked()) {
-                                                      player.sendMessage("§7[§l§bi§7] Вы не можете выбрать экспонат, он занят другой витриной.");
+                                                      MessageUtil.find("standlocked").send(player);
                                                       player.closeInventory();
                                                       return;
                                                   }
@@ -130,7 +131,7 @@ public class ManipulatorHandler implements Listener {
                                                   space.hide(archaeologist, player);
                                                   space.show(archaeologist, player);
                                                   player.closeInventory();
-                                                  player.sendMessage("§7[§l§bi§7] Экспонат поставлен на витрину!");
+                                                  MessageUtil.find("standplaced").send(player);
                                               }
                                       );
                                   }

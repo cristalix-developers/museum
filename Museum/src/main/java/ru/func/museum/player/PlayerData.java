@@ -10,6 +10,7 @@ import ru.func.museum.museum.coin.AbstractCoin;
 import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.museum.hall.template.space.Space;
 import ru.func.museum.player.pickaxe.PickaxeType;
+import ru.func.museum.util.MessageUtil;
 
 import java.util.List;
 import java.util.Set;
@@ -54,11 +55,10 @@ public class PlayerData implements Archaeologist {
         this.exp += exp;
         if (expNeed(this.exp) <= 0) {
             level++;
-            player.sendMessage(String.format(
-                    "§7[§l§bi§7] Вы достигли §l§b%d §7уровеня! До следующего уровня осталось §l§b%d§7 опыта.",
-                    level,
-                    expNeed(this.exp)
-            ));
+            MessageUtil.find("levelup")
+                    .set("level", level)
+                    .set("exp", expNeed(this.exp))
+                    .send(player);
         }
     }
 

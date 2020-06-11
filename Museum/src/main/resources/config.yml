@@ -1,6 +1,30 @@
 uri: 'mongodb+srv://root:admin@cluster0-vnynx.mongodb.net/test?retryWrites=true&w=majority&ssl=true&streamType=netty'
 database: 'data'
 collection: 'museum'
+
+chat:
+  prefix: '§7[§l§bi§7] '
+  messages:
+    levelup: 'Вы достигли §l§b%LEVEL% §7уровеня! До следующего уровня осталось §l§b%EXP%§7 опыта.'
+    excavationend: '§7Раскопки подошли к концу, сейчас вернем вас в музей!'
+    findcopy: 'Вы нашли §b%NAME%, §7этот фрагмент - дубликат, его цена §l§6+%COST%.'
+    findfragment: 'Вы откопали новый фрагмент: §b%NAME%§7!'
+    freedstand: 'Витрина освобождена!'
+    standlocked: 'Вы не можете выбрать экспонат, он занят другой витриной.'
+    standplaced: 'Экспонат поставлен на витрину!'
+    nomoney: 'У вас не достаточно средств. 㬏'
+    newpickaxe: 'Вы приобрели. Новое снаряжение!'
+    newcollector: 'Вы приобрели %NAME% коллектор!'
+    inviteyourself: 'Вы так одиноки? 㬚'
+    invited: 'Приглашение отправлено.'
+    invitefrom: 'Приглашение от %PLAYER%. [§6ПРИНЯТЬ§7]'
+    playeroffline: 'Игрок не в сети. 㬏'
+    museumtitlechange: 'Название музея изменено на "%TITLE%".'
+    backtomuseum: '§7Вы вернулись в свой музей.'
+    leavedfrommuseum: '§7%NAME% покинул ваш музей.'
+    visitexcavation: 'Вы прибыли на §l§b%TITLE%.'
+    visitaccepted: '%VISITOR% принял приглашение.'
+
 entity:
   - '{"title":"LOL","subs":[{"title":"1\u003eКость 4","pieces":[{"vectorX":-0.5,"vectorY":0.0,"vectorZ":-1.5,"headRotation":{"x":0.008068660297802531,"y":-0.0793915368682442,"z":0.0},"material":"GOLD_HELMET"}]},{"title":"1\u003eКость
        5","pieces":[{"vectorX":-0.5,"vectorY":0.0,"vectorZ":-2.5,"headRotation":{"x":0.03541479523846857,"y":0.10189174435810462,"z":0.0},"material":"IRON_HELMET"},{"vectorX":-0.5,"vectorY":0.0,"vectorZ":-3.5,"headRotation":{"x":0.0201098789310814,"y":0.011109476355806419,"z":0.0},"material":"LEATHER_HELMET"}]},{"title":"1\u003eКость

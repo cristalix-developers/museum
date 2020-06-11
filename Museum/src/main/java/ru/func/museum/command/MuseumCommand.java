@@ -8,6 +8,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.func.museum.App;
+import ru.func.museum.util.MessageUtil;
 
 /**
  * @author func 04.06.2020
@@ -28,20 +29,20 @@ public class MuseumCommand implements CommandExecutor {
                     val author = Bukkit.getPlayer(strings[1]);
 
                     if (author == null || !author.isOnline()) {
-                        player.sendMessage("§7[§l§bi§7] Игрок, который пригласил вас не в сети. 㬏");
+                        MessageUtil.find("playeroffline").send(player);
                         return true;
                     }
 
                     val sender = app.getArchaeologistMap().get(author.getUniqueId());
 
-                    if (app.getArchaeologistMap().get(player.getUniqueId()).getCurrentMuseum().getOwner().equals(sender)) {
-                        player.sendMessage("§7[§l§bi§7] Вы уже прибыли!");
+                    if (app.getArchaeologistMap().get(player.getUniqueId()).getCurrentMuseum().getOwner().equals(sender))
                         return true;
-                    }
 
                     sender.getCurrentMuseum().load(app, sender, player);
 
-                    author.sendMessage("§7[§l§bi§7] " + player.getName() + " принял приглашение.");
+                    MessageUtil.find("visitaccept")
+                            .set("visitor", player.getName())
+                            .send(author);
                 }
             }
         }

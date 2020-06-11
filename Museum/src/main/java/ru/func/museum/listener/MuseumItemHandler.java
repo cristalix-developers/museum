@@ -31,6 +31,7 @@ import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.pickaxe.PickaxeType;
+import ru.func.museum.util.MessageUtil;
 import ru.func.museum.util.VirtualSign;
 
 import java.text.DecimalFormat;
@@ -104,7 +105,7 @@ public class MuseumItemHandler implements Listener {
                                     event -> {
                                         player.closeInventory();
                                         if (excavation.getCost() > archaeologist.getMoney()) {
-                                            player.sendMessage("§7[§l§bi§7] У вас не достаточно средств. 㬏");
+                                            MessageUtil.find("nomoney").send(player);
                                             return;
                                         }
                                         archaeologist.setMoney(archaeologist.getMoney() - excavation.getCost());
@@ -148,18 +149,13 @@ public class MuseumItemHandler implements Listener {
                             if (pickaxeType.getPrice() > archaeologist.getPickaxeType().getPrice()) {
                                 contents.add('S', ClickableItem.of(pickaxeType.getItem(), event -> {
                                     if (archaeologist.getMoney() < pickaxeType.getPrice()) {
-                                        player.sendMessage("§7[§l§bi§7] У вас не достаточно средств. 㬏");
-                                        player.closeInventory();
-                                        return;
-                                    }
-                                    if (archaeologist.getPickaxeType().getPrice() >= pickaxeType.getPrice()) {
-                                        player.sendMessage("§7[§l§bi§7] Эта кирка хуже вашей, вам не продадим! 㬏");
+                                        MessageUtil.find("nomoney").send(player);
                                         player.closeInventory();
                                         return;
                                     }
                                     contents.fillMask('S', null);
                                     update(player, contents);
-                                    player.sendMessage("§7[§l§bi§7] Вы приобрели. Новое снаряжение!");
+                                    MessageUtil.find("newpickaxe").send(player);
                                     archaeologist.setPickaxeType(pickaxeType);
                                     archaeologist.setMoney(archaeologist.getMoney() - pickaxeType.getPrice());
                                 }));
@@ -240,11 +236,13 @@ public class MuseumItemHandler implements Listener {
                                             return;
                                         if (event.getClick().equals(ClickType.LEFT)) {
                                             if (archaeologist.getMoney() < collectorType.getCost()) {
-                                                player.sendMessage("§7[§l§bi§7] У вас не достаточно средств. 㬏");
+                                                MessageUtil.find("nomoney").send(player);
                                                 player.closeInventory();
                                                 return;
                                             }
-                                            player.sendMessage("§7[§l§bi§7] Вы приобрели " + collectorType.getName() + " коллектор!");
+                                            MessageUtil.find("newcollector")
+                                                    .set("name", collectorType.getName())
+                                                    .send(player);
                                             archaeologist.setMoney(archaeologist.getMoney() - collectorType.getCost());
                                             hall.setCollectorType(collectorType);
 
@@ -252,7 +250,7 @@ public class MuseumItemHandler implements Listener {
                                             museum.unload(app, archaeologist, player);
                                             museum.load(app, archaeologist, player);
                                             player.closeInventory();
-                                        } else if (event.getClick().equals(ClickType.DOUBLE_CLICK)) {
+                                        } else if (event.getClick().equals(ClickType.RIGHT)) {
                                             player.sendMessage("Лол");
                                         }
                                     }
@@ -303,19 +301,22 @@ public class MuseumItemHandler implements Listener {
                                         Player invited = Bukkit.getPlayer(line);
                                         if (invited != null) {
                                             if (invited.equals(player)) {
-                                                player.sendMessage("§7[§l§bi§7] Вы так одиноки? 㬚");
+                                                MessageUtil.find("inviteyourself").send(player);
                                                 return;
                                             }
-                                            player.sendMessage("§7[§l§bi§7] Приглашение отправлено.");
-                                            TextComponent invite = new TextComponent("§7[§l§bi§7] Приглашение от " + player.getName() + ". [§6ПРИНЯТЬ§7]");
+                                            MessageUtil.find("invited").send(player);
+                                            TextComponent invite = new TextComponent(
+                                                    MessageUtil.find("invitefrom")
+                                                            .set("player", player.getName())
+                                                            .getText()
+                                            );
                                             invite.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/museum accept " + player.getName()));
                                             invited.sendMessage(invite);
                                         } else
-                                            player.sendMessage("§7[§l§bi§7] Игрок не в сети. 㬏");
+                                            MessageUtil.find("playeroffline").send(player);
                                         return;
                                     }
                                 }
-                                player.sendMessage("§7[§l§bi§7] Напишите хоть что-нибудь. 㬏");
                             })
                     ));
                     contents.add('S', ClickableItem.of(Items.builder()
@@ -342,11 +343,12 @@ public class MuseumItemHandler implements Listener {
                                 for (String line : lines) {
                                     if (line != null && !line.isEmpty()) {
                                         museum.setTitle(line);
-                                        player.sendMessage("§7[§l§bi§7] Название музея изменено на \"" + line + "\".");
+                                        MessageUtil.find("museumtitlechange")
+                                                .set("title", line)
+                                                .send(player);
                                         return;
                                     }
                                 }
-                                player.sendMessage("§7[§l§bi§7] Вы написали пустую строку. Так музей не называют. 㬏");
                             })
                     ));
                     contents.fillMask('O', null);
@@ -377,7 +379,6 @@ public class MuseumItemHandler implements Listener {
                 val ownerArchaeologist = museum.getOwner();
 
                 if (ownerArchaeologist.equals(player)) {
-                    user.sendMessage("§7[§l§bi§7] §7Вы уже в своем музее!");
                     user.getInventory().remove(Material.SADDLE);
                     return;
                 }
@@ -387,9 +388,11 @@ public class MuseumItemHandler implements Listener {
                 val owner = Bukkit.getPlayer(UUID.fromString(ownerArchaeologist.getUuid()));
 
                 if (owner != null)
-                    owner.sendMessage("§7[§l§bi§7] §7" + user.getName() + " покинул ваш музей.");
+                    MessageUtil.find("leavedfrommuseum")
+                            .set("name", user.getName())
+                            .send(owner);
 
-                user.sendMessage("§7[§l§bi§7] §7Вы вернулись в свой музей.");
+                MessageUtil.find("backtomuseum").send(user);
             }
         }
     }

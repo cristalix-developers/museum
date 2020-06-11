@@ -17,6 +17,7 @@ import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.player.Archaeologist;
 import ru.func.museum.player.pickaxe.Pickaxe;
 import ru.func.museum.player.pickaxe.PickaxeType;
+import ru.func.museum.util.MessageUtil;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -74,10 +75,10 @@ public class BeforePacketHandler implements Prepare {
         archaeologist.setBreakLess(archaeologist.getBreakLess() - 1);
         if (archaeologist.getBreakLess() == 0) {
             player.sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
-            player.sendMessage("§7[§l§bi§7] §7Раскопки подошли к концу, сейчас вернем вас в музей!");
+            MessageUtil.find("excavationend").send(player);
             Bukkit.getScheduler().runTaskLater(app, () -> {
                 archaeologist.setOnExcavation(false);
-                PreparePlayer.INVENTORY.getPrepare().execute(player, archaeologist, app);
+                PrepareSteps.INVENTORY.getPrepare().execute(player, archaeologist, app);
                 archaeologist.getCurrentMuseum().load(app, archaeologist, player);
                 archaeologist.setExcavationCount(archaeologist.getExcavationCount() + 1);
             }, 10 * 20L);
@@ -145,13 +146,13 @@ public class BeforePacketHandler implements Prepare {
                         double cost = parent.getRare().getCost();
                         double prize = cost + ((Pickaxe.RANDOM.nextFloat() - .5) * cost / 2);
 
-                        String value = String.format("%.2f", prize) + "$";
-                        player.sendMessage("" +
-                                "§7[§l§bi§7] Вы нашли §b" +
-                                subEntity.getTitle() +
-                                ", §7этот фрагмент - дубликат, его цена §l§6+" +
-                                value
-                        );
+                        String value = String.format("%.2f$", prize);
+
+                        MessageUtil.find("findcopy")
+                                .set("name", subEntity.getTitle())
+                                .set("cost", value)
+                                .send(player);
+
                         player.sendTitle("§6Находка!", "§e+" + value);
 
                         archaeologist.setMoney(archaeologist.getMoney() + prize);
@@ -160,7 +161,9 @@ public class BeforePacketHandler implements Prepare {
                     });
 
             if (!exists[0]) {
-                player.sendMessage("§7[§l§bi§7] Вы откопали новый фрагмент: §b" + subEntity.getTitle() + "§7!");
+                MessageUtil.find("findfragment")
+                        .set("name", subEntity.getTitle())
+                        .send(player);
                 player.sendTitle("§l§6Находка!", "§eобнаружен " + parent.getRare().getWord() + " фрагмент");
 
                 archaeologist.getElementList().add(new Element(parentId, id, false, parent.getRare().getIncrease()));

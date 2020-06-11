@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.func.museum.excavation.generator.ExcavationGenerator;
 import ru.func.museum.player.Archaeologist;
+import ru.func.museum.util.MessageUtil;
 
 public interface Excavation {
 
@@ -29,7 +30,10 @@ public interface Excavation {
         IScoreboardService.get().setCurrentObjective(player.getUniqueId(), "excavation");
 
         player.sendTitle("§6Прибытие!", getTitle());
-        player.sendMessage("§7[§l§bi§7] Вы прибыли на §l§b" + getTitle() + ".");
+
+        MessageUtil.find("visitexcavation")
+                .set("title", getTitle())
+                .send(player);
         excavation.getExcavationGenerator().generateAndShow(player);
     }
 }

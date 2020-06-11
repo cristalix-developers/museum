@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import ru.func.museum.App;
 import ru.func.museum.MongoManager;
-import ru.func.museum.player.prepare.PreparePlayer;
+import ru.func.museum.player.prepare.PrepareSteps;
 
 import java.util.concurrent.ExecutionException;
 
@@ -33,7 +33,7 @@ public class PlayerConnectionListener implements Listener {
 
         archaeologist.setConnection(((CraftPlayer) player).getHandle().playerConnection);
 
-        for (val prepare : PreparePlayer.values())
+        for (val prepare : PrepareSteps.values())
             prepare.getPrepare().execute(player, archaeologist, app);
 
         e.setJoinMessage(null);

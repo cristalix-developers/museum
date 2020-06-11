@@ -9,11 +9,12 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum PreparePlayer {
+public enum PrepareSteps {
     PACKET_HANDLER(new BeforePacketHandler()),
     INVENTORY(new PrepareInventory()),
     MUSEUM(new PrepareMuseum()),
-    SCOREBOARD(new PrepareScoreBoard()),;
+    SCOREBOARD(new PrepareScoreBoard()),
+    HIDE_PLAYERS(new PreparePlayers());
 
     private Prepare prepare;
 }
