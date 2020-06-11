@@ -157,10 +157,11 @@ public class MuseumItemHandler implements Listener {
                                         player.closeInventory();
                                         return;
                                     }
+                                    contents.fillMask('S', null);
+                                    update(player, contents);
                                     player.sendMessage("§7[§l§bi§7] Вы приобрели. Новое снаряжение!");
                                     archaeologist.setPickaxeType(pickaxeType);
                                     archaeologist.setMoney(archaeologist.getMoney() - pickaxeType.getPrice());
-                                    update(player, contents);
                                 }));
                                 break;
                             }

@@ -38,7 +38,7 @@ public class SimpleSpaceViewer implements Space {
     }
 
     @Override
-    public int[] getAccessEntities() {
-        return new int[0];
+    public List<Integer> getAccessEntities() {
+        return null;
     }
 }

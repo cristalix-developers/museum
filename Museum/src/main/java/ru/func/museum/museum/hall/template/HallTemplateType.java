@@ -9,6 +9,7 @@ import ru.func.museum.museum.hall.template.space.SpaceReflectType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author func 22.05.2020
@@ -24,14 +25,14 @@ public enum HallTemplateType {
                     0,
                     -87, 90, 261,
                     new ArrayList<>(),
-                    new int[]{0}
+                    Collections.singletonList(0)
             ), new SkeletonSpaceViewer(
                     -94, 91, 262,
                     SpaceReflectType.NORTH,
                     0,
                     -95, 90, 261,
                     new ArrayList<>(),
-                    new int[]{0}
+                    Collections.singletonList(0)
             )), "Музей динозавров",
             Arrays.asList(
                     new Location(Excavation.WORLD, -92.5, 90, 267.5),

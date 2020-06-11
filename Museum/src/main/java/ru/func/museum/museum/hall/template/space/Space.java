@@ -19,5 +19,5 @@ public interface Space {
 
     List<Element> getElements();
 
-    int[] getAccessEntities();
+    List<Integer> getAccessEntities();
 }

@@ -2,6 +2,7 @@ package ru.func.museum.listener;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
+import lombok.var;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -59,13 +60,14 @@ public class PlayerConnectionListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent e) {
         e.setQuitMessage(null);
 
-        val archaeologist = app.getArchaeologistMap().get(e.getPlayer().getUniqueId());
+        val uuid = e.getPlayer().getUniqueId();
+        var archaeologist = app.getArchaeologistMap().get(uuid);
 
         archaeologist.setBreakLess(0);
         archaeologist.setOnExcavation(false);
 
         MongoManager.save(archaeologist);
 
-        app.getArchaeologistMap().remove(e.getPlayer().getUniqueId());
+        app.getArchaeologistMap().remove(uuid);
     }
 }

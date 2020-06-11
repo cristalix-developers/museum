@@ -43,6 +43,7 @@ public class PrepareScoreBoard implements Prepare {
         objective.setDisplayName("Музей археологии");
         objective.startGroup("Сервер")
                 .record("Онлайн", () -> Bukkit.getOnlinePlayers().size() + "")
+                .record("Свободно", () -> Runtime.getRuntime().freeMemory()/1024/1024 + "мб")
                 .record("TPS", () -> String.format("%.2f", Bukkit.getTPS()[0]));
     }
 }

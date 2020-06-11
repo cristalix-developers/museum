@@ -48,7 +48,7 @@ public class SkeletonSpaceViewer implements Space {
     @NonNull
     private List<Element> elements;
     @NonNull
-    private int[] accessEntities;
+    private List<Integer> accessEntities;
 
     @Override
     public boolean isManipulator(Location location) {
