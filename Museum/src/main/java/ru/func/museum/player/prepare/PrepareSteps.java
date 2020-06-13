@@ -14,6 +14,7 @@ public enum PrepareSteps {
     INVENTORY(new PrepareInventory()),
     MUSEUM(new PrepareMuseum()),
     SCOREBOARD(new PrepareScoreBoard()),
+    ANIME(new PrepareJSAnime()),
     HIDE_PLAYERS(new PreparePlayers());
 
     private Prepare prepare;

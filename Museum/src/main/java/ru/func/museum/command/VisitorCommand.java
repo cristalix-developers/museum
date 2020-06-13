@@ -23,7 +23,7 @@ public class VisitorCommand implements CommandExecutor {
                 case "reload":
                     visitorManager.clear(); // IF RELOAD - DO NOT BREAK!!!
                 case "spawn":
-                    visitorManager.spawn(((Player) commandSender).getLocation());
+                    visitorManager.spawn(((Player) commandSender).getLocation(), 20);
                     break;
                 case "clear":
                     visitorManager.clear();

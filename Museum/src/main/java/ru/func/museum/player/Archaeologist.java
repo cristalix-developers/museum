@@ -54,6 +54,8 @@ public interface Archaeologist {
 
     int getExcavationCount();
 
+    void sendAnime();
+
     void setExcavationCount(int excavationCount);
 
     long getExp();

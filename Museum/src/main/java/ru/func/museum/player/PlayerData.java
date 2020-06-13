@@ -1,8 +1,16 @@
 package ru.func.museum.player;
 
-import lombok.*;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import net.minecraft.server.v1_12_R1.PacketDataSerializer;
+import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.entity.Player;
+import ru.cristalix.core.util.UtilNetty;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.AbstractMuseum;
@@ -20,11 +28,9 @@ import java.util.Set;
  * @project Museum
  */
 @Builder
-@Getter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-@Setter
-@ToString
+@AllArgsConstructor
 public class PlayerData implements Archaeologist {
     private String name;
     private String uuid;
@@ -48,6 +54,13 @@ public class PlayerData implements Archaeologist {
     @Override
     public void incPickedCoinsCount() {
         pickedCoinsCount++;
+    }
+
+    @Override
+    public void sendAnime() {
+        ByteBuf buffer = Unpooled.buffer();
+        UtilNetty.writeVarInt(buffer, breakLess);
+        connection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
     }
 
     @Override

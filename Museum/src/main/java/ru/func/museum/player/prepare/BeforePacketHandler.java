@@ -57,6 +57,8 @@ public class BeforePacketHandler implements Prepare {
                                     excavation.getExcavationGenerator().fastCanBreak(bd.a.getX(), bd.a.getY(), bd.a.getZ());
 
                             if (valid && bd.c == PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK) {
+                                // Обновляю текст с кол-вом оставшихся ударов
+                                archaeologist.sendAnime();
                                 // Возвращение игрока в музей
                                 if (tryReturnPlayer(player, archaeologist, app))
                                     return;
@@ -72,10 +74,14 @@ public class BeforePacketHandler implements Prepare {
     }
 
     private boolean tryReturnPlayer(Player player, Archaeologist archaeologist, App app) {
+        if (archaeologist.getBreakLess() == -1)
+            return true;
+
         archaeologist.setBreakLess(archaeologist.getBreakLess() - 1);
         if (archaeologist.getBreakLess() == 0) {
             player.sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
             MessageUtil.find("excavationend").send(player);
+            archaeologist.setBreakLess(-1);
             Bukkit.getScheduler().runTaskLater(app, () -> {
                 archaeologist.setOnExcavation(false);
                 PrepareSteps.INVENTORY.getPrepare().execute(player, archaeologist, app);

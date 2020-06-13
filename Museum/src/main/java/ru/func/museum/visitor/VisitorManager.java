@@ -22,13 +22,18 @@ public class VisitorManager {
     private List<Visitor> visitors = new ArrayList<>();
     @NonNull
     private List<Location> locations;
+    private int counter;
+    private int size;
 
-    public void spawn(Location location) {
-        for (int i = 0; i < 20; i++)
+    public void spawn(Location location, int amount) {
+        this.counter = 0;
+        size = amount;
+        for (int i = 0; i < size; i++)
             visitors.add(new Visitor(Excavation.WORLD.spawnEntity(location, EntityType.VILLAGER)));
     }
 
     public void clear() {
+        counter = 0;
         visitors.clear();
         Excavation.WORLD.getEntities().stream()
                 .filter(entity -> entity.getType() == EntityType.VILLAGER)
@@ -36,7 +41,8 @@ public class VisitorManager {
     }
 
     public Location getVictimFutureLocation() {
-        val victim = visitors.get(Pickaxe.RANDOM.nextInt(visitors.size()));
+        counter = ++counter % size;
+        val victim = visitors.get(counter);
         victim.visit(locations.get(Pickaxe.RANDOM.nextInt(locations.size()))
                 .clone()
                 .add(

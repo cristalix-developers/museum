@@ -2,16 +2,25 @@ package ru.func.museum.util;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.UtilityClass;
 import org.bukkit.entity.Player;
 import ru.func.museum.App;
+
+import java.text.DecimalFormat;
 
 /**
  * @author func 11.06.2020
  * @project Museum
  */
+@UtilityClass
 public class MessageUtil {
 
     private static String PREFIX;
+    private static DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###,###.##$");
+
+    public static String toMoneyFormat(double money) {
+        return MONEY_FORMAT.format(money);
+    }
 
     public static Message find(String locator) {
         if (PREFIX == null)

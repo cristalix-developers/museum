@@ -7,8 +7,7 @@ import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 import ru.func.museum.App;
 import ru.func.museum.player.Archaeologist;
-
-import java.text.DecimalFormat;
+import ru.func.museum.util.MessageUtil;
 
 /**
  * @author func 03.06.2020
@@ -16,17 +15,15 @@ import java.text.DecimalFormat;
  */
 public class PrepareScoreBoard implements Prepare {
 
-    private static DecimalFormat numberFormat = new DecimalFormat("###,###,###,###,###,###.##$");
-
     @Override
     public void execute(Player player, Archaeologist archaeologist, App app) {
         SimpleBoardObjective main = IScoreboardService.get().getPlayerObjective(player.getUniqueId(), "main");
         main.startGroup("Игрок")
                 .record("Уровень", () -> "§b" + archaeologist.getLevel() + " §7" + archaeologist.expNeed(archaeologist.expNeed(0) - archaeologist.getExp()) + "/" + archaeologist.expNeed(0))
-                .record("Баланс", () -> "§a" + numberFormat.format(archaeologist.getMoney()));
+                .record("Баланс", () -> "§a" + MessageUtil.toMoneyFormat(archaeologist.getMoney()));
         val museum = archaeologist.getCurrentMuseum();
         main.startGroup("Музей")
-                .record("Заработок", () -> "§b" + numberFormat.format(archaeologist.getCurrentMuseum().getSummaryIncrease()))
+                .record("Заработок", () -> "§b" + MessageUtil.toMoneyFormat(archaeologist.getCurrentMuseum().getSummaryIncrease()))
                 .record("Посещений", () -> "§b" + museum.getViews());
         template(main);
 

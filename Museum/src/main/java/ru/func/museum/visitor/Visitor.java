@@ -18,6 +18,7 @@ public class Visitor {
     }
 
     public void visit(Location meetingLocation) {
+        entity.ticksLived = 0;
         entity.getNavigation().a(
                 meetingLocation.getX(),
                 meetingLocation.getY(),

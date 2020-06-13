@@ -52,6 +52,8 @@ public class Museum implements AbstractMuseum {
         views++;
 
         updateIncrease();
+        archaeologist.setBreakLess(-2);
+        archaeologist.sendAnime();
 
         IScoreboardService.get().setCurrentObjective(guest.getUniqueId(), "main");
 

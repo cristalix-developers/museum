@@ -34,7 +34,6 @@ import ru.func.museum.player.pickaxe.PickaxeType;
 import ru.func.museum.util.MessageUtil;
 import ru.func.museum.util.VirtualSign;
 
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -47,8 +46,6 @@ public class MuseumItemHandler implements Listener {
     @NonNull
     private App app;
     private ItemStack museumItem;
-
-    private static DecimalFormat numberFormat = new DecimalFormat("###,###,###,###,###,###.##$");
 
     private ItemStack backItem = Items.builder()
             .type(Material.BARRIER)
@@ -198,7 +195,7 @@ public class MuseumItemHandler implements Listener {
                     contents.add('T', ClickableItem.empty(Items.builder()
                             .type(Material.PAPER)
                             .displayName("§bКоллекторы")
-                            .lore("", "§fКупить за игрокую валюту - [ЛКМ],", "§fза кристалики - двойной клик [ЛКМ]")
+                            .lore("", "§fКупить за игрокую валюту - [ЛКМ],", "§fза кристалики - [ПКМ]")
                             .build()
                     ));
 
@@ -280,7 +277,7 @@ public class MuseumItemHandler implements Listener {
                             .loreLines(
                                     "",
                                     "§fУровень: " + archaeologist.getLevel(),
-                                    "§fДенег: " + numberFormat.format(archaeologist.getMoney()),
+                                    "§fДенег: " + MessageUtil.toMoneyFormat(archaeologist.getMoney()),
                                     "§fОпыт: " + archaeologist.getExp(),
                                     "§fОпыта осталось: " + archaeologist.expNeed(archaeologist.getExp()),
                                     "§fЧасов сыграно: " + player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000,
@@ -420,7 +417,7 @@ public class MuseumItemHandler implements Listener {
                 "§fПосещений: " + museum.getViews(),
                 "",
                 "§b > Залл",
-                "§fДоход: " + numberFormat.format(museum.getSummaryIncrease()),
+                "§fДоход: " + MessageUtil.toMoneyFormat(museum.getSummaryIncrease()),
                 "§fКоллектор: " + hall.getCollectorType().getName(),
                 "§fВитрин: " + archaeologist.getCurrentHall().getMatrix().size(),
                 "",

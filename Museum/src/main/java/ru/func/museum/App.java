@@ -67,7 +67,7 @@ public final class App extends JavaPlugin {
 
         VisitorManager visitorManager = new VisitorManager(HallTemplateType.DEFAULT.getHallTemplate().getCollectorRoute());
         visitorManager.clear();
-        visitorManager.spawn(new Location(Excavation.WORLD, -91, 90, 250));
+        visitorManager.spawn(new Location(Excavation.WORLD, -91, 90, 250), 20);
 
         Bukkit.getPluginCommand("museum").setExecutor(new MuseumCommand(this));
         Bukkit.getPluginCommand("visitor").setExecutor(new VisitorCommand(visitorManager));

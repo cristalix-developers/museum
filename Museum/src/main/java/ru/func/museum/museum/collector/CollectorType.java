@@ -28,7 +28,6 @@ public enum CollectorType {
                 (byte) (yaw * 256 / 360), (byte) (pitch * 256 / 360),
                 false
         ));
-
     /*    armorStand.setHeadPose(new Vector3f(pitch, 0, 0));
         connection.sendPacket(new PacketPlayOutEntityMetadata(armorStand.getId(), armorStand.getDataWatcher(), false));*/
     }
