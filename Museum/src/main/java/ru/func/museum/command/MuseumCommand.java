@@ -38,6 +38,7 @@ public class MuseumCommand implements CommandExecutor {
                     if (app.getArchaeologistMap().get(player.getUniqueId()).getCurrentMuseum().getOwner().equals(sender))
                         return true;
 
+                    sender.getCurrentMuseum().unload(app, sender, player);
                     sender.getCurrentMuseum().load(app, sender, player);
 
                     MessageUtil.find("visitaccept")

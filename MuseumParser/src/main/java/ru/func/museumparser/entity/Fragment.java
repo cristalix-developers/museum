@@ -12,7 +12,7 @@ import org.bukkit.util.EulerAngle;
  */
 @Getter
 @AllArgsConstructor
-public class SubEntity {
+public class Fragment {
     private String title;
     @Setter
     private Piece[] pieces;

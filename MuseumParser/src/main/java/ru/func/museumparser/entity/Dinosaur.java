@@ -3,26 +3,20 @@ package ru.func.museumparser.entity;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @author func 31.05.2020
  * @project Museum
  */
 @Getter
-public class MuseumEntity {
+public class Dinosaur {
     private String title;
-    private SubEntity[] subs;
+    private Fragment[] subs;
     private ElementRare rare;
 
-    public MuseumEntity(Location zeroPoint, double radius, ElementRare rare, String title) {
-        subs = new SubEntity[]{null};
+    public Dinosaur(Location zeroPoint, double radius, ElementRare rare, String title) {
+        subs = new Fragment[]{null};
         zeroPoint.getNearbyLivingEntities(radius, entity -> entity.getType().equals(EntityType.ARMOR_STAND)).stream()
                 .map(entity -> (ArmorStand) entity)
                 .forEach(entity -> {
@@ -39,26 +33,26 @@ public class MuseumEntity {
                     String name = entity.getCustomName();
 
                     // Если надсущность уже определена, примкнуть кусочку, как часть
-                    for (SubEntity subEntity : subs) {
-                        if (subEntity == null)
+                    for (Fragment fragment : subs) {
+                        if (fragment == null)
                             continue;
-                        if (subEntity.getTitle().equals(name)) {
+                        if (fragment.getTitle().equals(name)) {
                             founded = true;
-                            Piece[] pieces = new Piece[subEntity.getPieces().length + 1];
+                            Piece[] pieces = new Piece[fragment.getPieces().length + 1];
                             // Мне не нравится, это перезиписывание массива, если в начале есть будет, то из-за этого
-                            System.arraycopy(subEntity.getPieces(), 0, pieces, 0, subEntity.getPieces().length);
-                            pieces[subEntity.getPieces().length] = piece;
-                            subEntity.setPieces(pieces);
+                            System.arraycopy(fragment.getPieces(), 0, pieces, 0, fragment.getPieces().length);
+                            pieces[fragment.getPieces().length] = piece;
+                            fragment.setPieces(pieces);
                         }
                     }
                     // Если родитель не нашелся - то стать самому себе родителем.
                     if (!founded) {
                         if (subs[0] != null) {
-                            SubEntity[] temp = new SubEntity[subs.length + 1];
+                            Fragment[] temp = new Fragment[subs.length + 1];
                             System.arraycopy(subs, 0, temp, 0, subs.length);
                             subs = temp;
                         }
-                        subs[subs.length - 1] = new SubEntity(name, new Piece[]{piece});
+                        subs[subs.length - 1] = new Fragment(name, new Piece[]{piece});
                     }
                 });
         this.title = title;

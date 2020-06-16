@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.func.museumparser.MuseumParser;
 import ru.func.museumparser.entity.ElementRare;
-import ru.func.museumparser.entity.MuseumEntity;
+import ru.func.museumparser.entity.Dinosaur;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,7 +38,7 @@ public class SerializeEntity implements CommandExecutor {
         String title = Stream.of(args).skip(3).collect(Collectors.joining(" "));
 
         try {
-            plugin.getConfig().set("data", gson.toJson(new MuseumEntity(
+            plugin.getConfig().set("data", gson.toJson(new Dinosaur(
                     player.getLocation(),
                     Integer.parseInt(args[0]),
                     ElementRare.valueOf(args[1]),
