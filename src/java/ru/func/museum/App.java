@@ -35,7 +35,7 @@ public final class App extends JavaPlugin {
     @Getter
     private static App app;
     @Getter
-    private Map<UUID, Archaeologist> archaeologistMap = Maps.newHashMap();
+    private final Map<UUID, Archaeologist> archaeologistMap = Maps.newHashMap();
     @Getter
     private MuseumEntity[] museumEntities;
 

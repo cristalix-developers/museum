@@ -21,19 +21,23 @@ jar {
 }
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    compileOnly 'org.projectlombok:lombok:1.18.12'
     compileOnly files('external/paper-1.12.2.jar')
     compileOnly files('external/cristalix-core.jar')
+    compile files('external/clepto-cristalix.jar')
+    compile 'org.mongodb:mongodb-driver-async:3.7.1'
 }
 
+
+
 sourceSets {
-    'museum-game' {
+    main {
         java {
-            srcDirs = ['java']
+            srcDirs = ['src/java']
         }
         resources {
-            srcDirs = ['resources']
+            srcDirs = ['src/resources']
         }
     }
 }
