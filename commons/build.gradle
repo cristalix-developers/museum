@@ -1,0 +1,3 @@
+dependencies {
+    compileOnly files("../external/cristalix-core.jar")
+}
