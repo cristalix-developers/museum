@@ -1,5 +1,6 @@
 package ru.func.museum;
 
+import clepto.bukkit.B;
 import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.val;
@@ -41,7 +42,7 @@ public final class App extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        app = this;
+		B.plugin = App.app = this;
 
         CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
         CoreApi.get().registerService(IInventoryService.class, new InventoryService());

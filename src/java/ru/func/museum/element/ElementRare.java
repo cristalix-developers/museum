@@ -8,13 +8,13 @@ import lombok.Getter;
 public enum ElementRare {
     USUAL(5, 100, .1, "Обыная", "новый"),
     RARE(5, 500, .3, "Редкая", "редкий"),
-    AMAZING(5, 2000, .6, "Финоминальная", "финоминальный"),
+    AMAZING(5, 2000, .6, "Финоминальная", "феноминальный"),
     FANTASTIC(8, 100000, 1.1,"Неизведанная", "ранее неизвестный"),
     ;
 
-    private int rareScale;
-    private int cost;
-    private double increase;
-    private String name;
-    private String word;
+    private final int rareScale;
+    private final int cost;
+    private final double increase;
+    private final String name;
+    private final String word;
 }

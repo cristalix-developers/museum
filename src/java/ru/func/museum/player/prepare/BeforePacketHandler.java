@@ -20,6 +20,7 @@ import ru.func.museum.player.pickaxe.PickaxeType;
 import ru.func.museum.util.MessageUtil;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -142,31 +143,27 @@ public class BeforePacketHandler implements Prepare {
 
             animateFragments(archaeologist.getConnection(), ids, app);
 
-            boolean[] exists = new boolean[]{false};
-
             // Проверка на дубликат
-            archaeologist.getElementList().stream()
-                    .filter(element -> element.getParentId() == parentId && element.getId() == id)
-                    .findFirst()
-                    .ifPresent(element -> {
-                        double cost = parent.getRare().getCost();
-                        double prize = cost + ((Pickaxe.RANDOM.nextFloat() - .5) * cost / 2);
+			Optional<Element> elementOptional = archaeologist.getElementList().stream()
+					.filter(element -> element.getParentId() == parentId && element.getId() == id)
+					.findFirst();
 
-                        String value = String.format("%.2f$", prize);
+			if (elementOptional.isPresent()) {
+				double cost = parent.getRare().getCost();
+				double prize = cost + ((Pickaxe.RANDOM.nextFloat() - .5) * cost / 2);
 
-                        MessageUtil.find("findcopy")
-                                .set("name", subEntity.getTitle())
-                                .set("cost", value)
-                                .send(player);
+				String value = String.format("%.2f$", prize);
 
-                        player.sendTitle("§6Находка!", "§e+" + value);
+				MessageUtil.find("findcopy")
+						.set("name", subEntity.getTitle())
+						.set("cost", value)
+						.send(player);
 
-                        archaeologist.setMoney(archaeologist.getMoney() + prize);
+				player.sendTitle("§6Находка!", "§e+" + value);
 
-                        exists[0] = true;
-                    });
+				archaeologist.setMoney(archaeologist.getMoney() + prize);
 
-            if (!exists[0]) {
+			} else {
                 MessageUtil.find("findfragment")
                         .set("name", subEntity.getTitle())
                         .send(player);
