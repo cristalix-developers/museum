@@ -25,6 +25,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.12'
     compileOnly files('external/paper-1.12.2.jar')
     compileOnly files('external/cristalix-core.jar')
+    compile project(':commons')
     compile files('external/clepto-cristalix.jar')
     compile 'org.mongodb:mongodb-driver-async:3.7.1'
 }
