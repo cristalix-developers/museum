@@ -1,0 +1,36 @@
+
+apply plugin: 'java'
+
+
+//apply plugin: 'java'
+//
+//group 'ru.cristalix'
+//version '1.2'
+//
+//repositories {
+//    mavenLocal()
+//    mavenCentral()
+//}
+//
+//compileJava.options.encoding = 'UTF-8'
+//
+//tasks.withType(JavaCompile) {
+//    options.encoding = 'UTF-8'
+//}
+//
+//jar {
+//    from {
+//        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+//    }
+//}
+//
+//sourceSets {
+//    'museum-game' {
+//        java {
+//            srcDirs = ['java']
+//        }
+//        resources {
+//            srcDirs = ['resources']
+//        }
+//    }
+//}

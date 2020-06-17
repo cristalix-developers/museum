@@ -1,0 +1,39 @@
+apply plugin: 'java'
+
+group 'ru.cristalix'
+version '1.2'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    compileOnly files('external/paper-1.12.2.jar')
+    compileOnly files('external/cristalix-core.jar')
+}
+
+sourceSets {
+    'museum-game' {
+        java {
+            srcDirs = ['java']
+        }
+        resources {
+            srcDirs = ['resources']
+        }
+    }
+}
