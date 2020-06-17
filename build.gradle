@@ -29,8 +29,6 @@ dependencies {
     compile 'org.mongodb:mongodb-driver-async:3.7.1'
 }
 
-
-
 sourceSets {
     main {
         java {
@@ -39,5 +37,27 @@ sourceSets {
         resources {
             srcDirs = ['src/resources']
         }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    group 'ru.cristalix'
+    version '1.2'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    compileJava.options.encoding = 'UTF-8'
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+    dependencies {
+        annotationProcessor 'org.projectlombok:lombok:1.18.12'
+        compileOnly 'org.projectlombok:lombok:1.18.12'
     }
 }
