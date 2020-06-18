@@ -24,8 +24,5 @@ public class MuseumMap implements WorldMeta {
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
-
-
 	}
-
 }

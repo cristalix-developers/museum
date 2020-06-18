@@ -1,5 +1,6 @@
 package ru.func.museum.museum.coin;
 
+import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
@@ -19,12 +20,9 @@ import ru.func.museum.player.pickaxe.Pickaxe;
  */
 public class Coin {
 
-	public static final ItemStack COIN = CraftItemStack.asNMSCopy(Items.builder()
-			.type(Material.DOUBLE_PLANT)
-			.build()
-																 );
-	public static final int SECONDS_LIVE = 15;
-	private EntityItem entityItem;
+    public static final ItemStack COIN = CraftItemStack.asNMSCopy(Lemonade.get("coin").render());
+    public static final int SECONDS_LIVE = 15;
+    private EntityItem entityItem;
     private Location location;
     @Getter
     private long timestamp;
