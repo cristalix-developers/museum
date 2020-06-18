@@ -10,7 +10,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +19,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import ru.cristalix.core.inventory.ClickableItem;
 import ru.cristalix.core.inventory.ControlledInventory;
 import ru.cristalix.core.inventory.InventoryContents;
@@ -83,13 +81,13 @@ public class MuseumItemHandler implements Listener {
                 public void init(Player player, InventoryContents contents) {
                     contents.resetMask("SSSSSSSSB");
 
-                    val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
+                    val user = app.getUser(player.getUniqueId());
                     for (ExcavationType excavationType : ExcavationType.values()) {
                         if (excavationType == ExcavationType.NOOP)
                             continue;
 
                         Excavation excavation = excavationType.getExcavation();
-                        if (excavation.getMinimalLevel() <= archaeologist.getLevel()) {
+                        if (excavation.getMinimalLevel() <= user.getGlobalLevel()) {
                             contents.add('S', ClickableItem.of(
                                     Items.builder()
                                             .displayName("§bВ путь!")
@@ -103,17 +101,17 @@ public class MuseumItemHandler implements Listener {
                                             ).build(),
                                     event -> {
                                         player.closeInventory();
-                                        if (excavation.getCost() > archaeologist.getMoney()) {
-                                            MessageUtil.find("nomoney").send(player);
+                                        if (excavation.getCost() > user.getMoney()) {
+                                            MessageUtil.find("nomoney").send(user);
                                             return;
                                         }
-                                        archaeologist.setMoney(archaeologist.getMoney() - excavation.getCost());
-                                        archaeologist.setBreakLess(excavation.getBreakCount());
-                                        archaeologist.setOnExcavation(true);
-                                        archaeologist.setLastExcavation(excavationType);
+                                        user.setMoney(user.getMoney() - excavation.getCost());
+                                        user.setBreakLess(excavation.getBreakCount());
+                                        user.setOnExcavation(true);
+                                        user.setLastExcavation(excavationType);
 
-                                        archaeologist.getCurrentMuseum().unload(app, archaeologist, player);
-                                        excavation.load(archaeologist, player);
+                                        user.getCurrentMuseum().unload(user);
+                                        excavation.load(user);
                                     }
                             ));
                         }
@@ -136,27 +134,27 @@ public class MuseumItemHandler implements Listener {
                 public void update(Player player, InventoryContents contents) {
                     contents.resetMask("OOOOSOOOB");
 
-                    val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
+                    val user = app.getUser(player.getUniqueId());
 
                     contents.add('B', ClickableItem.of(backItem, event -> pickaxeUI.open(player)));
                     contents.fillMask('O', null);
 
-                    if (archaeologist.getPickaxeType() == PickaxeType.PRESTIGE) {
-                        contents.add('S', ClickableItem.empty(archaeologist.getPickaxeType().getItem()));
+                    if (user.getPickaxeType() == PickaxeType.PRESTIGE) {
+                        contents.add('S', ClickableItem.empty(user.getPickaxeType().getItem()));
                     } else {
                         for (PickaxeType pickaxeType : PickaxeType.values()) {
-                            if (pickaxeType.getPrice() > archaeologist.getPickaxeType().getPrice()) {
+                            if (pickaxeType.getPrice() > user.getPickaxeType().getPrice()) {
                                 contents.add('S', ClickableItem.of(pickaxeType.getItem(), event -> {
-                                    if (archaeologist.getMoney() < pickaxeType.getPrice()) {
+                                    if (user.getMoney() < pickaxeType.getPrice()) {
                                         MessageUtil.find("nomoney").send(player);
                                         player.closeInventory();
                                         return;
                                     }
                                     contents.fillMask('S', null);
                                     update(player, contents);
-                                    MessageUtil.find("newpickaxe").send(player);
-                                    archaeologist.setPickaxeType(pickaxeType);
-                                    archaeologist.setMoney(archaeologist.getMoney() - pickaxeType.getPrice());
+                                    MessageUtil.find("newpickaxe").send(user);
+                                    user.setPickaxeType(pickaxeType);
+                                    user.setMoney(user.getMoney() - pickaxeType.getPrice());
                                 }));
                                 break;
                             }
@@ -187,9 +185,9 @@ public class MuseumItemHandler implements Listener {
             .provider(new InventoryProvider() {
                 @Override
                 public void init(Player player, InventoryContents contents) {
-                    val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
-                    val hall = archaeologist.getCurrentHall();
-                    val museum = archaeologist.getCurrentMuseum();
+                    val user = app.getUser(player.getUniqueId());
+                    val hall = user.getCurrentHall();
+                    val museum = user.getCurrentMuseum();
 
                     contents.resetMask("SOSOSOOTB");
 
@@ -234,20 +232,20 @@ public class MuseumItemHandler implements Listener {
                                         if (collector == collectorType)
                                             return;
                                         if (event.getClick().equals(ClickType.LEFT)) {
-                                            if (archaeologist.getMoney() < collectorType.getCost()) {
-                                                MessageUtil.find("nomoney").send(player);
+                                            if (user.getMoney() < collectorType.getCost()) {
+                                                MessageUtil.find("nomoney").send(user);
                                                 player.closeInventory();
                                                 return;
                                             }
                                             MessageUtil.find("newcollector")
                                                     .set("name", collectorType.getName())
-                                                    .send(player);
-                                            archaeologist.setMoney(archaeologist.getMoney() - collectorType.getCost());
+                                                    .send(user);
+                                            user.setMoney(user.getMoney() - collectorType.getCost());
                                             hall.setCollectorType(collectorType);
 
                                             // Перезагрузка музея
-                                            museum.unload(app, archaeologist, player);
-                                            museum.load(app, archaeologist, player);
+                                            museum.unload(user);
+                                            museum.load(app, user);
                                             player.closeInventory();
                                         } else if (event.getClick().equals(ClickType.RIGHT)) {
                                             player.sendMessage("Лол");
@@ -268,8 +266,8 @@ public class MuseumItemHandler implements Listener {
             .provider(new InventoryProvider() {
                 @Override
                 public void init(Player player, InventoryContents contents) {
-                    val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
-                    val museum = archaeologist.getCurrentMuseum();
+                    val user = app.getUser(player.getUniqueId());
+                    val museum = user.getCurrentMuseum();
 
                     contents.resetMask("OFOSMTOAO");
 
@@ -278,18 +276,18 @@ public class MuseumItemHandler implements Listener {
                             .displayName("§bПрофиль")
                             .loreLines(
                                     "",
-                                    "§fУровень: " + archaeologist.getLevel(),
-                                    "§fДенег: " + MessageUtil.toMoneyFormat(archaeologist.getMoney()),
-                                    "§fОпыт: " + archaeologist.getExp(),
-                                    "§fОпыта осталось: " + archaeologist.expNeed(archaeologist.getExp()),
+                                    "§fУровень: " + user.getGlobalLevel(),
+                                    "§fДенег: " + MessageUtil.toMoneyFormat(user.getMoney()),
+                                    "§fОпыт: " + user.getExperience(),
+                                    "§fОпыта осталось: " + user.getRequiredExperience(user.getGlobalLevel() + 1),
                                     "§fЧасов сыграно: " + player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000,
-                                    "§fМонет собрано: " + archaeologist.getPickedCoinsCount(),
-                                    "§fКирка: " + archaeologist.getPickaxeType().getName(),
-                                    "§fРаскопок: " + archaeologist.getExcavationCount(),
-                                    "§fФрагментов: " + archaeologist.getElementList().size()
+                                    "§fМонет собрано: " + user.getPickedCoinsCount(),
+                                    "§fКирка: " + user.getPickaxeType().getName(),
+                                    "§fРаскопок: " + user.getExcavationCount(),
+                                    "§fФрагментов: " + user.getElementList().size()
                             ).build()
                     ));
-                    contents.add('M', ClickableItem.empty(getMuseumItem(archaeologist)));
+                    contents.add('M', ClickableItem.empty(getMuseumItem(user)));
                     contents.add('A', ClickableItem.of(Items.builder()
                                     .displayName("§bПригласить друга")
                                     .type(Material.BOOK_AND_QUILL)
@@ -300,10 +298,10 @@ public class MuseumItemHandler implements Listener {
                                         Player invited = Bukkit.getPlayer(line);
                                         if (invited != null) {
                                             if (invited.equals(player)) {
-                                                MessageUtil.find("inviteyourself").send(player);
+                                                MessageUtil.find("inviteyourself").send(user);
                                                 return;
                                             }
-                                            MessageUtil.find("invited").send(player);
+                                            MessageUtil.find("invited").send(user);
                                             TextComponent invite = new TextComponent(
                                                     MessageUtil.find("invitefrom")
                                                             .set("player", player.getName())
@@ -312,7 +310,7 @@ public class MuseumItemHandler implements Listener {
                                             invite.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/museum accept " + player.getName()));
                                             invited.sendMessage(invite);
                                         } else
-                                            MessageUtil.find("playeroffline").send(player);
+                                            MessageUtil.find("playeroffline").send(user);
                                         return;
                                     }
                                 }
@@ -344,7 +342,7 @@ public class MuseumItemHandler implements Listener {
                                         museum.setTitle(line);
                                         MessageUtil.find("museumtitlechange")
                                                 .set("title", line)
-                                                .send(player);
+                                                .send(user);
                                         return;
                                     }
                                 }
@@ -377,7 +375,7 @@ public class MuseumItemHandler implements Listener {
                 Museum museum = user.getCurrentMuseum();
                 val owner = museum.getOwner();
 
-                museum.unload(app, user);
+                museum.unload(user);
                 user.getMuseums().get(0).load(app, user);
 
                 if (owner != null)

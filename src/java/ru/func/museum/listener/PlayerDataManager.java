@@ -56,9 +56,8 @@ public class PlayerDataManager implements Listener {
 
 		val uuid = e.getUniqueId();
 		UserInfo userInfo = app.getServiceConnector().loadUserSync(uuid);
-		User user = new User(uuid, e.getName(), userInfo);
 
-		userMap.put(uuid, user);
+		userMap.put(uuid, new User(userInfo));
 	}
 
 	@EventHandler

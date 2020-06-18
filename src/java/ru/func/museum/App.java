@@ -80,25 +80,25 @@ public final class App extends JavaPlugin {
                 val visitedPoint = visitorManager.getVictimFutureLocation();
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    val archaeologist = archaeologistMap.get(player.getUniqueId());
+                    val user = getUser(player.getUniqueId());
 
-                    if (archaeologist.isOnExcavation()) {
+                    if (user.isOnExcavation()) {
                         continue;
                     }
 
                     if (visitedPoint != null && time % 5 == 0) {
                         Coin coin = new Coin(visitedPoint);
-                        coin.create(archaeologist.getConnection());
-                        archaeologist.getCoins().add(coin);
+                        coin.create(user.getConnection());
+                        user.getCoins().add(coin);
                     }
 
-                    archaeologist.getCurrentMuseum().getHalls()
-                            .forEach(hall -> hall.moveCollector(archaeologist, player, time));
+                    user.getCurrentMuseum().getCollectors()
+                            .forEach(collector -> collector.moveCollector(user, player, time));
 
                     // Если монеты устарели, что бы не копились на клиенте, удаляю
-                    archaeologist.getCoins().removeIf(coin -> {
+                    user.getCoins().removeIf(coin -> {
                         if (coin.getTimestamp() + Coin.SECONDS_LIVE * 1000 < time) {
-                            coin.remove(archaeologist.getConnection());
+                            coin.remove(user.getConnection());
                             return true;
                         }
                         return false;

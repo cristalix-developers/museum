@@ -37,8 +37,8 @@ public class PrepareInventory implements Prepare {
             ).build();
 
     @Override
-    public void execute(Player player, User archaeologist, App app) {
-        val inventory = player.getInventory();
+    public void execute(User user, App app) {
+        val inventory = user.getPlayer().getInventory();
         inventory.clear();
         inventory.setItem(0, menu);
         inventory.setItem(1, excavations);

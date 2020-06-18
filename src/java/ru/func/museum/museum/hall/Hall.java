@@ -35,16 +35,16 @@ public class Hall {
     private transient Location previousLocation;
     private transient CollectorNavigator navigator;
 
-    public void moveCollector(User archaeologist, Player player, long iteration) {
+    public void moveCollector(User user, long iteration) {
         if (collectorType.equals(CollectorType.NONE))
             return;
 
         val location = getLocation(iteration);
 
-        archaeologist.getCoins().removeIf(coin -> coin.pickUp(player, archaeologist, location, collectorType.getRadius()));
+        user.getCoins().removeIf(coin -> coin.pickUp(user, location, collectorType.getRadius()));
 
         collectorType.move(
-                ((CraftPlayer) player).getHandle().playerConnection,
+                user.getConnection(),
                 armorStand,
                 location.getX() - previousLocation.getX(),
                 location.getY() - previousLocation.getY(),

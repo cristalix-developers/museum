@@ -15,32 +15,32 @@ import ru.func.museum.util.MessageUtil;
  */
 public class PrepareScoreBoard implements Prepare {
 
-    @Override
-    public void execute(Player player, User archaeologist, App app) {
-        SimpleBoardObjective main = IScoreboardService.get().getPlayerObjective(player.getUniqueId(), "main");
-        main.startGroup("Игрок")
-                .record("Уровень", () -> "§b" + archaeologist.getLevel() + " §7" + archaeologist.getRequiredExperience(archaeologist.getRequiredExperience(0) - archaeologist.getExp()) + "/" + archaeologist.getRequiredExperience(0))
-                .record("Баланс", () -> "§a" + MessageUtil.toMoneyFormat(archaeologist.getMoney()));
-        val museum = archaeologist.getCurrentMuseum();
-        main.startGroup("Музей")
-                .record("Заработок", () -> "§b" + MessageUtil.toMoneyFormat(archaeologist.getCurrentMuseum().getSummaryIncrease()))
-                .record("Посещений", () -> "§b" + museum.getViews());
-        template(main);
-
-        SimpleBoardObjective excavation = IScoreboardService.get().getPlayerObjective(player.getUniqueId(), "excavation");
-        excavation.startGroup("Раскопки")
-                .record("Ударов", () -> Math.max(archaeologist.getBreakLess(), 0) + " осталось")
-                .record("Уровень", () -> "§b" + archaeologist.getLevel() + " §7" + archaeologist.getRequiredExperience(archaeologist.getRequiredExperience(0) - archaeologist.getExp()) + "/" + archaeologist.getRequiredExperience(0));
-        template(excavation);
-
-        IScoreboardService.get().setCurrentObjective(player.getUniqueId(), "main");
-    }
-
     private void template(SimpleBoardObjective objective) {
         objective.setDisplayName("Музей археологии");
         objective.startGroup("Сервер")
                 .record("Онлайн", () -> Bukkit.getOnlinePlayers().size() + "")
                 .record("Свободно", () -> Runtime.getRuntime().freeMemory()/1024/1024 + "мб")
                 .record("TPS", () -> String.format("%.2f", Bukkit.getTPS()[0]));
+    }
+
+    @Override
+    public void execute(User user, App app) {
+        SimpleBoardObjective main = IScoreboardService.get().getPlayerObjective(user.getUuid(), "main");
+        main.startGroup("Игрок")
+                .record("Уровень", () -> "§b" + user.getGlobalLevel() + " §7" + user.getRequiredExperience(user.getRequiredExperience(0) - user.getExperience()) + "/" + user.getRequiredExperience(0))
+                .record("Баланс", () -> "§a" + MessageUtil.toMoneyFormat(user.getMoney()));
+        val museum = user.getCurrentMuseum();
+        main.startGroup("Музей")
+                .record("Заработок", () -> "§b" + MessageUtil.toMoneyFormat(user.getCurrentMuseum().getIncome()))
+                .record("Посещений", () -> "§b" + museum.getViews());
+        template(main);
+
+        SimpleBoardObjective excavation = IScoreboardService.get().getPlayerObjective(user.getUuid(), "excavation");
+        excavation.startGroup("Раскопки")
+                .record("Ударов", () -> Math.max(user.getBreakLess(), 0) + " осталось")
+                .record("Уровень", () -> "§b" + user.getGlobalLevel() + " §7" + user.getRequiredExperience(user.getRequiredExperience(0) - user.getExperience()) + "/" + user.getRequiredExperience(0));
+        template(excavation);
+
+        IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
     }
 }

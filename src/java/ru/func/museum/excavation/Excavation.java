@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.IScoreboardService;
+import ru.func.museum.data.ExcavationType;
 import ru.func.museum.excavation.generator.ExcavationGenerator;
 import ru.func.museum.player.User;
 import ru.func.museum.util.MessageUtil;
@@ -20,20 +21,20 @@ public interface Excavation {
     Location getStartLocation();
     int getBreakCount();
 
-    default void load(User archaeologist, Player player) {
-        Excavation excavation = archaeologist.getLastExcavation()
-                .getExcavation();
+    default void load(User user) {
+        ExcavationType excavation = user.getLastExcavation();
+        Player player = user.getPlayer();
         player.getInventory().clear();
-        player.getInventory().addItem(archaeologist.getPickaxeType().getItem());
+        player.getInventory().addItem(user.getPickaxeType().getItem());
         player.teleport(excavation.getStartLocation());
 
-        IScoreboardService.get().setCurrentObjective(player.getUniqueId(), "excavation");
+        IScoreboardService.get().setCurrentObjective(user.getUuid(), "excavation");
 
         player.sendTitle("§6Прибытие!", getTitle());
 
         MessageUtil.find("visitexcavation")
                 .set("title", getTitle())
-                .send(player);
+                .send(user);
         excavation.getExcavationGenerator().generateAndShow(player);
     }
 }

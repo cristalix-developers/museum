@@ -4,6 +4,7 @@ import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
+import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import ru.cristalix.core.scoreboard.IScoreboardService;
@@ -61,26 +62,28 @@ public class Museum {
 
 		user.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
 
-		user.getInventory().remove(Material.SADDLE);
+		val player = user.getPlayer();
+
+		player.getInventory().remove(Material.SADDLE);
 
 		if (!user.getMuseums().contains(this)) {
-			user.getInventory().setItem(8, Lemonade.get("back").render());
+			player.getInventory().setItem(8, Lemonade.get("back").render());
 		}
 
-		user.teleport(new Location(Excavation.WORLD, spawnX, spawnY, spawnZ));
+		player.teleport(new Location(Excavation.WORLD, spawnX, spawnY, spawnZ));
 		// Поготовка заллов
 		spaces.forEach(space -> space.show(user));
 		collectors.forEach(collector -> collector.show(user));
 	}
 
-	public void unload(App app, User user) {
+	public void unload(User user) {
 		// Очстка витрин, коллекторов
 		spaces.forEach(space -> space.hide(user));
 		collectors.forEach(collector -> collector.hide(user));
 
 		// Очистка монет
-		Set<Coin> coins = app.getArchaeologistMap().get(guest.getUniqueId()).getCoins();
-		coins.forEach(coin -> coin.remove(connection));
+		Set<Coin> coins = user.getCoins();
+		coins.forEach(coin -> coin.remove(user.getConnection()));
 		coins.clear();
 	}
 

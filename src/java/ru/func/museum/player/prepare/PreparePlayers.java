@@ -10,8 +10,10 @@ import ru.func.museum.player.User;
  * @project Museum
  */
 public class PreparePlayers implements Prepare {
+
     @Override
-    public void execute(Player player, User archaeologist, App app) {
-        Bukkit.getOnlinePlayers().forEach(current -> player.hidePlayer(app, current));
+    public void execute(User user, App app) {
+        Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current));
+
     }
 }

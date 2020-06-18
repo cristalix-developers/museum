@@ -10,7 +10,7 @@ import ru.func.museum.player.User;
  */
 public class PrepareMuseum implements Prepare {
     @Override
-    public void execute(Player player, User archaeologist, App app) {
-        archaeologist.getMuseumList().get(0).load(app, archaeologist, player);
+    public void execute(User user, App app) {
+        user.getMuseums().get(0).load(app, user);
     }
 }

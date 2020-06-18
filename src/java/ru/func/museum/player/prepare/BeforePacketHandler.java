@@ -54,7 +54,7 @@ public class BeforePacketHandler implements Prepare {
                             val excavation = lastExcavation.getExcavation();
 
                             boolean valid = user.isOnExcavation() &&
-                                    !lastExcavation.equals(ExcavationType.NOOP) &&
+                                    lastExcavation != ExcavationType.NOOP &&
                                     excavation.getExcavationGenerator().fastCanBreak(bd.a.getX(), bd.a.getY(), bd.a.getZ());
 
                             if (valid && bd.c == PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK) {
@@ -80,7 +80,7 @@ public class BeforePacketHandler implements Prepare {
 
         user.setBreakLess(user.getBreakLess() - 1);
         if (user.getBreakLess() == 0) {
-            user.sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
+            user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
             MessageUtil.find("excavationend").send(user);
             user.setBreakLess(-1);
             Bukkit.getScheduler().runTaskLater(app, () -> {
@@ -159,7 +159,7 @@ public class BeforePacketHandler implements Prepare {
 						.set("cost", value)
 						.send(user);
 
-				user.sendTitle("§6Находка!", "§e+" + value);
+				user.getPlayer().sendTitle("§6Находка!", "§e+" + value);
 
 				user.setMoney(user.getMoney() + prize);
 
@@ -167,7 +167,7 @@ public class BeforePacketHandler implements Prepare {
                 MessageUtil.find("findfragment")
                         .set("name", subEntity.getTitle())
                         .send(user);
-                user.sendTitle("§l§6Находка!", "§eобнаружен " + parent.getRare().getWord() + " фрагмент");
+                user.getPlayer().sendTitle("§l§6Находка!", "§eобнаружен " + parent.getRare().getWord() + " фрагмент");
 
                 user.getElementList().add(new Element(parentId, id, false, parent.getRare().getIncrease()));
             }
