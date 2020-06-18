@@ -11,6 +11,7 @@ import ru.func.museum.data.MuseumInfo;
 import ru.func.museum.museum.coin.Coin;
 import ru.func.museum.museum.collector.Collector;
 import ru.func.museum.museum.hall.template.space.Space;
+import ru.func.museum.museum.map.MuseumPrototype;
 import ru.func.museum.player.User;
 
 import java.util.ArrayList;

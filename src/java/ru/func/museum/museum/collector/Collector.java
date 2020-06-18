@@ -1,24 +1,44 @@
 package ru.func.museum.museum.collector;
 
+import delfikpro.exhibit.Piece;
 import lombok.experimental.Delegate;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import ru.func.museum.data.collector.CollectorInfo;
 import ru.func.museum.excavation.Excavation;
+import ru.func.museum.museum.Museum;
 import ru.func.museum.player.User;
 import ru.func.museum.player.pickaxe.Pickaxe;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Collector {
+
+	private final Museum museum;
 
 	@Delegate
 	private final CollectorInfo info;
+	private CollectorNavigator navigator;
+	private List<Piece> pieces;
 
-	public Collector(CollectorInfo info) {
+	public Collector(Museum museum, CollectorInfo info) {
+		this.museum = museum;
 		this.info = info;
+		this.navigator = museum.getPrototype().getDefaultCollectorNavigators().get(info.getId());
+		this.pieces = new ArrayList<>();
+		CraftWorld world = museum.getPrototype().getMap().getWorld();
+		EntityArmorStand armorStand = new EntityArmorStand(world.getHandle());
+		armorStand.setEquipment(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(new ItemStack(Material.WORKBENCH)));
+		pieces.add(new Piece(armorStand, new Location(world, 0, 0, 0)));
+
+
 	}
 
 

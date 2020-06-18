@@ -20,7 +20,7 @@ import ru.func.museum.command.MuseumCommand;
 import ru.func.museum.command.VisitorCommand;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.listener.*;
-import ru.func.museum.museum.MuseumMap;
+import ru.func.museum.museum.map.MuseumMap;
 import ru.func.museum.museum.coin.Coin;
 import ru.func.museum.museum.hall.template.HallTemplateType;
 import ru.func.museum.player.User;
@@ -48,8 +48,6 @@ public final class App extends JavaPlugin {
 		this.serviceConnector = new ServiceConnector(this);
 		this.museumMap = new MuseumMap(this);
 
-		B.events(playerDataManager);
-
         CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
         CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
@@ -58,13 +56,14 @@ public final class App extends JavaPlugin {
 			Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key);
 		}
 
-		Arrays.asList(
+		B.events(
+				playerDataManager,
                 new CancelEvent(),
                 new MuseumItemHandler(this),
                 new ManipulatorHandler(this),
                 new PlayerDataManager(this),
                 new MoveListener(this)
-        ).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
+        );
 
         Excavation.WORLD.setGameRuleValue("mobGriefing", "false");
 

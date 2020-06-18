@@ -30,8 +30,7 @@ public class Piece {
 	private final List<Piece> children = new ArrayList<>();
 
 	// ToDo: Optimize via custom packets with pre-serialized byte data
-	public Piece(ArmorStand bukkitStand, Location worldOrigin) {
-		EntityArmorStand as = ((CraftArmorStand) bukkitStand).getHandle();
+	public Piece(EntityArmorStand as, Location worldOrigin) {
 		this.entityId = as.getId();
 		this.syncSpawnPacket = new PacketPlayOutSpawnEntity(as, 78);
 		this.metadataPacket = new PacketPlayOutEntityMetadata(as.getId(), as.getDataWatcher(), false);

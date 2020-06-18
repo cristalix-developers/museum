@@ -8,8 +8,8 @@ import java.util.List;
 @Data
 public class CollectorInfo {
 
-	private final List<V3> endpoints;
+	private final int id;
+	private final List<V3> customRoute;
 	private final CollectorType type;
-	private final String name;
 
 }

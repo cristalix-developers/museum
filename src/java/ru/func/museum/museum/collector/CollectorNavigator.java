@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.bukkit.Location;
 import org.bukkit.World;
+import ru.func.museum.museum.map.MuseumPrototype;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,11 +18,13 @@ import java.util.stream.Collectors;
 @Getter
 public class CollectorNavigator {
 
+	private final MuseumPrototype museumProto;
     private final World world;
     private final List<Node> nodes;
     private double totalLocation;
 
-    public CollectorNavigator(World world, List<Location> points) {
+    public CollectorNavigator(MuseumPrototype museumProto, World world, List<Location> points) {
+    	this.museumProto = museumProto;
         this.world = world;
         this.nodes = points.stream().map(Node::new).collect(Collectors.toList());
         for (int i = 0; i < this.nodes.size(); i++) {

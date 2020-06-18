@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface Space {
 
-    boolean isManipulator(Location location);
-
     void show(User owner);
 
     void hide(User owner);

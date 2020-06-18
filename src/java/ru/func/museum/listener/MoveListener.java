@@ -15,7 +15,7 @@ import ru.func.museum.museum.hall.Hall;
 @AllArgsConstructor
 public class MoveListener implements Listener {
 
-    private App app;
+    private final App app;
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
@@ -30,7 +30,7 @@ public class MoveListener implements Listener {
                 return;
 
             // Попытка скушать монетки
-            user.getCoins().removeIf(coin -> coin.pickUp(player, user, to, 1.7));
+            user.getCoins().removeIf(coin -> coin.pickUp(user, to, 1.7));
         }
     }
 }
