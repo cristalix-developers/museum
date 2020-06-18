@@ -47,33 +47,14 @@ public class MuseumItemHandler implements Listener {
     private App app;
     private ItemStack museumItem;
 
-    private ItemStack backItem = Items.builder()
-            .type(Material.BARRIER)
-            .displayName("§cВернуться")
-            .build();
-
-    private ClickableItem alreadyHave = ClickableItem.empty(Items.builder()
-            .displayName("§bПусто")
-            .loreLines(
-                    "",
-                    "§fСдесь был коллектор,",
-                    "§fкоторый вам не нужен,",
-                    "§fпоэтому мы его убрали."
-            ).type(Material.EMERALD)
-            .build()
-    );
-
-    private ItemStack gotoExcavationsItem = Items.builder()
-            .displayName("§bЭкспедиции")
-            .type(Material.COMPASS)
-            .lore("", "§fОтправтесь на раскопки", "§fи найдите следы прошлого.")
-            .build();
-
-    private ItemStack gotoPickaxesItem = Items.builder()
-            .displayName("§bКирки")
-            .type(Material.DIAMOND_PICKAXE)
-            .lore("", "§fПриобретите новую кирку,", "§fи разгодайте тайны песка...")
-            .build();
+    private final ItemStack museumChangeTitleItem = Lemonade.get("museum_change_title").render();
+    private final ItemStack backItem = Lemonade.get("goback").render();
+    private final ClickableItem alreadyHave = ClickableItem.empty(Lemonade.get("already_have").render());
+    private final ItemStack gotoExcavationsItem = Lemonade.get("goto_excavations_item").render();
+    private final ItemStack gotoPickaxesItem = Lemonade.get("goto_pickaxes_item").render();
+    private final ItemStack collectorsItem = Lemonade.get("collectors").render();
+    private final ItemStack inviteItem = Lemonade.get("invite").render();
+    private final ItemStack buyCollectorItem = Lemonade.get("buy_collector").render();
 
     private ControlledInventory excavationUI = ControlledInventory.builder()
             .provider(new InventoryProvider() {
@@ -89,16 +70,12 @@ public class MuseumItemHandler implements Listener {
                         Excavation excavation = excavationType.getExcavation();
                         if (excavation.getMinimalLevel() <= user.getGlobalLevel()) {
                             contents.add('S', ClickableItem.of(
-                                    Items.builder()
-                                            .displayName("§bВ путь!")
-                                            .type(excavationType.getIcon())
-                                            .lore(
-                                                    "",
-                                                    "§fЭкспедиция: " + excavation.getTitle(),
-                                                    String.format("§fЦена: %.2f$", excavation.getCost()),
-                                                    "§fМинимальный уровень: " + excavation.getMinimalLevel(),
-                                                    "§fКол-во ударов: " + excavation.getBreakCount()
-                                            ).build(),
+                                    Lemonade.get("go").dynamic()
+                                            .fill("excavation", excavation.getTitle())
+                                            .fill("cost", String.format("%.2f", excavation.getCost()))
+                                            .fill("lvl", String.valueOf(excavation.getMinimalLevel()))
+                                            .fill("breaks", String.valueOf(excavation.getBreakCount()))
+                                            .render(),
                                     event -> {
                                         player.closeInventory();
                                         if (excavation.getCost() > user.getMoney()) {
@@ -192,12 +169,7 @@ public class MuseumItemHandler implements Listener {
                     contents.resetMask("SOSOSOOTB");
 
                     contents.add('B', ClickableItem.of(backItem, event -> museumUI.open(player)));
-                    contents.add('T', ClickableItem.empty(Items.builder()
-                            .type(Material.PAPER)
-                            .displayName("§bКоллекторы")
-                            .lore("", "§fКупить за игрокую валюту - [ЛКМ],", "§fза кристалики - [ПКМ]")
-                            .build()
-                    ));
+                    contents.add('T', ClickableItem.empty(collectorsItem));
 
                     val collector = hall.getCollectorType();
 
@@ -271,28 +243,21 @@ public class MuseumItemHandler implements Listener {
 
                     contents.resetMask("OFOSMTOAO");
 
-                    contents.add('F', ClickableItem.empty(Items.builder()
-                            .type(Material.PAPER)
-                            .displayName("§bПрофиль")
-                            .loreLines(
-                                    "",
-                                    "§fУровень: " + user.getGlobalLevel(),
-                                    "§fДенег: " + MessageUtil.toMoneyFormat(user.getMoney()),
-                                    "§fОпыт: " + user.getExperience(),
-                                    "§fОпыта осталось: " + user.getRequiredExperience(user.getGlobalLevel() + 1),
-                                    "§fЧасов сыграно: " + player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000,
-                                    "§fМонет собрано: " + user.getPickedCoinsCount(),
-                                    "§fКирка: " + user.getPickaxeType().getName(),
-                                    "§fРаскопок: " + user.getExcavationCount(),
-                                    "§fФрагментов: " + user.getElementList().size()
-                            ).build()
+                    contents.add('F', ClickableItem.empty(
+                            Lemonade.get("profile").dynamic()
+                            .fill("level", String.valueOf(user.getGlobalLevel()))
+                            .fill("money", MessageUtil.toMoneyFormat(user.getMoney()))
+                            .fill("exp", String.valueOf(user.getExperience()))
+                            .fill("need_exp", String.valueOf(user.getRequiredExperience(user.getGlobalLevel() + 1)))
+                            .fill("hours_played", String.valueOf(player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000))
+                            .fill("coins_picked", String.valueOf(user.getPickedCoinsCount()))
+                            .fill("pickaxe", user.getPickaxeType().getName())
+                            .fill("excavations", String.valueOf(user.getExcavationCount()))
+                            .fill("fragments", String.valueOf(user.getElementList().size()))
+                            .render()
                     ));
                     contents.add('M', ClickableItem.empty(getMuseumItem(user)));
-                    contents.add('A', ClickableItem.of(Items.builder()
-                                    .displayName("§bПригласить друга")
-                                    .type(Material.BOOK_AND_QUILL)
-                                    .lore("", "§fНажмите и введите", "§fникнейм приглашенного!")
-                                    .build(), event -> new VirtualSign().openSign(player, lines -> {
+                    contents.add('A', ClickableItem.of(inviteItem, event -> new VirtualSign().openSign(player, lines -> {
                                 for (String line : lines) {
                                     if (line != null && !line.isEmpty()) {
                                         Player invited = Bukkit.getPlayer(line);
@@ -316,26 +281,9 @@ public class MuseumItemHandler implements Listener {
                                 }
                             })
                     ));
-                    contents.add('S', ClickableItem.of(Items.builder()
-                            .displayName("§bКупить коллектор")
-                            .type(Material.DISPENSER)
-                            .loreLines(
-                                    "",
-                                    "§fХороший коллектор способен",
-                                    "§fсобрать больше монет!",
-                                    "",
-                                    "§f[§bдля этого залла§f]"
-                            ).build(), event -> collectorUI.open(player)
+                    contents.add('S', ClickableItem.of(buyCollectorItem, event -> collectorUI.open(player)
                     ));
-                    contents.add('T', ClickableItem.of(Items.builder()
-                                    .displayName("§bПереименовать музей")
-                                    .type(Material.SIGN)
-                                    .loreLines(
-                                            "",
-                                            "§fЕсли вам не нравтся",
-                                            "§fназвание вашего музея",
-                                            "§fвы можете его изменить."
-                                    ).build(),
+                    contents.add('T', ClickableItem.of(museumChangeTitleItem,
                             event -> new VirtualSign().openSign(player, lines -> {
                                 for (String line : lines) {
                                     if (line != null && !line.isEmpty()) {
@@ -389,17 +337,17 @@ public class MuseumItemHandler implements Listener {
     }
 
     private ItemStack getMuseumItem(User user) {
-		val museum = user.getCurrentMuseum();
+        val museum = user.getCurrentMuseum();
 
-		return Lemonade.get("museum").dynamic()
-				.fill("owner", museum.getOwner().getName())
-				.fill("title", museum.getTitle())
-				.fill("views", String.valueOf(museum.getViews()))
-				.fill("income", MessageUtil.toMoneyFormat(museum.getIncome()))
-				.fill("collectors", String.valueOf(museum.getCollectorSlots()))
-				.fill("spaces", String.valueOf(museum.getSpaces().size()))
-				.fill("sinceCreation", LoveHumans.formatTime(System.currentTimeMillis() - museum.getCreationDate().getTime()))
-				.render();
+        return Lemonade.get("museum").dynamic()
+                .fill("owner", museum.getOwner().getName())
+                .fill("title", museum.getTitle())
+                .fill("views", String.valueOf(museum.getViews()))
+                .fill("income", MessageUtil.toMoneyFormat(museum.getIncome()))
+                .fill("collectors", String.valueOf(museum.getCollectorSlots()))
+                .fill("spaces", String.valueOf(museum.getSpaces().size()))
+                .fill("sinceCreation", LoveHumans.formatTime(System.currentTimeMillis() - museum.getCreationDate().getTime()))
+                .render();
 
     }
 }
