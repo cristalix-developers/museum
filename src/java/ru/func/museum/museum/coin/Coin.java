@@ -45,7 +45,7 @@ public class Coin {
         connection.sendPacket(new PacketPlayOutEntityMetadata(entityItem.getId(), entityItem.getDataWatcher(), false));
     }
 
-    public boolean pickUp(Player player, User archaeologist, Location location, double radius) {
+    public boolean pickUp(User user, Location location, double radius) {
         boolean close = this.location.distanceSquared(location) <= radius * radius;
 
         if (close) {
@@ -53,22 +53,22 @@ public class Coin {
             entityItem.setNoGravity(true);
 
             // Расчет стоимости монеты
-            val money = (archaeologist.getCurrentMuseum().getSummaryIncrease() / archaeologist.getMuseumList().size()) * (.5 + Pickaxe.RANDOM.nextDouble());
+            val money = (user.getCurrentMuseum().getIncome() / user.getMuseums().size()) * (.5 + Pickaxe.RANDOM.nextDouble());
             val format = Math.floor(money * 100) / 100;
             entityItem.setCustomName("§6+ " + format + "$");
 
-            val connection = archaeologist.getConnection();
+            val connection = user.getConnection();
 
             connection.sendPacket(new PacketPlayOutEntityVelocity(entityItem.getId(), 0, .05, 0));
             connection.sendPacket(new PacketPlayOutEntityMetadata(entityItem.getId(), entityItem.getDataWatcher(), false));
 
-            archaeologist.incPickedCoinsCount();
+            user.setPickedCoinsCount(user.getPickedCoinsCount() + 1);
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(App.getApp(), () -> {
                 remove(connection);
-                player.playSound(this.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.WEATHER, .2F, 1);
-                player.spawnParticle(Particle.TOTEM, this.location.add(0, 1.5, 0), 5, 0, 0, 0, .3);
-                archaeologist.setMoney(archaeologist.getMoney() + money);
+                user.getPlayer().playSound(this.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.WEATHER, .2F, 1);
+                user.getPlayer().spawnParticle(Particle.TOTEM, this.location.add(0, 1.5, 0), 5, 0, 0, 0, .3);
+                user.setMoney(user.getMoney() + money);
             }, 30);
         }
 

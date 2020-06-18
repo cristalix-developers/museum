@@ -13,7 +13,7 @@ public class UserInfo {
 
 	public long experience;
 	public double money;
-	public String lastExcavation;
+	public ExcavationType lastExcavation;
 	public PickaxeType pickaxeType;
 	public List<MuseumInfo> museumInfos;
 	public List<SkeletonInfo> skeletonInfos;

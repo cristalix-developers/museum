@@ -23,27 +23,28 @@ public class MuseumCommand implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player) {
             val player = (Player) commandSender;
+            val user = app.getUser(player.getUniqueId());
 
             if (strings.length == 2) {
                 if (strings[0].equals("accept")) {
                     val author = Bukkit.getPlayer(strings[1]);
 
                     if (author == null || !author.isOnline()) {
-                        MessageUtil.find("playeroffline").send(player);
+                        MessageUtil.find("playeroffline").send(user);
                         return true;
                     }
 
-                    val sender = app.getArchaeologistMap().get(author.getUniqueId());
+                    val sender = app.getUser(author.getUniqueId());
 
-                    if (app.getArchaeologistMap().get(player.getUniqueId()).getCurrentMuseum().getOwner().equals(sender))
+                    if (user.getCurrentMuseum().getOwner().equals(sender))
                         return true;
 
-					sender.getCurrentMuseum().unload(app, sender, player);
-                    sender.getCurrentMuseum().load(app, sender, player);
+					sender.getCurrentMuseum().unload(user);
+                    sender.getCurrentMuseum().load(app, user);
 
                     MessageUtil.find("visitaccept")
                             .set("visitor", player.getName())
-                            .send(author);
+                            .send(sender);
                 }
             }
         }

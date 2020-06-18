@@ -24,7 +24,6 @@ public class Collector {
 
 	public void show(User user) {
 		val armorStand = new EntityArmorStand(Pickaxe.WORLD);
-		val endpoints = hallTemplateType.getHallTemplate().getCollectorRoute();
 
 		navigator = new CollectorNavigator(Excavation.WORLD, endpoints);
 
@@ -40,8 +39,8 @@ public class Collector {
 				location.getZ()
 							  );
 		armorStand.setNoGravity(true);
-		connection.sendPacket(new PacketPlayOutSpawnEntityLiving(armorStand));
-		connection.sendPacket(new PacketPlayOutEntityEquipment(
+		user.getConnection().sendPacket(new PacketPlayOutSpawnEntityLiving(armorStand));
+		user.getConnection().sendPacket(new PacketPlayOutEntityEquipment(
 				armorStand.id,
 				EnumItemSlot.HEAD,
 				CraftItemStack.asNMSCopy(collectorType.getHead())

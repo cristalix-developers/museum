@@ -70,7 +70,7 @@ public class Museum {
 		collectors.forEach(collector -> collector.show(user));
 	}
 
-	public void unload(App app, User user) {
+	public void unload(User user) {
 		// Очстка витрин, коллекторов
 		spaces.forEach(space -> space.hide(user));
 		collectors.forEach(collector -> collector.hide(user));

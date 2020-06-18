@@ -21,7 +21,7 @@ public class PrepareJSAnime implements Prepare {
     private static final String FILENAME = "anime_min.js";
 
     @Override
-    public void execute(Player player, User archaeologist, App app) {
+    public void execute(User user, App app) {
         if (code == null) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(app.getResource(FILENAME)))) {
                 code = new JavaScriptMessage(new String[]{reader.lines().collect(Collectors.joining("\n"))});
@@ -29,6 +29,6 @@ public class PrepareJSAnime implements Prepare {
                 e.printStackTrace();
             }
         }
-        IDisplayService.get().sendScripts(player.getUniqueId(), code);
+        IDisplayService.get().sendScripts(user.getUuid(), code);
     }
 }

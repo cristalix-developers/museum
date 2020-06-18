@@ -154,15 +154,14 @@ public class ManipulatorHandler implements Listener {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (!e.getClickedBlock().getType().name().contains("SIGN"))
                 return;
-            val archaeologist = app.getArchaeologistMap().get(e.getPlayer().getUniqueId());
-            archaeologist.getCurrentMuseum().getHalls().forEach(hall -> hall.getMatrix().stream()
+            val user = app.getUser(e.getPlayer().getUniqueId());
+            user.getCurrentMuseum().getSpaces().stream()
                     .filter(space -> space.isManipulator(e.getClickedBlock().getLocation()))
                     .findFirst()
                     .ifPresent(space -> {
-                        archaeologist.setCurrentSpace(space);
+                        user.setCurrentSpace(space);
                         spaceUiTemplate.open(e.getPlayer());
-                    })
-            );
+                    });
         }
     }
 }

@@ -49,7 +49,7 @@ public class MessageUtil {
         }
 
         public void send(User user) {
-            user.sendMessage(text);
+            user.getPlayer().sendMessage(text);
         }
     }
 }

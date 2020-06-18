@@ -24,23 +24,13 @@ public class MoveListener implements Listener {
 
         if (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ()) {
             val player = e.getPlayer();
-            val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
+            val user = app.getUser(player.getUniqueId());
 
-            if (archaeologist.isOnExcavation())
+            if (user.isOnExcavation())
                 return;
 
-            // Если игрок теперь не в выбранном холле, тогда заменить холл
-            if (!archaeologist.getCurrentHall().isInside(to)) {
-                for (Hall hall : archaeologist.getCurrentMuseum().getHalls()) {
-                    if (hall.isInside(to)) {
-                        archaeologist.setCurrentHall(hall);
-                        break;
-                    }
-                }
-            }
-
             // Попытка скушать монетки
-            archaeologist.getCoins().removeIf(coin -> coin.pickUp(player, archaeologist, to, 1.7));
+            user.getCoins().removeIf(coin -> coin.pickUp(player, user, to, 1.7));
         }
     }
 }
