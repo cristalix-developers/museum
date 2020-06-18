@@ -1,24 +1,33 @@
 package ru.func.museum;
 
+import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.microservice.MicroServicePlatform;
 import ru.cristalix.core.microservice.MicroserviceBootstrap;
 import ru.cristalix.core.network.Capability;
 import ru.cristalix.core.network.CorePackage;
 import ru.cristalix.core.network.ISocketClient;
 import ru.cristalix.core.realm.RealmId;
+import ru.func.museum.data.UserInfo;
 import ru.func.museum.packages.UserInfoPackage;
 
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class MuseumService {
 
     public static void main(String[] args) {
-    	MuseumSerializers.initialize();
         MicroserviceBootstrap.bootstrap(new MicroServicePlatform(1));
+        MongoManager.connect(
+                System.getProperty("db_url"),
+                System.getProperty("db_data"),
+                System.getProperty("db_collection")
+        );
 
         registerCapability(UserInfoPackage.class, false);
         registerHandler(UserInfoPackage.class, (source, pckg) -> {
+            MongoManager.load(pckg.getUuid())
+                    .thenAccept(data -> pckg.setUserInfo(GlobalSerializers.fromJson(data, UserInfo.class)));
             answer(pckg);
         });
     }
