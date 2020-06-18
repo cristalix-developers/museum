@@ -22,15 +22,15 @@ public class SimpleSpaceViewer implements Space {
         return false;
     }
 
-    @Override
-    public void show(User owner, Player quest) {
+	@Override
+	public void show(User owner) {
 
-    }
+	}
 
-    @Override
-    public void hide(User owner, Player guest) {
+	@Override
+	public void hide(User owner) {
 
-    }
+	}
 
     @Override
     public List<Element> getElements() {
@@ -41,4 +41,10 @@ public class SimpleSpaceViewer implements Space {
     public List<Integer> getAccessEntities() {
         return null;
     }
+
+	@Override
+	public double getIncome() {
+		return 0;
+	}
+
 }

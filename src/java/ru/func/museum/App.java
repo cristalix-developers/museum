@@ -18,9 +18,9 @@ import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 import ru.func.museum.command.MuseumCommand;
 import ru.func.museum.command.VisitorCommand;
-import ru.func.museum.element.deserialized.MuseumEntity;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.listener.*;
+import ru.func.museum.museum.MuseumMap;
 import ru.func.museum.museum.coin.Coin;
 import ru.func.museum.museum.hall.template.HallTemplateType;
 import ru.func.museum.player.User;
@@ -35,9 +35,10 @@ public final class App extends JavaPlugin {
 
 	@Getter
     private static App app;
-    private MuseumEntity[] museumEntities;
+
     private PlayerDataManager playerDataManager;
     private ServiceConnector serviceConnector;
+    private MuseumMap museumMap;
 
     @Override
     public void onEnable() {
@@ -45,6 +46,7 @@ public final class App extends JavaPlugin {
 
 		this.playerDataManager = new PlayerDataManager(this);
 		this.serviceConnector = new ServiceConnector(this);
+		this.museumMap = new MuseumMap(this);
 
 		B.events(playerDataManager);
 
@@ -80,25 +82,25 @@ public final class App extends JavaPlugin {
                 val visitedPoint = visitorManager.getVictimFutureLocation();
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    val archaeologist = archaeologistMap.get(player.getUniqueId());
+                    val user = getUser(player.getUniqueId());
 
-                    if (archaeologist.isOnExcavation()) {
+                    if (user.isOnExcavation()) {
                         continue;
                     }
 
                     if (visitedPoint != null && time % 5 == 0) {
                         Coin coin = new Coin(visitedPoint);
-                        coin.create(archaeologist.getConnection());
-                        archaeologist.getCoins().add(coin);
+                        coin.create(user.getConnection());
+                        user.getCoins().add(coin);
                     }
 
-                    archaeologist.getCurrentMuseum().getHalls()
-                            .forEach(hall -> hall.moveCollector(archaeologist, player, time));
+                    user.getCurrentMuseum().getCollectors()
+                            .forEach(collector -> collector.move(user, time));
 
                     // Если монеты устарели, что бы не копились на клиенте, удаляю
-                    archaeologist.getCoins().removeIf(coin -> {
+                    user.getCoins().removeIf(coin -> {
                         if (coin.getTimestamp() + Coin.SECONDS_LIVE * 1000 < time) {
-                            coin.remove(archaeologist.getConnection());
+                            coin.remove(user.getConnection());
                             return true;
                         }
                         return false;

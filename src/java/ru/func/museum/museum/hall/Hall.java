@@ -35,34 +35,13 @@ public class Hall {
     private transient Location previousLocation;
     private transient CollectorNavigator navigator;
 
-    public void moveCollector(User archaeologist, Player player, long iteration) {
-        if (collectorType.equals(CollectorType.NONE))
-            return;
 
-        val location = getLocation(iteration);
-
-        archaeologist.getCoins().removeIf(coin -> coin.pickUp(player, archaeologist, location, collectorType.getRadius()));
-
-        collectorType.move(
-                ((CraftPlayer) player).getHandle().playerConnection,
-                armorStand,
-                location.getX() - previousLocation.getX(),
-                location.getY() - previousLocation.getY(),
-                location.getZ() - previousLocation.getZ(),
-                location.getYaw(),
-                location.getPitch()
-        );
-        previousLocation = location;
-    }
 
     public void removeCollector(PlayerConnection connection) {
         connection.sendPacket(new PacketPlayOutEntityDestroy(armorStand.getId()));
     }
 
 
-    private Location getLocation(long time) {
-        return navigator.getLocation(time * collectorType.getSpeed() % 25_000 / 25_000D);
-    }
 
     public boolean isInside(Location location) {
         return hallTemplateType.getHallTemplate().isInside(location);

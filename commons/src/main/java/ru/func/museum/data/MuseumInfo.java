@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 public class MuseumInfo {
 
+	public String address;
 	public String title;
 	public Date creationDate;
 	public long views;
