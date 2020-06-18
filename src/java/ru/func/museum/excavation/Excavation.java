@@ -6,7 +6,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.func.museum.excavation.generator.ExcavationGenerator;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 import ru.func.museum.util.MessageUtil;
 
 public interface Excavation {
@@ -20,7 +20,7 @@ public interface Excavation {
     Location getStartLocation();
     int getBreakCount();
 
-    default void load(Archaeologist archaeologist, Player player) {
+    default void load(User archaeologist, Player player) {
         Excavation excavation = archaeologist.getLastExcavation()
                 .getExcavation();
         player.getInventory().clear();

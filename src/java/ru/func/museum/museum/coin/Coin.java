@@ -3,20 +3,28 @@ package ru.func.museum.museum.coin;
 import lombok.Getter;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
+import org.bukkit.Material;
 import org.bukkit.SoundCategory;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
+import ru.cristalix.core.item.Items;
 import ru.func.museum.App;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 import ru.func.museum.player.pickaxe.Pickaxe;
 
 /**
  * @author func 08.06.2020
  * @project Museum
  */
-public class Coin implements AbstractCoin {
+public class Coin {
 
-    private EntityItem entityItem;
+	public static final ItemStack COIN = CraftItemStack.asNMSCopy(Items.builder()
+			.type(Material.DOUBLE_PLANT)
+			.build()
+																 );
+	public static final int SECONDS_LIVE = 15;
+	private EntityItem entityItem;
     private Location location;
     @Getter
     private long timestamp;
@@ -28,19 +36,16 @@ public class Coin implements AbstractCoin {
         timestamp = System.currentTimeMillis();
     }
 
-    @Override
     public void remove(PlayerConnection connection) {
         connection.sendPacket(new PacketPlayOutEntityDestroy(entityItem.getId()));
     }
 
-    @Override
     public void create(PlayerConnection connection) {
         connection.sendPacket(new PacketPlayOutSpawnEntity(entityItem, 2));
         connection.sendPacket(new PacketPlayOutEntityMetadata(entityItem.getId(), entityItem.getDataWatcher(), false));
     }
 
-    @Override
-    public boolean pickUp(Player player, Archaeologist archaeologist, Location location, double radius) {
+    public boolean pickUp(Player player, User archaeologist, Location location, double radius) {
         boolean close = this.location.distanceSquared(location) <= radius * radius;
 
         if (close) {

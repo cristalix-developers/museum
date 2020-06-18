@@ -11,7 +11,7 @@ import ru.func.museum.museum.collector.CollectorNavigator;
 import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.museum.hall.template.HallTemplateType;
 import ru.func.museum.museum.hall.template.space.Space;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 import ru.func.museum.player.pickaxe.Pickaxe;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class Hall {
     private transient Location previousLocation;
     private transient CollectorNavigator navigator;
 
-    public void moveCollector(Archaeologist archaeologist, Player player, long iteration) {
+    public void moveCollector(User archaeologist, Player player, long iteration) {
         if (collectorType.equals(CollectorType.NONE))
             return;
 
@@ -59,33 +59,6 @@ public class Hall {
         connection.sendPacket(new PacketPlayOutEntityDestroy(armorStand.getId()));
     }
 
-    public void generateCollector(PlayerConnection connection) {
-        val armorStand = new EntityArmorStand(Pickaxe.WORLD);
-        val endpoints = hallTemplateType.getHallTemplate().getCollectorRoute();
-
-        navigator = new CollectorNavigator(Excavation.WORLD, endpoints);
-
-        val location = getLocation(System.currentTimeMillis());
-
-        armorStand.setCustomName("§6Коллектор " + collectorType.getName());
-        armorStand.id = 800 + Pickaxe.RANDOM.nextInt(200);
-        armorStand.setInvisible(true);
-        armorStand.setCustomNameVisible(true);
-        armorStand.setPosition(
-                location.getX(),
-                location.getY(),
-                location.getZ()
-        );
-        armorStand.setNoGravity(true);
-        connection.sendPacket(new PacketPlayOutSpawnEntityLiving(armorStand));
-        connection.sendPacket(new PacketPlayOutEntityEquipment(
-                armorStand.id,
-                EnumItemSlot.HEAD,
-                CraftItemStack.asNMSCopy(collectorType.getHead())
-        ));
-        this.armorStand = armorStand;
-        previousLocation = location;
-    }
 
     private Location getLocation(long time) {
         return navigator.getLocation(time * collectorType.getSpeed() % 25_000 / 25_000D);

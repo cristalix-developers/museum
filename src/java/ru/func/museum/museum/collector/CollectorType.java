@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 @AllArgsConstructor
 public enum CollectorType {
     NONE("отсутствует", new ItemStack(Material.PAPER), 0, 0, 0,  -10),
-    LOVED("любительский", new ItemStack(Material.WORKBENCH), 1, 100_000, 1.5, -1),
+    AMATEUR("любительский", new ItemStack(Material.WORKBENCH), 1, 100_000, 1.5, -1),
     PROFESSIONAL("профессиольный", new ItemStack(Material.WORKBENCH), 2, 400_000, 2,69),
     PRESTIGE("престижный", new ItemStack(Material.WORKBENCH), 4, 750_000, 3, 99);
 

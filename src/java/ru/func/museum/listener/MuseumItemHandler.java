@@ -1,5 +1,7 @@
 package ru.func.museum.listener;
 
+import clepto.LoveHumans;
+import clepto.bukkit.Lemonade;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -27,9 +29,9 @@ import ru.cristalix.core.item.Items;
 import ru.func.museum.App;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.excavation.ExcavationType;
-import ru.func.museum.museum.AbstractMuseum;
+import ru.func.museum.museum.Museum;
 import ru.func.museum.museum.collector.CollectorType;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 import ru.func.museum.player.pickaxe.PickaxeType;
 import ru.func.museum.util.MessageUtil;
 import ru.func.museum.util.VirtualSign;
@@ -363,7 +365,7 @@ public class MuseumItemHandler implements Listener {
 
     @EventHandler
     public void onItemClick(PlayerInteractEvent e) {
-        Player user = e.getPlayer();
+        Player player = e.getPlayer();
         if (e.getItem() != null && e.getMaterial() != Material.AIR) {
             Material material = e.getMaterial();
             if (material == Material.PAPER) {
@@ -371,22 +373,16 @@ public class MuseumItemHandler implements Listener {
             } else if (material == Material.EMERALD) {
                 pickaxeUI.open(e.getPlayer());
             } else if (material == Material.SADDLE) {
-                val player = app.getArchaeologistMap().get(user.getUniqueId());
-                AbstractMuseum museum = player.getCurrentMuseum();
-                val ownerArchaeologist = museum.getOwner();
+                val user = app.getUser(player.getUniqueId());
+                Museum museum = user.getCurrentMuseum();
+                val owner = museum.getOwner();
 
-                if (ownerArchaeologist.equals(player)) {
-                    user.getInventory().remove(Material.SADDLE);
-                    return;
-                }
-
-                museum.unload(app, ownerArchaeologist, user);
-                player.getMuseumList().get(0).load(app, player, user);
-                val owner = Bukkit.getPlayer(UUID.fromString(ownerArchaeologist.getUuid()));
+                museum.unload(app, user);
+                user.getMuseums().get(0).load(app, user);
 
                 if (owner != null)
                     MessageUtil.find("leavedfrommuseum")
-                            .set("name", user.getName())
+                            .set("name", player.getName())
                             .send(owner);
 
                 MessageUtil.find("backtomuseum").send(user);
@@ -394,36 +390,18 @@ public class MuseumItemHandler implements Listener {
         }
     }
 
-    private ItemStack getMuseumItem(Archaeologist archaeologist) {
-        if (museumItem == null) {
-            museumItem = Items.builder()
-                    .displayName("§bМузей")
-                    .type(Material.CLAY_BALL)
-                    .build();
-            net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(museumItem);
-            nmsItem.tag.setString("other", "guild_bank");
-            museumItem.setItemMeta(CraftItemStack.getItemMeta(nmsItem));
-        }
-        val museum = archaeologist.getCurrentMuseum();
-        val hall = archaeologist.getCurrentHall();
+    private ItemStack getMuseumItem(User user) {
+		val museum = user.getCurrentMuseum();
 
-        ItemStack clone = museumItem.clone();
-        ItemMeta meta = clone.getItemMeta();
-        Date date = new Date();
-        meta.setLore(Arrays.asList(
-                "§fХозяин: " + museum.getOwner().getName(),
-                "§fНазвание: " + museum.getTitle(),
-                "§fЗаллов: " + museum.getHalls().size(),
-                "§fПосещений: " + museum.getViews(),
-                "",
-                "§b > Залл",
-                "§fДоход: " + MessageUtil.toMoneyFormat(museum.getSummaryIncrease()),
-                "§fКоллектор: " + hall.getCollectorType().getName(),
-                "§fВитрин: " + archaeologist.getCurrentHall().getMatrix().size(),
-                "",
-                "§7Создан " + (date.getTime() - museum.getDate().getTime()) / 3600_000 / 24 + " дней(я) назад"
-        ));
-        clone.setItemMeta(meta);
-        return clone;
+		return Lemonade.get("museum").dynamic()
+				.fill("owner", museum.getOwner().getName())
+				.fill("title", museum.getTitle())
+				.fill("views", String.valueOf(museum.getViews()))
+				.fill("income", MessageUtil.toMoneyFormat(museum.getIncome()))
+				.fill("collectors", String.valueOf(museum.getCollectorSlots()))
+				.fill("spaces", String.valueOf(museum.getSpaces().size()))
+				.fill("sinceCreation", LoveHumans.formatTime(System.currentTimeMillis() - museum.getCreationDate().getTime()))
+				.render();
+
     }
 }

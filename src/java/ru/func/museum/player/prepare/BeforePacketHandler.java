@@ -14,7 +14,7 @@ import ru.func.museum.element.Element;
 import ru.func.museum.element.deserialized.SubEntity;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.excavation.ExcavationType;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 import ru.func.museum.player.pickaxe.Pickaxe;
 import ru.func.museum.player.pickaxe.PickaxeType;
 import ru.func.museum.util.MessageUtil;
@@ -32,17 +32,17 @@ public class BeforePacketHandler implements Prepare {
     private final BlockPosition dump = new BlockPosition(0, 0, 0);
 
     @Override
-    public void execute(Player player, Archaeologist archaeologist, App app) {
-        val connection = ((CraftPlayer) player).getHandle().playerConnection;
+    public void execute(User user, App app) {
+        val connection = user.getConnection();
         connection.networkManager.channel.pipeline().addBefore(
                 "packet_handler",
-                player.getName(),
+                user.getName(),
                 new ChannelDuplexHandler() {
                     @Override
                     public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                        if (packet instanceof PacketPlayInUseItem && archaeologist.isOnExcavation()) {
+                        if (packet instanceof PacketPlayInUseItem && user.isOnExcavation()) {
                             val pc = (PacketPlayInUseItem) packet;
-                            if (pc.c.equals(EnumHand.OFF_HAND) || archaeologist.getLastExcavation()
+                            if (pc.c.equals(EnumHand.OFF_HAND) || user.getLastExcavation()
                                     .getExcavation()
                                     .getExcavationGenerator()
                                     .fastCanBreak(pc.a.getX(), pc.a.getY(), pc.a.getZ())
@@ -50,21 +50,21 @@ public class BeforePacketHandler implements Prepare {
                                 pc.a = dump; // Genius
                         } else if (packet instanceof PacketPlayInBlockDig) {
                             val bd = (PacketPlayInBlockDig) packet;
-                            val lastExcavation = archaeologist.getLastExcavation();
+                            val lastExcavation = user.getLastExcavation();
                             val excavation = lastExcavation.getExcavation();
 
-                            boolean valid = archaeologist.isOnExcavation() &&
+                            boolean valid = user.isOnExcavation() &&
                                     !lastExcavation.equals(ExcavationType.NOOP) &&
                                     excavation.getExcavationGenerator().fastCanBreak(bd.a.getX(), bd.a.getY(), bd.a.getZ());
 
                             if (valid && bd.c == PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK) {
                                 // Обновляю текст с кол-вом оставшихся ударов
-                                archaeologist.sendAnime();
+                                user.sendAnime();
                                 // Возвращение игрока в музей
-                                if (tryReturnPlayer(player, archaeologist, app))
+                                if (tryReturnPlayer(user, app))
                                     return;
                                 // Игрок на раскопках, блок находится в шахте
-                                acceptedBreak(player, archaeologist, excavation, bd, app);
+                                acceptedBreak(user, excavation, bd, app);
                             } else if (!valid && bd.c == PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK)
                                 bd.c = PacketPlayInBlockDig.EnumPlayerDigType.ABORT_DESTROY_BLOCK; // Genius
                         }
@@ -74,53 +74,53 @@ public class BeforePacketHandler implements Prepare {
         );
     }
 
-    private boolean tryReturnPlayer(Player player, Archaeologist archaeologist, App app) {
-        if (archaeologist.getBreakLess() == -1)
+    private boolean tryReturnPlayer(User user, App app) {
+        if (user.getBreakLess() == -1)
             return true;
 
-        archaeologist.setBreakLess(archaeologist.getBreakLess() - 1);
-        if (archaeologist.getBreakLess() == 0) {
-            player.sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
-            MessageUtil.find("excavationend").send(player);
-            archaeologist.setBreakLess(-1);
+        user.setBreakLess(user.getBreakLess() - 1);
+        if (user.getBreakLess() == 0) {
+            user.sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
+            MessageUtil.find("excavationend").send(user);
+            user.setBreakLess(-1);
             Bukkit.getScheduler().runTaskLater(app, () -> {
-                archaeologist.setOnExcavation(false);
-                PrepareSteps.INVENTORY.getPrepare().execute(player, archaeologist, app);
-                archaeologist.getCurrentMuseum().load(app, archaeologist, player);
-                archaeologist.setExcavationCount(archaeologist.getExcavationCount() + 1);
+                user.setOnExcavation(false);
+                PrepareSteps.INVENTORY.getPrepare().execute(user, app);
+                user.getCurrentMuseum().load(app, user);
+                user.setExcavationCount(user.getExcavationCount() + 1);
             }, 10 * 20L);
             return true;
         }
-        return archaeologist.getBreakLess() < 0;
+        return user.getBreakLess() < 0;
     }
 
-    private void acceptedBreak(Player player, Archaeologist archaeologist, Excavation excavation, PacketPlayInBlockDig bd, App app) {
-        archaeologist.giveExp(player, 5);
+    private void acceptedBreak(User archaeologist, Excavation excavation, PacketPlayInBlockDig bd, App app) {
+        archaeologist.giveExperience(5);
 
         MinecraftServer.getServer().postToMainThread(() -> {
             for (PickaxeType pickaxeType : PickaxeType.values()) {
                 if (pickaxeType.getPrice() <= archaeologist.getPickaxeType().getPrice()) {
                     List<BlockPosition> positions = pickaxeType.getPickaxe().dig(archaeologist.getConnection(), excavation, bd.a);
                     if (positions != null)
-                        positions.forEach(position -> generateFragments(player, archaeologist, excavation, position, app));
+                        positions.forEach(position -> generateFragments(archaeologist, excavation, position, app));
                 }
             }
         });
     }
 
-    private void generateFragments(Player player, Archaeologist archaeologist, Excavation excavation, BlockPosition position, App app) {
+    private void generateFragments(User user, Excavation excavation, BlockPosition position, App app) {
         int[] ableIds = excavation.getExcavationGenerator().getElementsId();
         int parentId = ableIds[Pickaxe.RANDOM.nextInt(ableIds.length)];
 
         val parent = app.getMuseumEntities()[parentId];
         val generator = excavation.getExcavationGenerator();
 
-        double luckyBuffer = (double) (generator.getCenter().getBlockY() - player.getLocation().getBlockY()) / generator.getDepth(); // no zero
+        double luckyBuffer = (double) (generator.getCenter().getBlockY() - user.getLocation().getBlockY()) / generator.getDepth(); // no zero
 
         double bingo = luckyBuffer / parent.getRare().getRareScale() / 10;
         if (bingo > Pickaxe.RANDOM.nextDouble()) {
             // Если повезло, то будет проиграна анимация и тд
-            archaeologist.giveExp(player, 25);
+            user.giveExperience(25);
             SubEntity[] subEntities = parent.getSubs();
 
             val id = Pickaxe.RANDOM.nextInt(subEntities.length);
@@ -134,17 +134,17 @@ public class BeforePacketHandler implements Prepare {
                 ids[i] = noise * 100 + i;
 
             subEntity.show(
-                    archaeologist.getConnection(),
+                    user.getConnection(),
                     new Location(Excavation.WORLD, position.getX(), position.getY(), position.getZ()),
                     0,
                     noise,
                     true
             );
 
-            animateFragments(archaeologist.getConnection(), ids, app);
+            animateFragments(user.getConnection(), ids, app);
 
             // Проверка на дубликат
-			Optional<Element> elementOptional = archaeologist.getElementList().stream()
+			Optional<Element> elementOptional = user.getElementList().stream()
 					.filter(element -> element.getParentId() == parentId && element.getId() == id)
 					.findFirst();
 
@@ -157,19 +157,19 @@ public class BeforePacketHandler implements Prepare {
 				MessageUtil.find("findcopy")
 						.set("name", subEntity.getTitle())
 						.set("cost", value)
-						.send(player);
+						.send(user);
 
-				player.sendTitle("§6Находка!", "§e+" + value);
+				user.sendTitle("§6Находка!", "§e+" + value);
 
-				archaeologist.setMoney(archaeologist.getMoney() + prize);
+				user.setMoney(user.getMoney() + prize);
 
 			} else {
                 MessageUtil.find("findfragment")
                         .set("name", subEntity.getTitle())
-                        .send(player);
-                player.sendTitle("§l§6Находка!", "§eобнаружен " + parent.getRare().getWord() + " фрагмент");
+                        .send(user);
+                user.sendTitle("§l§6Находка!", "§eобнаружен " + parent.getRare().getWord() + " фрагмент");
 
-                archaeologist.getElementList().add(new Element(parentId, id, false, parent.getRare().getIncrease()));
+                user.getElementList().add(new Element(parentId, id, false, parent.getRare().getIncrease()));
             }
         }
     }

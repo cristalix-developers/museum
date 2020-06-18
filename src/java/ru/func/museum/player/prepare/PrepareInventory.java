@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.item.Items;
 import ru.func.museum.App;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 
 /**
  * @author func 03.06.2020
@@ -37,7 +37,7 @@ public class PrepareInventory implements Prepare {
             ).build();
 
     @Override
-    public void execute(Player player, Archaeologist archaeologist, App app) {
+    public void execute(Player player, User archaeologist, App app) {
         val inventory = player.getInventory();
         inventory.clear();
         inventory.setItem(0, menu);

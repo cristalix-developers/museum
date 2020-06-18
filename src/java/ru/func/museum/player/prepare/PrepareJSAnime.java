@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import ru.cristalix.core.display.IDisplayService;
 import ru.cristalix.core.display.messages.JavaScriptMessage;
 import ru.func.museum.App;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class PrepareJSAnime implements Prepare {
     private static final String FILENAME = "anime_min.js";
 
     @Override
-    public void execute(Player player, Archaeologist archaeologist, App app) {
+    public void execute(Player player, User archaeologist, App app) {
         if (code == null) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(app.getResource(FILENAME)))) {
                 code = new JavaScriptMessage(new String[]{reader.lines().collect(Collectors.joining("\n"))});

@@ -2,20 +2,20 @@ package ru.func.museum.packages;
 
 import lombok.*;
 import ru.cristalix.core.network.CorePackage;
+import ru.func.museum.data.UserInfo;
 
 import java.util.UUID;
 
+@Data
 @EqualsAndHashCode(callSuper = false)
-@Getter
-@Setter
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class UserInfoPackage extends CorePackage {
 
     // request
-    private UUID user;
+    private final UUID uuid;
 
     // response
-    private int coins;
+    private UserInfo userInfo;
 
 }

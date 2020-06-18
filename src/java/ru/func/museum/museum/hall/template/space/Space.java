@@ -1,23 +1,23 @@
 package ru.func.museum.museum.hall.template.space;
 
-import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 
 import java.util.List;
 
-@BsonDiscriminator
 public interface Space {
 
     boolean isManipulator(Location location);
 
-    void show(Archaeologist owner, Player guest);
+    void show(User owner);
 
-    void hide(Archaeologist owner, Player guest);
+    void hide(User owner);
 
     List<Element> getElements();
 
     List<Integer> getAccessEntities();
+
+    double getIncome();
+
 }

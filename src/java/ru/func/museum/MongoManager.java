@@ -11,15 +11,13 @@ import org.bson.codecs.pojo.ClassModel;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bukkit.Bukkit;
 import ru.func.museum.excavation.ExcavationType;
-import ru.func.museum.museum.AbstractMuseum;
 import ru.func.museum.museum.Museum;
 import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.museum.hall.template.HallTemplateType;
 import ru.func.museum.museum.hall.template.space.SkeletonSpaceViewer;
 import ru.func.museum.museum.hall.template.space.Space;
-import ru.func.museum.player.Archaeologist;
-import ru.func.museum.player.PlayerData;
+import ru.func.museum.player.User;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
 import java.util.ArrayList;
@@ -36,15 +34,15 @@ import static org.bson.codecs.pojo.Conventions.CLASS_AND_PROPERTY_CONVENTION;
  * @project Museum
  */
 public class MongoManager {
-    private static MongoCollection<Archaeologist> mongoCollection;
+    private static MongoCollection<User> mongoCollection;
 
     public static void connect(String uri, String database, String collection) {
         val codecProvider = PojoCodecProvider.builder()
                 .conventions(ImmutableList.of(CLASS_AND_PROPERTY_CONVENTION, ANNOTATION_CONVENTION))
                 .register(
-                        ClassModel.builder(Archaeologist.class).enableDiscriminator(true).build(),
-                        ClassModel.builder(PlayerData.class).enableDiscriminator(true).build(),
-                        ClassModel.builder(AbstractMuseum.class).enableDiscriminator(true).build(),
+                        ClassModel.builder(User.class).enableDiscriminator(true).build(),
+                        ClassModel.builder(User.class).enableDiscriminator(true).build(),
+                        ClassModel.builder(Museum.class).enableDiscriminator(true).build(),
                         ClassModel.builder(Space.class).enableDiscriminator(true).build(),
                         ClassModel.builder(SkeletonSpaceViewer.class).enableDiscriminator(true).build(),
                         ClassModel.builder(Museum.class).enableDiscriminator(true).build()
@@ -57,16 +55,16 @@ public class MongoManager {
         mongoCollection = MongoClients.create(uri)
                 .getDatabase(database)
                 .withCodecRegistry(codecRegistry)
-                .getCollection(collection, Archaeologist.class);
+                .getCollection(collection, User.class);
         Bukkit.getConsoleSender().sendMessage("§aConnected to database successfully.");
     }
 
-    public static CompletableFuture<Archaeologist> load(String name, String uuid) {
-        CompletableFuture<Archaeologist> archaeologist = new CompletableFuture<>();
+    public static CompletableFuture<User> load(String name, String uuid) {
+        CompletableFuture<User> archaeologist = new CompletableFuture<>();
 
         mongoCollection.find(eq("uuid", uuid)).first((result, t) -> {
             if (result == null) {
-                result = PlayerData.builder()
+                result = User.builder()
                         .level(1)
                         .name(name)
                         .uuid(uuid)
@@ -102,7 +100,7 @@ public class MongoManager {
         return archaeologist;
     }
 
-    public static void save(Archaeologist archaeologist) {
+    public static void save(User archaeologist) {
         mongoCollection.updateOne(
                 eq("uuid", archaeologist.getUuid()),
                 new Document("$set", archaeologist),

@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import ru.func.museum.element.Element;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 
 import java.util.List;
 
@@ -23,12 +23,12 @@ public class SimpleSpaceViewer implements Space {
     }
 
     @Override
-    public void show(Archaeologist owner, Player quest) {
+    public void show(User owner, Player quest) {
 
     }
 
     @Override
-    public void hide(Archaeologist owner, Player guest) {
+    public void hide(User owner, Player guest) {
 
     }
 

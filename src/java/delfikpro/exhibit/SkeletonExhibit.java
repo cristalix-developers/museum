@@ -44,7 +44,7 @@ public class SkeletonExhibit extends Exhibit {
 
 		Piece root = pieces.stream()
 				.min(Comparator.comparingDouble(Piece::getDistanceSq))
-				.orElseThrow(RuntimeException::new);
+				.orElseThrow(() -> new RuntimeException("No armorStands found for skeleton '" + address + "'"));
 
 		List<Piece> free = new ArrayList<>(pieces);
 		free.remove(root);

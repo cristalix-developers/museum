@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 import ru.func.museum.App;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 import ru.func.museum.util.MessageUtil;
 
 /**
@@ -16,10 +16,10 @@ import ru.func.museum.util.MessageUtil;
 public class PrepareScoreBoard implements Prepare {
 
     @Override
-    public void execute(Player player, Archaeologist archaeologist, App app) {
+    public void execute(Player player, User archaeologist, App app) {
         SimpleBoardObjective main = IScoreboardService.get().getPlayerObjective(player.getUniqueId(), "main");
         main.startGroup("Игрок")
-                .record("Уровень", () -> "§b" + archaeologist.getLevel() + " §7" + archaeologist.expNeed(archaeologist.expNeed(0) - archaeologist.getExp()) + "/" + archaeologist.expNeed(0))
+                .record("Уровень", () -> "§b" + archaeologist.getLevel() + " §7" + archaeologist.getRequiredExperience(archaeologist.getRequiredExperience(0) - archaeologist.getExp()) + "/" + archaeologist.getRequiredExperience(0))
                 .record("Баланс", () -> "§a" + MessageUtil.toMoneyFormat(archaeologist.getMoney()));
         val museum = archaeologist.getCurrentMuseum();
         main.startGroup("Музей")
@@ -30,7 +30,7 @@ public class PrepareScoreBoard implements Prepare {
         SimpleBoardObjective excavation = IScoreboardService.get().getPlayerObjective(player.getUniqueId(), "excavation");
         excavation.startGroup("Раскопки")
                 .record("Ударов", () -> Math.max(archaeologist.getBreakLess(), 0) + " осталось")
-                .record("Уровень", () -> "§b" + archaeologist.getLevel() + " §7" + archaeologist.expNeed(archaeologist.expNeed(0) - archaeologist.getExp()) + "/" + archaeologist.expNeed(0));
+                .record("Уровень", () -> "§b" + archaeologist.getLevel() + " §7" + archaeologist.getRequiredExperience(archaeologist.getRequiredExperience(0) - archaeologist.getExp()) + "/" + archaeologist.getRequiredExperience(0));
         template(excavation);
 
         IScoreboardService.get().setCurrentObjective(player.getUniqueId(), "main");

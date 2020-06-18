@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.entity.Player;
 import ru.func.museum.App;
+import ru.func.museum.player.User;
 
 import java.text.DecimalFormat;
 
@@ -47,8 +48,8 @@ public class MessageUtil {
             return set(key, value + "");
         }
 
-        public void send(Player player) {
-            player.sendMessage(text);
+        public void send(User user) {
+            user.sendMessage(text);
         }
     }
 }

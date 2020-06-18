@@ -1,12 +1,13 @@
 package ru.func.museum;
 
 import clepto.bukkit.B;
-import com.google.common.collect.Maps;
+import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.val;
 import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,52 +18,51 @@ import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 import ru.func.museum.command.MuseumCommand;
 import ru.func.museum.command.VisitorCommand;
-import ru.func.museum.element.deserialized.EntityDeserializer;
 import ru.func.museum.element.deserialized.MuseumEntity;
 import ru.func.museum.excavation.Excavation;
 import ru.func.museum.listener.*;
-import ru.func.museum.museum.coin.AbstractCoin;
 import ru.func.museum.museum.coin.Coin;
 import ru.func.museum.museum.hall.template.HallTemplateType;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 import ru.func.museum.visitor.VisitorManager;
 
+import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.UUID;
 
+@Getter
 public final class App extends JavaPlugin {
 
-    @Getter
+	@Getter
     private static App app;
-    @Getter
-    private final Map<UUID, Archaeologist> archaeologistMap = Maps.newHashMap();
-    @Getter
     private MuseumEntity[] museumEntities;
+    private PlayerDataManager playerDataManager;
+    private ServiceConnector serviceConnector;
 
     @Override
     public void onEnable() {
 		B.plugin = App.app = this;
 
+		this.playerDataManager = new PlayerDataManager(this);
+		this.serviceConnector = new ServiceConnector(this);
+
+		B.events(playerDataManager);
+
         CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
         CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
-        Arrays.asList(
+		YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(getResource("items.yml")));
+		for (String key : itemsConfig.getKeys(false)) {
+			Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key);
+		}
+
+		Arrays.asList(
                 new CancelEvent(),
                 new MuseumItemHandler(this),
                 new ManipulatorHandler(this),
-                new PlayerConnectionListener(this),
+                new PlayerDataManager(this),
                 new MoveListener(this)
         ).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
-
-        MongoManager.connect(
-                getConfig().getString("uri"),
-                getConfig().getString("database"),
-                getConfig().getString("collection")
-        );
-
-        // Десериализация данных о существах
-        museumEntities = new EntityDeserializer().execute(getConfig().getStringList("entity"));
 
         Excavation.WORLD.setGameRuleValue("mobGriefing", "false");
 
@@ -87,7 +87,7 @@ public final class App extends JavaPlugin {
                     }
 
                     if (visitedPoint != null && time % 5 == 0) {
-                        AbstractCoin coin = new Coin(visitedPoint);
+                        Coin coin = new Coin(visitedPoint);
                         coin.create(archaeologist.getConnection());
                         archaeologist.getCoins().add(coin);
                     }
@@ -97,7 +97,7 @@ public final class App extends JavaPlugin {
 
                     // Если монеты устарели, что бы не копились на клиенте, удаляю
                     archaeologist.getCoins().removeIf(coin -> {
-                        if (coin.getTimestamp() + AbstractCoin.SECONDS_LIVE * 1000 < time) {
+                        if (coin.getTimestamp() + Coin.SECONDS_LIVE * 1000 < time) {
                             coin.remove(archaeologist.getConnection());
                             return true;
                         }
@@ -108,4 +108,9 @@ public final class App extends JavaPlugin {
             }
         }.runTaskTimerAsynchronously(this, 0, 1);
     }
+
+    public User	getUser(UUID uuid) {
+    	return playerDataManager.getUser(uuid);
+	}
+
 }

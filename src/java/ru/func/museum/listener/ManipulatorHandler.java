@@ -45,19 +45,19 @@ public class ManipulatorHandler implements Listener {
                                       "XXXXXXXXX"
                               );
 
-                              val archaeologist = app.getArchaeologistMap().get(player.getUniqueId());
-                              val museum = archaeologist.getCurrentMuseum();
-                              val space = archaeologist.getCurrentSpace();
+                              val user = app.getUser(player.getUniqueId());
+                              val museum = user.getCurrentMuseum();
+                              val space = user.getCurrentSpace();
 
                               contents.add('O', ClickableItem.of(clear, event -> {
-                                  for (Element element : archaeologist.getElementList())
+                                  for (Element element : user.getElementList())
                                       for (Element spaceElement : space.getElements())
                                           if (element.getId() == spaceElement.getId() && element.getParentId() == spaceElement.getParentId())
                                               element.setLocked(false);
 
-                                  space.hide(archaeologist, player);
+                                  space.hide(user);
                                   player.closeInventory();
-                                  MessageUtil.find("freestand").send(player);
+                                  MessageUtil.find("freestand").send(user);
                                   space.getElements().clear();
                                   museum.updateIncrease();
                               }));
@@ -79,7 +79,7 @@ public class ManipulatorHandler implements Listener {
                                   val entity = app.getMuseumEntities()[i];
                                   val parentId = i;
 
-                                  List<Element> elements = archaeologist.getElementList().stream()
+                                  List<Element> elements = user.getElementList().stream()
                                           .filter(element -> element.getParentId() == parentId)
                                           .collect(Collectors.toList());
 
@@ -118,7 +118,7 @@ public class ManipulatorHandler implements Listener {
                                                       " фрагментов"
                                               ).lore(fragments).build(), event -> {
                                                   if (elements.get(0).isLocked()) {
-                                                      MessageUtil.find("standlocked").send(player);
+                                                      MessageUtil.find("standlocked").send(user);
                                                       player.closeInventory();
                                                       return;
                                                   }
@@ -128,10 +128,10 @@ public class ManipulatorHandler implements Listener {
                                                   }
                                                   // Перезапуск витрины
                                                   museum.updateIncrease();
-                                                  space.hide(archaeologist, player);
-                                                  space.show(archaeologist, player);
+                                                  space.hide(user);
+                                                  space.show(user);
                                                   player.closeInventory();
-                                                  MessageUtil.find("standplaced").send(player);
+                                                  MessageUtil.find("standplaced").send(user);
                                               }
                                       );
                                   }

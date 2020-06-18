@@ -1,25 +1,28 @@
 package ru.func.museum.museum;
 
-import lombok.*;
+import clepto.bukkit.Lemonade;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Delegate;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.entity.Player;
-import ru.cristalix.core.item.Items;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.func.museum.App;
+import ru.func.museum.data.MuseumInfo;
 import ru.func.museum.element.Element;
 import ru.func.museum.excavation.Excavation;
-import ru.func.museum.museum.coin.AbstractCoin;
+import ru.func.museum.museum.coin.Coin;
+import ru.func.museum.museum.collector.Collector;
 import ru.func.museum.museum.hall.Hall;
 import ru.func.museum.museum.hall.template.space.Space;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author func 22.05.2020
@@ -27,87 +30,64 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Setter
 @Getter
-@RequiredArgsConstructor
-@NoArgsConstructor
-public class Museum implements AbstractMuseum {
-    @NonNull
-    private Date date;
-    private long views;
-    private transient Archaeologist owner;
-    @NonNull
-    private List<Hall> halls;
-    private transient double summaryIncrease;
-    @NonNull
-    private String title;
-    @NonNull
-    private int spawnX;
-    @NonNull
-    private int spawnY;
-    @NonNull
-    private int spawnZ;
+public class Museum {
 
-    @Override
-    public void load(App plugin, Archaeologist archaeologist, Player guest) {
-        owner = archaeologist;
-        views++;
+	private final User owner;
 
-        updateIncrease();
-        archaeologist.setBreakLess(-2);
-        archaeologist.sendAnime();
+	@Delegate
+	private final MuseumInfo info;
 
-        IScoreboardService.get().setCurrentObjective(guest.getUniqueId(), "main");
+	private final List<Collector> collectors;
+	private final List<Space> spaces = new ArrayList<>();
 
-        // Подготовка игрока
-        val guestA = plugin.getArchaeologistMap().get(guest.getUniqueId());
+	private double income;
 
-        guestA.setCurrentMuseum(this);
-        guestA.setCurrentHall(halls.get(0));
+	public Museum(MuseumInfo info, User owner) {
+		this.info = info;
+		this.owner = owner;
+		this.collectors = info.getCollectorInfos().stream().map(Collector::new).collect(Collectors.toList());
+	}
 
-        guestA.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
+	public void load(App plugin, User user) {
+		info.views++;
 
-        guest.getInventory().remove(Material.SADDLE);
+		updateIncrease();
+		user.setBreakLess(-2);
+		user.sendAnime();
 
-        if (!guestA.equals(owner)) {
-            guest.getInventory().setItem(8, Items.builder()
-                    .type(Material.SADDLE)
-                    .displayName("§bВернуться")
-                    .loreLines(
-                            "",
-                            "§7Нажмите ПКМ, что бы вернуться."
-                    ).build()
-            );
-        }
+		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
 
-        guest.teleport(new Location(Excavation.WORLD, spawnX, spawnY, spawnZ));
-        val connection = ((CraftPlayer) guest).getHandle().playerConnection;
+		user.setCurrentMuseum(this);
 
-        // Поготовка заллов
-        halls.forEach(hall -> {
-            hall.getMatrix().forEach(space -> space.show(archaeologist, guest));
-            hall.generateCollector(connection);
-        });
-    }
+		user.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
 
-    @Override
-    public void unload(App app, Archaeologist archaeologist, Player guest) {
-        val connection = ((CraftPlayer) guest).getHandle().playerConnection;
-        // Очстка витрин, коллекторов
-        halls.forEach(hall -> {
-            hall.getMatrix().forEach(space -> space.hide(archaeologist, guest));
-            hall.removeCollector(connection);
-        });
-        // Очистка монет
-        Set<AbstractCoin> coins = app.getArchaeologistMap().get(guest.getUniqueId()).getCoins();
-        coins.forEach(coin -> coin.remove(connection));
-        coins.clear();
-    }
+		user.getInventory().remove(Material.SADDLE);
 
-    @Override
-    public void updateIncrease() {
-        summaryIncrease = .1;
-        for (Hall hall : halls)
-            for (Space space : hall.getMatrix())
-                for (Element element : space.getElements())
-                    summaryIncrease += element.getIncrease();
-    }
+		if (!user.getMuseums().contains(this)) {
+			user.getInventory().setItem(8, Lemonade.get("back").render());
+		}
+
+		user.teleport(new Location(Excavation.WORLD, spawnX, spawnY, spawnZ));
+		// Поготовка заллов
+		spaces.forEach(space -> space.show(user));
+		collectors.forEach(collector -> collector.show(user));
+	}
+
+	public void unload(App app, User user) {
+		// Очстка витрин, коллекторов
+		spaces.forEach(space -> space.hide(user));
+		collectors.forEach(collector -> collector.hide(user));
+
+		// Очистка монет
+		Set<Coin> coins = app.getArchaeologistMap().get(guest.getUniqueId()).getCoins();
+		coins.forEach(coin -> coin.remove(connection));
+		coins.clear();
+	}
+
+	public void updateIncrease() {
+		income = .1;
+		for (Space space : spaces)
+			income += space.getIncome();
+	}
+
 }

@@ -14,11 +14,11 @@ import java.util.function.Consumer;
 public class MuseumService {
 
     public static void main(String[] args) {
+    	MuseumSerializers.initialize();
         MicroserviceBootstrap.bootstrap(new MicroServicePlatform(1));
 
         registerCapability(UserInfoPackage.class, false);
         registerHandler(UserInfoPackage.class, (source, pckg) -> {
-            pckg.setCoins(4);
             answer(pckg);
         });
     }
@@ -27,7 +27,7 @@ public class MuseumService {
      * Register class to this service (means that this service can handle packages of this type)
      *
      * @param clazz        class of package
-     * @param notification if true service don't answer (for example: we don't need to answer on user update package)
+     * @param notification if true service doesn't answer (for example: we don't need to answer on user update package)
      */
     private static void registerCapability(Class<? extends CorePackage> clazz, boolean notification) {
         ISocketClient.get().registerCapability(Capability.builder().className(clazz.getName()).notification(notification).build());

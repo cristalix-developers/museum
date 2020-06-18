@@ -10,7 +10,7 @@ import org.bukkit.util.EulerAngle;
 import ru.func.museum.App;
 import ru.func.museum.element.Element;
 import ru.func.museum.element.deserialized.Piece;
-import ru.func.museum.player.Archaeologist;
+import ru.func.museum.player.User;
 import ru.func.museum.player.pickaxe.Pickaxe;
 
 import java.util.List;
@@ -58,7 +58,7 @@ public class SkeletonSpaceViewer implements Space {
     }
 
     @Override
-    public void show(Archaeologist owner, Player guest) {
+    public void show(User owner, Player guest) {
         if (entity < 0)
             return;
 
@@ -96,7 +96,7 @@ public class SkeletonSpaceViewer implements Space {
     }
 
     @Override
-    public void hide(Archaeologist owner, Player guest) {
+    public void hide(User owner, Player guest) {
         int[] ids = new int[amount];
         amount = 0;
         random.setSeed(seed);
