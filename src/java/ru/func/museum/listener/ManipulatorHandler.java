@@ -48,7 +48,7 @@ public class ManipulatorHandler implements Listener {
 
                               val user = app.getUser(player.getUniqueId());
                               val museum = user.getCurrentMuseum();
-                              val space = user.getCurrentSpace();
+                              val space = user.getCurrentSubject();
 
                               contents.add('O', ClickableItem.of(clear, event -> {
                                   for (Element element : user.getElementList())
@@ -159,11 +159,11 @@ public class ManipulatorHandler implements Listener {
             val user = app.getUser(e.getPlayer().getUniqueId());
 			for (MuseumPrototype prototype : app.getMuseumMap().getPrototypeMap().values()) {
 			}
-            user.getCurrentMuseum().getSpaces().stream()
+            user.getCurrentMuseum().getSubjects().stream()
                     .filter(space -> space.isManipulator(e.getClickedBlock().getLocation()))
                     .findFirst()
                     .ifPresent(space -> {
-                        user.setCurrentSpace(space);
+                        user.setCurrentSubject(space);
                         spaceUiTemplate.open(e.getPlayer());
                     });
         }

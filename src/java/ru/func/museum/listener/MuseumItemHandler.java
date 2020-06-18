@@ -345,7 +345,7 @@ public class MuseumItemHandler implements Listener {
                 .fill("views", String.valueOf(museum.getViews()))
                 .fill("income", MessageUtil.toMoneyFormat(museum.getIncome()))
                 .fill("collectors", String.valueOf(museum.getCollectorSlots()))
-                .fill("spaces", String.valueOf(museum.getSpaces().size()))
+                .fill("spaces", String.valueOf(museum.getSubjects().size()))
                 .fill("sinceCreation", LoveHumans.formatTime(System.currentTimeMillis() - museum.getCreationDate().getTime()))
                 .render();
 

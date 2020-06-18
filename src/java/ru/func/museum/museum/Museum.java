@@ -10,7 +10,7 @@ import ru.func.museum.App;
 import ru.func.museum.data.MuseumInfo;
 import ru.func.museum.museum.coin.Coin;
 import ru.func.museum.museum.collector.Collector;
-import ru.func.museum.museum.hall.template.space.Space;
+import ru.func.museum.museum.hall.template.space.Subject;
 import ru.func.museum.museum.map.MuseumPrototype;
 import ru.func.museum.player.User;
 
@@ -35,7 +35,7 @@ public class Museum {
 	private final MuseumInfo info;
 
 	private final List<Collector> collectors;
-	private final List<Space> spaces = new ArrayList<>();
+	private final List<Subject> subjects = new ArrayList<>();
 
 	private double income;
 
@@ -69,13 +69,13 @@ public class Museum {
 
 		user.getPlayer().teleport(prototype.getSpawnPoint());
 		// Поготовка заллов
-		spaces.forEach(space -> space.show(user));
+		subjects.forEach(space -> space.show(user));
 		collectors.forEach(collector -> collector.show(user));
 	}
 
 	public void unload(User user) {
 		// Очстка витрин, коллекторов
-		spaces.forEach(space -> space.hide(user));
+		subjects.forEach(space -> space.hide(user));
 		collectors.forEach(collector -> collector.hide(user));
 
 		// Очистка монет
@@ -86,8 +86,8 @@ public class Museum {
 
 	public void updateIncrease() {
 		income = .1;
-		for (Space space : spaces)
-			income += space.getIncome();
+		for (Subject subject : subjects)
+			income += subject.getIncome();
 	}
 
 }

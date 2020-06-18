@@ -10,7 +10,6 @@ import net.minecraft.server.v1_12_R1.PacketDataSerializer;
 import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.util.UtilNetty;
@@ -19,7 +18,7 @@ import ru.func.museum.element.Element;
 import ru.func.museum.museum.Museum;
 import ru.func.museum.museum.coin.Coin;
 import ru.func.museum.museum.hall.Hall;
-import ru.func.museum.museum.hall.template.space.Space;
+import ru.func.museum.museum.hall.template.space.Subject;
 import ru.func.museum.util.MessageUtil;
 
 import java.util.List;
@@ -38,8 +37,8 @@ public class User implements PlayerWrapper {
     private int breakLess;
     private boolean onExcavation;
     private List<Museum> museums;
-    private List<Element> elementList;
-    private Space currentSpace;
+    private List<Exhi> elementList;
+    private Subject currentSubject;
     private Museum currentMuseum;
     private Hall currentHall;
     private Set<Coin> coins;

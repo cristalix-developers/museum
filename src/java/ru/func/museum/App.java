@@ -2,6 +2,7 @@ package ru.func.museum;
 
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
+import delfikpro.exhibit.ExhibitManager;
 import lombok.Getter;
 import lombok.val;
 import lombok.var;
@@ -22,12 +23,10 @@ import ru.func.museum.excavation.Excavation;
 import ru.func.museum.listener.*;
 import ru.func.museum.museum.map.MuseumMap;
 import ru.func.museum.museum.coin.Coin;
-import ru.func.museum.museum.hall.template.HallTemplateType;
 import ru.func.museum.player.User;
 import ru.func.museum.visitor.VisitorManager;
 
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.UUID;
 
 @Getter
@@ -39,6 +38,7 @@ public final class App extends JavaPlugin {
     private PlayerDataManager playerDataManager;
     private ServiceConnector serviceConnector;
     private MuseumMap museumMap;
+    private ExhibitManager exhibitManager;
 
     @Override
     public void onEnable() {
@@ -47,6 +47,7 @@ public final class App extends JavaPlugin {
 		this.playerDataManager = new PlayerDataManager(this);
 		this.serviceConnector = new ServiceConnector(this);
 		this.museumMap = new MuseumMap(this);
+		this.exhibitManager = new ExhibitManager(museumMap);
 
         CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
         CoreApi.get().registerService(IInventoryService.class, new InventoryService());

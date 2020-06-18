@@ -2,7 +2,7 @@ package ru.func.museum.data;
 
 import lombok.Data;
 import ru.func.museum.data.collector.CollectorInfo;
-import ru.func.museum.data.space.SpaceInfo;
+import ru.func.museum.data.subject.SubjectInfo;
 
 import java.util.Date;
 import java.util.List;
@@ -16,6 +16,6 @@ public class MuseumInfo {
 	public long views;
 	public List<CollectorInfo> collectorInfos;
 	public int collectorSlots;
-	public List<SpaceInfo> spaceInfos;
+	public List<SubjectInfo> subjectInfos;
 
 }

@@ -14,9 +14,8 @@ import ru.func.museum.excavation.ExcavationType;
 import ru.func.museum.museum.Museum;
 import ru.func.museum.museum.collector.CollectorType;
 import ru.func.museum.museum.hall.Hall;
-import ru.func.museum.museum.hall.template.HallTemplateType;
-import ru.func.museum.museum.hall.template.space.SkeletonSpaceViewer;
-import ru.func.museum.museum.hall.template.space.Space;
+import ru.func.museum.museum.hall.template.space.SkeletonSubject;
+import ru.func.museum.museum.hall.template.space.Subject;
 import ru.func.museum.player.User;
 import ru.func.museum.player.pickaxe.PickaxeType;
 
@@ -43,8 +42,8 @@ public class MongoManager {
                         ClassModel.builder(User.class).enableDiscriminator(true).build(),
                         ClassModel.builder(User.class).enableDiscriminator(true).build(),
                         ClassModel.builder(Museum.class).enableDiscriminator(true).build(),
-                        ClassModel.builder(Space.class).enableDiscriminator(true).build(),
-                        ClassModel.builder(SkeletonSpaceViewer.class).enableDiscriminator(true).build(),
+                        ClassModel.builder(Subject.class).enableDiscriminator(true).build(),
+                        ClassModel.builder(SkeletonSubject.class).enableDiscriminator(true).build(),
                         ClassModel.builder(Museum.class).enableDiscriminator(true).build()
                 ).automatic(true)
                 .build();

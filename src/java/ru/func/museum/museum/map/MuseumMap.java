@@ -4,18 +4,15 @@ import clepto.cristalix.Cristalix;
 import clepto.cristalix.WorldMeta;
 import lombok.Getter;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
-import ru.cristalix.core.build.models.IZone;
 import ru.cristalix.core.build.models.Point;
 import ru.cristalix.core.map.BukkitWorldLoader;
 import ru.cristalix.core.map.LoadedMap;
 import ru.cristalix.core.map.MapListDataItem;
 import ru.func.museum.App;
 import ru.func.museum.museum.collector.CollectorNavigator;
-import ru.func.museum.museum.hall.template.space.SkeletonSpaceViewer;
-import ru.func.museum.museum.hall.template.space.Space;
+import ru.func.museum.museum.hall.template.space.SkeletonSubject;
+import ru.func.museum.museum.hall.template.space.Subject;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -66,7 +63,7 @@ public class MuseumMap implements WorldMeta {
 				.map(Map.Entry::getValue)
 				.forEach(navigator -> navigator.getMuseumProto().getDefaultCollectorNavigators().add(navigator));
 
-		for (Point point : getPoints("space")) {
+		for (Point point : getPoints("subject")) {
 			Location location = point2Loc(point);
 			String[] ss = point.getTag().split(" ");
 
@@ -74,8 +71,8 @@ public class MuseumMap implements WorldMeta {
 					.min(Comparator.comparingDouble(o -> location.distanceSquared(o.getOrigin())))
 					.orElseThrow(() -> new RuntimeException("No museum prototypes found!"));
 
-			Supplier<Space> spaceSupplier;
-			if ("skeleton".startsWith(ss[0].toLowerCase())) spaceSupplier = () -> new SkeletonSpaceViewer();
+			Supplier<Subject> spaceSupplier;
+			if ("skeleton".startsWith(ss[0].toLowerCase())) spaceSupplier = () -> new SkeletonSubject();
 
 			SpacePrototype spacePrototype = new SpacePrototype(location);
 			prototype.getSpacePrototypes().add(spacePrototype);

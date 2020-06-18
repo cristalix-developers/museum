@@ -1,5 +1,6 @@
 package ru.func.museum.museum.hall.template.space;
 
+import delfikpro.exhibit.Exhibit;
 import lombok.*;
 import net.minecraft.server.v1_12_R1.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_12_R1.Vector3f;
@@ -7,14 +8,15 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.util.EulerAngle;
+import ru.cristalix.core.math.V3;
 import ru.func.museum.App;
+import ru.func.museum.data.subject.SubjectInfo;
 import ru.func.museum.element.Element;
 import ru.func.museum.element.deserialized.Piece;
+import ru.func.museum.museum.Museum;
 import ru.func.museum.player.User;
-import ru.func.museum.player.pickaxe.Pickaxe;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author func 22.05.2020
@@ -25,40 +27,32 @@ import java.util.Random;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class SkeletonSpaceViewer implements Space {
+public class SkeletonSubject implements Subject {
 
+	private final Museum museum;
+	private final SubjectInfo subjectInfo;
 	private Location location;
-		private SpaceReflectType reflection;
-    @NonNull
-    private int entity;
-    private transient int seed;
-    private transient int amount = 0;
-    private transient Random random;
-    @NonNull
-    private int x;
-    @NonNull
-    private int y;
-    @NonNull
-    private int z;
-    @NonNull
     private List<Element> elements;
-    @NonNull
-    private List<Integer> accessEntities;
+    private Exhibit exhibit;
+    private float yaw;
+
+    public SkeletonSubject(Museum museum, SubjectInfo info) {
+    	this.museum = museum;
+    	this.subjectInfo = info;
+		V3 loc = info.getLocationDelta();
+		this.location = museum.getPrototype().getOrigin().clone().add(loc.getX(), loc.getY(), loc.getZ());
+		if (info.metadata == null) return;
+		String[] ss = info.metadata.split(":");
+		String skeletonAddress = ss[0];
+		float yaw = Float.parseFloat(ss[1]);
+		museum.getOwner().get
+	}
+
 
     @Override
-    public boolean isManipulator(Location location) {
-        return Math.abs(location.getBlockX() - x) < 2 &&
-                Math.abs(location.getBlockY() - y) < 2 &&
-                Math.abs(location.getBlockZ() - z) < 2;
-    }
+    public void show(User user) {
 
-    @Override
-    public void show(User owner, Player guest) {
-        if (entity < 0)
-            return;
 
-        seed = Pickaxe.RANDOM.nextInt(999);
-        random = new Random(seed);
 
         val subEntities = App.getApp().getMuseumEntities()[entity].getSubs();
 
