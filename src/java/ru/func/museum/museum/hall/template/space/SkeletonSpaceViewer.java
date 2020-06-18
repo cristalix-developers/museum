@@ -26,14 +26,9 @@ import java.util.Random;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class SkeletonSpaceViewer implements Space {
-    @NonNull
-    private int startDotX;
-    @NonNull
-    private int startDotY;
-    @NonNull
-    private int startDotZ;
-    @NonNull
-    private SpaceReflectType reflection;
+
+	private Location location;
+		private SpaceReflectType reflection;
     @NonNull
     private int entity;
     private transient int seed;

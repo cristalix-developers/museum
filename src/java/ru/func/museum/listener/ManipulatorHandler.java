@@ -17,6 +17,7 @@ import ru.cristalix.core.inventory.InventoryProvider;
 import ru.cristalix.core.item.Items;
 import ru.func.museum.App;
 import ru.func.museum.element.Element;
+import ru.func.museum.museum.map.MuseumPrototype;
 import ru.func.museum.util.MessageUtil;
 
 import java.util.List;
@@ -140,7 +141,7 @@ public class ManipulatorHandler implements Listener {
                           }
                       }
             ).rows(6)
-            .title("Выбор экспаната")
+            .title("Выбор экспоната")
             .build();
 
     private ItemStack clear = Items.builder()
@@ -152,9 +153,12 @@ public class ManipulatorHandler implements Listener {
     @EventHandler
     public void onBlockClick(PlayerInteractEvent e) {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (!e.getClickedBlock().getType().name().contains("SIGN"))
-                return;
+			Material type = e.getClickedBlock().getType();
+			if (type != Material.SIGN_POST && type != Material.WALL_SIGN) return;
+
             val user = app.getUser(e.getPlayer().getUniqueId());
+			for (MuseumPrototype prototype : app.getMuseumMap().getPrototypeMap().values()) {
+			}
             user.getCurrentMuseum().getSpaces().stream()
                     .filter(space -> space.isManipulator(e.getClickedBlock().getLocation()))
                     .findFirst()

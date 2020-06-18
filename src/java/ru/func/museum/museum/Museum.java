@@ -43,7 +43,9 @@ public class Museum {
 		this.info = info;
 		this.owner = owner;
 		this.prototype = App.getApp().getMuseumMap().getPrototype(info.getAddress());
-		this.collectors = info.getCollectorInfos().stream().map(Collector::new).collect(Collectors.toList());
+		this.collectors = info.getCollectorInfos().stream()
+				.map(collectorInfo -> new Collector(this, collectorInfo))
+				.collect(Collectors.toList());
 	}
 
 	public void load(App plugin, User user) {

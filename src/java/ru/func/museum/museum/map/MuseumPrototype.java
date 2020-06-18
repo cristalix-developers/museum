@@ -16,6 +16,7 @@ public class MuseumPrototype {
 	private final Location origin;
 	private final Location spawnPoint;
 	private final List<CollectorNavigator> defaultCollectorNavigators = new ArrayList<>();
+	private final List<SpacePrototype> spacePrototypes = new ArrayList<>();
 
 	public MuseumPrototype(String address, MuseumMap map, Location origin) {
 		this.address = address;
@@ -23,6 +24,7 @@ public class MuseumPrototype {
 		this.origin = origin;
 		this.spawnPoint = map.getLocations("spawn").stream().min(Comparator.comparingDouble(origin::distanceSquared))
 				.orElseThrow(() -> new RuntimeException("No .p spawn found on the map."));
+
 	}
 
 }

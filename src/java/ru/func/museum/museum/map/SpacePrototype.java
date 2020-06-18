@@ -11,5 +11,6 @@ public class SpacePrototype {
 
 	private final Location manipulator;
 	private final Supplier<Space> spaceSupplier;
+	private final int size;
 
 }
