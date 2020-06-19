@@ -21,6 +21,7 @@ import ru.cristalix.core.scoreboard.ScoreboardService;
 import ru.cristalix.museum.command.MuseumCommand;
 import ru.cristalix.museum.command.VisitorCommand;
 import ru.cristalix.museum.excavation.ExcavationManager;
+import ru.cristalix.museum.gui.MuseumGuis;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.MuseumEvents;
 import ru.cristalix.museum.museum.map.MuseumManager;
@@ -60,6 +61,8 @@ public final class App extends JavaPlugin {
         for (String key : itemsConfig.getKeys(false)) {
             Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key);
         }
+
+        MuseumGuis.init(this);
 
         B.events(
                 playerDataManager,

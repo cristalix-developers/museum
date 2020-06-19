@@ -24,9 +24,9 @@ public class MuseumService {
         MicroserviceBootstrap.bootstrap(new MicroServicePlatform(1));
 
         MongoManager.connect(
-                System.getProperty("db_url"),
-                System.getProperty("db_data"),
-                System.getProperty("db_collection")
+                System.getenv("db_url"),
+                System.getenv("db_data"),
+                System.getenv("db_collection")
         );
 
         registerCapability(UserInfoPackage.class, false);

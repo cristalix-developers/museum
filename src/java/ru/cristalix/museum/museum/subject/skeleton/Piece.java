@@ -57,7 +57,7 @@ public class Piece {
 		children.add(stand);
 	}
 
-	public double ditanceSquared(Piece another) {
+	public double distanceSquared(Piece another) {
 		return another.getDelta().subtract(this.getDelta()).length();
 	}
 
