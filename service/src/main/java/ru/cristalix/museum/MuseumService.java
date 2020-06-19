@@ -1,6 +1,5 @@
 package ru.cristalix.museum;
 
-import javafx.application.Application;
 import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.microservice.MicroServicePlatform;
 import ru.cristalix.core.microservice.MicroserviceBootstrap;
@@ -9,10 +8,13 @@ import ru.cristalix.core.network.CorePackage;
 import ru.cristalix.core.network.ISocketClient;
 import ru.cristalix.core.realm.RealmId;
 import ru.cristalix.museum.data.UserInfo;
+import ru.cristalix.museum.packages.BulkSaveUserPackage;
+import ru.cristalix.museum.packages.SaveUserPackage;
 import ru.cristalix.museum.packages.UserInfoPackage;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class MuseumService {
 
@@ -25,14 +27,18 @@ public class MuseumService {
                 System.getProperty("db_collection")
         );
 
-        //todo сохранение не используется
-
         registerCapability(UserInfoPackage.class, false);
         registerHandler(UserInfoPackage.class, (source, pckg) -> {
             MongoManager.load(pckg.getUuid())
-                    .thenAccept(data -> pckg.setUserInfo(GlobalSerializers.fromJson(data, UserInfo.class)));
-            answer(pckg);
+                    .thenAccept(data -> {
+                        pckg.setUserInfo(GlobalSerializers.fromJson(data, UserInfo.class));
+                        answer(pckg);
+                    });
         });
+        registerCapability(SaveUserPackage.class, true);
+        registerHandler(SaveUserPackage.class, pckg -> MongoManager.save(pckg.getUserInfo()));
+        registerCapability(BulkSaveUserPackage.class, true);
+        registerHandler(BulkSaveUserPackage.class, pckg -> MongoManager.bulkSave(pckg.getPackages().stream().map(SaveUserPackage::getUserInfo).collect(Collectors.toList())));
     }
 
     /**
