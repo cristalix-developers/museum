@@ -18,6 +18,8 @@ public class MuseumService {
 
         registerCapability(UserInfoPackage.class, false);
         registerHandler(UserInfoPackage.class, (source, pckg) -> {
+            MongoManager.load(pckg.getUuid())
+                    .thenAccept(data -> pckg.setUserInfo(GlobalSerializers.fromJson(data, UserInfo.class)));
             answer(pckg);
         });
     }

@@ -1,5 +1,6 @@
 dependencies {
     compile project(":commons")
+    compile 'org.mongodb:mongodb-driver-async:3.7.1'
     compile files("../external/microservice-1.0.jar")
     compile 'com.google.code.gson:gson:2.8.5'
     compile 'com.google.guava:guava:21.0'
