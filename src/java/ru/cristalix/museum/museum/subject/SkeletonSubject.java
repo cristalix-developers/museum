@@ -1,12 +1,12 @@
 package ru.cristalix.museum.museum.subject;
 
-import ru.cristalix.museum.skeleton.Fragment;
+import ru.cristalix.museum.museum.subject.skeleton.Fragment;
 import lombok.*;
 import org.bukkit.Location;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.museum.Museum;
-import ru.cristalix.museum.skeleton.Skeleton;
+import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
 import ru.cristalix.museum.player.User;
 
 /**

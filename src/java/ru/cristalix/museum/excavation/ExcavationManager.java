@@ -2,7 +2,7 @@ package ru.cristalix.museum.excavation;
 
 import clepto.ListUtils;
 import clepto.cristalix.WorldMeta;
-import ru.cristalix.museum.skeleton.SkeletonPrototype;
+import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Chunk;

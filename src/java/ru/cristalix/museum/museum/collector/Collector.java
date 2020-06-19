@@ -1,6 +1,6 @@
 package ru.cristalix.museum.museum.collector;
 
-import ru.cristalix.museum.skeleton.Piece;
+import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import lombok.experimental.Delegate;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;

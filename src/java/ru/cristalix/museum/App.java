@@ -2,10 +2,9 @@ package ru.cristalix.museum;
 
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
-import ru.cristalix.museum.gui.ManipulatorHandler;
 import ru.cristalix.museum.museum.MuseumEvents;
 import ru.cristalix.museum.player.PlayerDataManager;
-import ru.cristalix.museum.skeleton.SkeletonManager;
+import ru.cristalix.museum.museum.subject.skeleton.SkeletonManager;
 import lombok.Getter;
 import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;

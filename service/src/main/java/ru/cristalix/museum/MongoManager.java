@@ -17,7 +17,6 @@ import java.util.concurrent.CompletableFuture;
 public class MongoManager {
     private static MongoCollection<Document> mongoCollection;
 
-
     public static void connect(String uri, String database, String collection) {
         mongoCollection = MongoClients.create(uri)
                 .getDatabase(database)

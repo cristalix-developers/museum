@@ -1,4 +1,4 @@
-package ru.cristalix.museum.skeleton;
+package ru.cristalix.museum.museum.subject.skeleton;
 
 import clepto.cristalix.WorldMeta;
 import ru.cristalix.core.build.models.Point;

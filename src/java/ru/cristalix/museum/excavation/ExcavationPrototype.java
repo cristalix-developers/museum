@@ -1,6 +1,6 @@
 package ru.cristalix.museum.excavation;
 
-import ru.cristalix.museum.skeleton.SkeletonPrototype;
+import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import lombok.Data;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Location;
@@ -18,7 +18,5 @@ public class ExcavationPrototype {
 	private final String title;
 	private final Location spawnPoint;
 	private final List<PacketPlayOutMapChunk> packets;
-
-
 
 }

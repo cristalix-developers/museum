@@ -1,5 +1,6 @@
 package ru.cristalix.museum;
 
+import javafx.application.Application;
 import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.microservice.MicroServicePlatform;
 import ru.cristalix.core.microservice.MicroserviceBootstrap;
@@ -17,6 +18,14 @@ public class MuseumService {
 
     public static void main(String[] args) {
         MicroserviceBootstrap.bootstrap(new MicroServicePlatform(1));
+
+        MongoManager.connect(
+                System.getProperty("db_url"),
+                System.getProperty("db_data"),
+                System.getProperty("db_collection")
+        );
+
+        //todo сохранение не используется
 
         registerCapability(UserInfoPackage.class, false);
         registerHandler(UserInfoPackage.class, (source, pckg) -> {

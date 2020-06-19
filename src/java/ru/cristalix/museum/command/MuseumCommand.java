@@ -40,7 +40,7 @@ public class MuseumCommand implements CommandExecutor {
                         return true;
 
 					sender.getCurrentMuseum().unload(user);
-                    sender.getCurrentMuseum().load(app, user);
+                    sender.getCurrentMuseum().load(user);
 
                     MessageUtil.find("visitaccept")
                             .set("visitor", player.getName())

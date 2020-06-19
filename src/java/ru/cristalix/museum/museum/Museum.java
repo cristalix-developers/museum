@@ -60,7 +60,7 @@ public class Museum implements Storable<MuseumInfo> {
 		return info;
 	}
 
-	public void load(App plugin, User user) {
+	public void load(User user) {
 		info.views++;
 
 		updateIncrease();

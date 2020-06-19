@@ -47,14 +47,12 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler (priority = EventPriority.MONITOR)
 	public void preLoadPlayerEvent(AsyncPlayerPreLoginEvent e) {
-
 		if (e.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED || e.getPlayerProfile() == null)
 			return;
 
 		val uuid = e.getUniqueId();
-		UserInfo userInfo = app.getServiceConnector().loadUserSync(uuid);
 
-		userMap.put(uuid, new User(userInfo));
+		userMap.put(uuid, new User(app.getServiceConnector().loadUserSync(uuid)));
 	}
 
 	@EventHandler

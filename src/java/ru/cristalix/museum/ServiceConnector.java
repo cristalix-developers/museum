@@ -12,14 +12,12 @@ import java.util.concurrent.ExecutionException;
 
 public class ServiceConnector {
 
-	private final App app;
 	private final ISocketClient client;
 	private final RealmId serviceRealm;
 
 	public ServiceConnector(App app) {
-		this.app = app;
 		this.client = CoreApi.get().getSocketClient();
-		this.serviceRealm = RealmId.of(System.getProperty("MUSEUM_SERVICE"));
+		this.serviceRealm = RealmId.of(app.getConfig().getString("museum_service"));
 	}
 
 	public UserInfo loadUserSync(UUID uuid) {
@@ -35,7 +33,8 @@ public class ServiceConnector {
 
 	public UserInfo saveUser(UUID uuid, UserInfo info) {
 		try {
-			UserInfoPackage packet = (UserInfoPackage) client.awaitResponse(new PacketForwardPackage(serviceRealm, new UserInfoPackage(uuid))).get();
+			// todo сохранение не реализованно до конца
+			UserInfoPackage packet = (UserInfoPackage) client.awaitResponse(new PacketForwardPackage(serviceRealm, new UserInfoPackage(uuid, info))).get();
 			return packet.getUserInfo();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();

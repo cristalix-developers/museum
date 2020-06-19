@@ -2,8 +2,8 @@ package ru.cristalix.museum.player.prepare;
 
 import clepto.ListUtils;
 import clepto.bukkit.B;
-import ru.cristalix.museum.skeleton.Fragment;
-import ru.cristalix.museum.skeleton.SkeletonPrototype;
+import ru.cristalix.museum.museum.subject.skeleton.Fragment;
+import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.val;
@@ -16,7 +16,7 @@ import ru.cristalix.museum.data.SkeletonInfo;
 import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.excavation.ExcavationManager;
 import ru.cristalix.museum.excavation.ExcavationPrototype;
-import ru.cristalix.museum.skeleton.Skeleton;
+import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.player.pickaxe.Pickaxe;
 import ru.cristalix.museum.player.pickaxe.PickaxeType;
@@ -87,7 +87,7 @@ public class BeforePacketHandler implements Prepare {
 			Bukkit.getScheduler().runTaskLater(app, () -> {
 				user.setExcavation(null);
 				PrepareSteps.INVENTORY.getPrepare().execute(user, app);
-				user.getCurrentMuseum().load(app, user);
+				user.getCurrentMuseum().load(user);
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			}, 10 * 20L);
 			return true;

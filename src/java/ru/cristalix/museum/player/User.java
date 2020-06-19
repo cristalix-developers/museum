@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import ru.cristalix.core.util.UtilNetty;
 import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.excavation.Excavation;
-import ru.cristalix.museum.skeleton.Skeleton;
+import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.subject.Subject;
@@ -81,7 +81,6 @@ public class User implements PlayerWrapper {
 	}
 
 	public UserInfo generateUserInfo() {
-
 		return info;
 	}
 

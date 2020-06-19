@@ -1,4 +1,4 @@
-package ru.cristalix.museum.skeleton;
+package ru.cristalix.museum.museum.subject.skeleton;
 
 import lombok.Getter;
 import net.minecraft.server.v1_12_R1.*;

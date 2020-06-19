@@ -10,6 +10,6 @@ import ru.cristalix.museum.player.User;
 public class PrepareMuseum implements Prepare {
     @Override
     public void execute(User user, App app) {
-        user.getMuseums().get("main").load(app, user);
+        user.getMuseums().get("main").load(user);
     }
 }
