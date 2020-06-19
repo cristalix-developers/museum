@@ -1,11 +1,13 @@
 package ru.cristalix.museum;
 
+import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.microservice.MicroServicePlatform;
 import ru.cristalix.core.microservice.MicroserviceBootstrap;
 import ru.cristalix.core.network.Capability;
 import ru.cristalix.core.network.CorePackage;
 import ru.cristalix.core.network.ISocketClient;
 import ru.cristalix.core.realm.RealmId;
+import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.packages.UserInfoPackage;
 
 import java.util.function.BiConsumer;

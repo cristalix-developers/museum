@@ -1,38 +1,14 @@
-package ru.func.museum;
+package ru.cristalix.museum;
 
-import com.google.common.collect.ImmutableList;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.async.SingleResultCallback;
 import com.mongodb.async.client.MongoClients;
 import com.mongodb.async.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import lombok.val;
 import org.bson.Document;
-import org.bson.codecs.configuration.CodecRegistries;
-import org.bson.codecs.pojo.ClassModel;
-import org.bson.codecs.pojo.Conventions;
-import org.bson.codecs.pojo.PojoCodecProvider;
-import org.bukkit.Bukkit;
 import ru.cristalix.core.GlobalSerializers;
-import ru.func.museum.data.UserInfo;
-import ru.func.museum.excavation.ExcavationType;
-import ru.func.museum.museum.Museum;
-import ru.func.museum.museum.collector.CollectorType;
-import ru.func.museum.museum.hall.Hall;
-import ru.func.museum.museum.hall.template.space.SkeletonSubject;
-import ru.func.museum.museum.hall.template.space.Subject;
-import ru.func.museum.player.User;
-import ru.func.museum.player.pickaxe.PickaxeType;
+import ru.cristalix.museum.data.UserInfo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-import static com.mongodb.client.model.Filters.eq;
-import static org.bson.codecs.pojo.Conventions.ANNOTATION_CONVENTION;
-import static org.bson.codecs.pojo.Conventions.CLASS_AND_PROPERTY_CONVENTION;
 
 /**
  * @author func 23.05.2020
