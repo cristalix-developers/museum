@@ -23,12 +23,14 @@ public class MuseumEvents implements Listener {
 
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
-		if (e.getHand() == EquipmentSlot.OFF_HAND) return;
-		if (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if (e.getHand() == EquipmentSlot.OFF_HAND || (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK))
+			return;
 		Player player = e.getPlayer();
 		Material type = player.getInventory().getItemInMainHand().getType();
-		if (type == Material.PAPER) player.performCommand("gui main");
-		else if (type == Material.EMERALD) player.performCommand("gui pickaxes");
+		if (type == Material.PAPER)
+			player.performCommand("gui main");
+		else if (type == Material.EMERALD)
+			player.performCommand("gui pickaxes");
 	}
 
 	@EventHandler

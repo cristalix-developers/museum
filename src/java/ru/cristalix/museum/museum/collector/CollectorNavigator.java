@@ -26,7 +26,9 @@ public class CollectorNavigator {
     public CollectorNavigator(MuseumPrototype museumProto, World world, List<Location> points) {
     	this.museumProto = museumProto;
         this.world = world;
-        this.nodes = points.stream().map(Node::new).collect(Collectors.toList());
+        this.nodes = points.stream()
+                .map(Node::new)
+                .collect(Collectors.toList());
         for (int i = 0; i < this.nodes.size(); i++) {
             Node a = nodes.get(i);
             Node b = nodes.get(i == 0 ? this.nodes.size() - 1 : i - 1);

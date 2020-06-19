@@ -55,8 +55,6 @@ public class SkeletonPrototype {
 				.entrySet().stream()
 				.map(e -> new Fragment(address, e.getKey(), e.getValue(), e.getValue().stream().mapToInt(p -> p.getHandle().getId()).toArray()))
 				.collect(Collectors.toList());
-
-
 	}
 
 	private void recursiveTree(Map<ArmorStand, Location> selection, List<ArmorStand> walked) {
@@ -64,7 +62,8 @@ public class SkeletonPrototype {
 		for (Map.Entry<ArmorStand, Location> e : selection.entrySet()) {
 			if (walked.contains(e.getKey())) continue;
 			for (Map.Entry<ArmorStand, Location> e1 : selection.entrySet()) {
-				if (e1.getValue().distanceSquared(e.getValue()) < 16) current.add(e1.getKey());
+				if (e1.getValue().distanceSquared(e.getValue()) < 16)
+					current.add(e1.getKey());
 			}
 		}
 		walked.addAll(current);

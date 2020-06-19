@@ -45,20 +45,15 @@ public class SkeletonSubject extends SimpleSubject {
 	@Override
     public void show(User user) {
     	super.show(user);
-    	if (skeleton == null) return;
+    	if (skeleton == null)
+    		return;
 
-		for (Fragment fragment : skeleton.getUnlockedFragments()) {
-			fragment.show(user.getPlayer(), skeletonLocation);
-		}
+		skeleton.getUnlockedFragments().forEach(fragment -> fragment.show(user.getPlayer(), skeletonLocation));
     }
 
     @Override
     public void hide(User user) {
-
-		for (Fragment fragment : skeleton.getUnlockedFragments()) {
-			fragment.hide(user.getPlayer());
-		}
-
+		skeleton.getUnlockedFragments().forEach(fragment -> fragment.hide(user.getPlayer()));
     }
 
 	@Override

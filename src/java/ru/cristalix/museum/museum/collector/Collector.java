@@ -1,6 +1,5 @@
 package ru.cristalix.museum.museum.collector;
 
-import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import lombok.experimental.Delegate;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
@@ -13,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import ru.cristalix.museum.Storable;
 import ru.cristalix.museum.data.collector.CollectorInfo;
 import ru.cristalix.museum.museum.Museum;
+import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import ru.cristalix.museum.player.User;
 
 import java.util.ArrayList;
@@ -46,20 +46,22 @@ public class Collector implements Storable<CollectorInfo> {
 
 	public void show(User user) {
 		val location = getLocation(System.currentTimeMillis());
-		for (Piece piece : pieces) piece.show(user.getPlayer(), location);
+		for (Piece piece : pieces)
+			piece.show(user.getPlayer(), location);
 	}
 
 	public void move(User user, long iteration) {
-
 		val location = getLocation(iteration);
 
 		user.getCoins().removeIf(coin -> coin.pickUp(user, location, getType().getRadius()));
 
-		for (Piece piece : pieces) piece.update(user.getPlayer(), location);
+		for (Piece piece : pieces)
+			piece.update(user.getPlayer(), location);
 	}
 
 	public void hide(User user) {
-		for (Piece piece : pieces) piece.hide(user.getPlayer());
+		for (Piece piece : pieces)
+			piece.hide(user.getPlayer());
 	}
 
 	private Location getLocation(long time) {

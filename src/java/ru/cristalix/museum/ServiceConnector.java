@@ -33,7 +33,6 @@ public class ServiceConnector {
 
 	public UserInfo saveUser(UUID uuid, UserInfo info) {
 		try {
-			// todo сохранение не реализованно до конца
 			UserInfoPackage packet = (UserInfoPackage) client.awaitResponse(new PacketForwardPackage(serviceRealm, new UserInfoPackage(uuid, info))).get();
 			return packet.getUserInfo();
 		} catch (InterruptedException | ExecutionException e) {

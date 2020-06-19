@@ -21,14 +21,4 @@ public enum CollectorType {
     private final double radius;
     private final int cristalixCost;
 
-    public void move(PlayerConnection connection, EntityArmorStand armorStand, double dx, double dy, double dz, float yaw, float pitch) {
-        connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook(
-                armorStand.getId(),
-                (short) (4096 * dx), (short) (4096 * dy), (short) (4096 * dz),
-                (byte) (yaw * 256 / 360), (byte) (pitch * 256 / 360),
-                false
-        ));
-    /*    armorStand.setHeadPose(new Vector3f(pitch, 0, 0));
-        connection.sendPacket(new PacketPlayOutEntityMetadata(armorStand.getId(), armorStand.getDataWatcher(), false));*/
-    }
 }

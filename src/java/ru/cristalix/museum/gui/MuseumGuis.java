@@ -17,7 +17,6 @@ import ru.cristalix.museum.excavation.ExcavationPrototype;
 public class MuseumGuis {
 
 	public static void init(App app) {
-
 		B.regCommand((sender, args) -> {
 			Guis.registry.get(args[0]).open(sender, args[1]);
 			return null;

@@ -17,6 +17,4 @@ public enum CollectorType {
 	private final double radius;
 	private final int cristalixCost;
 
-
-
 }
