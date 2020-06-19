@@ -19,7 +19,7 @@ public class SkeletonManager {
 			String name = getNearConfig(point, "name");
 			Rarity rarity = Rarity.valueOf(getNearConfig(point, "rarity").toUpperCase());
 			String address = point.getTag();
-			exhibitMap.put(address, new SkeletonPrototype(name, size, pieces, rarity, address, worldMeta));
+			exhibitMap.put(address, new SkeletonPrototype(name, size, pieces, rarity, address, worldMeta.point2Loc(point), worldMeta));
 		}
 	}
 

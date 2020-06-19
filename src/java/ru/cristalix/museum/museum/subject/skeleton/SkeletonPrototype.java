@@ -29,13 +29,12 @@ public class SkeletonPrototype {
 	private final List<Piece> pieces;
 	private final List<Fragment> fragments;
 
-	public SkeletonPrototype(String title, int size, int piecesAmount, Rarity rarity, @NonNull String address, WorldMeta worldMeta) {
+	public SkeletonPrototype(String title, int size, int piecesAmount, Rarity rarity, @NonNull String address, Location worldOrigin, WorldMeta worldMeta) {
 		this.title = title;
 		this.size = size;
 		this.piecesAmount = piecesAmount;
 		this.address = address;
 		this.rarity = rarity;
-		Location worldOrigin = worldMeta.getLocation(address);
 		Map<ArmorStand, Location> allStands = new HashMap<>();
 		for (Entity entity : worldMeta.getWorld().getEntities()) {
 			if (entity.getType() != EntityType.ARMOR_STAND)
