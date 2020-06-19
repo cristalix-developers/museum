@@ -45,9 +45,9 @@ public class ExcavationManager {
 			MuseumManager map = app.getMuseumManager();
 			double price = Double.parseDouble(map.getTagInZone("price", zone));
 			int hitCount = Integer.parseInt(map.getTagInZone("hit-count", zone));
-			int requredLevl = Integer.parseInt(map.getTagInZone("reqtuied-level", zone));
-			String title = map.getTagInZone("required-level", zone);
-			Location spawn = map.point2Loc(map.getPointsInZone("required-level", zone).iterator().next());
+			int requredLevl = Integer.parseInt(map.getTagInZone("required-level", zone));
+			String title = map.getTagInZone("title", zone);
+			Location spawn = map.point2Loc(map.getPointsInZone("spawn", zone).iterator().next());
 			List<int[]> pallette = new ArrayList<>();
 			for (Point p : map.getPointsInZone("pallette", zone)) {
 				Block block = meta.point2Loc(p).getBlock();
