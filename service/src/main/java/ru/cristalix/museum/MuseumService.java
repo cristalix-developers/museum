@@ -7,11 +7,13 @@ import ru.cristalix.core.network.Capability;
 import ru.cristalix.core.network.CorePackage;
 import ru.cristalix.core.network.ISocketClient;
 import ru.cristalix.core.realm.RealmId;
+import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.packages.BulkSaveUserPackage;
 import ru.cristalix.museum.packages.SaveUserPackage;
 import ru.cristalix.museum.packages.UserInfoPackage;
 
+import java.util.Collections;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -31,7 +33,13 @@ public class MuseumService {
         registerHandler(UserInfoPackage.class, (source, pckg) -> {
             MongoManager.load(pckg.getUuid())
                     .thenAccept(data -> {
-                        pckg.setUserInfo(GlobalSerializers.fromJson(data, UserInfo.class));
+                        UserInfo info;
+                        if (data == null)
+                            // Default user values
+                            info = new UserInfo(pckg.getUuid(), 0, 0.0, PickaxeType.DEFAULT, Collections.emptyList(), Collections.emptyList(), 0, 0);
+                        else
+                            info = GlobalSerializers.fromJson(data, UserInfo.class);
+                        pckg.setUserInfo(info);
                         answer(pckg);
                     });
         });
