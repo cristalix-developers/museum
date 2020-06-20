@@ -1,27 +1,30 @@
 package ru.cristalix.museum;
 
+import io.netty.channel.Channel;
 import ru.cristalix.core.GlobalSerializers;
-import ru.cristalix.core.microservice.MicroServicePlatform;
-import ru.cristalix.core.microservice.MicroserviceBootstrap;
-import ru.cristalix.core.network.Capability;
-import ru.cristalix.core.network.CorePackage;
-import ru.cristalix.core.network.ISocketClient;
-import ru.cristalix.core.realm.RealmId;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.data.UserInfo;
+import ru.cristalix.museum.handlers.PackageHandler;
 import ru.cristalix.museum.packages.BulkSaveUserPackage;
+import ru.cristalix.museum.packages.MuseumPackage;
 import ru.cristalix.museum.packages.SaveUserPackage;
 import ru.cristalix.museum.packages.UserInfoPackage;
+import ru.cristalix.museum.socket.ServerSocket;
+import ru.cristalix.museum.socket.ServerSocketHandler;
 
 import java.util.Collections;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MuseumService {
 
+    public static final String PASSWORD = System.getProperty("PASSWORD", "gVatjN43AJnbFq36Fa");
+    public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
+
     public static void main(String[] args) {
-        MicroserviceBootstrap.bootstrap(new MicroServicePlatform(1));
+        ServerSocket serverSocket = new ServerSocket(14653);
+        serverSocket.start();
 
         MongoManager.connect(
                 System.getProperty("db_url"),
@@ -29,8 +32,7 @@ public class MuseumService {
                 System.getProperty("db_collection")
         );
 
-        registerCapability(UserInfoPackage.class, false);
-        registerHandler(UserInfoPackage.class, (source, pckg) -> {
+        registerHandler(UserInfoPackage.class, (channel, source, pckg) -> {
             MongoManager.load(pckg.getUuid())
                     .thenAccept(data -> {
                         UserInfo info;
@@ -40,45 +42,22 @@ public class MuseumService {
                         else
                             info = GlobalSerializers.fromJson(data, UserInfo.class);
                         pckg.setUserInfo(info);
-                        answer(pckg);
+                        answer(channel, pckg);
                     });
         });
-        registerCapability(SaveUserPackage.class, true);
-        registerHandler(SaveUserPackage.class, pckg -> MongoManager.save(pckg.getUserInfo()));
-        registerCapability(BulkSaveUserPackage.class, true);
-        registerHandler(BulkSaveUserPackage.class, pckg -> MongoManager.bulkSave(pckg.getPackages().stream().map(SaveUserPackage::getUserInfo).collect(Collectors.toList())));
-    }
-
-    /**
-     * Register class to this service (means that this service can handle packages of this type)
-     *
-     * @param clazz        class of package
-     * @param notification if true service doesn't answer (for example: we don't need to answer on user update package)
-     */
-    private static void registerCapability(Class<? extends CorePackage> clazz, boolean notification) {
-        ISocketClient.get().registerCapability(Capability.builder().className(clazz.getName()).notification(notification).build());
+        registerHandler(SaveUserPackage.class, (channel, source, pckg) -> MongoManager.save(pckg.getUserInfo()));
+        registerHandler(BulkSaveUserPackage.class, (channel, source, pckg) -> MongoManager.bulkSave(pckg.getPackages().stream().map(SaveUserPackage::getUserInfo).collect(Collectors.toList())));
     }
 
     /**
      * Register handler to package type
      *
-     * @param clazz    class of package
-     * @param consumer handler
-     * @param <T>      package type
+     * @param clazz   class of package
+     * @param handler handler
+     * @param <T>     package type
      */
-    private static <T extends CorePackage> void registerHandler(Class<T> clazz, BiConsumer<RealmId, T> consumer) {
-        ISocketClient.get().addListener(clazz, consumer);
-    }
-
-    /**
-     * Register handler to package without source (RealmId)
-     *
-     * @param clazz    class of package
-     * @param consumer handler
-     * @param <T>      package type
-     */
-    private static <T extends CorePackage> void registerHandler(Class<T> clazz, Consumer<T> consumer) {
-        ISocketClient.get().addListener(clazz, (source, pckg) -> consumer.accept(pckg));
+    private static <T extends MuseumPackage> void registerHandler(Class<T> clazz, PackageHandler<T> handler) {
+        HANDLER_MAP.put(clazz, handler);
     }
 
     /**
@@ -86,8 +65,8 @@ public class MuseumService {
      *
      * @param pckg package
      */
-    private static void answer(CorePackage pckg) {
-        ISocketClient.get().write(pckg);
+    private static void answer(Channel channel, MuseumPackage pckg) {
+        ServerSocketHandler.send(channel, pckg);
     }
 
 }
