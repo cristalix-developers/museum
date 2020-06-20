@@ -109,19 +109,6 @@ public class MuseumManager implements WorldMeta {
         }
     }
 
-    public String getTagInZone(String pointName, IZone zone) {
-        return getPoints(pointName).stream()
-                .filter(p -> zone.isInZone(p.getV3()))
-                .findFirst()
-                .map(Point::getTag)
-                .orElse(null);
-    }
-
-    public List<Point> getPointsInZone(String pointName, IZone zone) {
-        return getPoints(pointName).stream()
-                .filter(p -> zone.isInZone(p.getV3()))
-                .collect(Collectors.toList());
-    }
 
     public MuseumPrototype getMuseumPrototype(String address) {
         return museumPrototypeMap.get(address);

@@ -1,6 +1,7 @@
 package ru.cristalix.museum.excavation;
 
 import clepto.ListUtils;
+import clepto.bukkit.InvalidConfigException;
 import clepto.cristalix.WorldMeta;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -43,19 +44,28 @@ public class ExcavationManager {
 			V3 max = box.getMax();
 			min.setY(0);
 			MuseumManager map = app.getMuseumManager();
-			double price = Double.parseDouble(map.getTagInZone("price", zone));
-			int hitCount = Integer.parseInt(map.getTagInZone("hit-count", zone));
-			int requredLevl = Integer.parseInt(map.getTagInZone("required-level", zone));
-			String title = map.getTagInZone("title", zone);
+			double price = Double.parseDouble(map.requireTagInZone("price", zone));
+			int hitCount = Integer.parseInt(map.requireTagInZone("hit-count", zone));
+			int requredLevl = Integer.parseInt(map.requireTagInZone("required-level", zone));
+			String title = map.requireTagInZone("title", zone);
 			Location spawn = map.point2Loc(map.getPointsInZone("spawn", zone).iterator().next());
 			List<int[]> pallette = new ArrayList<>();
 			for (Point p : map.getPointsInZone("pallette", zone)) {
-				Block block = meta.point2Loc(p).getBlock();
+				System.out.println("Pallette point: " + p.getV3());
+				Block block = meta.point2Loc(p).add(0, -1, 0).getBlock();
 				pallette.add(new int[] {block.getType().getId(), block.getData()});
 			}
+			if (pallette.isEmpty()) {
+				throw new InvalidConfigException("No pallette markers found for excavation " + meta.getMeta().getName() + "/" + key);
+			}
+
 			List<SkeletonPrototype> skeletonPrototypes = new ArrayList<>();
 			for (Point p : map.getPointsInZone("available", zone)) {
 				skeletonPrototypes.add(app.getSkeletonManager().getExhibit(p.getTag()));
+			}
+			if (skeletonPrototypes.isEmpty()) {
+				throw new InvalidConfigException("No available skeletons (.p available) found for excavation " +
+						meta.getMeta().getName() + "/" + key);
 			}
 
 			List<Location> space = new ArrayList<>();
