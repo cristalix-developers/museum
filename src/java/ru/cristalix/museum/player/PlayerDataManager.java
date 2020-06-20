@@ -41,7 +41,7 @@ public class PlayerDataManager implements Listener {
                 return;
             val uuid = e.getUuid();
             try {
-                userMap.put(uuid, new User(client.writeAndAwaitResponse(new UserInfoPackage(uuid, null))
+                userMap.put(uuid, new User(client.writeAndAwaitResponse(new UserInfoPackage(uuid))
                         .get(5L, TimeUnit.SECONDS)
                         .getUserInfo()
                 ));
@@ -53,7 +53,8 @@ public class PlayerDataManager implements Listener {
         }, 400);
         api.bus().register(this, AccountEvent.Unload.class, e -> {
             val data = userMap.remove(e.getUuid());
-            if (data == null) return;
+            if (data == null)
+                return;
             client.write(new SaveUserPackage(e.getUuid(), data.generateUserInfo()));
         }, 100);
     }
@@ -64,6 +65,7 @@ public class PlayerDataManager implements Listener {
         val user = userMap.get(player.getUniqueId());
 
         user.setConnection(((CraftPlayer) player).getHandle().playerConnection);
+        user.setPlayer(player);
 
         for (val prepare : PrepareSteps.values())
             prepare.getPrepare().execute(user, app);

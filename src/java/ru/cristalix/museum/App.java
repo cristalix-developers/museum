@@ -43,12 +43,12 @@ public final class App extends JavaPlugin {
     public void onEnable() {
         B.plugin = App.app = this;
 
-        this.playerDataManager = new PlayerDataManager(this);
         this.museumManager = new MuseumManager(this);
         this.skeletonManager = new SkeletonManager(museumManager);
         this.excavationManager = new ExcavationManager(this, museumManager);
         this.clientSocket = new ClientSocket("127.0.0.1", 14653, "gVatjN43AJnbFq36Fa", IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName());
         clientSocket.connect();
+        this.playerDataManager = new PlayerDataManager(this);
 
         CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
         CoreApi.get().registerService(IInventoryService.class, new InventoryService());
@@ -65,7 +65,6 @@ public final class App extends JavaPlugin {
                 new PassiveEvents(),
                 //new MuseumItemHandler(this),
                 //new ManipulatorHandler(this),
-                new PlayerDataManager(this),
                 new MuseumEvents(this)
         );
 

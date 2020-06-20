@@ -41,7 +41,7 @@ public class MongoManager {
         String uuid = user.getUuid().toString();
         mongoCollection.updateOne(
                 Filters.eq("uuid", uuid),
-                new Document("$set", user),
+                new Document("$set", new Document("data", user)),
                 new UpdateOptions().upsert(true),
                 (result, t) -> {
                     if (t != null)
