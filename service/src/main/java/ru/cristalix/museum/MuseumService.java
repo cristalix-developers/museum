@@ -81,6 +81,10 @@ public class MuseumService {
                 answer(channel, pckg);
             });
         });
+        registerHandler(UserChatPackage.class, ((channel, serverName, museumPackage) -> {
+            BroadcastMessagePackage messagePackage = new BroadcastMessagePackage(museumPackage.getJsonMessage());
+            ServerSocketHandler.broadcast(messagePackage);
+        }));
     }
 
     /**

@@ -3,14 +3,18 @@ package ru.cristalix.museum;
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.cristalix.core.CoreApi;
+import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
+import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
@@ -20,8 +24,11 @@ import ru.cristalix.museum.gui.MuseumGuis;
 import ru.cristalix.museum.museum.MuseumEvents;
 import ru.cristalix.museum.museum.map.MuseumManager;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonManager;
+import ru.cristalix.museum.packages.BroadcastMessagePackage;
+import ru.cristalix.museum.packages.BroadcastTitlePackage;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
+import ru.cristalix.museum.util.BukkitChatService;
 import ru.cristalix.museum.util.PassiveEvents;
 
 import java.io.InputStreamReader;
@@ -48,8 +55,18 @@ public final class App extends JavaPlugin {
         this.excavationManager = new ExcavationManager(this, museumManager);
         this.clientSocket = new ClientSocket("127.0.0.1", 14653, "gVatjN43AJnbFq36Fa", IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName());
         clientSocket.connect();
+        clientSocket.registerHandler(BroadcastTitlePackage.class, pckg -> {
+            String[] data = pckg.getData();
+            Bukkit.getOnlinePlayers().forEach(pl -> pl.sendTitle(data[0], data[1], pckg.getFadeIn(), pckg.getStay(), pckg.getFadeOut()));
+        });
+        clientSocket.registerHandler(BroadcastMessagePackage.class, pckg -> {
+            BaseComponent[] msg = ComponentSerializer.parse(pckg.getJsonMessage());
+            Bukkit.getOnlinePlayers().forEach(pl -> pl.sendMessage(msg));
+        });
         this.playerDataManager = new PlayerDataManager(this);
 
+        CoreApi.get().unregisterService(IChatService.class);
+        CoreApi.get().registerService(IChatService.class, new BukkitChatService(IPermissionService.get(), getServer()));
         CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
         CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
