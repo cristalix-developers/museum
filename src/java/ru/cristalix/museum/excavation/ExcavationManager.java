@@ -43,6 +43,7 @@ public class ExcavationManager {
 			V3 min = box.getMin();
 			V3 max = box.getMax();
 			min.setY(0);
+			max.setY(255);
 			MuseumManager map = app.getMuseumManager();
 			double price = Double.parseDouble(map.requireTagInZone("price", zone));
 			int hitCount = Integer.parseInt(map.requireTagInZone("hit-count", zone));
