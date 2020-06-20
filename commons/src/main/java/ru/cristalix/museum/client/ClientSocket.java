@@ -61,9 +61,9 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
                         config.setOption(ChannelOption.TCP_NODELAY, Boolean.TRUE);
                         config.setOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE);
                         ch.pipeline()
-                                .addLast("codec", new HttpClientCodec())
-                                .addLast("aggregator", new HttpObjectAggregator(65536))
-                                .addLast("protocol_handler", new WebSocketClientProtocolHandler(
+                                .addLast(new HttpClientCodec())
+                                .addLast(new HttpObjectAggregator(65536))
+                                .addLast(new WebSocketClientProtocolHandler(
                                         WebSocketClientHandshakerFactory.newHandshaker(
                                                 URI.create("http://" + host + ":" + port + "/"),
                                                 WebSocketVersion.V13,
@@ -74,21 +74,18 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
                                         ),
                                         true
                                 ))
-                                .addLast("handler_boss", this);
+                                .addLast(this);
                     }
                 })
                 .remoteAddress(host, port)
                 .connect()
-                .addListener(new ChannelFutureListener() {
-                    @Override
-                    public void operationComplete(ChannelFuture future) throws Exception {
-                        if (future.isSuccess()) {
-                            System.out.println("Connection succeeded, bound to: " + (channel = future.channel()));
-                        } else {
-                            System.out.println("Connection failed");
-                            future.cause().printStackTrace();
-                            processAutoReconnect();
-                        }
+                .addListener((ChannelFutureListener) future -> {
+                    if (future.isSuccess()) {
+                        System.out.println("Connection succeeded, bound to: " + (channel = future.channel()));
+                    } else {
+                        System.out.println("Connection failed");
+                        future.cause().printStackTrace();
+                        processAutoReconnect();
                     }
                 });
     }

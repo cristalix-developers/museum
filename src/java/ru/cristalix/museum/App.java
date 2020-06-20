@@ -22,7 +22,9 @@ import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.command.MuseumCommand;
 import ru.cristalix.museum.command.VisitorCommand;
 import ru.cristalix.museum.excavation.ExcavationManager;
+import ru.cristalix.museum.gui.ManipulatorHandler;
 import ru.cristalix.museum.gui.MuseumGuis;
+import ru.cristalix.museum.gui.MuseumItemHandler;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.MuseumEvents;
 import ru.cristalix.museum.museum.map.MuseumManager;
@@ -56,6 +58,7 @@ public final class App extends JavaPlugin {
         this.skeletonManager = new SkeletonManager(museumManager);
         this.excavationManager = new ExcavationManager(this, museumManager);
         this.clientSocket = new ClientSocket("127.0.0.1", 14653, "gVatjN43AJnbFq36Fa", IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName());
+        clientSocket.connect();
 
         CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
         CoreApi.get().registerService(IInventoryService.class, new InventoryService());
@@ -70,8 +73,8 @@ public final class App extends JavaPlugin {
         B.events(
                 playerDataManager,
                 new PassiveEvents(),
-//                new MuseumItemHandler(this),
-//                new ManipulatorHandler(this),
+                //new MuseumItemHandler(this),
+                //new ManipulatorHandler(this),
                 new PlayerDataManager(this),
                 new MuseumEvents(this)
         );
@@ -113,7 +116,6 @@ public final class App extends JavaPlugin {
                         return false;
                     });
                 }
-
             }
         }.runTaskTimerAsynchronously(this, 0, 1);
 

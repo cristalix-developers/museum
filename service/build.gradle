@@ -9,7 +9,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes "Main-Class": "ru.func.museum.MuseumService"
+        attributes "Main-Class": "ru.cristalix.museum.MuseumService"
     }
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
