@@ -15,13 +15,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
-import ru.cristalix.core.network.ISocketClient;
+import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
+import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.command.MuseumCommand;
 import ru.cristalix.museum.command.VisitorCommand;
 import ru.cristalix.museum.excavation.ExcavationManager;
+import ru.cristalix.museum.gui.ManipulatorHandler;
 import ru.cristalix.museum.gui.MuseumGuis;
+import ru.cristalix.museum.gui.MuseumItemHandler;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.MuseumEvents;
 import ru.cristalix.museum.museum.map.MuseumManager;
@@ -44,6 +47,7 @@ public final class App extends JavaPlugin {
     private MuseumManager museumManager;
     private SkeletonManager skeletonManager;
     private ExcavationManager excavationManager;
+    private ClientSocket clientSocket;
 
     @Override
     public void onEnable() {
@@ -53,6 +57,8 @@ public final class App extends JavaPlugin {
         this.museumManager = new MuseumManager(this);
         this.skeletonManager = new SkeletonManager(museumManager);
         this.excavationManager = new ExcavationManager(this, museumManager);
+        this.clientSocket = new ClientSocket("127.0.0.1", 14653, "gVatjN43AJnbFq36Fa", IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName());
+        clientSocket.connect();
 
         CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
         CoreApi.get().registerService(IInventoryService.class, new InventoryService());
@@ -67,8 +73,8 @@ public final class App extends JavaPlugin {
         B.events(
                 playerDataManager,
                 new PassiveEvents(),
-//                new MuseumItemHandler(this),
-//                new ManipulatorHandler(this),
+                //new MuseumItemHandler(this),
+                //new ManipulatorHandler(this),
                 new PlayerDataManager(this),
                 new MuseumEvents(this)
         );
@@ -110,19 +116,18 @@ public final class App extends JavaPlugin {
                         return false;
                     });
                 }
-
             }
         }.runTaskTimerAsynchronously(this, 0, 1);
 
         long autoSavePeriod = 20 * 60 * 3;
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () ->
-                        ISocketClient.get().write(playerDataManager.bulk(false))
+                        clientSocket.write(playerDataManager.bulk(false))
                 , autoSavePeriod, autoSavePeriod);
     }
 
     @Override
     public void onDisable() {
-        ISocketClient.get().write(playerDataManager.bulk(true));
+        clientSocket.write(playerDataManager.bulk(true));
         try {
             Thread.sleep(1000L); // Если вдруг он не успеет написать в сокет(хотя вряд ли, конечно)
         } catch (Exception ex) {
