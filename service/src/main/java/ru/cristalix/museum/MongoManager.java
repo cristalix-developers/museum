@@ -37,11 +37,11 @@ public class MongoManager {
     }
 
     public static void save(UserInfo user) {
-        String data = GlobalSerializers.toJson(user);
+        // String data = GlobalSerializers.toJson(user);
         String uuid = user.getUuid().toString();
         mongoCollection.updateOne(
                 Filters.eq("uuid", uuid),
-                new Document("$set", data),
+                new Document("$set", user),
                 new UpdateOptions().upsert(true),
                 (result, t) -> {
                     if (t != null)

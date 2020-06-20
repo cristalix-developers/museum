@@ -33,6 +33,7 @@ public class MuseumService {
         );
 
         registerHandler(UserInfoPackage.class, (channel, source, pckg) -> {
+            System.out.println("Receive UserInfoPackage from " + source + " for " + pckg.getUuid().toString());
             MongoManager.load(pckg.getUuid())
                     .thenAccept(data -> {
                         UserInfo info;
@@ -45,8 +46,14 @@ public class MuseumService {
                         answer(channel, pckg);
                     });
         });
-        registerHandler(SaveUserPackage.class, (channel, source, pckg) -> MongoManager.save(pckg.getUserInfo()));
-        registerHandler(BulkSaveUserPackage.class, (channel, source, pckg) -> MongoManager.bulkSave(pckg.getPackages().stream().map(SaveUserPackage::getUserInfo).collect(Collectors.toList())));
+        registerHandler(SaveUserPackage.class, (channel, source, pckg) -> {
+            System.out.println("Receive SaveUserPackage from " + source + " for " + pckg.getUser().toString());
+            MongoManager.save(pckg.getUserInfo());
+        });
+        registerHandler(BulkSaveUserPackage.class, (channel, source, pckg) -> {
+            System.out.println("Receive BulkSaveUserPackage from " + source);
+            MongoManager.bulkSave(pckg.getPackages().stream().map(SaveUserPackage::getUserInfo).collect(Collectors.toList()));
+        });
     }
 
     /**

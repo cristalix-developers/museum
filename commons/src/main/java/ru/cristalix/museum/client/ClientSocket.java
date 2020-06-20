@@ -31,6 +31,7 @@ import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 @Getter
+@ChannelHandler.Sharable
 public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
 
     private static final Class<? extends SocketChannel> CHANNEL_CLASS;
@@ -74,7 +75,7 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
                                         ),
                                         true
                                 ))
-                                .addLast(this);
+                                .addLast(ClientSocket.this);
                     }
                 })
                 .remoteAddress(host, port)
