@@ -11,8 +11,8 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
-import ru.cristalix.core.network.ISocketClient;
 import ru.cristalix.museum.App;
+import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.packages.BulkSaveUserPackage;
 import ru.cristalix.museum.packages.SaveUserPackage;
 import ru.cristalix.museum.packages.UserInfoPackage;
@@ -34,14 +34,14 @@ public class PlayerDataManager implements Listener {
 
     public PlayerDataManager(App app) {
         this.app = app;
-        ISocketClient client = ISocketClient.get();
+        ClientSocket client = app.getClientSocket();
         CoreApi api = CoreApi.get();
         api.bus().register(this, AccountEvent.Load.class, e -> {
             if (e.isCancelled()) return;
             val uuid = e.getUuid();
             val p = new UserInfoPackage(uuid, null);
             try {
-                userMap.put(uuid, new User(client.<UserInfoPackage>writeAndAwaitResponse(p).get(5L, TimeUnit.SECONDS).getUserInfo()));
+                userMap.put(uuid, new User(client.writeAndAwaitResponse(p).get(5L, TimeUnit.SECONDS).getUserInfo()));
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
                 e.setCancelReason("Не удалось загрузить статистику о музее.");
                 e.setCancelled(true);
@@ -51,7 +51,7 @@ public class PlayerDataManager implements Listener {
         api.bus().register(this, AccountEvent.Unload.class, e -> {
             val data = userMap.remove(e.getUuid());
             if (data == null) return;
-            ISocketClient.get().write(new SaveUserPackage(e.getUuid(), data.generateUserInfo()));
+            client.write(new SaveUserPackage(e.getUuid(), data.generateUserInfo()));
         }, 100);
     }
 
