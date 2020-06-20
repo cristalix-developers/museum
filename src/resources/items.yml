@@ -161,7 +161,7 @@ pickaxe-professional:
 pickaxe-prestige:
   icon: gold-pickaxe
   unbreakable: true
-  enchant: [32:1]
+  enchant: ['32:1']
   text: |
     §bПрестижная кирка
 

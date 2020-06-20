@@ -13,6 +13,7 @@ public enum PrepareSteps {
     PACKET_HANDLER(new BeforePacketHandler()),
     INVENTORY(new PrepareInventory()),
     MUSEUM(new PrepareMuseum()),
+    TELEPORT(new PrepareSpawnpoint()),
     SCOREBOARD(new PrepareScoreBoard()),
     ANIME(new PrepareJSAnime()),
     HIDE_PLAYERS(new PreparePlayers());

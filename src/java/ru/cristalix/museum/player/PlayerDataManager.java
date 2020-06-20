@@ -37,11 +37,14 @@ public class PlayerDataManager implements Listener {
         ClientSocket client = app.getClientSocket();
         CoreApi api = CoreApi.get();
         api.bus().register(this, AccountEvent.Load.class, e -> {
-            if (e.isCancelled()) return;
+            if (e.isCancelled())
+                return;
             val uuid = e.getUuid();
-            val p = new UserInfoPackage(uuid, null);
             try {
-                userMap.put(uuid, new User(client.writeAndAwaitResponse(p).get(5L, TimeUnit.SECONDS).getUserInfo()));
+                userMap.put(uuid, new User(client.writeAndAwaitResponse(new UserInfoPackage(uuid, null))
+                        .get(5L, TimeUnit.SECONDS)
+                        .getUserInfo()
+                ));
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
                 e.setCancelReason("Не удалось загрузить статистику о музее.");
                 e.setCancelled(true);
