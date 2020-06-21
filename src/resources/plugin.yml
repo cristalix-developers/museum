@@ -1,7 +1,7 @@
 name: Museum
 version: ${project.version}
 main: ru.cristalix.museum.App
-authors: [func, DelfikPro]
+authors: [func, DelfikPro, Ilya_FX]
 website: funcid.ru
 depend: [CoreAPI]
 commands:
