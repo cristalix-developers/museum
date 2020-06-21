@@ -1,6 +1,6 @@
 package ru.cristalix.museum;
 
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import lombok.Getter;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
@@ -27,6 +27,7 @@ public class SqlManager {
 	private final SyncQueryFactory sync;
 	private final AsyncQueryFactory async;
 
+	@Getter
 	private Map<BoosterType, Booster> globalBoosters = new ConcurrentHashMap<>();
 
 	public SqlManager(BaseSQL sql) {
@@ -47,6 +48,7 @@ public class SqlManager {
 			globalBoosters = list.stream().collect(Collectors.toMap(Booster::getType, booster -> booster));
 			notifyBoosters();
 		});
+		// TODO: Alert message about boosters. Байтим на /thx )0
 		CoreApi.get().getPlatform().getScheduler().runAsyncRepeating(() -> {
 			List<BoosterType> mustDeleted = new ArrayList<>(1);
 			globalBoosters.forEach((type, boost) -> {
@@ -79,6 +81,8 @@ public class SqlManager {
 		if (booster.isGlobal()) {
 			globalBoosters.put(booster.getType(), booster);
 			notifyBoosters();
+			MuseumService.alert("§eБустер активирован!", "§b" + booster.getType().getName());
+			MuseumService.alertMessage("§f[§c!§f] Игрок §e" + booster.getUserName() + "§f активировал глобальный бустер §b" + booster.getType().getName() + " §fна час! Поблагодарить его §d§l/thx");
 		}
 	}
 

@@ -18,6 +18,7 @@ import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.data.UserInfo;
+import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.packages.BulkSaveUserPackage;
 import ru.cristalix.museum.packages.GlobalBoostersPackage;
 import ru.cristalix.museum.packages.SaveUserPackage;
@@ -67,8 +68,16 @@ public class PlayerDataManager implements Listener {
 							),
 							Collections.emptyList(),
 							0,
-							0
+							0,
+							new ArrayList<>(1)
 					);
+				} else {
+					List<DonateType> donates;
+					if (userInfo.getDonates() == null)
+						donates = new ArrayList<>(1);
+					else
+						donates = new ArrayList<>(userInfo.getDonates());
+					userInfo.setDonates(donates);
 				}
 				userMap.put(uuid, new User(userInfo, new ArrayList<>(userInfoPackage.getLocalBoosters())));
 			} catch (InterruptedException | ExecutionException | TimeoutException ex) {
