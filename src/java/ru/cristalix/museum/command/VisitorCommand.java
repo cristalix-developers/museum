@@ -14,22 +14,23 @@ import ru.cristalix.museum.visitor.VisitorManager;
 @AllArgsConstructor
 public class VisitorCommand implements CommandExecutor {
 
-    private VisitorManager visitorManager;
+	private VisitorManager visitorManager;
 
-    @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (commandSender.isOp()) {
-            switch (strings[0]) {
-                case "reload":
-                    visitorManager.clear(); // IF RELOAD - DO NOT BREAK!!!
-                case "spawn":
-                    visitorManager.spawn(((Player) commandSender).getLocation(), 20);
-                    break;
-                case "clear":
-                    visitorManager.clear();
-                    break;
-            }
-        }
-        return true;
-    }
+	@Override
+	public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+		if (commandSender.isOp()) {
+			switch (strings[0]) {
+				case "reload":
+					visitorManager.clear(); // IF RELOAD - DO NOT BREAK!!!
+				case "spawn":
+					visitorManager.spawn(((Player) commandSender).getLocation(), 20);
+					break;
+				case "clear":
+					visitorManager.clear();
+					break;
+			}
+		}
+		return true;
+	}
+
 }

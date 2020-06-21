@@ -7,6 +7,6 @@ import java.util.UUID;
 @Getter
 public abstract class MuseumPackage {
 
-    private final String id = UUID.randomUUID().toString();
+	private final String id = UUID.randomUUID().toString();
 
 }

@@ -27,58 +27,57 @@ import java.util.stream.Collectors;
 @Data
 public class User implements PlayerWrapper {
 
-    @Delegate
+	@Delegate
 	private final UserInfo info;
 
-    private Player player;
-    private PlayerConnection connection;
+	private Player player;
+	private PlayerConnection connection;
 
-    private final Map<String, Museum> museums;
-    private final Map<String, Skeleton> skeletons;
-    private Subject currentSubject;
-    private Museum currentMuseum;
-    private Set<Coin> coins;
-    private Excavation excavation;
+	private final Map<String, Museum> museums;
+	private final Map<String, Skeleton> skeletons;
+	private Subject currentSubject;
+	private Museum currentMuseum;
+	private Set<Coin> coins;
+	private Excavation excavation;
 
-    public User(UserInfo info) {
-    	this.info = info;
-    	this.museums = this.getMuseumInfos().stream()
+	public User(UserInfo info) {
+		this.info = info;
+		this.museums = this.getMuseumInfos().stream()
 				.map(museumInfo -> new Museum(museumInfo, this))
 				.collect(Collectors.toMap(Museum::getAddress, m -> m));
-    	this.skeletons = this.getSkeletonInfos().stream()
+		this.skeletons = this.getSkeletonInfos().stream()
 				.map(Skeleton::new)
 				.collect(Collectors.toMap(Skeleton::getAddress, s -> s));
 	}
 
 	public CraftPlayer getPlayer() {
-    	return (CraftPlayer) player;
+		return (CraftPlayer) player;
 	}
 
+	public void sendAnime() {
+		ByteBuf buffer = Unpooled.buffer();
+		UtilNetty.writeVarInt(buffer, excavation == null ? -1 : excavation.getHitsLeft() > 0 ? excavation.getHitsLeft() : -2);
+		connection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
+	}
 
-    public void sendAnime() {
-        ByteBuf buffer = Unpooled.buffer();
-        UtilNetty.writeVarInt(buffer, excavation == null ? -1 : excavation.getHitsLeft() > 0 ? excavation.getHitsLeft() : -2);
-        connection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
-    }
-
-    public void giveExperience(long exp) {
-    	int prevLevel = getLevel();
+	public void giveExperience(long exp) {
+		int prevLevel = getLevel();
 		info.experience += exp;
 		int newLevel = getLevel();
 		if (newLevel != prevLevel) {
-            MessageUtil.find("levelup")
-                    .set("level", newLevel)
-                    .set("exp", Levels.getRequiredExperience(newLevel + 1) - getExperience())
-                    .send(this);
-        }
-    }
+			MessageUtil.find("levelup")
+					.set("level", newLevel)
+					.set("exp", Levels.getRequiredExperience(newLevel + 1) - getExperience())
+					.send(this);
+		}
+	}
 
 	public long getExperienceToNextLevel() {
-    	return Levels.getRequiredExperience(getLevel() + 1) - getExperience();
+		return Levels.getRequiredExperience(getLevel() + 1) - getExperience();
 	}
 
 	public int getLevel() {
-    	return Levels.getLevel(getExperience());
+		return Levels.getLevel(getExperience());
 	}
 
 	public UserInfo generateUserInfo() {
@@ -105,7 +104,7 @@ public class User implements PlayerWrapper {
 	}
 
 	public void sendPacket(Packet<?> packet) {
-    	connection.sendPacket(packet);
+		connection.sendPacket(packet);
 	}
 
 }

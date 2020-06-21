@@ -12,13 +12,13 @@ import org.bukkit.inventory.ItemStack;
 @Getter
 @AllArgsConstructor
 public enum PickaxeType {
-    DEFAULT(new DefaultPickaxe()),
-    PROFESSIONAL(new ProfessionalPickaxe()),
-    PRESTIGE(new PrestigePickaxe());
+	DEFAULT(new DefaultPickaxe()),
+	PROFESSIONAL(new ProfessionalPickaxe()),
+	PRESTIGE(new PrestigePickaxe());
 
-    private final Pickaxe pickaxe;
+	private final Pickaxe pickaxe;
 
-    public ItemStack getItem() {
-    	return Lemonade.get("pickaxe-" + name().toLowerCase()).render();
+	public ItemStack getItem() {
+		return Lemonade.get("pickaxe-" + name().toLowerCase()).render();
 	}
 }

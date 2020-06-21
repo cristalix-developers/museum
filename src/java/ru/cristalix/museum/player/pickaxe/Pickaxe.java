@@ -11,27 +11,28 @@ import java.util.Random;
 
 public interface Pickaxe {
 
-    Random RANDOM = new Random();
+	Random RANDOM = new Random();
 
-    IBlockData AIR_DATA = Block.getById(0).getBlockData();
+	IBlockData AIR_DATA = Block.getById(0).getBlockData();
 
-    List<BlockPosition> dig(User user, BlockPosition position);
+	List<BlockPosition> dig(User user, BlockPosition position);
 
-    default boolean breakBlock(User user, BlockPosition position) {
-        if (ExcavationManager.isAir(user, position)) {
-            val blockChange = new PacketPlayOutBlockChange(App.getApp().getNMSWorld(), position);
-            blockChange.block = AIR_DATA;
-            user.sendPacket(blockChange);
-            return true;
-        }
-        return false;
-    }
+	default boolean breakBlock(User user, BlockPosition position) {
+		if (ExcavationManager.isAir(user, position)) {
+			val blockChange = new PacketPlayOutBlockChange(App.getApp().getNMSWorld(), position);
+			blockChange.block = AIR_DATA;
+			user.sendPacket(blockChange);
+			return true;
+		}
+		return false;
+	}
 
-    default void animate(PlayerConnection connection, BlockPosition position) {
-        connection.sendPacket(new PacketPlayOutBlockBreakAnimation(
-                RANDOM.nextInt(1000),
-                position,
-                6 + RANDOM.nextInt(3)
-        ));
-    }
+	default void animate(PlayerConnection connection, BlockPosition position) {
+		connection.sendPacket(new PacketPlayOutBlockBreakAnimation(
+				RANDOM.nextInt(1000),
+				position,
+				6 + RANDOM.nextInt(3)
+		));
+	}
+
 }

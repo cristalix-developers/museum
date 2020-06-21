@@ -19,47 +19,49 @@ import java.util.stream.Collectors;
  * @project Museum
  */
 public class MongoManager {
-    private static MongoCollection<Document> mongoCollection;
 
-    public static void connect(String uri, String database, String collection) {
-        mongoCollection = MongoClients.create(uri)
-                .getDatabase(database)
-                .getCollection(collection);
-    }
+	private static MongoCollection<Document> mongoCollection;
 
-    public static CompletableFuture<String> load(UUID uuid) {
-        CompletableFuture<String> archaeologist = new CompletableFuture<>();
+	public static void connect(String uri, String database, String collection) {
+		mongoCollection = MongoClients.create(uri)
+				.getDatabase(database)
+				.getCollection(collection);
+	}
 
-        mongoCollection
-                .find(Filters.eq("uuid", uuid.toString()))
-                .first((result, t) -> archaeologist.complete(result == null ? null : result.getString("data")));
-        return archaeologist;
-    }
+	public static CompletableFuture<String> load(UUID uuid) {
+		CompletableFuture<String> archaeologist = new CompletableFuture<>();
 
-    public static void save(UserInfo user) {
-        String uuid = user.getUuid().toString();
-        mongoCollection.updateOne(
-                Filters.eq("uuid", uuid),
-                new Document("$set", new Document("data", GlobalSerializers.toJson(user))),
-                new UpdateOptions().upsert(true),
-                (result, t) -> {
-                    if (t != null)
-                        t.printStackTrace();
-                }
-        );
-    }
+		mongoCollection
+				.find(Filters.eq("uuid", uuid.toString()))
+				.first((result, t) -> archaeologist.complete(result == null ? null : result.getString("data")));
+		return archaeologist;
+	}
 
-    public static void bulkSave(List<UserInfo> users) {
-        List<UpdateOneModel<Document>> models = users.stream().map(
-                info -> new UpdateOneModel<Document>(
-                        Filters.eq("uuid", info.getUuid().toString()),
-                        new Document("$set", new Document("data", GlobalSerializers.toJson(info))),
-                        new UpdateOptions().upsert(true)
-                )
-        ).collect(Collectors.toList());
-        mongoCollection.bulkWrite(models, (result, t) -> {
-            if (t != null)
-                t.printStackTrace();
-        });
-    }
+	public static void save(UserInfo user) {
+		String uuid = user.getUuid().toString();
+		mongoCollection.updateOne(
+				Filters.eq("uuid", uuid),
+				new Document("$set", new Document("data", GlobalSerializers.toJson(user))),
+				new UpdateOptions().upsert(true),
+				(result, t) -> {
+					if (t != null)
+						t.printStackTrace();
+				}
+								 );
+	}
+
+	public static void bulkSave(List<UserInfo> users) {
+		List<UpdateOneModel<Document>> models = users.stream().map(
+				info -> new UpdateOneModel<Document>(
+						Filters.eq("uuid", info.getUuid().toString()),
+						new Document("$set", new Document("data", GlobalSerializers.toJson(info))),
+						new UpdateOptions().upsert(true)
+				)
+																  ).collect(Collectors.toList());
+		mongoCollection.bulkWrite(models, (result, t) -> {
+			if (t != null)
+				t.printStackTrace();
+		});
+	}
+
 }

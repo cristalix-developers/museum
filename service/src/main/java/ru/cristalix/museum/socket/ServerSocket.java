@@ -22,59 +22,59 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ServerSocket extends Thread {
 
-    private static final Class<? extends ServerSocketChannel> CHANNEL_CLASS;
-    private static final EventLoopGroup BOSS_GROUP, WORKER_GROUP;
+	private static final Class<? extends ServerSocketChannel> CHANNEL_CLASS;
+	private static final EventLoopGroup BOSS_GROUP, WORKER_GROUP;
 
-    private final int port;
+	private final int port;
 
-    @Override
-    public void run() {
-        try {
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap
-                    .group(BOSS_GROUP, WORKER_GROUP)
-                    .channel(CHANNEL_CLASS)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            ChannelPipeline pipeline = socketChannel.pipeline();
+	@Override
+	public void run() {
+		try {
+			ServerBootstrap serverBootstrap = new ServerBootstrap();
+			serverBootstrap
+					.group(BOSS_GROUP, WORKER_GROUP)
+					.channel(CHANNEL_CLASS)
+					.handler(new LoggingHandler(LogLevel.INFO))
+					.childHandler(new ChannelInitializer<SocketChannel>() {
+						@Override
+						protected void initChannel(SocketChannel socketChannel) throws Exception {
+							ChannelPipeline pipeline = socketChannel.pipeline();
 
-                            pipeline.addLast(
-                                    new HttpRequestDecoder(),
-                                    new HttpObjectAggregator(65536),
-                                    new HttpResponseEncoder(),
-                                    new WebSocketServerProtocolHandler("/"),
-                                    new ServerSocketHandler()
-                            );
-                        }
-                    });
+							pipeline.addLast(
+									new HttpRequestDecoder(),
+									new HttpObjectAggregator(65536),
+									new HttpResponseEncoder(),
+									new WebSocketServerProtocolHandler("/"),
+									new ServerSocketHandler()
+											);
+						}
+					});
 
-            serverBootstrap.bind(port).sync().channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            BOSS_GROUP.shutdownGracefully();
-            WORKER_GROUP.shutdownGracefully();
-        }
-    }
+			serverBootstrap.bind(port).sync().channel().closeFuture().sync();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			BOSS_GROUP.shutdownGracefully();
+			WORKER_GROUP.shutdownGracefully();
+		}
+	}
 
-    static {
-        boolean epoll;
-        try {
-            Class.forName("io.netty.channel.epoll.Epoll");
-            epoll = !Boolean.getBoolean("cristalix.net.disable-native-transport") && Epoll.isAvailable();
-        } catch (ClassNotFoundException ignored) {
-            epoll = false;
-        }
-        if (epoll) {
-            CHANNEL_CLASS = EpollServerSocketChannel.class;
-            BOSS_GROUP = new EpollEventLoopGroup(1);
-            WORKER_GROUP = new EpollEventLoopGroup(1);
-        } else {
-            CHANNEL_CLASS = NioServerSocketChannel.class;
-            BOSS_GROUP = new NioEventLoopGroup(1);
-            WORKER_GROUP = new NioEventLoopGroup(1);
-        }
-    }
+	static {
+		boolean epoll;
+		try {
+			Class.forName("io.netty.channel.epoll.Epoll");
+			epoll = !Boolean.getBoolean("cristalix.net.disable-native-transport") && Epoll.isAvailable();
+		} catch (ClassNotFoundException ignored) {
+			epoll = false;
+		}
+		if (epoll) {
+			CHANNEL_CLASS = EpollServerSocketChannel.class;
+			BOSS_GROUP = new EpollEventLoopGroup(1);
+			WORKER_GROUP = new EpollEventLoopGroup(1);
+		} else {
+			CHANNEL_CLASS = NioServerSocketChannel.class;
+			BOSS_GROUP = new NioEventLoopGroup(1);
+			WORKER_GROUP = new NioEventLoopGroup(1);
+		}
+	}
 }

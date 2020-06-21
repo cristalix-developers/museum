@@ -9,15 +9,15 @@ import ru.cristalix.museum.data.UserInfo;
 import java.util.UUID;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode (callSuper = false)
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class UserInfoPackage extends MuseumPackage {
 
-    // request
-    private final UUID uuid;
+	// request
+	private final UUID uuid;
 
-    // response
-    private UserInfo userInfo;
+	// response
+	private UserInfo userInfo;
 
 }

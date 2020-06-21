@@ -7,11 +7,11 @@ import lombok.Getter;
 @Getter
 public enum DonateType {
 
-    COLLECTOR("Донатный сборщик монет", 299, true),
-    ;
+	COLLECTOR("Донатный сборщик монет", 299, true),
+	;
 
-    private String name;
-    private int price;
-    private boolean save; // можно ли купить повторно(возвращается в юзердате потом)
+	private String name;
+	private int price;
+	private boolean save; // можно ли купить повторно(возвращается в юзердате потом)
 
 }

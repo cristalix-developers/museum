@@ -15,11 +15,12 @@ import java.util.stream.Collectors;
  */
 public class DefaultPickaxe implements Pickaxe {
 
-    @Override
-    public List<BlockPosition> dig(User user, BlockPosition pos) {
-        return Arrays.stream(EnumDirection.values())
+	@Override
+	public List<BlockPosition> dig(User user, BlockPosition pos) {
+		return Arrays.stream(EnumDirection.values())
 				.map(pos::shift)
 				.filter(p -> ExcavationManager.isAir(user, p))
 				.collect(Collectors.toList());
-    }
+	}
+
 }

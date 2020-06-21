@@ -7,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode (callSuper = false)
 @RequiredArgsConstructor
 public class BulkSaveUserPackage extends MuseumPackage {
 
-    // request
-    private final List<SaveUserPackage> packages;
+	// request
+	private final List<SaveUserPackage> packages;
 
-    // no response
+	// no response
 
 }

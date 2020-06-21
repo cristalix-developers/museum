@@ -12,17 +12,18 @@ import java.util.List;
  */
 public class ProfessionalPickaxe implements Pickaxe {
 
-    @Override
-    public List<BlockPosition> dig(User user, BlockPosition pos) {
+	@Override
+	public List<BlockPosition> dig(User user, BlockPosition pos) {
 		PlayerConnection con = user.getConnection();
 		animate(con, pos.west().west());
-        animate(con, pos.south().south());
-        animate(con, pos.east().east());
-        animate(con, pos.north().north());
-        animate(con, pos.west().south());
-        animate(con, pos.south().west());
-        animate(con, pos.east().north());
-        animate(con, pos.north().east());
-        return null;
-    }
+		animate(con, pos.south().south());
+		animate(con, pos.east().east());
+		animate(con, pos.north().north());
+		animate(con, pos.west().south());
+		animate(con, pos.south().west());
+		animate(con, pos.east().north());
+		animate(con, pos.north().east());
+		return null;
+	}
+
 }

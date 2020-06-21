@@ -19,7 +19,9 @@ public class SubjectPrototype {
 	private final V3 dimensions;
 
 	public interface Provider {
+
 		Subject provide(Museum museum, SubjectInfo info);
+
 	}
 
 }
