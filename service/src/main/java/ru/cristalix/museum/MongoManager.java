@@ -53,7 +53,7 @@ public class MongoManager {
         List<UpdateOneModel<Document>> models = users.stream().map(
                 info -> new UpdateOneModel<Document>(
                         Filters.eq("uuid", info.getUuid().toString()),
-                        new Document("$set", GlobalSerializers.toJson(info)),
+                        new Document("$set", new Document("data", GlobalSerializers.toJson(info))),
                         new UpdateOptions().upsert(true)
                 )
         ).collect(Collectors.toList());
