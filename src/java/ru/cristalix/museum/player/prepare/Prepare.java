@@ -4,5 +4,7 @@ import ru.cristalix.museum.App;
 import ru.cristalix.museum.player.User;
 
 public interface Prepare {
-    void execute(User user, App app);
+
+	void execute(User user, App app);
+
 }

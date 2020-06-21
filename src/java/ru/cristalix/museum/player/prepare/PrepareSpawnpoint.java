@@ -8,8 +8,10 @@ import ru.cristalix.museum.player.User;
  * @project museum
  */
 public class PrepareSpawnpoint implements Prepare {
-    @Override
-    public void execute(User user, App app) {
-        user.getPlayer().teleport(user.getCurrentMuseum().getPrototype().getSpawnPoint());
-    }
+
+	@Override
+	public void execute(User user, App app) {
+		user.getPlayer().teleport(user.getCurrentMuseum().getPrototype().getSpawnPoint());
+	}
+
 }

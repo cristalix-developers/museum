@@ -16,18 +16,19 @@ import java.util.stream.Collectors;
  */
 public class PrepareJSAnime implements Prepare {
 
-    private JavaScriptMessage code;
-    private static final String FILENAME = "anime_min.js";
+	private JavaScriptMessage code;
+	private static final String FILENAME = "anime_min.js";
 
-    @Override
-    public void execute(User user, App app) {
-        if (code == null) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(app.getResource(FILENAME)))) {
-                code = new JavaScriptMessage(new String[]{reader.lines().collect(Collectors.joining("\n"))});
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        IDisplayService.get().sendScripts(user.getUuid(), code);
-    }
+	@Override
+	public void execute(User user, App app) {
+		if (code == null) {
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(app.getResource(FILENAME)))) {
+				code = new JavaScriptMessage(new String[] {reader.lines().collect(Collectors.joining("\n"))});
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		IDisplayService.get().sendScripts(user.getUuid(), code);
+	}
+
 }

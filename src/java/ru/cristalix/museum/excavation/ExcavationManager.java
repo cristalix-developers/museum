@@ -52,7 +52,6 @@ public class ExcavationManager {
 			Location spawn = map.point2Loc(map.getPointsInZone("spawn", zone).iterator().next());
 			List<int[]> pallette = new ArrayList<>();
 			for (Point p : map.getPointsInZone("pallette", zone)) {
-				System.out.println("Pallette point: " + p.getV3());
 				Block block = meta.point2Loc(p).add(0, -1, 0).getBlock();
 				pallette.add(new int[] {block.getType().getId(), block.getData()});
 			}
@@ -100,4 +99,5 @@ public class ExcavationManager {
 			excavationPrototypeMap.put(prototype.getAddress(), prototype);
 		}
 	}
+
 }

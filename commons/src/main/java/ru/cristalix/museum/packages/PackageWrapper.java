@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class PackageWrapper {
 
-    private final String clazz;
-    private final String objectData;
+	private final String clazz;
+	private final String objectData;
 
 }

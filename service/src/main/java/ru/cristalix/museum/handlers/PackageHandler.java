@@ -5,6 +5,6 @@ import ru.cristalix.museum.packages.MuseumPackage;
 
 public interface PackageHandler<T extends MuseumPackage> {
 
-    void handle(Channel channel, String serverName, T museumPackage);
+	void handle(Channel channel, String serverName, T museumPackage);
 
 }

@@ -30,95 +30,95 @@ import java.util.stream.Collectors;
 
 public class PlayerDataManager implements Listener {
 
-    private final App app;
-    private final Map<UUID, User> userMap = new HashMap<>();
+	private final App app;
+	private final Map<UUID, User> userMap = new HashMap<>();
 
-    public PlayerDataManager(App app) {
-        this.app = app;
-        ClientSocket client = app.getClientSocket();
-        CoreApi api = CoreApi.get();
-        api.bus().register(this, AccountEvent.Load.class, e -> {
-            if (e.isCancelled())
-                return;
-            val uuid = e.getUuid();
-            try {
-                UserInfo userInfo = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
-                        .get(5L, TimeUnit.SECONDS)
-                        .getUserInfo();
-                if (userInfo == null) {
-                    userInfo = new UserInfo(
-                            uuid,
-                            0,
-                            1000.0,
-                            PickaxeType.DEFAULT,
-                            Collections.singletonList(
-                                    new MuseumInfo(
-                                            "main",
-                                            "Музей археологии",
-                                            new Date(),
-                                            3,
-                                            Collections.emptyList(),
-                                            5,
-                                            Collections.emptyList()
-                                    )
-                            ),
-                            Collections.emptyList(),
-                            0,
-                            0
-                    );
-                }
-                userMap.put(uuid, new User(userInfo));
-            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-                e.setCancelReason("Не удалось загрузить статистику о музее.");
-                e.setCancelled(true);
-                ex.printStackTrace();
-            }
-        }, 400);
-        api.bus().register(this, AccountEvent.Unload.class, e -> {
-            val data = userMap.remove(e.getUuid());
-            if (data == null)
-                return;
-            client.write(new SaveUserPackage(e.getUuid(), data.generateUserInfo()));
-        }, 100);
-    }
+	public PlayerDataManager(App app) {
+		this.app = app;
+		ClientSocket client = app.getClientSocket();
+		CoreApi api = CoreApi.get();
+		api.bus().register(this, AccountEvent.Load.class, e -> {
+			if (e.isCancelled())
+				return;
+			val uuid = e.getUuid();
+			try {
+				UserInfo userInfo = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
+						.get(5L, TimeUnit.SECONDS)
+						.getUserInfo();
+				if (userInfo == null) {
+					userInfo = new UserInfo(
+							uuid,
+							0,
+							1000.0,
+							PickaxeType.DEFAULT,
+							Collections.singletonList(
+									new MuseumInfo(
+											"main",
+											"Музей археологии",
+											new Date(),
+											3,
+											Collections.emptyList(),
+											5,
+											Collections.emptyList()
+									)
+													 ),
+							Collections.emptyList(),
+							0,
+							0
+					);
+				}
+				userMap.put(uuid, new User(userInfo));
+			} catch (InterruptedException | ExecutionException | TimeoutException ex) {
+				e.setCancelReason("Не удалось загрузить статистику о музее.");
+				e.setCancelled(true);
+				ex.printStackTrace();
+			}
+		}, 400);
+		api.bus().register(this, AccountEvent.Unload.class, e -> {
+			val data = userMap.remove(e.getUuid());
+			if (data == null)
+				return;
+			client.write(new SaveUserPackage(e.getUuid(), data.generateUserInfo()));
+		}, 100);
+	}
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        val player = e.getPlayer();
-        val user = userMap.get(player.getUniqueId());
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		val player = e.getPlayer();
+		val user = userMap.get(player.getUniqueId());
 
-        user.setConnection(((CraftPlayer) player).getHandle().playerConnection);
-        user.setPlayer(player);
+		user.setConnection(((CraftPlayer) player).getHandle().playerConnection);
+		user.setPlayer(player);
 
-        for (val prepare : PrepareSteps.values())
-            prepare.getPrepare().execute(user, app);
+		for (val prepare : PrepareSteps.values())
+			prepare.getPrepare().execute(user, app);
 
-        e.setJoinMessage(null);
-    }
+		e.setJoinMessage(null);
+	}
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerLogin(PlayerLoginEvent e) {
-        if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
-            userMap.remove(e.getPlayer().getUniqueId());
-    }
+	@EventHandler (priority = EventPriority.MONITOR)
+	public void onPlayerLogin(PlayerLoginEvent e) {
+		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
+			userMap.remove(e.getPlayer().getUniqueId());
+	}
 
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent e) {
-        e.setQuitMessage(null);
-    }
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		e.setQuitMessage(null);
+	}
 
-    public User getUser(UUID uuid) {
-        return userMap.get(uuid);
-    }
+	public User getUser(UUID uuid) {
+		return userMap.get(uuid);
+	}
 
-    public BulkSaveUserPackage bulk(boolean remove) {
-        return new BulkSaveUserPackage(Bukkit.getOnlinePlayers().stream().map(pl -> {
-            val uuid = pl.getUniqueId();
-            User user = remove ? userMap.remove(uuid) : userMap.get(uuid);
-            if (user == null)
-                return null;
-            return new SaveUserPackage(uuid, user.generateUserInfo());
-        }).filter(Objects::nonNull).collect(Collectors.toList()));
-    }
+	public BulkSaveUserPackage bulk(boolean remove) {
+		return new BulkSaveUserPackage(Bukkit.getOnlinePlayers().stream().map(pl -> {
+			val uuid = pl.getUniqueId();
+			User user = remove ? userMap.remove(uuid) : userMap.get(uuid);
+			if (user == null)
+				return null;
+			return new SaveUserPackage(uuid, user.generateUserInfo());
+		}).filter(Objects::nonNull).collect(Collectors.toList()));
+	}
 
 }

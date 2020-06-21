@@ -12,12 +12,13 @@ import ru.cristalix.museum.player.User;
  */
 public class PrepareInventory implements Prepare {
 
-    private final ItemStack menu = Lemonade.get("menu").render();
+	private final ItemStack menu = Lemonade.get("menu").render();
 
-    @Override
-    public void execute(User user, App app) {
-        val inventory = user.getPlayer().getInventory();
-        inventory.clear();
-        inventory.setItem(0, menu);
-    }
+	@Override
+	public void execute(User user, App app) {
+		val inventory = user.getPlayer().getInventory();
+		inventory.clear();
+		inventory.setItem(0, menu);
+	}
+
 }

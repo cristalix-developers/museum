@@ -17,37 +17,38 @@ import ru.cristalix.museum.util.MessageUtil;
 @AllArgsConstructor
 public class MuseumCommand implements CommandExecutor {
 
-    private App app;
+	private App app;
 
-    @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (commandSender instanceof Player) {
-            val player = (Player) commandSender;
-            val user = app.getUser(player.getUniqueId());
+	@Override
+	public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+		if (commandSender instanceof Player) {
+			val player = (Player) commandSender;
+			val user = app.getUser(player.getUniqueId());
 
-            if (strings.length == 2) {
-                if (strings[0].equals("accept")) {
-                    val author = Bukkit.getPlayer(strings[1]);
+			if (strings.length == 2) {
+				if (strings[0].equals("accept")) {
+					val author = Bukkit.getPlayer(strings[1]);
 
-                    if (author == null || !author.isOnline()) {
-                        MessageUtil.find("playeroffline").send(user);
-                        return true;
-                    }
+					if (author == null || !author.isOnline()) {
+						MessageUtil.find("playeroffline").send(user);
+						return true;
+					}
 
-                    val sender = app.getUser(author.getUniqueId());
+					val sender = app.getUser(author.getUniqueId());
 
-                    if (user.getCurrentMuseum().getOwner().equals(sender))
-                        return true;
+					if (user.getCurrentMuseum().getOwner().equals(sender))
+						return true;
 
 					sender.getCurrentMuseum().unload(user);
-                    sender.getCurrentMuseum().load(user);
+					sender.getCurrentMuseum().load(user);
 
-                    MessageUtil.find("visitaccept")
-                            .set("visitor", player.getName())
-                            .send(sender);
-                }
-            }
-        }
-        return true;
-    }
+					MessageUtil.find("visitaccept")
+							.set("visitor", player.getName())
+							.send(sender);
+				}
+			}
+		}
+		return true;
+	}
+
 }

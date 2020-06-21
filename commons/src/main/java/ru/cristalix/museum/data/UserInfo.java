@@ -10,14 +10,14 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserInfo {
 
-    public final UUID uuid;
+	public final UUID uuid;
 
-    public long experience;
-    public double money;
-    public PickaxeType pickaxeType;
-    public List<MuseumInfo> museumInfos;
-    public List<SkeletonInfo> skeletonInfos;
-    public int excavationCount;
-    public long pickedCoinsCount;
+	public long experience;
+	public double money;
+	public PickaxeType pickaxeType;
+	public List<MuseumInfo> museumInfos;
+	public List<SkeletonInfo> skeletonInfos;
+	public int excavationCount;
+	public long pickedCoinsCount;
 
 }

@@ -6,12 +6,12 @@ import ru.cristalix.museum.player.User;
 
 public interface Subject extends Storable<SubjectInfo> {
 
-    void show(User owner);
+	void show(User owner);
 
-    void hide(User owner);
+	void hide(User owner);
 
-    default double getIncome() {
-    	return 0;
+	default double getIncome() {
+		return 0;
 	}
 
 }

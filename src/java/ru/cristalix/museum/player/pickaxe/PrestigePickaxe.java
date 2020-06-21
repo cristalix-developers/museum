@@ -14,13 +14,14 @@ import java.util.stream.Stream;
  */
 public class PrestigePickaxe implements Pickaxe {
 
-    @Override
-    public List<BlockPosition> dig(User user, BlockPosition pos) {
-        return Stream.of(
-                pos.east().east(),
-                pos.west().west(),
-                pos.south().south(),
-                pos.north().north()
-        ).filter(p -> ExcavationManager.isAir(user, p)).collect(Collectors.toList());
-    }
+	@Override
+	public List<BlockPosition> dig(User user, BlockPosition pos) {
+		return Stream.of(
+				pos.east().east(),
+				pos.west().west(),
+				pos.south().south(),
+				pos.north().north()
+						).filter(p -> ExcavationManager.isAir(user, p)).collect(Collectors.toList());
+	}
+
 }

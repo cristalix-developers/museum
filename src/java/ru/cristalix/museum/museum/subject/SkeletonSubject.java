@@ -19,10 +19,10 @@ public class SkeletonSubject extends SimpleSubject {
 	private final Skeleton skeleton;
 	private final Location skeletonLocation;
 
-    public SkeletonSubject(Museum museum, SubjectInfo info) {
-    	super(museum, info);
+	public SkeletonSubject(Museum museum, SubjectInfo info) {
+		super(museum, info);
 
-    	V3 o = prototype.getRelativeOrigin();
+		V3 o = prototype.getRelativeOrigin();
 		this.skeletonLocation = prototype.getPointMin().clone().add(o.getX(), o.getY(), o.getZ());
 
 		if (info.metadata == null) {
@@ -43,18 +43,18 @@ public class SkeletonSubject extends SimpleSubject {
 	}
 
 	@Override
-    public void show(User user) {
-    	super.show(user);
-    	if (skeleton == null)
-    		return;
+	public void show(User user) {
+		super.show(user);
+		if (skeleton == null)
+			return;
 
 		skeleton.getUnlockedFragments().forEach(fragment -> fragment.show(user.getPlayer(), skeletonLocation));
-    }
+	}
 
-    @Override
-    public void hide(User user) {
+	@Override
+	public void hide(User user) {
 		skeleton.getUnlockedFragments().forEach(fragment -> fragment.hide(user.getPlayer()));
-    }
+	}
 
 	@Override
 	public double getIncome() {

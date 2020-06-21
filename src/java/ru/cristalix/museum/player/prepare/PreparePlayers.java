@@ -10,8 +10,9 @@ import ru.cristalix.museum.player.User;
  */
 public class PreparePlayers implements Prepare {
 
-    @Override
-    public void execute(User user, App app) {
-        Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current));
-    }
+	@Override
+	public void execute(User user, App app) {
+		Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current));
+	}
+
 }

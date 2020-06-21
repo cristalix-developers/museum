@@ -10,13 +10,13 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum PrepareSteps {
-    PACKET_HANDLER(new BeforePacketHandler()),
-    INVENTORY(new PrepareInventory()),
-    MUSEUM(new PrepareMuseum()),
-    TELEPORT(new PrepareSpawnpoint()),
-    SCOREBOARD(new PrepareScoreBoard()),
-    ANIME(new PrepareJSAnime()),
-    HIDE_PLAYERS(new PreparePlayers());
+	PACKET_HANDLER(new BeforePacketHandler()),
+	INVENTORY(new PrepareInventory()),
+	MUSEUM(new PrepareMuseum()),
+	TELEPORT(new PrepareSpawnpoint()),
+	SCOREBOARD(new PrepareScoreBoard()),
+	ANIME(new PrepareJSAnime()),
+	HIDE_PLAYERS(new PreparePlayers());
 
-    private final Prepare prepare;
+	private final Prepare prepare;
 }
