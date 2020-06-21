@@ -1,21 +1,21 @@
 package ru.cristalix.museum;
 
 import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.packages.GlobalBoostersPackage;
 import ru.cristalix.museum.socket.ServerSocketHandler;
+import ru.cristalix.museum.utils.UtilTime;
 import ru.ilyafx.sql.BaseSQL;
 import ru.ilyafx.sql.QueryResult;
 import ru.ilyafx.sql.api.queries.FactoryManager;
 import ru.ilyafx.sql.api.queries.factories.AsyncQueryFactory;
 import ru.ilyafx.sql.api.queries.factories.SyncQueryFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +29,8 @@ public class SqlManager {
 
 	@Getter
 	private Map<BoosterType, Booster> globalBoosters = new ConcurrentHashMap<>();
+
+	private Map<UUID, Set<UUID>> thanksMap = new ConcurrentHashMap<>();
 
 	public SqlManager(BaseSQL sql) {
 		this.sql = sql;
@@ -48,21 +50,52 @@ public class SqlManager {
 			globalBoosters = list.stream().collect(Collectors.toMap(Booster::getType, booster -> booster));
 			notifyBoosters();
 		});
-		// TODO: Alert message about boosters. Байтим на /thx )0
 		CoreApi.get().getPlatform().getScheduler().runAsyncRepeating(() -> {
-			List<BoosterType> mustDeleted = new ArrayList<>(1);
+			if (!globalBoosters.isEmpty()) {
+				ComponentBuilder alertMessage = new ComponentBuilder("================\n").color(ChatColor.YELLOW);
+				alertMessage.append("     \n");
+				globalBoosters.forEach((type, boost) ->
+						alertMessage
+								.append("Бустер ").color(ChatColor.WHITE)
+								.append(type.getName()).color(ChatColor.AQUA)
+								.append(" от ").color(ChatColor.WHITE)
+								.append(boost.getUserName()).color(ChatColor.YELLOW)
+								.append(" | ").bold(true).color(ChatColor.BLUE)
+								.append(UtilTime.formatTime(boost.getUntil() - System.currentTimeMillis(), true)).color(ChatColor.GREEN)
+								.append("\n")
+				);
+				alertMessage.append("        \n");
+				alertMessage.append("Поблагодарить ").append("/thx").color(ChatColor.LIGHT_PURPLE).bold(true).append("\n");
+				alertMessage.append("        \n");
+				alertMessage.append("================\n").color(ChatColor.YELLOW);
+				MuseumService.alertMessage(alertMessage.create());
+			}
+			globalBoosters.values().forEach(booster -> {
+				int thanksCount = thanksMap.computeIfAbsent(booster.getUniqueId(), (g) -> new HashSet<>()).size();
+				MuseumService.sendMessage(Collections.singleton(booster.getUser()), "§f[§c!§f] За время работы вашего бустера §b" + booster.getType().getName() + "§f вас поблагодарили §e" + thanksCount + " §fигроков!");
+			});
+		}, 4L, TimeUnit.MINUTES);
+		CoreApi.get().getPlatform().getScheduler().runAsyncRepeating(() -> {
+			List<Booster> mustDeleted = new ArrayList<>(1);
 			globalBoosters.forEach((type, boost) -> {
-				if (boost.getUntil() < System.currentTimeMillis()) mustDeleted.add(type);
+				if (boost.getUntil() < System.currentTimeMillis()) mustDeleted.add(boost);
 			});
 			if (!mustDeleted.isEmpty()) {
-				mustDeleted.forEach(type -> {
-					MuseumService.alert("§eБустер закончился!", "§b" + type.getName());
-					MuseumService.alertMessage("§f[§c!§f] Глобальный бустер §b" + type.getName() + " §fзакончился!");
-					globalBoosters.remove(type);
+				mustDeleted.forEach(booster -> {
+					MuseumService.alert("§eБустер закончился!", "§b" + booster.getType().getName());
+					MuseumService.alertMessage("§f[§c!§f] Глобальный бустер §b" + booster.getType().getName() + " §fзакончился!");
+					globalBoosters.remove(booster.getType());
+					thanksMap.remove(booster.getUniqueId());
 				});
 				notifyBoosters();
 			}
 		}, 15L, TimeUnit.SECONDS);
+	}
+
+	public int executeThanks(UUID user) {
+		return (int) globalBoosters.values().stream().filter(booster -> {
+			return thanksMap.computeIfAbsent(booster.getUniqueId(), (g) -> new HashSet<>()).add(user);
+		}).peek(booster -> MuseumService.extra(booster.getUser(), null, (double) MuseumService.THANKS_SECONDS)).count();
 	}
 
 	public void push(Booster booster) {

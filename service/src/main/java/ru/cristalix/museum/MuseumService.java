@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 public class MuseumService {
 
+	public static final int THANKS_SECONDS = 45;
 	public static final String PASSWORD = System.getProperty("PASSWORD", "gVatjN43AJnbFq36Fa");
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
 	public static SqlManager SQL_MANAGER;
@@ -62,7 +63,7 @@ public class MuseumService {
 	}};
 
 	public static void main(String[] args) {
-		MicroserviceBootstrap.bootstrap(new MicroServicePlatform(1));
+		MicroserviceBootstrap.bootstrap(new MicroServicePlatform(2));
 
 		ServerSocket serverSocket = new ServerSocket(14653);
 		serverSocket.start();
@@ -139,6 +140,12 @@ public class MuseumService {
 			BroadcastTitlePackage broadcastPackage = new BroadcastTitlePackage(museumPackage.getData(), museumPackage.getFadeIn(), museumPackage.getStay(), museumPackage.getFadeOut());
 			ServerSocketHandler.broadcast(broadcastPackage);
 		}));
+		registerHandler(ThanksExecutePackage.class, ((channel, serverName, museumPackage) -> {
+			int boosters = SQL_MANAGER.executeThanks(museumPackage.getUser());
+			extra(museumPackage.getUser(), null, (double) (THANKS_SECONDS * boosters));
+			museumPackage.setBoostersCount(boosters);
+			answer(channel, museumPackage);
+		}));
 	}
 
 	/**
@@ -213,6 +220,19 @@ public class MuseumService {
 		FillLauncherUserDataPackage pc = new FillLauncherUserDataPackage();
 		pc.setUuidList(users);
 		return ISocketClient.get().<FillLauncherUserDataPackage>writeAndAwaitResponse(pc).thenApply(FillLauncherUserDataPackage::getUsernameList);
+	}
+
+	public static void extra(UUID user, Double sum, Double seconds) {
+		// TODO: we need to calculate money for offline users.
+		ServerSocketHandler.broadcast(new ExtraDepositUserPackage(user, sum, seconds));
+	}
+
+	public static void sendMessage(Set<UUID> users, String message) {
+		sendMessage(users, TextComponent.fromLegacyText(message));
+	}
+
+	public static void sendMessage(Set<UUID> users, BaseComponent[] message) {
+		ServerSocketHandler.broadcast(new TargetMessagePackage(users, ComponentSerializer.toString(message)));
 	}
 
 }

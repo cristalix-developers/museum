@@ -19,10 +19,7 @@ import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.donate.DonateType;
-import ru.cristalix.museum.packages.BulkSaveUserPackage;
-import ru.cristalix.museum.packages.GlobalBoostersPackage;
-import ru.cristalix.museum.packages.SaveUserPackage;
-import ru.cristalix.museum.packages.UserInfoPackage;
+import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.prepare.PrepareSteps;
 
 import java.util.*;
@@ -93,6 +90,17 @@ public class PlayerDataManager implements Listener {
 			client.write(new SaveUserPackage(e.getUuid(), data.generateUserInfo()));
 		}, 100);
 		client.registerHandler(GlobalBoostersPackage.class, pckg -> globalBoosters = pckg.getBoosters());
+		client.registerHandler(ExtraDepositUserPackage.class, pckg -> {
+			User user = userMap.get(pckg.getUser());
+			if (user != null) {
+				if (pckg.getSum() != null)
+					user.setMoney(user.getMoney() + pckg.getSum());
+				if (pckg.getSeconds() != null) {
+					double result = pckg.getSeconds() * user.getCurrentMuseum().getIncome(); // Да?..
+					user.setMoney(user.getMoney() + result);
+				}
+			}
+		});
 	}
 
 	@EventHandler

@@ -29,6 +29,7 @@ import ru.cristalix.museum.museum.map.MuseumManager;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonManager;
 import ru.cristalix.museum.packages.BroadcastMessagePackage;
 import ru.cristalix.museum.packages.BroadcastTitlePackage;
+import ru.cristalix.museum.packages.TargetMessagePackage;
 import ru.cristalix.museum.packages.UserTransactionPackage;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
@@ -36,6 +37,7 @@ import ru.cristalix.museum.util.BukkitChatService;
 import ru.cristalix.museum.util.PassiveEvents;
 
 import java.io.InputStreamReader;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -67,6 +69,10 @@ public final class App extends JavaPlugin {
 		clientSocket.registerHandler(BroadcastMessagePackage.class, pckg -> {
 			BaseComponent[] msg = ComponentSerializer.parse(pckg.getJsonMessage());
 			Bukkit.getOnlinePlayers().forEach(pl -> pl.sendMessage(msg));
+		});
+		clientSocket.registerHandler(TargetMessagePackage.class, pckg -> {
+			BaseComponent[] msg = ComponentSerializer.parse(pckg.getJsonMessage());
+			pckg.getUsers().stream().map(Bukkit::getPlayer).filter(Objects::nonNull).forEach(pl -> pl.sendMessage(msg));
 		});
 		this.playerDataManager = new PlayerDataManager(this);
 
