@@ -16,11 +16,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserInfoPackage extends MuseumPackage {
 
-    // request
-    private final UUID uuid;
+	// request
+	private final UUID uuid;
 
-    // response
-    private UserInfo userInfo;
-    private List<Booster> localBoosters;
+	// response
+	private UserInfo userInfo;
+	private List<Booster> localBoosters;
 
 }

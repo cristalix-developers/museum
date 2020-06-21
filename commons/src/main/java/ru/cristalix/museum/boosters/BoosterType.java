@@ -7,11 +7,11 @@ import lombok.Getter;
 @Getter
 public enum BoosterType {
 
-    ;
+	;
 
-    private final String name;
-    private final String description;
-    private final int localPrice, globalPrice;
-    private final double localMultiplier, globalMultiplier;
+	private final String name;
+	private final String description;
+	private final int localPrice, globalPrice;
+	private final double localMultiplier, globalMultiplier;
 
 }

@@ -12,9 +12,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GlobalBoostersPackage extends MuseumPackage {
 
-    // request
-    private final List<Booster> boosters;
+	// request
+	private final List<Booster> boosters;
 
-    // no response
+	// no response
 
 }

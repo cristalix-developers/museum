@@ -47,7 +47,7 @@ public class MongoManager {
 					if (t != null)
 						t.printStackTrace();
 				}
-								 );
+		);
 	}
 
 	public static void bulkSave(List<UserInfo> users) {
@@ -57,7 +57,7 @@ public class MongoManager {
 						new Document("$set", new Document("data", GlobalSerializers.toJson(info))),
 						new UpdateOptions().upsert(true)
 				)
-																  ).collect(Collectors.toList());
+		).collect(Collectors.toList());
 		mongoCollection.bulkWrite(models, (result, t) -> {
 			if (t != null)
 				t.printStackTrace();
