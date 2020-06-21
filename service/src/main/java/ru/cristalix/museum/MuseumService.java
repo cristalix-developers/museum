@@ -13,6 +13,7 @@ import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage;
 import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage;
 import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
+import ru.cristalix.museum.configuration.ConfigurationManager;
 import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.handlers.PackageHandler;
@@ -35,6 +36,7 @@ public class MuseumService {
 	public static final String PASSWORD = System.getProperty("PASSWORD", "gVatjN43AJnbFq36Fa");
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
 	public static SqlManager SQL_MANAGER;
+	public static ConfigurationManager CONFIGURATION_MANAGER;
 	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.LOCAL_MONEY_BOOSTER, (pckg, info) -> {
 			try {
@@ -81,6 +83,9 @@ public class MuseumService {
 				.password(System.getenv("SQL_PASSWORD"))
 				.user(System.getenv("SQL_USER"))
 				.build()));
+
+		CONFIGURATION_MANAGER = new ConfigurationManager("config.yml", "guis.yml", "items.yml");
+		CONFIGURATION_MANAGER.init();
 
 		registerHandler(UserInfoPackage.class, (channel, source, pckg) -> {
 			System.out.println("Receive UserInfoPackage from " + source + " for " + pckg.getUuid().toString());

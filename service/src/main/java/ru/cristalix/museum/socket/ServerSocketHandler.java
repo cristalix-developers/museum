@@ -6,6 +6,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.util.AttributeKey;
+import ru.cristalix.core.CoreApi;
 import ru.cristalix.museum.MuseumService;
 import ru.cristalix.museum.packages.GreetingPackage;
 import ru.cristalix.museum.packages.MuseumPackage;
@@ -15,6 +16,7 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
@@ -48,7 +50,10 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 				}
 				channel.attr(serverInfoKey).set(pckg.getServerName());
 				connectedChannels.put(pckg.getServerName(), channel);
-				send(channel, MuseumService.SQL_MANAGER.pckg());
+				CoreApi.get().getPlatform().getScheduler().runAsyncDelayed(() -> {
+					send(channel, MuseumService.SQL_MANAGER.pckg());
+					send(channel, MuseumService.CONFIGURATION_MANAGER.pckg());
+				}, 1L, TimeUnit.SECONDS);
 				System.out.println("Server authorized! " + pckg.getServerName());
 			} else {
 				if (!channel.hasAttr(serverInfoKey)) {
