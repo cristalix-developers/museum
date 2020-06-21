@@ -19,22 +19,12 @@ museum:
     Коллекторов: &e<collectors>
     Витрин: &e<spaces>
 
-    Создан &e<sinceCreation> назад
+    Создан &e<sinceCreation>назад
 
 unavailable:
   icon: clay-ball
   nbt: {other: point}
   text: '&7???'
-
-excavations:
-  icon: emerald
-  text: |
-    §f>> §6§lРаскопки §f<<
-
-    Нажмите правую кнопку
-    мыши, что бы открыть
-    меню, где вы можете
-    выбирать экспидицию и кирку
 
 menu:
   icon: paper

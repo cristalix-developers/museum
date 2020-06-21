@@ -1,6 +1,7 @@
 package ru.cristalix.museum.excavation;
 
 import clepto.bukkit.Lemonade;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.IScoreboardService;
@@ -8,6 +9,7 @@ import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.util.MessageUtil;
 
 @Data
+@AllArgsConstructor
 public class Excavation {
 
 	private final ExcavationPrototype prototype;

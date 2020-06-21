@@ -1,12 +1,12 @@
-$back: &back
-  char: B
-  icon: goback
-  left-click: /gui main
-
-
 main:
+  $back: &back
+    char: B
+    icon: goback
+    left-click: /gui main
   title: Главное меню
-  layout: -F-SMT-A-
+  layout: |
+    F--SMT--A
+    --H---J--
   buttons:
 
     - char: F
@@ -29,6 +29,13 @@ main:
       icon: invite
       left-click: /invite
 
+    - char: H
+      icon: goto_pickaxes_item
+      left-click: /gui pickaxes
+
+    - char: J
+      icon: goto_excavations_item
+      left-click: /gui excavations
 
 pickaxes:
   title: Инструменты
@@ -40,10 +47,6 @@ pickaxes:
 
     - <<: *back
 
-
-
-
-
 excavations:
   title: Экспедиции
   layout: OOOOOOOOB
@@ -54,7 +57,7 @@ excavations:
     native: excavation
 
   buttons:
-    - {<<: *exc, info: 1}
+    - {<<: *exc, info: 'dirt'}
     - {<<: *exc, info: 2}
     - {<<: *exc, info: 3}
     - {<<: *exc, info: 4}

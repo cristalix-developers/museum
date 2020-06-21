@@ -13,15 +13,16 @@ import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.client.ClientSocket;
+import ru.cristalix.museum.data.MuseumInfo;
+import ru.cristalix.museum.data.PickaxeType;
+import ru.cristalix.museum.data.UserInfo;
+import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.packages.BulkSaveUserPackage;
 import ru.cristalix.museum.packages.SaveUserPackage;
 import ru.cristalix.museum.packages.UserInfoPackage;
 import ru.cristalix.museum.player.prepare.PrepareSteps;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -41,10 +42,32 @@ public class PlayerDataManager implements Listener {
                 return;
             val uuid = e.getUuid();
             try {
-                userMap.put(uuid, new User(client.writeAndAwaitResponse(new UserInfoPackage(uuid))
+                UserInfo userInfo = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
                         .get(5L, TimeUnit.SECONDS)
-                        .getUserInfo()
-                ));
+                        .getUserInfo();
+                if (userInfo == null) {
+                    userInfo = new UserInfo(
+                            uuid,
+                            0,
+                            1000.0,
+                            PickaxeType.DEFAULT,
+                            Collections.singletonList(
+                                    new MuseumInfo(
+                                            "main",
+                                            "Музей археологии",
+                                            new Date(),
+                                            3,
+                                            Collections.emptyList(),
+                                            5,
+                                            Collections.emptyList()
+                                    )
+                            ),
+                            Collections.emptyList(),
+                            0,
+                            0
+                    );
+                }
+                userMap.put(uuid, new User(userInfo));
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
                 e.setCancelReason("Не удалось загрузить статистику о музее.");
                 e.setCancelled(true);

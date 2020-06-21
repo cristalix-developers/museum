@@ -29,8 +29,6 @@ public class MuseumEvents implements Listener {
 		Material type = player.getInventory().getItemInMainHand().getType();
 		if (type == Material.PAPER)
 			player.performCommand("gui main");
-		else if (type == Material.EMERALD)
-			player.performCommand("gui pickaxes");
 	}
 
 	@EventHandler
@@ -43,7 +41,8 @@ public class MuseumEvents implements Listener {
 		val player = e.getPlayer();
 		val user = app.getUser(player.getUniqueId());
 
-		if (user.getExcavation() != null) return;
+		if (user.getExcavation() != null)
+			return;
 
 		// Попытка скушать монетки
 		user.getCoins().removeIf(coin -> coin.pickUp(user, to, 1.7));

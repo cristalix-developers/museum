@@ -2,8 +2,10 @@ package ru.cristalix.museum;
 
 import io.netty.channel.Channel;
 import ru.cristalix.core.GlobalSerializers;
+import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.data.UserInfo;
+import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.handlers.PackageHandler;
 import ru.cristalix.museum.packages.BulkSaveUserPackage;
 import ru.cristalix.museum.packages.MuseumPackage;
@@ -12,9 +14,7 @@ import ru.cristalix.museum.packages.UserInfoPackage;
 import ru.cristalix.museum.socket.ServerSocket;
 import ru.cristalix.museum.socket.ServerSocketHandler;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MuseumService {
@@ -38,8 +38,7 @@ public class MuseumService {
                     .thenAccept(data -> {
                         UserInfo info;
                         if (data == null)
-                            // Default user values
-                            info = new UserInfo(pckg.getUuid(), 0, 0.0, PickaxeType.DEFAULT, Collections.emptyList(), Collections.emptyList(), 0, 0);
+                            info = null;
                         else
                             info = GlobalSerializers.fromJson(data, UserInfo.class);
                         pckg.setUserInfo(info);

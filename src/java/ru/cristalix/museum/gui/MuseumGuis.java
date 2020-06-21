@@ -16,9 +16,9 @@ import ru.cristalix.museum.excavation.ExcavationPrototype;
 
 public class MuseumGuis {
 
-	public static void init(App app) {
+	public MuseumGuis(App app) {
 		B.regCommand((sender, args) -> {
-			Guis.registry.get(args[0]).open(sender, args[1]);
+			Guis.registry.get(args[0]).open(sender, args.length > 1 ? args[1] : null);
 			return null;
 		}, "gui");
 
@@ -32,7 +32,7 @@ public class MuseumGuis {
 
 			user.setMoney(user.getMoney() - proto.getPrice());
 
-			Excavation excavation = new Excavation(proto);
+			Excavation excavation = new Excavation(proto, proto.getHitCount());
 			user.setExcavation(excavation);
 
 			user.getCurrentMuseum().unload(user);
@@ -61,13 +61,14 @@ public class MuseumGuis {
 			PickaxeType pickaxe = user.getPickaxeType().getNext();
 			return Lemonade.get("pickaxe-" + pickaxe.name()).render();
 		});
-		
+
 		Guis.registerItemizer("excavation", (base, player, context, slotId) -> {
 			SlotData slotData = context.getOpenedGui().getSlotData(slotId);
 			String info = slotData.getInfo();
 			ExcavationPrototype excavation = app.getExcavationManager().getExcavationPrototype(info);
 			User user = App.getApp().getUser(player);
-			if (excavation == null || excavation.getRequiredLevel() > user.getLevel()) return Lemonade.get("unavailable").render();
+			if (excavation == null || excavation.getRequiredLevel() > user.getLevel())
+				return Lemonade.get("unavailable").render();
 			return base.dynamic()
 					.fill("excavation", excavation.getTitle())
 					.fill("cost", String.format("%.2f", excavation.getPrice()))
@@ -78,7 +79,8 @@ public class MuseumGuis {
 
 		Guis.registerItemizer("profile", (base, player, context, slotId) -> {
 			User user = app.getUser(player);
-			return base.dynamic().fill("level", String.valueOf(user.getLevel()))
+			return base.dynamic()
+					.fill("level", String.valueOf(user.getLevel()))
 					.fill("money", MessageUtil.toMoneyFormat(user.getMoney()))
 					.fill("exp", String.valueOf(user.getExperience()))
 					.fill("need_exp", String.valueOf(user.getRequiredExperience(user.getLevel() + 1)))
@@ -98,11 +100,10 @@ public class MuseumGuis {
 					.fill("title", museum.getTitle())
 					.fill("views", String.valueOf(museum.getViews()))
 					.fill("income", MessageUtil.toMoneyFormat(museum.getIncome()))
-					.fill("collectors", String.valueOf(museum.getCollectorSlots()))
+					.fill("collectors", String.valueOf(museum.getCollectors().size()))
 					.fill("spaces", String.valueOf(museum.getSubjects().size()))
 					.fill("sinceCreation", LoveHumans.formatTime(System.currentTimeMillis() - museum.getCreationDate().getTime()))
 					.render();
 		});
 	}
-
 }

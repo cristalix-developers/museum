@@ -75,7 +75,8 @@ public class ExcavationManager {
 					for (int z = (int) min.getZ(); z < (int) max.getZ(); z++) {
 						Location loc = new Location(meta.getWorld(), x, y, z);
 						Block block = loc.getBlock();
-						if (block.getType() == Material.IRON_BLOCK) space.add(loc);
+						if (block.getType() == Material.IRON_BLOCK)
+							space.add(loc);
 					}
 				}
 			}
@@ -93,10 +94,10 @@ public class ExcavationManager {
 				packets.add(new PacketPlayOutMapChunk(((CraftChunk) chunk).getHandle(), 65535));
 			}
 
-			ExcavationPrototype prototype = new ExcavationPrototype(key.replace("excavation", ""), skeletonPrototypes, hitCount, requredLevl, price, title, spawn, packets);
-			excavationPrototypeMap.put(prototype.getAddress(), prototype);
+			space.forEach(block -> block.getBlock().setType(Material.AIR));
 
+			ExcavationPrototype prototype = new ExcavationPrototype(key.replace("excavation-", ""), skeletonPrototypes, hitCount, requredLevl, price, title, spawn, packets);
+			excavationPrototypeMap.put(prototype.getAddress(), prototype);
 		}
 	}
-
 }

@@ -2,6 +2,8 @@ package ru.cristalix.museum;
 
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
+import clepto.bukkit.gui.GuiEvents;
+import clepto.bukkit.gui.Guis;
 import lombok.Getter;
 import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
@@ -58,14 +60,16 @@ public final class App extends JavaPlugin {
             Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key);
         }
 
-        MuseumGuis.init(this);
+        Guis.loadGuis(YamlConfiguration.loadConfiguration(new InputStreamReader(getResource("guis.yml"))));
+        new MuseumGuis(this);
 
         B.events(
                 playerDataManager,
                 new PassiveEvents(),
                 //new MuseumItemHandler(this),
                 //new ManipulatorHandler(this),
-                new MuseumEvents(this)
+                new MuseumEvents(this),
+                new GuiEvents()
         );
 
         // todo добавить локации
