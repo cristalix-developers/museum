@@ -1,5 +1,6 @@
 package ru.cristalix.museum;
 
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
@@ -52,7 +53,11 @@ public class SqlManager {
 				if (boost.getUntil() < System.currentTimeMillis()) mustDeleted.add(type);
 			});
 			if (!mustDeleted.isEmpty()) {
-				mustDeleted.forEach(globalBoosters::remove);
+				mustDeleted.forEach(type -> {
+					MuseumService.alert("§eБустер закончился!", "§b" + type.getName());
+					MuseumService.alertMessage("§f[§c!§f] Глобальный бустер §b" + type.getName() + " §fзакончился!");
+					globalBoosters.remove(type);
+				});
 				notifyBoosters();
 			}
 		}, 15L, TimeUnit.SECONDS);

@@ -12,12 +12,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
 import ru.cristalix.museum.App;
+import ru.cristalix.museum.boosters.Booster;
+import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.data.UserInfo;
-import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.packages.BulkSaveUserPackage;
+import ru.cristalix.museum.packages.GlobalBoostersPackage;
 import ru.cristalix.museum.packages.SaveUserPackage;
 import ru.cristalix.museum.packages.UserInfoPackage;
 import ru.cristalix.museum.player.prepare.PrepareSteps;
@@ -32,6 +34,7 @@ public class PlayerDataManager implements Listener {
 
 	private final App app;
 	private final Map<UUID, User> userMap = new HashMap<>();
+	private List<Booster> globalBoosters = new ArrayList<>(0);
 
 	public PlayerDataManager(App app) {
 		this.app = app;
@@ -42,9 +45,9 @@ public class PlayerDataManager implements Listener {
 				return;
 			val uuid = e.getUuid();
 			try {
-				UserInfo userInfo = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
-						.get(5L, TimeUnit.SECONDS)
-						.getUserInfo();
+				UserInfoPackage userInfoPackage = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
+						.get(5L, TimeUnit.SECONDS);
+				UserInfo userInfo = userInfoPackage.getUserInfo();
 				if (userInfo == null) {
 					userInfo = new UserInfo(
 							uuid,
@@ -61,13 +64,13 @@ public class PlayerDataManager implements Listener {
 											5,
 											Collections.emptyList()
 									)
-													 ),
+							),
 							Collections.emptyList(),
 							0,
 							0
 					);
 				}
-				userMap.put(uuid, new User(userInfo));
+				userMap.put(uuid, new User(userInfo, new ArrayList<>(userInfoPackage.getLocalBoosters())));
 			} catch (InterruptedException | ExecutionException | TimeoutException ex) {
 				e.setCancelReason("Не удалось загрузить статистику о музее.");
 				e.setCancelled(true);
@@ -80,6 +83,7 @@ public class PlayerDataManager implements Listener {
 				return;
 			client.write(new SaveUserPackage(e.getUuid(), data.generateUserInfo()));
 		}, 100);
+		client.registerHandler(GlobalBoostersPackage.class, pckg -> globalBoosters = pckg.getBoosters());
 	}
 
 	@EventHandler
@@ -96,7 +100,7 @@ public class PlayerDataManager implements Listener {
 		e.setJoinMessage(null);
 	}
 
-	@EventHandler (priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLogin(PlayerLoginEvent e) {
 		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
 			userMap.remove(e.getPlayer().getUniqueId());
@@ -105,6 +109,10 @@ public class PlayerDataManager implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		e.setQuitMessage(null);
+	}
+
+	public double calcMultiplier(UUID user, BoosterType type) {
+		return userMap.get(user).calcMultiplier(type) + globalBoosters.stream().filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis()).mapToDouble(booster -> booster.getMultiplier() - 1.0).sum();
 	}
 
 	public User getUser(UUID uuid) {
