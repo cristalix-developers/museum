@@ -17,6 +17,7 @@ import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.subject.Subject;
+import ru.cristalix.museum.util.Levels;
 import ru.cristalix.museum.util.MessageUtil;
 
 import java.util.Map;
@@ -67,17 +68,17 @@ public class User implements PlayerWrapper {
 		if (newLevel != prevLevel) {
             MessageUtil.find("levelup")
                     .set("level", newLevel)
-                    .set("exp", getRequiredExperience(this.getExperience()))
+                    .set("exp", Levels.getRequiredExperience(newLevel + 1) - getExperience())
                     .send(this);
         }
     }
 
-    public long getRequiredExperience(long level) {
-        return 100 * level * level - 50 * level - getExperience();
-    }
+	public long getExperienceToNextLevel() {
+    	return Levels.getRequiredExperience(getLevel() + 1) - getExperience();
+	}
 
-    public int getLevel() {
-    	return (int) (0.25 + 0.05 * Math.sqrt(4 * getExperience() + 25));
+	public int getLevel() {
+    	return Levels.getLevel(getExperience());
 	}
 
 	public UserInfo generateUserInfo() {

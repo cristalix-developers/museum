@@ -6,6 +6,7 @@ import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.player.User;
+import ru.cristalix.museum.util.Levels;
 import ru.cristalix.museum.util.MessageUtil;
 
 /**
@@ -26,7 +27,7 @@ public class PrepareScoreBoard implements Prepare {
     public void execute(User user, App app) {
         SimpleBoardObjective main = IScoreboardService.get().getPlayerObjective(user.getUuid(), "main");
         main.startGroup("Игрок")
-                .record("Уровень", () -> "§b" + user.getLevel() + " §7" + user.getRequiredExperience(user.getRequiredExperience(0) - user.getExperience()) + "/" + user.getRequiredExperience(0))
+                .record("Уровень", () -> Levels.formatExperience(user.getExperience()))
                 .record("Баланс", () -> "§a" + MessageUtil.toMoneyFormat(user.getMoney()));
         val museum = user.getCurrentMuseum();
         main.startGroup("Музей")
@@ -37,9 +38,11 @@ public class PrepareScoreBoard implements Prepare {
         SimpleBoardObjective excavation = IScoreboardService.get().getPlayerObjective(user.getUuid(), "excavation");
         excavation.startGroup("Раскопки")
                 .record("Ударов", () -> Math.max(user.getExcavation() != null ? user.getExcavation().getHitsLeft() : 0, 0) + " осталось")
-                .record("Уровень", () -> "§b" + user.getLevel() + " §7" + user.getRequiredExperience(user.getRequiredExperience(0) - user.getExperience()) + "/" + user.getRequiredExperience(0));
+                .record("Уровень", () -> Levels.formatExperience(user.getExperience()));
         template(excavation);
 
         IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
     }
+
+
 }

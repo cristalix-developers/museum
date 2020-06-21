@@ -9,6 +9,7 @@ import org.bukkit.Statistic;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.player.User;
+import ru.cristalix.museum.util.Levels;
 import ru.cristalix.museum.util.MessageUtil;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.excavation.Excavation;
@@ -83,7 +84,7 @@ public class MuseumGuis {
 					.fill("level", String.valueOf(user.getLevel()))
 					.fill("money", MessageUtil.toMoneyFormat(user.getMoney()))
 					.fill("exp", String.valueOf(user.getExperience()))
-					.fill("need_exp", String.valueOf(user.getRequiredExperience(user.getLevel() + 1)))
+					.fill("need_exp", Levels.formatExperience(user.getExperience()))
 					.fill("hours_played", String.valueOf(player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000))
 					.fill("coins_picked", String.valueOf(user.getPickedCoinsCount()))
 					.fill("pickaxe", user.getPickaxeType().name())
