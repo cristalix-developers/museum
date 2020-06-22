@@ -2,6 +2,7 @@ package ru.cristalix.museum.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import ru.cristalix.museum.donate.DonateType;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,5 +20,6 @@ public class UserInfo {
 	public List<SkeletonInfo> skeletonInfos;
 	public int excavationCount;
 	public long pickedCoinsCount;
+	public List<DonateType> donates;
 
 }

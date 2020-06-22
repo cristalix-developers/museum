@@ -9,6 +9,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,20 +22,24 @@ import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 import ru.cristalix.museum.client.ClientSocket;
+import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.excavation.ExcavationManager;
 import ru.cristalix.museum.gui.MuseumGuis;
 import ru.cristalix.museum.museum.MuseumEvents;
 import ru.cristalix.museum.museum.map.MuseumManager;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonManager;
-import ru.cristalix.museum.packages.BroadcastMessagePackage;
-import ru.cristalix.museum.packages.BroadcastTitlePackage;
+import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.util.BukkitChatService;
 import ru.cristalix.museum.util.PassiveEvents;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.util.Base64;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Getter
 public final class App extends JavaPlugin {
@@ -47,6 +52,8 @@ public final class App extends JavaPlugin {
 	private SkeletonManager skeletonManager;
 	private ExcavationManager excavationManager;
 	private ClientSocket clientSocket;
+
+	private YamlConfiguration configuration;
 
 	@Override
 	public void onEnable() {
@@ -65,6 +72,10 @@ public final class App extends JavaPlugin {
 			BaseComponent[] msg = ComponentSerializer.parse(pckg.getJsonMessage());
 			Bukkit.getOnlinePlayers().forEach(pl -> pl.sendMessage(msg));
 		});
+		clientSocket.registerHandler(TargetMessagePackage.class, pckg -> {
+			BaseComponent[] msg = ComponentSerializer.parse(pckg.getJsonMessage());
+			pckg.getUsers().stream().map(Bukkit::getPlayer).filter(Objects::nonNull).forEach(pl -> pl.sendMessage(msg));
+		});
 		this.playerDataManager = new PlayerDataManager(this);
 
 		CoreApi.get().unregisterService(IChatService.class);
@@ -72,12 +83,17 @@ public final class App extends JavaPlugin {
 		CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
 		CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
-		YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(getResource("items.yml")));
-		for (String key : itemsConfig.getKeys(false)) {
-			Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key);
-		}
+		clientSocket.registerHandler(ConfigurationsPackage.class, pckg -> {
+			YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
+			for (String key : itemsConfig.getKeys(false)) {
+				Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key);
+			}
 
-		Guis.loadGuis(YamlConfiguration.loadConfiguration(new InputStreamReader(getResource("guis.yml"))));
+			Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));
+
+			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
+		});
+
 		new MuseumGuis(this);
 
 		B.events(
@@ -87,7 +103,7 @@ public final class App extends JavaPlugin {
 				//new ManipulatorHandler(this),
 				new MuseumEvents(this),
 				new GuiEvents()
-				);
+		);
 
 		// todo добавить локации
 		/**
@@ -146,6 +162,11 @@ public final class App extends JavaPlugin {
 		}
 	}
 
+	@Override
+	public FileConfiguration getConfig() {
+		return configuration;
+	}
+
 	public User getUser(UUID uuid) {
 		return playerDataManager.getUser(uuid);
 	}
@@ -158,4 +179,11 @@ public final class App extends JavaPlugin {
 		return getUser(player.getUniqueId());
 	}
 
+	public CompletableFuture<UserTransactionPackage.TransactionResponse> processDonate(UUID user, DonateType donate) {
+		return getClientSocket().writeAndAwaitResponse(new UserTransactionPackage(user, donate, null)).thenApply(UserTransactionPackage::getResponse);
+	}
+
+	private InputStreamReader reader(String base64) {
+		return new InputStreamReader(new ByteArrayInputStream(Base64.getDecoder().decode(base64)));
+	}
 }

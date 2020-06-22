@@ -6,20 +6,26 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.Data;
 import lombok.experimental.Delegate;
-import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.Packet;
+import net.minecraft.server.v1_12_R1.PacketDataSerializer;
+import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.util.UtilNetty;
+import ru.cristalix.museum.boosters.Booster;
+import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.excavation.Excavation;
-import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
-import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.Coin;
+import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.subject.Subject;
+import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
 import ru.cristalix.museum.util.Levels;
 import ru.cristalix.museum.util.MessageUtil;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,12 +41,13 @@ public class User implements PlayerWrapper {
 
 	private final Map<String, Museum> museums;
 	private final Map<String, Skeleton> skeletons;
+	private List<Booster> localBoosters;
 	private Subject currentSubject;
 	private Museum currentMuseum;
 	private Set<Coin> coins;
 	private Excavation excavation;
 
-	public User(UserInfo info) {
+	public User(UserInfo info, List<Booster> localBoosters) {
 		this.info = info;
 		this.museums = this.getMuseumInfos().stream()
 				.map(museumInfo -> new Museum(museumInfo, this))
@@ -48,6 +55,7 @@ public class User implements PlayerWrapper {
 		this.skeletons = this.getSkeletonInfos().stream()
 				.map(Skeleton::new)
 				.collect(Collectors.toMap(Skeleton::getAddress, s -> s));
+		this.localBoosters = localBoosters;
 	}
 
 	public CraftPlayer getPlayer() {
@@ -105,6 +113,10 @@ public class User implements PlayerWrapper {
 
 	public void sendPacket(Packet<?> packet) {
 		connection.sendPacket(packet);
+	}
+
+	public double calcMultiplier(BoosterType type) {
+		return 1.0 + localBoosters.stream().filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis()).mapToDouble(booster -> booster.getMultiplier() - 1).sum();
 	}
 
 }

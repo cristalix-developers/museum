@@ -28,13 +28,13 @@ public class MongoManager {
 				.getCollection(collection);
 	}
 
-	public static CompletableFuture<String> load(UUID uuid) {
+	public static CompletableFuture<UserInfo> load(UUID uuid) {
 		CompletableFuture<String> archaeologist = new CompletableFuture<>();
 
 		mongoCollection
 				.find(Filters.eq("uuid", uuid.toString()))
 				.first((result, t) -> archaeologist.complete(result == null ? null : result.getString("data")));
-		return archaeologist;
+		return archaeologist.thenApply(s -> s == null ? null : GlobalSerializers.fromJson(s, UserInfo.class));
 	}
 
 	public static void save(UserInfo user) {
@@ -47,7 +47,7 @@ public class MongoManager {
 					if (t != null)
 						t.printStackTrace();
 				}
-								 );
+		);
 	}
 
 	public static void bulkSave(List<UserInfo> users) {
@@ -57,7 +57,7 @@ public class MongoManager {
 						new Document("$set", new Document("data", GlobalSerializers.toJson(info))),
 						new UpdateOptions().upsert(true)
 				)
-																  ).collect(Collectors.toList());
+		).collect(Collectors.toList());
 		mongoCollection.bulkWrite(models, (result, t) -> {
 			if (t != null)
 				t.printStackTrace();
