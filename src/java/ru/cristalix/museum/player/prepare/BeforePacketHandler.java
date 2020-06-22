@@ -1,7 +1,6 @@
 package ru.cristalix.museum.player.prepare;
 
 import clepto.ListUtils;
-import clepto.bukkit.B;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.val;
@@ -44,7 +43,7 @@ public class BeforePacketHandler implements Prepare {
 				new ChannelDuplexHandler() {
 					@Override
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
-						if (packetObj instanceof PacketPlayInUseItem && user.getExcavation() != null) {
+						if (packetObj instanceof PacketPlayInUseItem) {
 							val packet = (PacketPlayInUseItem) packetObj;
 							if (packet.c.equals(EnumHand.OFF_HAND) || Excavation.isAir(user, packet.a))
 								packet.a = dump; // Genius
@@ -54,16 +53,14 @@ public class BeforePacketHandler implements Prepare {
 
 							boolean valid = excavation != null && Excavation.isAir(user, packet.a);
 
-							if (valid && packet.c == STOP_DESTROY_BLOCK) {
-								// Обновляю текст с кол-вом оставшихся ударов
+							if (packet.c == STOP_DESTROY_BLOCK && valid) {
 								user.sendAnime();
-								// Возвращение игрока в музей
-								if (tryReturnPlayer(user, app))
-									return;
-								// Игрок на раскопках, блок находится в шахте
+								if (tryReturnPlayer(user, app)) return;
 								acceptedBreak(user, packet, app);
-							} else if (!valid && packet.c == START_DESTROY_BLOCK)
-								packet.c = ABORT_DESTROY_BLOCK; // Genius
+							} else if (packet.c == START_DESTROY_BLOCK) {
+								packet.c = ABORT_DESTROY_BLOCK;
+								packet.a = dump;
+							}
 						}
 						super.channelRead(channelHandlerContext, packetObj);
 					}
@@ -94,10 +91,11 @@ public class BeforePacketHandler implements Prepare {
 		return excavation.getHitsLeft() < 0;
 	}
 
+	@SuppressWarnings ("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet, App app) {
 		user.giveExperience(5);
 
-		B.run(() -> {
+		MinecraftServer.getServer().postToMainThread(() -> {
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
 					List<BlockPosition> positions = pickaxeType.getPickaxe().dig(user, packet.a);

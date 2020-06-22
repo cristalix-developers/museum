@@ -25,9 +25,12 @@ public class MuseumGuis {
 		}, "gui");
 
 		B.regCommand((player, args) -> {
-			player.closeInventory();
 			User user = app.getUser(player);
+			if (args.length == 0) return null;
 			ExcavationPrototype proto = Managers.excavation.getPrototype(args[0]);
+			if (proto == null) return null;
+
+			player.closeInventory();
 
 			if (proto.getPrice() > user.getMoney())
 				return MessageUtil.get("nomoney");
@@ -45,7 +48,7 @@ public class MuseumGuis {
 		B.regCommand((player, args) -> {
 			User user = app.getUser(player);
 			PickaxeType pickaxe = user.getPickaxeType().getNext();
-			if (pickaxe == user.getPickaxeType()) return "";
+			if (pickaxe == user.getPickaxeType()) return null;
 			player.closeInventory();
 
 			if (user.getMoney() < pickaxe.getPrice())

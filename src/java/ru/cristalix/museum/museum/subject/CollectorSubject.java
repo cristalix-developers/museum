@@ -6,7 +6,9 @@ import lombok.val;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.museum.Museum;
@@ -34,7 +36,9 @@ public class CollectorSubject implements Subject {
 		this.navigator = null;
 		this.prototype = (CollectorSubjectPrototype) prototype;
 		EntityArmorStand armorStand = new EntityArmorStand(App.getApp().getNMSWorld());
-		armorStand.setEquipment(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(Lemonade.get(this.prototype.getAddress()).render()));
+		Lemonade lemonade = Lemonade.get(this.prototype.getAddress());
+		ItemStack item = lemonade == null ? new ItemStack(Material.WORKBENCH) : lemonade.render();
+		armorStand.setEquipment(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(item));
 		armorStand.setCustomName(prototype.getTitle());
 		armorStand.setCustomNameVisible(true);
 		armorStand.setInvisible(true);
@@ -72,7 +76,8 @@ public class CollectorSubject implements Subject {
 
 	private Location getLocation(long time) {
 		int secondsPerLap = (int) prototype.getSpeed();
-		return navigator.getLocation(time % secondsPerLap / (double) secondsPerLap);
+		return new Location(App.getApp().getWorld(), 0, 0, 0);
+//		return navigator.getLocation(time % secondsPerLap / (double) secondsPerLap);
 	}
 
 }

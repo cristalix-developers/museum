@@ -37,6 +37,7 @@ public class SimpleSubject implements Subject {
 	@Override
 	public void show(User owner) {
 		update(owner, false);
+		System.out.println("drawing " + this + " for " + owner.getName());
 	}
 
 	@Override

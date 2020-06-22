@@ -53,6 +53,9 @@ public class SkeletonSubject extends SimpleSubject {
 
 	@Override
 	public void hide(User user) {
+		super.hide(user);
+		if (skeleton == null)
+			return;
 		skeleton.getUnlockedFragments().forEach(fragment -> fragment.hide(user.getPlayer()));
 	}
 

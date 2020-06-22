@@ -17,6 +17,7 @@ public class Excavation {
 	private final ExcavationPrototype prototype;
 	private int hitsLeft;
 
+	@SuppressWarnings ("deprecation")
 	public void load(User user) {
 		Player player = user.getPlayer();
 		player.getInventory().clear();

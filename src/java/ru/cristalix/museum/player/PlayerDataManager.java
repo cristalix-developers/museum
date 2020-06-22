@@ -1,6 +1,6 @@
 package ru.cristalix.museum.player;
 
-import clepto.ListUtils;
+import clepto.bukkit.B;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -22,7 +22,6 @@ import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.museum.map.MuseumPrototype;
-import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.prepare.PrepareSteps;
 import ru.cristalix.museum.prototype.Managers;
@@ -118,8 +117,10 @@ public class PlayerDataManager implements Listener {
 		user.setConnection(((CraftPlayer) player).getHandle().playerConnection);
 		user.setPlayer(player);
 
-		for (val prepare : PrepareSteps.values())
-			prepare.getPrepare().execute(user, app);
+		B.postpone(5, () -> {
+			for (val prepare : PrepareSteps.values())
+				prepare.getPrepare().execute(user, app);
+		});
 
 		e.setJoinMessage(null);
 	}

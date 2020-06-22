@@ -65,6 +65,7 @@ public class Museum implements Storable<MuseumInfo> {
 		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
 
 		user.setCurrentMuseum(this);
+		user.getPlayer().teleport(user.getCurrentMuseum().getPrototype().getSpawnPoint());
 
 		user.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
 

@@ -64,7 +64,7 @@ public class User implements PlayerWrapper {
 
 	public void sendAnime() {
 		ByteBuf buffer = Unpooled.buffer();
-		UtilNetty.writeVarInt(buffer, excavation == null ? -1 : excavation.getHitsLeft() > 0 ? excavation.getHitsLeft() : -2);
+		UtilNetty.writeVarInt(buffer, excavation == null ? -2 : excavation.getHitsLeft() > 0 ? excavation.getHitsLeft() : -1);
 		connection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
 	}
 

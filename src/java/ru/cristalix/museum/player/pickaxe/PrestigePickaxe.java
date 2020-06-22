@@ -1,7 +1,6 @@
 package ru.cristalix.museum.player.pickaxe;
 
 import net.minecraft.server.v1_12_R1.BlockPosition;
-import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.player.User;
 
 import java.util.List;
@@ -17,7 +16,7 @@ public class PrestigePickaxe implements Pickaxe {
 	@Override
 	public List<BlockPosition> dig(User user, BlockPosition pos) {
 		return Stream.of(pos.east().east(), pos.west().west(), pos.south().south(), pos.north().north())
-				.filter(p -> Excavation.isAir(user, p)).collect(Collectors.toList());
+				.filter(p -> breakBlock(user, p)).collect(Collectors.toList());
 	}
 
 }

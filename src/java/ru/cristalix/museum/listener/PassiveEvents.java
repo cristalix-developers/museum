@@ -3,10 +3,7 @@ package ru.cristalix.museum.listener;
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -35,6 +32,11 @@ public class PassiveEvents implements Listener {
 
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
+		e.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onBlockBreak(BlockBreakEvent e) {
 		e.setCancelled(true);
 	}
 
