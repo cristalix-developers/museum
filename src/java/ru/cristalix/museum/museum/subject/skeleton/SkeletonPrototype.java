@@ -8,6 +8,8 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import ru.cristalix.museum.App;
+import ru.cristalix.museum.Prototype;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
  * Обеспечивает одинаковое расположение костей при каждом перезапуске
  */
 @Getter
-public class SkeletonPrototype {
+public class SkeletonPrototype implements Prototype {
 
 	private final String title;
 	private final int size;
@@ -29,14 +31,14 @@ public class SkeletonPrototype {
 	private final List<Piece> pieces;
 	private final List<Fragment> fragments;
 
-	public SkeletonPrototype(String title, int size, int piecesAmount, Rarity rarity, @NonNull String address, Location worldOrigin, WorldMeta worldMeta) {
+	public SkeletonPrototype(String title, int size, int piecesAmount, Rarity rarity, @NonNull String address, Location worldOrigin) {
 		this.title = title;
 		this.size = size;
 		this.piecesAmount = piecesAmount;
 		this.address = address;
 		this.rarity = rarity;
 		Map<ArmorStand, Location> allStands = new HashMap<>();
-		for (Entity entity : worldMeta.getWorld().getEntities()) {
+		for (Entity entity : App.getApp().getMap().getWorld().getEntities()) {
 			if (entity.getType() != EntityType.ARMOR_STAND)
 				continue;
 			allStands.put((ArmorStand) entity, entity.getLocation());

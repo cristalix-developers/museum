@@ -2,16 +2,13 @@ package ru.cristalix.museum.museum.map;
 
 import clepto.cristalix.Box;
 import lombok.Data;
-import org.bukkit.Location;
 import ru.cristalix.core.math.V3;
-import ru.cristalix.museum.museum.Museum;
-import ru.cristalix.museum.data.subject.SubjectInfo;
-import ru.cristalix.museum.museum.subject.Subject;
+import ru.cristalix.museum.Prototype;
 
 import java.util.List;
 
 @Data
-public class SubjectPrototype {
+public class SubjectPrototype implements Prototype {
 
 	private final String address;
 	private final SubjectType type;

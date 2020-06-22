@@ -1,4 +1,4 @@
-package ru.cristalix.museum.util;
+package ru.cristalix.museum.listener;
 
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent;
 import org.bukkit.event.EventHandler;

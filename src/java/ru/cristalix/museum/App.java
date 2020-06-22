@@ -4,6 +4,8 @@ import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
 import clepto.bukkit.gui.Guis;
+import clepto.cristalix.Cristalix;
+import clepto.cristalix.WorldMeta;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -17,6 +19,8 @@ import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
+import ru.cristalix.core.map.BukkitWorldLoader;
+import ru.cristalix.core.map.MapListDataItem;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.scoreboard.IScoreboardService;
@@ -27,12 +31,13 @@ import ru.cristalix.museum.excavation.ExcavationManager;
 import ru.cristalix.museum.gui.MuseumGuis;
 import ru.cristalix.museum.museum.MuseumEvents;
 import ru.cristalix.museum.museum.map.MuseumManager;
+import ru.cristalix.museum.museum.subject.SubjectManager;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonManager;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.util.BukkitChatService;
-import ru.cristalix.museum.util.PassiveEvents;
+import ru.cristalix.museum.listener.PassiveEvents;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -40,6 +45,7 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Getter
 public final class App extends JavaPlugin {
@@ -51,7 +57,9 @@ public final class App extends JavaPlugin {
 	private MuseumManager museumManager;
 	private SkeletonManager skeletonManager;
 	private ExcavationManager excavationManager;
+	private SubjectManager subjectManager;
 	private ClientSocket clientSocket;
+	private WorldMeta map;
 
 	private YamlConfiguration configuration;
 
@@ -59,9 +67,20 @@ public final class App extends JavaPlugin {
 	public void onEnable() {
 		B.plugin = App.app = this;
 
+		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("MODELS", "Dino")
+				.orElseThrow(() -> new RuntimeException("Map museum/main wasn't found in the MapService"));
+
+		try {
+			this.map = new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get());
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+		getWorld().setGameRuleValue("mobGriefing", "false");
+
 		this.museumManager = new MuseumManager(this);
-		this.skeletonManager = new SkeletonManager(museumManager);
-		this.excavationManager = new ExcavationManager(this, museumManager);
+		this.subjectManager = new SubjectManager();
+		this.skeletonManager = new SkeletonManager();
+		this.excavationManager = new ExcavationManager(this, map);
 		this.clientSocket = new ClientSocket("127.0.0.1", 14653, "gVatjN43AJnbFq36Fa", IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName());
 		clientSocket.connect();
 		clientSocket.registerHandler(BroadcastTitlePackage.class, pckg -> {
@@ -172,7 +191,7 @@ public final class App extends JavaPlugin {
 	}
 
 	public World getNMSWorld() {
-		return getMuseumManager().getWorld().getHandle();
+		return map.getWorld().getHandle();
 	}
 
 	public User getUser(Player player) {

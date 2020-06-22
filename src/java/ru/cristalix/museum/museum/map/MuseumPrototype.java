@@ -2,8 +2,7 @@ package ru.cristalix.museum.museum.map;
 
 import lombok.Data;
 import org.bukkit.Location;
-import ru.cristalix.museum.museum.collector.CollectorNavigator;
-import ru.cristalix.museum.util.Prototype;
+import ru.cristalix.museum.Prototype;
 
 import java.util.*;
 
