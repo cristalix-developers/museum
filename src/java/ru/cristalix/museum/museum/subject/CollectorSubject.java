@@ -1,4 +1,4 @@
-package ru.cristalix.museum.museum.collector;
+package ru.cristalix.museum.museum.subject;
 
 import lombok.experimental.Delegate;
 import lombok.val;
@@ -9,40 +9,40 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
-import ru.cristalix.museum.Storable;
+import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.museum.Museum;
+import ru.cristalix.museum.museum.collector.CollectorNavigator;
+import ru.cristalix.museum.museum.collector.CollectorType;
 import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import ru.cristalix.museum.player.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Collector implements Storable<CollectorInfo> {
+public class CollectorSubject implements Subject {
+
+	private final Museum museum;
 
 	@Delegate
-	private final CollectorInfo info;
+	private final SubjectInfo info;
+
 	private final CollectorNavigator navigator;
 	private final List<Piece> pieces = new ArrayList<>();
 
-	public Collector(Museum museum, CollectorInfo info) {
+	public CollectorSubject(Museum museum, SubjectInfo info) {
+		this.museum = museum;
 		this.info = info;
-		this.navigator = museum.getPrototype().getDefaultCollectorNavigators().get(info.getId());
-		CraftWorld world = museum.getPrototype().getMap().getWorld();
-		EntityArmorStand armorStand = new EntityArmorStand(world.getHandle());
-		armorStand.setEquipment(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(new ItemStack(Material.WORKBENCH)));
-		armorStand.setCustomName("§6Коллектор " + getType());
-		armorStand.setCustomNameVisible(true);
-		armorStand.setInvisible(true);
-		armorStand.setNoGravity(true);
 
-		pieces.add(new Piece(armorStand, new Location(world, 0, 0, 0)));
+
+		pieces.add(new Piece(, new Location(world, 0, 0, 0)));
 	}
 
 	@Override
-	public CollectorInfo generateInfo() {
-		return null;
+	public SubjectInfo generateInfo() {
+		return info;
 	}
 
+	@Override
 	public void show(User user) {
 		val location = getLocation(System.currentTimeMillis());
 		for (Piece piece : pieces)
@@ -58,6 +58,7 @@ public class Collector implements Storable<CollectorInfo> {
 			piece.update(user.getPlayer(), location);
 	}
 
+	@Override
 	public void hide(User user) {
 		for (Piece piece : pieces)
 			piece.hide(user.getPlayer());

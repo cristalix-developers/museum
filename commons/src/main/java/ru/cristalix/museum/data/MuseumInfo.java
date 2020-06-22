@@ -2,7 +2,6 @@ package ru.cristalix.museum.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.cristalix.museum.data.collector.CollectorInfo;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 
 import java.util.Date;

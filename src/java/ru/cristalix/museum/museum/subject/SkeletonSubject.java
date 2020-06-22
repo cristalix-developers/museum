@@ -1,6 +1,5 @@
 package ru.cristalix.museum.museum.subject;
 
-import ru.cristalix.museum.museum.subject.skeleton.Fragment;
 import lombok.*;
 import org.bukkit.Location;
 import ru.cristalix.core.math.V3;
@@ -23,7 +22,7 @@ public class SkeletonSubject extends SimpleSubject {
 		super(museum, info);
 
 		V3 o = prototype.getRelativeOrigin();
-		this.skeletonLocation = prototype.getPointMin().clone().add(o.getX(), o.getY(), o.getZ());
+		this.skeletonLocation = prototype.getBox().getMin().clone().add(o.getX(), o.getY(), o.getZ());
 
 		if (info.metadata == null) {
 			this.skeleton = null;
