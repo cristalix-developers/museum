@@ -4,10 +4,7 @@ import clepto.cristalix.MapServiceException;
 import lombok.RequiredArgsConstructor;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.museum.Museum;
-import ru.cristalix.museum.museum.subject.CollectorSubject;
-import ru.cristalix.museum.museum.subject.SimpleSubject;
-import ru.cristalix.museum.museum.subject.SkeletonSubject;
-import ru.cristalix.museum.museum.subject.Subject;
+import ru.cristalix.museum.museum.subject.*;
 
 @RequiredArgsConstructor
 public enum SubjectType {
@@ -19,8 +16,8 @@ public enum SubjectType {
 
     private final Provider provider;
 
-    public Subject provide(Museum museum, SubjectInfo info) {
-        return provider.provide(museum, info);
+    public Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
+        return provider.provide(museum, info, prototype);
     }
 
     public static SubjectType byString(String string) {
@@ -33,7 +30,7 @@ public enum SubjectType {
 
     public interface Provider {
 
-        Subject provide(Museum museum, SubjectInfo info);
+        Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype);
 
     }
 }

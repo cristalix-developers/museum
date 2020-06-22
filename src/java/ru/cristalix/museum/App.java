@@ -13,6 +13,7 @@ import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.cristalix.core.CoreApi;
@@ -27,17 +28,14 @@ import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.donate.DonateType;
-import ru.cristalix.museum.excavation.ExcavationManager;
 import ru.cristalix.museum.gui.MuseumGuis;
 import ru.cristalix.museum.museum.MuseumEvents;
-import ru.cristalix.museum.museum.map.MuseumManager;
-import ru.cristalix.museum.museum.subject.SubjectManager;
-import ru.cristalix.museum.museum.subject.skeleton.SkeletonManager;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.util.BukkitChatService;
 import ru.cristalix.museum.listener.PassiveEvents;
+import ru.cristalix.museum.prototype.Managers;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -54,10 +52,6 @@ public final class App extends JavaPlugin {
 	private static App app;
 
 	private PlayerDataManager playerDataManager;
-	private MuseumManager museumManager;
-	private SkeletonManager skeletonManager;
-	private ExcavationManager excavationManager;
-	private SubjectManager subjectManager;
 	private ClientSocket clientSocket;
 	private WorldMeta map;
 
@@ -75,12 +69,10 @@ public final class App extends JavaPlugin {
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
-		getWorld().setGameRuleValue("mobGriefing", "false");
+		this.map.getWorld().setGameRuleValue("mobGriefing", "false");
 
-		this.museumManager = new MuseumManager(this);
-		this.subjectManager = new SubjectManager();
-		this.skeletonManager = new SkeletonManager();
-		this.excavationManager = new ExcavationManager(this, map);
+		Managers.init();
+
 		this.clientSocket = new ClientSocket("127.0.0.1", 14653, "gVatjN43AJnbFq36Fa", IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName());
 		clientSocket.connect();
 		clientSocket.registerHandler(BroadcastTitlePackage.class, pckg -> {
@@ -205,4 +197,9 @@ public final class App extends JavaPlugin {
 	private InputStreamReader reader(String base64) {
 		return new InputStreamReader(new ByteArrayInputStream(Base64.getDecoder().decode(base64)));
 	}
+
+	public CraftWorld getWorld() {
+		return map.getWorld();
+	}
+
 }

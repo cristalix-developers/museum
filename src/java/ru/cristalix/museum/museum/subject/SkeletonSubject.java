@@ -1,10 +1,11 @@
 package ru.cristalix.museum.museum.subject;
 
-import lombok.*;
+import lombok.Getter;
 import org.bukkit.Location;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.museum.Museum;
+import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
 import ru.cristalix.museum.player.User;
 
@@ -18,8 +19,8 @@ public class SkeletonSubject extends SimpleSubject {
 	private final Skeleton skeleton;
 	private final Location skeletonLocation;
 
-	public SkeletonSubject(Museum museum, SubjectInfo info) {
-		super(museum, info);
+	public SkeletonSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
+		super(museum, info, prototype);
 
 		V3 o = prototype.getRelativeOrigin();
 		this.skeletonLocation = prototype.getBox().getMin().clone().add(o.getX(), o.getY(), o.getZ());

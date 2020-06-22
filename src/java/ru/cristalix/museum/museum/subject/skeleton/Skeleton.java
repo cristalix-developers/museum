@@ -2,9 +2,9 @@ package ru.cristalix.museum.museum.subject.skeleton;
 
 import lombok.Data;
 import lombok.experimental.Delegate;
-import ru.cristalix.museum.App;
 import ru.cristalix.museum.Storable;
 import ru.cristalix.museum.data.SkeletonInfo;
+import ru.cristalix.museum.prototype.Managers;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +27,7 @@ public class Skeleton implements Storable<SkeletonInfo> {
 
 	public Skeleton(SkeletonInfo info) {
 		this.info = info;
-		this.skeletonPrototype = App.getApp().getSkeletonManager().getExhibit(info.getAddress());
+		this.skeletonPrototype = Managers.skeleton.getPrototype(info.getAddress());
 		this.unlockedFragments = skeletonPrototype.getFragments().stream()
 				.filter(e -> info.getUnlockedFragmentAddresses().contains(e.getAddress()))
 				.collect(Collectors.toList());

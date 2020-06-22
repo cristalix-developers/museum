@@ -1,4 +1,4 @@
-package ru.cristalix.museum;
+package ru.cristalix.museum.prototype;
 
 public interface Prototype {
 

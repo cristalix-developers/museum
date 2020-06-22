@@ -16,7 +16,6 @@ museum:
     Посещений: &e<views>
 
     Доход: &e<income>
-    Коллекторов: &e<collectors>
     Витрин: &e<spaces>
 
     Создан &e<sinceCreation>назад

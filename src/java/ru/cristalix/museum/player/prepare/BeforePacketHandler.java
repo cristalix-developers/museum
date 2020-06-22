@@ -2,8 +2,6 @@ package ru.cristalix.museum.player.prepare;
 
 import clepto.ListUtils;
 import clepto.bukkit.B;
-import ru.cristalix.museum.museum.subject.skeleton.Fragment;
-import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.val;
@@ -14,9 +12,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.data.SkeletonInfo;
 import ru.cristalix.museum.excavation.Excavation;
-import ru.cristalix.museum.excavation.ExcavationManager;
 import ru.cristalix.museum.excavation.ExcavationPrototype;
+import ru.cristalix.museum.museum.subject.skeleton.Fragment;
 import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
+import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.player.pickaxe.Pickaxe;
 import ru.cristalix.museum.player.pickaxe.PickaxeType;
@@ -47,13 +46,13 @@ public class BeforePacketHandler implements Prepare {
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 						if (packetObj instanceof PacketPlayInUseItem && user.getExcavation() != null) {
 							val packet = (PacketPlayInUseItem) packetObj;
-							if (packet.c.equals(EnumHand.OFF_HAND) || ExcavationManager.isAir(user, packet.a))
+							if (packet.c.equals(EnumHand.OFF_HAND) || Excavation.isAir(user, packet.a))
 								packet.a = dump; // Genius
 						} else if (packetObj instanceof PacketPlayInBlockDig) {
 							val packet = (PacketPlayInBlockDig) packetObj;
 							Excavation excavation = user.getExcavation();
 
-							boolean valid = excavation != null && ExcavationManager.isAir(user, packet.a);
+							boolean valid = excavation != null && Excavation.isAir(user, packet.a);
 
 							if (valid && packet.c == STOP_DESTROY_BLOCK) {
 								// Обновляю текст с кол-вом оставшихся ударов

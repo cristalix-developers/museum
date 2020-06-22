@@ -7,13 +7,14 @@ import clepto.bukkit.gui.Guis;
 import clepto.bukkit.gui.SlotData;
 import org.bukkit.Statistic;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.museum.Museum;
-import ru.cristalix.museum.player.User;
-import ru.cristalix.museum.util.LevelSystem;
-import ru.cristalix.museum.util.MessageUtil;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.excavation.ExcavationPrototype;
+import ru.cristalix.museum.museum.Museum;
+import ru.cristalix.museum.player.User;
+import ru.cristalix.museum.prototype.Managers;
+import ru.cristalix.museum.util.LevelSystem;
+import ru.cristalix.museum.util.MessageUtil;
 
 public class MuseumGuis {
 
@@ -26,7 +27,7 @@ public class MuseumGuis {
 		B.regCommand((player, args) -> {
 			player.closeInventory();
 			User user = app.getUser(player);
-			ExcavationPrototype proto = app.getExcavationManager().getExcavationPrototype(args[0]);
+			ExcavationPrototype proto = Managers.excavation.getPrototype(args[0]);
 
 			if (proto.getPrice() > user.getMoney())
 				return MessageUtil.get("nomoney");
@@ -66,7 +67,7 @@ public class MuseumGuis {
 		Guis.registerItemizer("excavation", (base, player, context, slotId) -> {
 			SlotData slotData = context.getOpenedGui().getSlotData(slotId);
 			String info = slotData.getInfo();
-			ExcavationPrototype excavation = app.getExcavationManager().getExcavationPrototype(info);
+			ExcavationPrototype excavation = Managers.excavation.getPrototype(info);
 			User user = App.getApp().getUser(player);
 			if (excavation == null || excavation.getRequiredLevel() > user.getLevel())
 				return Lemonade.get("unavailable").render();
@@ -101,7 +102,6 @@ public class MuseumGuis {
 					.fill("title", museum.getTitle())
 					.fill("views", String.valueOf(museum.getViews()))
 					.fill("income", MessageUtil.toMoneyFormat(museum.getIncome()))
-					.fill("collectors", String.valueOf(museum.getCollectors().size()))
 					.fill("spaces", String.valueOf(museum.getSubjects().size()))
 					.fill("sinceCreation", LoveHumans.formatTime(System.currentTimeMillis() - museum.getCreationDate().getTime()))
 					.render();

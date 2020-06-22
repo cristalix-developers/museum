@@ -1,6 +1,5 @@
 package ru.cristalix.museum.museum.subject.skeleton;
 
-import clepto.cristalix.WorldMeta;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -9,7 +8,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.Prototype;
+import ru.cristalix.museum.prototype.Prototype;
 
 import java.util.ArrayList;
 import java.util.HashMap;

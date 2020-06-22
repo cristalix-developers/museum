@@ -44,9 +44,9 @@ public class Piece {
 		}
 		this.equipmentPackets = list.toArray(new PacketPlayOutEntityEquipment[0]);
 		this.worldOrigin = worldOrigin;
-		this.deltaX = as.locX - worldOrigin.getX();
-		this.deltaY = as.locY - worldOrigin.getY();
-		this.deltaZ = as.locX - worldOrigin.getZ();
+		this.deltaX = worldOrigin != null ? as.locX - worldOrigin.getX() : 0;
+		this.deltaY = worldOrigin != null ? as.locY - worldOrigin.getY() : 0;
+		this.deltaZ = worldOrigin != null ? as.locZ - worldOrigin.getZ() : 0;
 		this.delta = new Vector(deltaX, deltaY, deltaZ);
 		this.distanceSq = delta.length();
 		this.name = as.getCustomName();

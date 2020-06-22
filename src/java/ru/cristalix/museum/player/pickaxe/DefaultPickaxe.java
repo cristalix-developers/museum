@@ -2,7 +2,7 @@ package ru.cristalix.museum.player.pickaxe;
 
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.EnumDirection;
-import ru.cristalix.museum.excavation.ExcavationManager;
+import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.player.User;
 
 import java.util.Arrays;
@@ -19,7 +19,7 @@ public class DefaultPickaxe implements Pickaxe {
 	public List<BlockPosition> dig(User user, BlockPosition pos) {
 		return Arrays.stream(EnumDirection.values())
 				.map(pos::shift)
-				.filter(p -> ExcavationManager.isAir(user, p))
+				.filter(p -> Excavation.isAir(user, p))
 				.collect(Collectors.toList());
 	}
 

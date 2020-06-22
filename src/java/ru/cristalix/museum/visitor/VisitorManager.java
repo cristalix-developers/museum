@@ -35,7 +35,7 @@ public class VisitorManager {
 	public void clear() {
 		counter = 0;
 		visitors.clear();
-		App.getApp().getMuseumManager().getWorld().getEntities().stream()
+		App.getApp().getWorld().getEntities().stream()
 				.filter(entity -> entity.getType() == EntityType.VILLAGER)
 				.forEach(Entity::remove);
 	}

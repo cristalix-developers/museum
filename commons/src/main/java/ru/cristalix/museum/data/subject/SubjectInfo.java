@@ -8,19 +8,25 @@ import ru.cristalix.core.math.V3;
 
 @Data
 @AllArgsConstructor
-public class SubjectInfo {
+public class SubjectInfo implements Cloneable {
 
 	public final String prototypeAddress;
 
-	/**
-	 * Позиция этого субъекта относительно центра музея
-	 */
-	public V3 locationDelta;
+	public V3 location;
 
 	public D2 rotation;
 
 	private Color color;
 
 	public String metadata;
+
+	@Override
+	public SubjectInfo clone() {
+		try {
+			return (SubjectInfo) super.clone();
+		} catch (CloneNotSupportedException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
 }

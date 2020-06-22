@@ -15,8 +15,6 @@ public class MuseumInfo {
 	public String title;
 	public Date creationDate;
 	public long views;
-	public List<CollectorInfo> collectorInfos;
-	public int collectorSlots;
 	public List<SubjectInfo> subjectInfos;
 
 }

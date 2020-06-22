@@ -2,7 +2,8 @@ package ru.cristalix.museum.museum.map;
 
 import lombok.Data;
 import org.bukkit.Location;
-import ru.cristalix.museum.Prototype;
+import ru.cristalix.museum.data.subject.SubjectInfo;
+import ru.cristalix.museum.prototype.Prototype;
 
 import java.util.*;
 
@@ -10,8 +11,7 @@ import java.util.*;
 public class MuseumPrototype implements Prototype {
 
 	private final String address;
-	private final MuseumManager map;
 	private final Location spawnPoint;
-	private final List<SubjectPrototype> defaultSubjects;
+	private final List<SubjectInfo> defaultSubjects;
 
 }

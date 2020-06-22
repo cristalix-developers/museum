@@ -1,5 +1,6 @@
 package ru.cristalix.museum.player;
 
+import clepto.ListUtils;
 import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -18,9 +19,13 @@ import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.data.UserInfo;
+import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.donate.DonateType;
+import ru.cristalix.museum.museum.map.MuseumPrototype;
+import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.prepare.PrepareSteps;
+import ru.cristalix.museum.prototype.Managers;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -47,26 +52,28 @@ public class PlayerDataManager implements Listener {
 						.get(5L, TimeUnit.SECONDS);
 				UserInfo userInfo = userInfoPackage.getUserInfo();
 				if (userInfo == null) {
+					MuseumPrototype proto = Managers.museum.getPrototype("main");
+					MuseumInfo startMuseum = new MuseumInfo(
+							proto.getAddress(),
+							"Музей археологии",
+							new Date(),
+							3,
+							new ArrayList<>()
+					);
+					for (SubjectInfo subject : proto.getDefaultSubjects()) {
+						startMuseum.getSubjectInfos().add(subject.clone());
+					}
+
 					userInfo = new UserInfo(
 							uuid,
 							0,
 							1000.0,
 							PickaxeType.DEFAULT,
-							Collections.singletonList(
-									new MuseumInfo(
-											"main",
-											"Музей археологии",
-											new Date(),
-											3,
-											Collections.emptyList(),
-											5,
-											Collections.emptyList()
-									)
-							),
+							Collections.singletonList(startMuseum),
 							Collections.emptyList(),
 							0,
 							0,
-							new ArrayList<>(1)
+							new ArrayList<>()
 					);
 				} else {
 					List<DonateType> donates;
@@ -117,7 +124,7 @@ public class PlayerDataManager implements Listener {
 		e.setJoinMessage(null);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler (priority = EventPriority.MONITOR)
 	public void onPlayerLogin(PlayerLoginEvent e) {
 		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
 			userMap.remove(e.getPlayer().getUniqueId());
@@ -129,7 +136,8 @@ public class PlayerDataManager implements Listener {
 	}
 
 	public double calcMultiplier(UUID user, BoosterType type) {
-		return userMap.get(user).calcMultiplier(type) + globalBoosters.stream().filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis()).mapToDouble(booster -> booster.getMultiplier() - 1.0).sum();
+		return userMap.get(user).calcMultiplier(type) + globalBoosters.stream().filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis()).mapToDouble(
+				booster -> booster.getMultiplier() - 1.0).sum();
 	}
 
 	public User getUser(UUID uuid) {
