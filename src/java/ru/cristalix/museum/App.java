@@ -140,6 +140,7 @@ public final class App extends JavaPlugin {
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     val user = getUser(player.getUniqueId());
+					B.bc("Moving " + user.getPlayer() + "'s collector...");
 
                     if (user.getExcavation() != null || user.getCurrentMuseum() == null)
                         continue;
@@ -149,9 +150,10 @@ public final class App extends JavaPlugin {
                         coin.create(user.getConnection());
                         user.getCoins().add(coin);
                     }
-                    user.getCurrentMuseum().getSubjects().stream()
-                            .filter(subject -> subject instanceof CollectorSubject)
-                            .forEach(subject -> ((CollectorSubject) subject).move(user, time));
+					for (CollectorSubject collector : user.getCurrentMuseum().getSubjects(SubjectType.COLLECTOR)) {
+						collector.move(user, time);
+						B.bc("Moving " + user.getPlayer() + "'s collector " + collector + " to point");
+					}
 
                     // Если монеты устарели, что бы не копились на клиенте, удаляю
                     user.getCoins().removeIf(coin -> {
