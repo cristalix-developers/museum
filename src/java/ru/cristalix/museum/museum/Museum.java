@@ -20,10 +20,7 @@ import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Managers;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -57,10 +54,24 @@ public class Museum implements Storable<MuseumInfo> {
 				}).collect(Collectors.toList());
 
 		for (CollectorSubject collector : getSubjects(SubjectType.COLLECTOR)) {
-			List<Location> route = getSubjects(SubjectType.MARKER).stream()
-					.map(MarkerSubject::getLocation)
+			List<MarkerSubject> markers = getSubjects(SubjectType.MARKER).stream()
+					.filter(marker -> marker.getCollectorAddress().equals(collector.getPrototypeAddress()))
 					.collect(Collectors.toList());
-			collector.setNavigator(new CollectorNavigator(prototype, App.getApp().getWorld(), route));
+			List<Location> locations = new ArrayList<>();
+			for (MarkerSubject step : markers) {
+				MarkerSubject nearest = null;
+				for (MarkerSubject founded : markers) {
+					if (step.equals(founded))
+						continue;
+					if (nearest == null)
+						nearest = founded;
+					if (step.getLocation().distanceSquared(nearest.getLocation()) > step.getLocation().distanceSquared(founded.getLocation()))
+						nearest = founded;
+				}
+				if (nearest!= null)
+					locations.add(nearest.getLocation());
+			}
+			collector.setNavigator(new CollectorNavigator(prototype, App.getApp().getWorld(), locations));
 		}
 	}
 

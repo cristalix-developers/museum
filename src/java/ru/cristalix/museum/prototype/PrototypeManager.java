@@ -18,10 +18,6 @@ public class PrototypeManager<T extends Prototype> {
                 .forEach(this::registerPrototype);
     }
 
-    public Collection<T> values() {
-    	return map.values();
-	}
-
     public T getPrototype(String address) {
         return map.get(address);
     }

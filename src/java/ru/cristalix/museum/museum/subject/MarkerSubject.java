@@ -8,15 +8,20 @@ import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.player.User;
+import ru.cristalix.museum.prototype.Managers;
 
 public class MarkerSubject implements Subject {
 
 	private final SubjectInfo info;
 	private final Location location;
 
-	public MarkerSubject(Museum museum, SubjectInfo subjectInfo, SubjectPrototype prototype) {
-		this.info = subjectInfo;
-		this.location = UtilV3.toLocation(subjectInfo.getLocation(), App.getApp().getWorld());
+	public MarkerSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
+		this.info = info;
+		this.location = UtilV3.toLocation(info.getLocation(), App.getApp().getWorld());
+	}
+
+	public String getCollectorAddress() {
+		return info.getMetadata();
 	}
 
 	public Location getLocation() {

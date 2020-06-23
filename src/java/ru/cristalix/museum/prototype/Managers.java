@@ -28,140 +28,140 @@ import java.util.stream.Collectors;
 
 public class Managers {
 
-	public static PrototypeManager<SubjectPrototype> subject;
-	public static PrototypeManager<MuseumPrototype> museum;
-	public static PrototypeManager<SkeletonPrototype> skeleton;
-	public static PrototypeManager<ExcavationPrototype> excavation;
+    public static PrototypeManager<SubjectPrototype> subject;
+    public static PrototypeManager<MuseumPrototype> museum;
+    public static PrototypeManager<SkeletonPrototype> skeleton;
+    public static PrototypeManager<ExcavationPrototype> excavation;
 
-	@SuppressWarnings ("deprecation")
-	public static void init() {
-		subject = new PrototypeManager<>("subject", (address, box) -> {
-			String typeStr = box.requireLabel("type").getTag();
-			String title = box.requireLabel("title").getTag();
-			double price = box.requireLabel("price").getTagDouble();
-			int cristalixPrice = box.getLabels("cristalix-price").stream()
-					.findAny().map(Label::getTag).map(Integer::parseInt).orElse(-1);
-			Location origin = box.getLabels("origin").stream()
-					.findAny()
-					.orElse(null);
+    @SuppressWarnings("deprecation")
+    public static void init() {
+        subject = new PrototypeManager<>("subject", (address, box) -> {
+            String typeStr = box.requireLabel("type").getTag();
+            String title = box.requireLabel("title").getTag();
+            double price = box.requireLabel("price").getTagDouble();
+            int cristalixPrice = box.getLabels("cristalix-price").stream()
+                    .findAny().map(Label::getTag).map(Integer::parseInt).orElse(-1);
+            Location origin = box.getLabels("origin").stream()
+                    .findAny()
+                    .orElse(null);
 
-			if (origin == null)
-				origin = box.getCenter();
+            if (origin == null)
+                origin = box.getCenter();
 
-			SubjectPrototype.SubjectPrototypeBuilder<?, ?> builder;
-			SubjectType<?> type = SubjectType.byString(typeStr);
+            SubjectPrototype.SubjectPrototypeBuilder<?, ?> builder;
+            SubjectType<?> type = SubjectType.byString(typeStr);
 
-			if (type == SubjectType.COLLECTOR)
-				builder = CollectorSubjectPrototype.builder()
-						.radius(box.requireLabel("radius").getTagDouble())
-						.speed(box.requireLabel("speed").getTagDouble());
+            if (type == SubjectType.COLLECTOR)
+                builder = CollectorSubjectPrototype.builder()
+                        .radius(box.requireLabel("radius").getTagDouble())
+                        .speed(box.requireLabel("speed").getTagDouble());
 
-			else if (type == SubjectType.SKELETON_CASE)
-				builder = SkeletonSubjectPrototype.builder()
-						.size(box.requireLabel("size").getTagInt());
+            else if (type == SubjectType.SKELETON_CASE)
+                builder = SkeletonSubjectPrototype.builder()
+                        .size(box.requireLabel("size").getTagInt());
 
-			else builder = SubjectPrototype.builder();
+            else builder = SubjectPrototype.builder();
 
-			List<V3> manipulators = box.getLabels("manipulator").stream()
-					.map(box::toRelativeVector)
-					.collect(Collectors.toList());
+            List<V3> manipulators = box.getLabels("manipulator").stream()
+                    .map(box::toRelativeVector)
+                    .collect(Collectors.toList());
 
-			return builder.relativeOrigin(box.toRelativeVector(origin))
-					.relativeManipulators(manipulators)
-					.address(address)
-					.price(price)
-					.cristalixPrice(cristalixPrice)
-					.title(title)
-					.box(box)
-					.type(type)
-					.build();
-		});
+            return builder.relativeOrigin(box.toRelativeVector(origin))
+                    .relativeManipulators(manipulators)
+                    .address(address)
+                    .price(price)
+                    .cristalixPrice(cristalixPrice)
+                    .title(title)
+                    .box(box)
+                    .type(type)
+                    .build();
+        });
 
-		museum = new PrototypeManager<>(
-				"museum", (address, box) -> {
-			box.expandVert();
-			List<SubjectInfo> defaultInfos = new ArrayList<>();
-			for (Label label : box.getLabels("default")) {
-				SubjectPrototype prototype = subject.getPrototype(label.getTag());
-				if (prototype == null)
-					throw new MapServiceException("Illegal default subject '" + label.getTag() +
-							"' in museum " + address + " on " + label.getCoords());
-				defaultInfos.add(new SubjectInfo(prototype.getAddress(), label.toV3(), D2.PX, Color.AQUA, null));
-			}
-			return new MuseumPrototype(address, box.requireLabel("spawn"), defaultInfos);
-		}
-		);
+        museum = new PrototypeManager<>(
+                "museum", (address, box) -> {
+            box.expandVert();
+            List<SubjectInfo> defaultInfos = new ArrayList<>();
+            for (Label label : box.getLabels("default")) {
+                String[] tag = label.getTag().split(" ");
+                SubjectPrototype prototype = subject.getPrototype(tag[0]);
+                if (prototype == null)
+                    throw new MapServiceException("Illegal default subject '" + tag[0] + "' in museum " +
+                            address + " on " + label.getCoords());
+                defaultInfos.add(new SubjectInfo(prototype.getAddress(), label.toV3(), D2.PX, Color.AQUA, tag.length > 1 ? tag[1] : null));
+            }
+            return new MuseumPrototype(address, box.requireLabel("spawn"), defaultInfos);
+        });
 
-		skeleton = new PrototypeManager<>(
-				"skeleton", (address, box) ->
-				new SkeletonPrototype(
-						box.requireLabel("title").getTag(),
-						box.requireLabel("size").getTagInt(),
-						box.requireLabel("pieces").getTagInt(),
-						Rarity.valueOf(box.requireLabel("rarity").getTag().toUpperCase()),
-						address,
-						box.requireLabel("origin")
-				));
+        skeleton = new PrototypeManager<>(
+                "skeleton", (address, box) ->
+                new SkeletonPrototype(
+                        box.requireLabel("title").getTag(),
+                        box.requireLabel("size").getTagInt(),
+                        box.requireLabel("pieces").getTagInt(),
+                        Rarity.valueOf(box.requireLabel("rarity").getTag().toUpperCase()),
+                        address,
+                        box.requireLabel("origin")
+                ));
 
-		excavation = new PrototypeManager<>(
-				"excavation", (address, box) -> {
+        excavation = new PrototypeManager<>(
+                "excavation", (address, box) -> {
 
-			box.expandVert();
+            box.expandVert();
 
-			List<int[]> pallette = box.getLabels("pallette").stream()
-					.map(location -> location.add(0, -1, 0).getBlock())
-					.map(block -> new int[] {block.getType().getId(), block.getData()})
-					.collect(Collectors.toList());
+            List<int[]> pallette = box.getLabels("pallette").stream()
+                    .map(location -> location.add(0, -1, 0).getBlock())
+                    .map(block -> new int[]{block.getType().getId(), block.getData()})
+                    .collect(Collectors.toList());
 
-			if (pallette.isEmpty())
-				throw new MapServiceException("No pallette markers found for excavation " + address);
+            if (pallette.isEmpty())
+                throw new MapServiceException("No pallette markers found for excavation " + address);
 
-			List<SkeletonPrototype> skeletonPrototypes = box.getLabels("available").stream()
-					.map(label -> skeleton.getPrototype(label.getTag()))
-					.collect(Collectors.toList());
+            List<SkeletonPrototype> skeletonPrototypes = box.getLabels("available").stream()
+                    .map(label -> skeleton.getPrototype(label.getTag()))
+                    .collect(Collectors.toList());
 
-			if (skeletonPrototypes.isEmpty())
-				throw new InvalidConfigException("No available skeletons (.p available) found for excavation " + address);
+            if (skeletonPrototypes.isEmpty())
+                throw new InvalidConfigException("No available skeletons (.p available) found for excavation " + address);
 
-			Location min = box.getMin();
-			Location max = box.getMax();
+            Location min = box.getMin();
+            Location max = box.getMax();
 
-			List<Location> space = new ArrayList<>();
-			for (int x = (int) min.getX(); x < (int) max.getX(); x++) {
-				for (int y = (int) min.getY(); y < (int) max.getY(); y++) {
-					for (int z = (int) min.getZ(); z < (int) max.getZ(); z++) {
-						Location loc = new Location(box.getMeta().getWorld(), x, y, z);
-						Block block = loc.getBlock();
-						if (block.getType() == Material.IRON_BLOCK)
-							space.add(loc);
-					}
-				}
-			}
+            List<Location> space = new ArrayList<>();
+            for (int x = (int) min.getX(); x < (int) max.getX(); x++) {
+                for (int y = (int) min.getY(); y < (int) max.getY(); y++) {
+                    for (int z = (int) min.getZ(); z < (int) max.getZ(); z++) {
+                        Location loc = new Location(box.getMeta().getWorld(), x, y, z);
+                        Block block = loc.getBlock();
+                        if (block.getType() == Material.IRON_BLOCK)
+                            space.add(loc);
+                    }
+                }
+            }
 
-			Set<Chunk> chunks = new HashSet<>();
-			for (Location location : space) {
-				Block block = location.getBlock();
-				int[] random = ListUtils.random(pallette);
-				block.setTypeIdAndData(random[0], (byte) random[1], false);
-				chunks.add(location.getChunk());
-			}
+            Set<Chunk> chunks = new HashSet<>();
+            for (Location location : space) {
+                Block block = location.getBlock();
+                int[] random = ListUtils.random(pallette);
+                block.setTypeIdAndData(random[0], (byte) random[1], false);
+                chunks.add(location.getChunk());
+            }
 
-			val packets = chunks.stream()
-					.map(chunk -> new PacketPlayOutMapChunk(((CraftChunk) chunk).getHandle(), 65535))
-					.collect(Collectors.toList());
+            val packets = chunks.stream()
+                    .map(chunk -> new PacketPlayOutMapChunk(((CraftChunk) chunk).getHandle(), 65535))
+                    .collect(Collectors.toList());
 
-			space.forEach(block -> block.getBlock().setType(Material.AIR));
+            space.forEach(block -> block.getBlock().setType(Material.AIR));
 
-			return new ExcavationPrototype(
-					address, skeletonPrototypes,
-					box.requireLabel("hit-count").getTagInt(),
-					box.requireLabel("required-level").getTagInt(),
-					box.requireLabel("price").getTagDouble(),
-					box.requireLabel("title").getTag(),
-					box.requireLabel("spawn"),
-					packets
-			);
-		});
-	}
+            return new ExcavationPrototype(
+                    address, skeletonPrototypes,
+                    box.requireLabel("hit-count").getTagInt(),
+                    box.requireLabel("required-level").getTagInt(),
+                    box.requireLabel("price").getTagDouble(),
+                    box.requireLabel("title").getTag(),
+                    box.requireLabel("spawn"),
+                    packets
+            );
+        });
+    }
 
 }
