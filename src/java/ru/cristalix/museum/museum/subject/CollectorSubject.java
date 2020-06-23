@@ -77,7 +77,7 @@ public class CollectorSubject implements Subject {
 	}
 
 	private Location getLocation(long time) {
-		int secondsPerLap = (int) prototype.getSpeed();
+		int secondsPerLap = 20000 / (int) prototype.getSpeed();
 		return navigator.getLocation(time % secondsPerLap / (double) secondsPerLap);
 	}
 }

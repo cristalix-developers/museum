@@ -140,7 +140,6 @@ public final class App extends JavaPlugin {
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     val user = getUser(player.getUniqueId());
-					B.bc("Moving " + user.getPlayer() + "'s collector...");
 
                     if (user.getExcavation() != null || user.getCurrentMuseum() == null)
                         continue;
