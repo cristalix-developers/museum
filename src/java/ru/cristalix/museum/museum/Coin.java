@@ -18,7 +18,7 @@ import ru.cristalix.museum.player.pickaxe.Pickaxe;
 public class Coin {
 
 	public static final ItemStack COIN = CraftItemStack.asNMSCopy(Lemonade.get("coin").render());
-	public static final int SECONDS_LIVE = 15;
+	public static final int SECONDS_LIVE = 20;
 	private EntityItem entityItem;
 	private Location location;
 	@Getter
