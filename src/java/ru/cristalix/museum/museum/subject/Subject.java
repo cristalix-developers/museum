@@ -2,9 +2,12 @@ package ru.cristalix.museum.museum.subject;
 
 import ru.cristalix.museum.Storable;
 import ru.cristalix.museum.data.subject.SubjectInfo;
+import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.player.User;
 
 public interface Subject extends Storable<SubjectInfo> {
+
+	SubjectType<?> getType();
 
 	void show(User user);
 

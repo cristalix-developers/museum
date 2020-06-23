@@ -49,21 +49,18 @@ public class Managers {
 				origin = box.getCenter();
 
 			SubjectPrototype.SubjectPrototypeBuilder<?, ?> builder;
-			SubjectType type = SubjectType.byString(typeStr);
+			SubjectType<?> type = SubjectType.byString(typeStr);
 
-			switch (type) {
-				case COLLECTOR:
-					builder = CollectorSubjectPrototype.builder()
-							.radius(box.requireLabel("radius").getTagDouble())
-							.speed(box.requireLabel("speed").getTagDouble());
-					break;
-				case SKELETON_CASE:
-					builder = SkeletonSubjectPrototype.builder()
-							.size(box.requireLabel("size").getTagInt());
-					break;
-				default:
-					builder = SubjectPrototype.builder();
-			}
+			if (type == SubjectType.COLLECTOR)
+				builder = CollectorSubjectPrototype.builder()
+						.radius(box.requireLabel("radius").getTagDouble())
+						.speed(box.requireLabel("speed").getTagDouble());
+
+			else if (type == SubjectType.SKELETON_CASE)
+				builder = SkeletonSubjectPrototype.builder()
+						.size(box.requireLabel("size").getTagInt());
+
+			else builder = SubjectPrototype.builder();
 
 			List<V3> manipulators = box.getLabels("manipulator").stream()
 					.map(box::toRelativeVector)

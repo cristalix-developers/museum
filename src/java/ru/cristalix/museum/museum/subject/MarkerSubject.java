@@ -6,6 +6,7 @@ import ru.cristalix.museum.App;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
+import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.player.User;
 
 public class MarkerSubject implements Subject {
@@ -30,6 +31,11 @@ public class MarkerSubject implements Subject {
 	@Override
 	public void hide(User user) {
 
+	}
+
+	@Override
+	public SubjectType<?> getType() {
+		return SubjectType.MARKER;
 	}
 
 	@Override

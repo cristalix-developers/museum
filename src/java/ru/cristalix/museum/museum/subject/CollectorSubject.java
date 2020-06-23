@@ -16,12 +16,9 @@ import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.collector.CollectorNavigator;
 import ru.cristalix.museum.museum.map.CollectorSubjectPrototype;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
+import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import ru.cristalix.museum.player.User;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class CollectorSubject implements Subject {
 
@@ -52,6 +49,11 @@ public class CollectorSubject implements Subject {
 	@Override
 	public SubjectInfo generateInfo() {
 		return info;
+	}
+
+	@Override
+	public SubjectType<?> getType() {
+		return SubjectType.COLLECTOR;
 	}
 
 	@Override

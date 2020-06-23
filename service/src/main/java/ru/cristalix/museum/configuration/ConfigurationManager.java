@@ -8,6 +8,7 @@ import ru.cristalix.museum.socket.ServerSocketHandler;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -25,23 +26,22 @@ public class ConfigurationManager {
 	public void reload() {
 		boolean reload = false;
 		String config = read(configFile);
-		if (!config.equals(configData)) {
+		if (!Objects.equals(config, configData)) {
 			configData = config;
 			reload = true;
 		}
 		String guis = read(guisFile);
-		if (!guis.equals(guisData)) {
+		if (!Objects.equals(guis, guisData)) {
 			guisData = guis;
 			reload = true;
 		}
 		String items = read(itemsFile);
-		if (!items.equals(itemsData)) {
+		if (!Objects.equals(items, itemsData)) {
 			itemsData = items;
 			reload = true;
 		}
-		if (reload) {
+		if (reload)
 			ServerSocketHandler.broadcast(pckg());
-		}
 	}
 
 	private String read(String file) {

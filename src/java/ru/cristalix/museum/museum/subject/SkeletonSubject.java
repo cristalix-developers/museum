@@ -1,18 +1,14 @@
 package ru.cristalix.museum.museum.subject;
 
 import lombok.Getter;
-import lombok.val;
 import org.bukkit.Location;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
-import ru.cristalix.museum.museum.subject.skeleton.Fragment;
+import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
 import ru.cristalix.museum.player.User;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author func 22.05.2020
@@ -69,5 +65,10 @@ public class SkeletonSubject extends SimpleSubject {
             return 0;
         return skeleton.getUnlockedFragments().size() * skeleton.getSkeletonPrototype().getRarity().getIncrease();
     }
+
+	@Override
+	public SubjectType<?> getType() {
+		return SubjectType.SKELETON_CASE;
+	}
 
 }

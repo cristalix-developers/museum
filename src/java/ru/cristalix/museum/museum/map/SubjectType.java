@@ -1,36 +1,54 @@
 package ru.cristalix.museum.museum.map;
 
 import clepto.cristalix.MapServiceException;
-import lombok.RequiredArgsConstructor;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.subject.*;
 
-@RequiredArgsConstructor
-public enum SubjectType {
+import java.util.ArrayList;
+import java.util.List;
 
-    SKELETON_CASE(SkeletonSubject::new),
-    DECORATION(SimpleSubject::new),
-    COLLECTOR(CollectorSubject::new),
-    MARKER(MarkerSubject::new);
+public class SubjectType<T extends Subject> {
 
-    private final Provider provider;
+	private static final List<SubjectType<?>> registry = new ArrayList<>();
 
-    public Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
-        return provider.provide(museum, info, prototype);
-    }
+	public static SubjectType<SkeletonSubject> SKELETON_CASE;
+	public static SubjectType<SimpleSubject> DECORATION;
+	public static SubjectType<CollectorSubject> COLLECTOR;
+	public static SubjectType<MarkerSubject> MARKER;
 
-    public static SubjectType byString(String string) {
-        string = string.replace('-', '_').toUpperCase();
-        for (SubjectType value : values()) {
-            if (value.name().startsWith(string)) return value;
-        }
-        throw new MapServiceException("Subject type '" + string + "' is not a valid type.");
-    }
+	public static void init() {
+		SKELETON_CASE = new SubjectType<>("skeleton-case", SkeletonSubject::new);
+		DECORATION = new SubjectType<>("decoration", SimpleSubject::new);
+		COLLECTOR = new SubjectType<>("collector", CollectorSubject::new);
+		MARKER = new SubjectType<>("marker", MarkerSubject::new);
+	}
 
-    public interface Provider {
+	private final String address;
+	private final Provider provider;
 
-        Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype);
+	public SubjectType(String address, Provider provider) {
+		this.provider = provider;
+		this.address = address;
+		registry.add(this);
+	}
 
-    }
+	public Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
+		return provider.provide(museum, info, prototype);
+	}
+
+	public static SubjectType<?> byString(String query) {
+		query = query.toLowerCase().replace("_", "-");
+		for (SubjectType<?> subjectType : registry)
+			if (subjectType.address.startsWith(query))
+				return subjectType;
+		throw new MapServiceException("Subject type '" + query + "' is not a valid type.");
+	}
+
+	public interface Provider {
+
+		Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype);
+
+	}
+
 }
