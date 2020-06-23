@@ -37,7 +37,8 @@ public class CollectorSubject implements Subject {
 		EntityArmorStand armorStand = new EntityArmorStand(App.getApp().getNMSWorld());
 		Lemonade lemonade = Lemonade.get(this.prototype.getAddress());
 		ItemStack item = lemonade == null ? new ItemStack(Material.WORKBENCH) : lemonade.render();
-		armorStand.setEquipment(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(item));
+		armorStand.setSlot(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(item));
+		armorStand.setBasePlate(false);
 		armorStand.setCustomName(prototype.getTitle());
 		armorStand.setCustomNameVisible(true);
 		armorStand.setInvisible(true);
