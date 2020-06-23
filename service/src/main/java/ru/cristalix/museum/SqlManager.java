@@ -43,6 +43,7 @@ public class SqlManager {
 				" `username` varchar(36) NOT NULL," +
 				" `booster` varchar(50) NOT NULL," +
 				" `until` LONG NOT NULL," +
+				" `time` LONG NOT NULL," +
 				" `multiplier` DOUBLE NOT NULL," +
 				" `global` BOOLEAN NOT NULL," +
 				" PRIMARY KEY(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
@@ -99,15 +100,16 @@ public class SqlManager {
 	}
 
 	public void push(Booster booster) {
-		async.prepareUpdate("INSERT INTO boosters VALUES (?,?,?,?,?,?);", ps -> {
+		async.prepareUpdate("INSERT INTO boosters VALUES (?,?,?,?,?,?,?);", ps -> {
 			try {
 				ps.setString(1, booster.getUniqueId().toString());
 				ps.setString(2, booster.getUser().toString());
 				ps.setString(3, booster.getUserName());
 				ps.setString(4, booster.getType().name());
 				ps.setLong(5, booster.getUntil());
-				ps.setDouble(6, booster.getMultiplier());
-				ps.setBoolean(7, booster.isGlobal());
+				ps.setLong(6, booster.getTime());
+				ps.setDouble(7, booster.getMultiplier());
+				ps.setBoolean(8, booster.isGlobal());
 			} catch (Exception ignored) {
 			}
 		});
@@ -144,9 +146,10 @@ public class SqlManager {
 		String userName = sec.lookupValue("username");
 		BoosterType type = BoosterType.valueOf(sec.lookupValue("booster"));
 		long until = Long.parseLong(sec.lookupValue("until"));
+		long time = Long.parseLong(sec.lookupValue("time"));
 		double multiplier = sec.lookupValue("multiplier");
 		boolean global = sec.lookupValue("global");
-		return new Booster(uniqueId, user, userName, type, until, multiplier, global);
+		return new Booster(uniqueId, user, userName, type, until, time, multiplier, global);
 	}
 
 	private void notifyBoosters() {

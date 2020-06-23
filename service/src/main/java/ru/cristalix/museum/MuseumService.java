@@ -32,36 +32,24 @@ import java.util.stream.Collectors;
 
 public class MuseumService {
 
+	public static final long DEFAULT_BOOSTER_TIME = TimeUnit.HOURS.toMillis(1L);
 	public static final int THANKS_SECONDS = 45;
 	public static final String PASSWORD = System.getProperty("PASSWORD", "gVatjN43AJnbFq36Fa");
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
 	public static SqlManager SQL_MANAGER;
 	public static ConfigurationManager CONFIGURATION_MANAGER;
 	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
-		put(DonateType.LOCAL_MONEY_BOOSTER, (pckg, info) -> {
-			try {
-				return SQL_MANAGER.receiveLocal(pckg.getUser()).get(2L, TimeUnit.SECONDS).stream().noneMatch(booster -> booster.getType() == BoosterType.COINS);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				return false;
-			}
-		});
-		put(DonateType.GLOBAL_MONEY_BOOSTER, (pckg, info) -> {
-			return !SQL_MANAGER.getGlobalBoosters().containsKey(BoosterType.COINS);
-		});
+		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
+		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
+		put(DonateType.LOCAL_VISITORS_BOOSTER, localBoosterPreAuthorize(BoosterType.VISITORS));
+		put(DonateType.GLOBAL_VISITORS_BOOSTER, globalBoosterPreAuthorize(BoosterType.VISITORS));
 	}};
 
 	private static final Map<DonateType, BiConsumer<UserTransactionPackage, UserInfo>> TRANSACTION_POST_AUTHORIZE_MAP = new HashMap<DonateType, BiConsumer<UserTransactionPackage, UserInfo>>() {{
-		put(DonateType.LOCAL_MONEY_BOOSTER, (pckg, info) -> {
-			wrapUuid(Collections.singletonList(pckg.getUser())).thenApply(list -> list.get(0)).thenAccept(userName -> {
-				SQL_MANAGER.push(Booster.defaultInstance(pckg.getUser(), userName, BoosterType.COINS, false));
-			});
-		});
-		put(DonateType.GLOBAL_MONEY_BOOSTER, (pckg, info) -> {
-			wrapUuid(Collections.singletonList(pckg.getUser())).thenApply(list -> list.get(0)).thenAccept(userName -> {
-				SQL_MANAGER.push(Booster.defaultInstance(pckg.getUser(), userName, BoosterType.COINS, true));
-			});
-		});
+		put(DonateType.LOCAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, false));
+		put(DonateType.GLOBAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, true));
+		put(DonateType.LOCAL_VISITORS_BOOSTER, boosterPostAuthorize(BoosterType.VISITORS, false));
+		put(DonateType.GLOBAL_VISITORS_BOOSTER, boosterPostAuthorize(BoosterType.VISITORS, true));
 	}};
 
 	public static void main(String[] args) {
@@ -238,6 +226,27 @@ public class MuseumService {
 
 	public static void sendMessage(Set<UUID> users, BaseComponent[] message) {
 		ServerSocketHandler.broadcast(new TargetMessagePackage(users, ComponentSerializer.toString(message)));
+	}
+
+	private static BiPredicate<UserTransactionPackage, UserInfo> globalBoosterPreAuthorize(BoosterType type) {
+		return (pckg, info) -> !SQL_MANAGER.getGlobalBoosters().containsKey(type);
+	}
+
+	private static BiPredicate<UserTransactionPackage, UserInfo> localBoosterPreAuthorize(BoosterType type) {
+		return (pckg, info) -> {
+			try {
+				return SQL_MANAGER.receiveLocal(pckg.getUser()).get(2L, TimeUnit.SECONDS).stream().noneMatch(booster -> booster.getType() == type);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				return false;
+			}
+		};
+	}
+
+	private static BiConsumer<UserTransactionPackage, UserInfo> boosterPostAuthorize(BoosterType type, boolean global) {
+		return (pckg, info) -> wrapUuid(Collections.singletonList(pckg.getUser())).thenApply(list -> list.get(0)).thenAccept(userName -> {
+			SQL_MANAGER.push(Booster.defaultInstance(pckg.getUser(), userName, type, DEFAULT_BOOSTER_TIME, global));
+		});
 	}
 
 }
