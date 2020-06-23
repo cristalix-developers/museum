@@ -59,7 +59,6 @@ public class Museum implements Storable<MuseumInfo> {
 	public void load(User user) {
 		info.views++;
 
-		updateIncrease();
 		user.sendAnime();
 
 		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
@@ -77,6 +76,8 @@ public class Museum implements Storable<MuseumInfo> {
 
 		user.getPlayer().teleport(prototype.getSpawnPoint());
 		subjects.forEach(space -> space.show(user));
+
+		updateIncrease();
 	}
 
 	public void unload(User user) {

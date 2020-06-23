@@ -27,7 +27,6 @@ public class PrototypeManager<T extends Prototype> {
     }
 
     public void registerPrototype(T prototype) {
-		System.out.println("Registered " + prototype.getClass().getSimpleName() + " " + prototype.getAddress() + ": " + prototype);
         map.put(prototype.getAddress(), prototype);
     }
 }

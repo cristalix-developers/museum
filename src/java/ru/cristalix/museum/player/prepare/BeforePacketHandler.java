@@ -93,12 +93,11 @@ public class BeforePacketHandler implements Prepare {
 
 	@SuppressWarnings ("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet, App app) {
-		user.giveExperience(5);
-
 		MinecraftServer.getServer().postToMainThread(() -> {
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
 					List<BlockPosition> positions = pickaxeType.getPickaxe().dig(user, packet.a);
+					user.giveExperience(pickaxeType.getExperience());
 					if (positions != null)
 						positions.forEach(position -> generateFragments(user, position, app));
 				}
@@ -107,7 +106,6 @@ public class BeforePacketHandler implements Prepare {
 	}
 
 	private void generateFragments(User user, BlockPosition position, App app) {
-
 		ExcavationPrototype prototype = user.getExcavation().getPrototype();
 		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 

@@ -110,8 +110,6 @@ public final class App extends JavaPlugin {
 		B.events(
 				playerDataManager,
 				new PassiveEvents(),
-				//new MuseumItemHandler(this),
-				//new ManipulatorHandler(this),
 				new MuseumEvents(this),
 				new GuiEvents()
 		);

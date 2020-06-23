@@ -33,14 +33,15 @@ public class MuseumCommand implements CommandExecutor {
 						MessageUtil.find("playeroffline").send(user);
 						return true;
 					}
+					val userAuthor = app.getUser(author);
 
 					val sender = app.getUser(author.getUniqueId());
 
 					if (user.getCurrentMuseum().getOwner().equals(sender))
 						return true;
-
+					//todo музей не загружается
 					sender.getCurrentMuseum().unload(user);
-					sender.getCurrentMuseum().load(user);
+					userAuthor.getCurrentMuseum().load(user);
 
 					MessageUtil.find("visitaccept")
 							.set("visitor", player.getName())

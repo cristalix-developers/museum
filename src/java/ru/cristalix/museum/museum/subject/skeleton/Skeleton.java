@@ -21,7 +21,8 @@ public class Skeleton implements Storable<SkeletonInfo> {
 	public SkeletonInfo generateInfo() {
 		info.setUnlockedFragmentAddresses(unlockedFragments.stream()
 				.map(Fragment::getAddress)
-				.collect(Collectors.toList()));
+				.collect(Collectors.toList())
+		);
 		return info;
 	}
 
