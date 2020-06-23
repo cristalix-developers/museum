@@ -27,7 +27,6 @@ public class Coin {
 	public Coin(Location location) {
 		this.location = location;
 		entityItem = new EntityItem(App.getApp().getNMSWorld(), location.getX(), location.getY(), location.getZ(), COIN);
-		entityItem.id = Pickaxe.RANDOM.nextInt(200) + 600;
 		timestamp = System.currentTimeMillis();
 	}
 

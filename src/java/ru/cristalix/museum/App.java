@@ -152,7 +152,7 @@ public final class App extends JavaPlugin {
                     }
 					for (CollectorSubject collector : user.getCurrentMuseum().getSubjects(SubjectType.COLLECTOR)) {
 						collector.move(user, time);
-						B.bc("Moving " + user.getPlayer() + "'s collector " + collector + " to point");
+						B.bc(visitedPoint.getX() + " " + visitedPoint.getY() + " " + visitedPoint.getZ());
 					}
 
                     // Если монеты устарели, что бы не копились на клиенте, удаляю
