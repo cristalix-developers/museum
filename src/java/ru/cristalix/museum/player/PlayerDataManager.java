@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
+import ru.cristalix.core.formatting.Colors;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
@@ -25,6 +26,7 @@ import ru.cristalix.museum.museum.map.MuseumPrototype;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.prepare.PrepareSteps;
 import ru.cristalix.museum.prototype.Managers;
+import ru.cristalix.museum.utils.MultiTimeBar;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -36,6 +38,7 @@ public class PlayerDataManager implements Listener {
 
 	private final App app;
 	private final Map<UUID, User> userMap = new HashMap<>();
+	private final MultiTimeBar timeBar;
 	private List<Booster> globalBoosters = new ArrayList<>(0);
 
 	public PlayerDataManager(App app) {
@@ -107,11 +110,17 @@ public class PlayerDataManager implements Listener {
 				}
 			}
 		});
+		this.timeBar = new MultiTimeBar(
+				() -> new ArrayList<>(globalBoosters),
+				5L, TimeUnit.SECONDS,
+				() -> Colors.cYellow + "Нет активных глобальных бустеров"
+		);
 	}
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		val player = e.getPlayer();
+		timeBar.onJoin(player.getUniqueId());
 		val user = userMap.get(player.getUniqueId());
 
 		user.setConnection(((CraftPlayer) player).getHandle().playerConnection);
@@ -125,7 +134,7 @@ public class PlayerDataManager implements Listener {
 		e.setJoinMessage(null);
 	}
 
-	@EventHandler (priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLogin(PlayerLoginEvent e) {
 		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
 			userMap.remove(e.getPlayer().getUniqueId());
@@ -133,6 +142,7 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
+		timeBar.onQuit(e.getPlayer().getUniqueId());
 		e.setQuitMessage(null);
 	}
 
