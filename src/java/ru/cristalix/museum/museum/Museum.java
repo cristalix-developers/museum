@@ -1,10 +1,10 @@
 package ru.cristalix.museum.museum;
 
+import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.museum.App;
@@ -19,8 +19,12 @@ import ru.cristalix.museum.museum.subject.MarkerSubject;
 import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Managers;
+import ru.cristalix.museum.util.LocationTree;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -53,25 +57,16 @@ public class Museum implements Storable<MuseumInfo> {
 					return prototype.getType().provide(this, subjectInfo, prototype);
 				}).collect(Collectors.toList());
 
+		;
+
 		for (CollectorSubject collector : getSubjects(SubjectType.COLLECTOR)) {
 			List<MarkerSubject> markers = getSubjects(SubjectType.MARKER).stream()
-					.filter(marker -> marker.getCollectorAddress().equals(collector.getPrototypeAddress()))
+					.filter(marker -> marker.getCollectorId() == collector.getId())
 					.collect(Collectors.toList());
-			List<Location> locations = new ArrayList<>();
-			for (MarkerSubject step : markers) {
-				MarkerSubject nearest = null;
-				for (MarkerSubject founded : markers) {
-					if (step.equals(founded))
-						continue;
-					if (nearest == null)
-						nearest = founded;
-					if (step.getLocation().distanceSquared(nearest.getLocation()) > step.getLocation().distanceSquared(founded.getLocation()))
-						nearest = founded;
-				}
-				if (nearest!= null)
-					locations.add(nearest.getLocation());
-			}
-			collector.setNavigator(new CollectorNavigator(prototype, App.getApp().getWorld(), locations));
+			List<MarkerSubject> route = LocationTree.order(markers, MarkerSubject::getLocation);
+
+			collector.setNavigator(new CollectorNavigator(prototype, App.getApp().getWorld(),
+					route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 		}
 	}
 
@@ -126,6 +121,10 @@ public class Museum implements Storable<MuseumInfo> {
 			if (subject.getType() == type) list.add((T) subject);
 		}
 		return list;
+	}
+
+	public void processClick(int x, int y, int z) {
+		B.run(() -> B.bc("§aClick at " + x + " " + y + " " + z));
 	}
 
 }

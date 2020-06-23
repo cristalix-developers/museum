@@ -1,6 +1,7 @@
 package ru.cristalix.museum.museum.subject;
 
 import clepto.bukkit.Lemonade;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
 import lombok.val;
@@ -20,18 +21,22 @@ import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import ru.cristalix.museum.player.User;
 
-public class CollectorSubject implements Subject {
+public class CollectorSubject extends SimpleSubject {
 
 	private final CollectorSubjectPrototype prototype;
 
 	@Delegate
 	private final SubjectInfo info;
 
+	@Getter
+	private final int id;
+
 	@Setter
 	private CollectorNavigator navigator;
 	private final Piece piece;
 
 	public CollectorSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
+		super(museum, info, prototype);
 		this.info = info;
 		this.prototype = (CollectorSubjectPrototype) prototype;
 		EntityArmorStand armorStand = new EntityArmorStand(App.getApp().getNMSWorld());
@@ -45,10 +50,12 @@ public class CollectorSubject implements Subject {
 		armorStand.setNoGravity(true);
 		this.navigator = null;
 		this.piece = new Piece(armorStand, null);
+		this.id = info.getMetadata() == null ? 0 : Integer.parseInt(info.getMetadata());
 	}
 
 	@Override
 	public SubjectInfo generateInfo() {
+		info.metadata = String.valueOf(id);
 		return info;
 	}
 
@@ -59,6 +66,7 @@ public class CollectorSubject implements Subject {
 
 	@Override
 	public void show(User user) {
+		super.show(user);
 		val location = getLocation(System.currentTimeMillis());
 		piece.show(user.getPlayer(), location);
 	}
@@ -73,6 +81,7 @@ public class CollectorSubject implements Subject {
 
 	@Override
 	public void hide(User user) {
+		super.hide(user);
 		piece.hide(user.getPlayer());
 	}
 

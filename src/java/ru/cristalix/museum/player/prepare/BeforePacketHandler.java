@@ -32,7 +32,7 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
  */
 public class BeforePacketHandler implements Prepare {
 
-	private final BlockPosition dump = new BlockPosition(0, 0, 0);
+	private final BlockPosition dummy = new BlockPosition(0, 0, 0);
 
 	@Override
 	public void execute(User user, App app) {
@@ -45,8 +45,13 @@ public class BeforePacketHandler implements Prepare {
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 						if (packetObj instanceof PacketPlayInUseItem) {
 							val packet = (PacketPlayInUseItem) packetObj;
-							if (packet.c.equals(EnumHand.OFF_HAND) || Excavation.isAir(user, packet.a))
-								packet.a = dump; // Genius
+							BlockPosition pos = packet.a;
+							if (packet.c == EnumHand.MAIN_HAND && Excavation.isAir(user, packet.a)) {
+								if (user.getExcavation() == null)
+									user.getCurrentMuseum().processClick(pos.getX(), pos.getY(), pos.getZ());
+								packet.a = dummy; // Genius
+							}
+							if (packet.c == EnumHand.OFF_HAND) packet.a = dummy;
 						} else if (packetObj instanceof PacketPlayInBlockDig) {
 							val packet = (PacketPlayInBlockDig) packetObj;
 							Excavation excavation = user.getExcavation();
@@ -59,7 +64,7 @@ public class BeforePacketHandler implements Prepare {
 								acceptedBreak(user, packet, app);
 							} else if (packet.c == START_DESTROY_BLOCK) {
 								packet.c = ABORT_DESTROY_BLOCK;
-								packet.a = dump;
+								packet.a = dummy;
 							}
 						}
 						super.channelRead(channelHandlerContext, packetObj);

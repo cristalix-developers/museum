@@ -38,7 +38,7 @@ public class Managers {
         subject = new PrototypeManager<>("subject", (address, box) -> {
             String typeStr = box.requireLabel("type").getTag();
             String title = box.requireLabel("title").getTag();
-            double price = box.requireLabel("price").getTagDouble();
+            double price = box.getLabels("price").stream().findAny().map(Label::getTagDouble).orElse(Double.NaN);
             int cristalixPrice = box.getLabels("cristalix-price").stream()
                     .findAny().map(Label::getTag).map(Integer::parseInt).orElse(-1);
             Location origin = box.getLabels("origin").stream()

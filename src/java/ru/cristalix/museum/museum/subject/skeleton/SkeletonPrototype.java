@@ -57,7 +57,7 @@ public class SkeletonPrototype implements Prototype {
 				.collect(Collectors.toList());
 	}
 
-	private void recursiveTree(Map<ArmorStand, Location> selection, List<ArmorStand> walked) {
+	public static void recursiveTree(Map<ArmorStand, Location> selection, List<ArmorStand> walked) {
 		List<ArmorStand> current = new ArrayList<>();
 		for (Map.Entry<ArmorStand, Location> e : selection.entrySet()) {
 			if (walked.contains(e.getKey())) continue;

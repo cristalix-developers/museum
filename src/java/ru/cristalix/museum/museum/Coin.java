@@ -4,8 +4,8 @@ import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
-import org.bukkit.SoundCategory;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.player.User;
@@ -39,7 +39,7 @@ public class Coin {
 		connection.sendPacket(new PacketPlayOutEntityMetadata(entityItem.getId(), entityItem.getDataWatcher(), false));
 	}
 
-	public boolean pickUp(User user, Location location, double radius) {
+	public boolean pickUp(User user, Location location, double radius, int collectorId) {
 		boolean close = this.location.distanceSquared(location) <= radius * radius;
 
 		if (close) {
@@ -53,17 +53,18 @@ public class Coin {
 
 			val connection = user.getConnection();
 
-			connection.sendPacket(new PacketPlayOutEntityVelocity(entityItem.getId(), 0, .05, 0));
-			connection.sendPacket(new PacketPlayOutEntityMetadata(entityItem.getId(), entityItem.getDataWatcher(), false));
-
-			user.setPickedCoinsCount(user.getPickedCoinsCount() + 1);
-
+			connection.sendPacket(new PacketPlayOutCollect(entityItem.getId(), collectorId, 1));
+//			connection.sendPacket(new PacketPlayOutEntityVelocity(entityItem.getId(), 0, .05, 0));
+//			connection.sendPacket(new PacketPlayOutEntityMetadata(entityItem.getId(), entityItem.getDataWatcher(), false));
+//
+//			user.setPickedCoinsCount(user.getPickedCoinsCount() + 1);
+//
+			user.setMoney(user.getMoney() + money);
 			Bukkit.getScheduler().runTaskLaterAsynchronously(App.getApp(), () -> {
 				remove(connection);
-				user.getPlayer().playSound(this.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.WEATHER, .2F, 1);
-				user.getPlayer().spawnParticle(Particle.TOTEM, this.location.add(0, 1.5, 0), 5, 0, 0, 0, .3);
-				user.setMoney(user.getMoney() + money);
-			}, 30);
+//				user.getPlayer().playSound(this.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.WEATHER, .2F, 1);
+//				user.getPlayer().spawnParticle(Particle.TOTEM, this.location.add(0, 1.5, 0), 5, 0, 0, 0, .3);
+			}, 2);
 		}
 
 		return close;
