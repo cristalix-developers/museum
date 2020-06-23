@@ -36,6 +36,7 @@ import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.gui.MuseumGuis;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.MuseumEvents;
+import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.museum.subject.CollectorSubject;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
@@ -80,6 +81,7 @@ public final class App extends JavaPlugin {
         }
         this.map.getWorld().setGameRuleValue("mobGriefing", "false");
 
+        SubjectType.init();
         Managers.init();
 
         this.clientSocket = new ClientSocket("127.0.0.1", 14653, "gVatjN43AJnbFq36Fa", IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName());
