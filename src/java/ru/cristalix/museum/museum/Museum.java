@@ -6,10 +6,14 @@ import lombok.Setter;
 import lombok.experimental.Delegate;
 import org.bukkit.Material;
 import ru.cristalix.core.scoreboard.IScoreboardService;
+import ru.cristalix.museum.App;
 import ru.cristalix.museum.Storable;
 import ru.cristalix.museum.data.MuseumInfo;
+import ru.cristalix.museum.museum.collector.CollectorNavigator;
 import ru.cristalix.museum.museum.map.MuseumPrototype;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
+import ru.cristalix.museum.museum.subject.CollectorSubject;
+import ru.cristalix.museum.museum.subject.MarkerSubject;
 import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Managers;
@@ -27,70 +31,80 @@ import java.util.stream.Collectors;
 @Getter
 public class Museum implements Storable<MuseumInfo> {
 
-	private final User owner;
-	private final MuseumPrototype prototype;
+    private final User owner;
+    private final MuseumPrototype prototype;
 
-	@Delegate
-	private final MuseumInfo info;
+    @Delegate
+    private final MuseumInfo info;
 
-	private final List<Subject> subjects;
+    private final List<Subject> subjects;
 
-	private double income;
+    private double income;
 
-	public Museum(MuseumInfo info, User owner) {
-		this.info = info;
-		this.owner = owner;
+    public Museum(MuseumInfo info, User owner) {
+        this.info = info;
+        this.owner = owner;
 
-		this.prototype = Managers.museum.getPrototype(info.getAddress());
+        this.prototype = Managers.museum.getPrototype(info.getAddress());
 
-		this.subjects = info.getSubjectInfos().stream()
-				.map(subjectInfo -> {
-					SubjectPrototype prototype = Managers.subject.getPrototype(subjectInfo.getPrototypeAddress());
-					return prototype.getType().provide(this, subjectInfo, prototype);
-				}).collect(Collectors.toList());
-	}
+        this.subjects = info.getSubjectInfos().stream()
+                .map(subjectInfo -> {
+                    SubjectPrototype prototype = Managers.subject.getPrototype(subjectInfo.getPrototypeAddress());
+                    return prototype.getType().provide(this, subjectInfo, prototype);
+                }).collect(Collectors.toList());
 
-	@Override
-	public MuseumInfo generateInfo() {
-		this.info.subjectInfos = Storable.store(subjects);
-		return info;
-	}
+        subjects.stream().filter(subject -> subject instanceof CollectorSubject)
+                .map(subject -> (CollectorSubject) subject)
+                .forEach(collector -> collector.setNavigator(new CollectorNavigator(
+						prototype, App.getApp().getWorld(), subjects.stream()
+						.filter(subject -> subject instanceof MarkerSubject)
+						.map(subject -> (MarkerSubject) subject)
+						.map(MarkerSubject::getLocation)
+						.collect(Collectors.toList())
+				)));
+    }
 
-	public void load(User user) {
-		info.views++;
+    @Override
+    public MuseumInfo generateInfo() {
+        this.info.subjectInfos = Storable.store(subjects);
+        return info;
+    }
 
-		user.sendAnime();
+    public void load(User user) {
+        info.views++;
 
-		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
+        user.sendAnime();
 
-		user.setCurrentMuseum(this);
-		user.getPlayer().teleport(user.getCurrentMuseum().getPrototype().getSpawnPoint());
+        IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
 
-		user.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
+        user.setCurrentMuseum(this);
+        user.getPlayer().teleport(user.getCurrentMuseum().getPrototype().getSpawnPoint());
 
-		user.getPlayer().getInventory().remove(Material.SADDLE);
+        user.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
 
-		if (this.owner != user) {
-			user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
-		}
+        user.getPlayer().getInventory().remove(Material.SADDLE);
 
-		user.getPlayer().teleport(prototype.getSpawnPoint());
-		subjects.forEach(space -> space.show(user));
+        if (this.owner != user) {
+            user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
+        }
 
-		updateIncrease();
-	}
+        user.getPlayer().teleport(prototype.getSpawnPoint());
+        subjects.forEach(space -> space.show(user));
 
-	public void unload(User user) {
-		subjects.forEach(space -> space.hide(user));
+        updateIncrease();
+    }
 
-		Set<Coin> coins = user.getCoins();
-		coins.forEach(coin -> coin.remove(user.getConnection()));
-		coins.clear();
-	}
+    public void unload(User user) {
+        subjects.forEach(space -> space.hide(user));
 
-	public void updateIncrease() {
-		income = .1;
-		for (Subject subject : subjects)
-			income += subject.getIncome();
-	}
+        Set<Coin> coins = user.getCoins();
+        coins.forEach(coin -> coin.remove(user.getConnection()));
+        coins.clear();
+    }
+
+    public void updateIncrease() {
+        income = .1;
+        for (Subject subject : subjects)
+            income += subject.getIncome();
+    }
 }

@@ -1,6 +1,7 @@
 package ru.cristalix.museum.museum.subject;
 
 import clepto.bukkit.Lemonade;
+import lombok.Setter;
 import lombok.experimental.Delegate;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
@@ -20,6 +21,7 @@ import ru.cristalix.museum.player.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CollectorSubject implements Subject {
 
@@ -28,12 +30,12 @@ public class CollectorSubject implements Subject {
 	@Delegate
 	private final SubjectInfo info;
 
-	private final CollectorNavigator navigator;
-	private final List<Piece> pieces = new ArrayList<>();
+	@Setter
+	private CollectorNavigator navigator;
+	private final Piece piece;
 
 	public CollectorSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
 		this.info = info;
-		this.navigator = null;
 		this.prototype = (CollectorSubjectPrototype) prototype;
 		EntityArmorStand armorStand = new EntityArmorStand(App.getApp().getNMSWorld());
 		Lemonade lemonade = Lemonade.get(this.prototype.getAddress());
@@ -43,8 +45,8 @@ public class CollectorSubject implements Subject {
 		armorStand.setCustomNameVisible(true);
 		armorStand.setInvisible(true);
 		armorStand.setNoGravity(true);
-
-		pieces.add(new Piece(armorStand, null));
+		this.navigator = null;
+		this.piece = new Piece(armorStand, null);
 	}
 
 	@Override
@@ -55,29 +57,24 @@ public class CollectorSubject implements Subject {
 	@Override
 	public void show(User user) {
 		val location = getLocation(System.currentTimeMillis());
-		for (Piece piece : pieces)
-			piece.show(user.getPlayer(), location);
+		piece.show(user.getPlayer(), location);
 	}
 
 	public void move(User user, long iteration) {
+		if (navigator == null)
+			return;
 		val location = getLocation(iteration);
-
 		user.getCoins().removeIf(coin -> coin.pickUp(user, location, prototype.getRadius()));
-
-		for (Piece piece : pieces)
-			piece.update(user.getPlayer(), location);
+		piece.update(user.getPlayer(), location);
 	}
 
 	@Override
 	public void hide(User user) {
-		for (Piece piece : pieces)
-			piece.hide(user.getPlayer());
+		piece.hide(user.getPlayer());
 	}
 
 	private Location getLocation(long time) {
 		int secondsPerLap = (int) prototype.getSpeed();
-		return new Location(App.getApp().getWorld(), 0, 0, 0);
-//		return navigator.getLocation(time % secondsPerLap / (double) secondsPerLap);
+		return navigator.getLocation(time % secondsPerLap / (double) secondsPerLap);
 	}
-
 }
