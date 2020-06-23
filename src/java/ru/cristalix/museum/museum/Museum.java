@@ -93,5 +93,4 @@ public class Museum implements Storable<MuseumInfo> {
 		for (Subject subject : subjects)
 			income += subject.getIncome();
 	}
-
 }

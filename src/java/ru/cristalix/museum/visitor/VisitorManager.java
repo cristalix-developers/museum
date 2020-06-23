@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import ru.cristalix.museum.App;
+import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.player.pickaxe.Pickaxe;
 
 import java.util.ArrayList;
