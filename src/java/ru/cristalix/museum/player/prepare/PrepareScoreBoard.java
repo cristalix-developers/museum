@@ -21,9 +21,9 @@ public class PrepareScoreBoard implements Prepare {
 				.record("Онлайн", () -> Bukkit.getOnlinePlayers().size() + "")
 				.record("total/max/free", () ->
 						Runtime.getRuntime().totalMemory() / 1024 / 1024 + " " +
-						Runtime.getRuntime().maxMemory() / 1024 / 1024 + " " +
-						Runtime.getRuntime().freeMemory() / 1024 / 1024
-					   )
+								Runtime.getRuntime().maxMemory() / 1024 / 1024 + " " +
+								Runtime.getRuntime().freeMemory() / 1024 / 1024
+				)
 				.record("TPS", () -> String.format("%.2f", Bukkit.getTPS()[0]));
 	}
 

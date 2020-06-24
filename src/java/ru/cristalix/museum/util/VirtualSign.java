@@ -1,9 +1,7 @@
 package ru.cristalix.museum.util;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.NoArgsConstructor;
@@ -16,7 +14,10 @@ import org.bukkit.entity.Player;
 import ru.cristalix.core.lib.Preconditions;
 import ru.cristalix.museum.App;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**

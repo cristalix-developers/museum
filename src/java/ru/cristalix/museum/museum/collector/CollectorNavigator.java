@@ -62,7 +62,7 @@ public class CollectorNavigator {
 		double x = (to.getX() - from.getX()) * localPart;
 		double y = (to.getY() - from.getY()) * localPart;
 		double z = (to.getZ() - from.getZ()) * localPart;
-		return new Location(world, x + to.getX(), y + to.getY(), z + to.getZ(), yaw, 0); // pitch
+		return new Location(world, x + to.getX(), y + to.getY() - 1, z + to.getZ(), yaw, 0); // pitch
 	}
 
 	@Data

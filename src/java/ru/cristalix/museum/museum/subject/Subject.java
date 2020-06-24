@@ -12,7 +12,8 @@ public interface Subject extends Storable<SubjectInfo> {
 	void show(User user);
 
 	// todo: useless method
-	default void update(User user) {}
+	default void update(User user) {
+	}
 
 	void hide(User user);
 

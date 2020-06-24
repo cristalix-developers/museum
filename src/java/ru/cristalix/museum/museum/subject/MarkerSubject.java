@@ -24,7 +24,7 @@ public class MarkerSubject implements Subject {
 
 	public MarkerSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
 		this.info = info;
-		this.location = UtilV3.toLocation(info.getLocation().clone().add(0.5, -0.5, 0.5), App.getApp().getWorld());
+		this.location = UtilV3.toLocation(info.getLocation().clone().add(0.5, 0, 0.5), App.getApp().getWorld());
 		this.collectorId = info.getMetadata() == null ? 0 : Integer.parseInt(info.getMetadata());
 	}
 

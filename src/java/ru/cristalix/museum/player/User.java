@@ -35,12 +35,10 @@ public class User implements PlayerWrapper {
 
 	@Delegate
 	private final UserInfo info;
-
-	private Player player;
-	private PlayerConnection connection;
-
 	private final Map<String, Museum> museums;
 	private final Map<String, Skeleton> skeletons;
+	private Player player;
+	private PlayerConnection connection;
 	private List<Booster> localBoosters;
 	private Subject currentSubject;
 	private Museum currentMuseum;

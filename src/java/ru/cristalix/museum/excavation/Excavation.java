@@ -17,7 +17,11 @@ public class Excavation {
 	private final ExcavationPrototype prototype;
 	private int hitsLeft;
 
-	@SuppressWarnings ("deprecation")
+	public static boolean isAir(User user, BlockPosition pos) {
+		return user.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ()).getType() == Material.AIR;
+	}
+
+	@SuppressWarnings("deprecation")
 	public void load(User user) {
 		Player player = user.getPlayer();
 		player.getInventory().clear();
@@ -34,10 +38,6 @@ public class Excavation {
 				.send(user);
 
 		prototype.getPackets().forEach(user::sendPacket);
-	}
-
-	public static boolean isAir(User user, BlockPosition pos) {
-		return user.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ()).getType() == Material.AIR;
 	}
 
 }

@@ -1,4 +1,4 @@
-package ru.cristalix.museum.museum;
+package ru.cristalix.museum.listener;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
@@ -36,12 +36,13 @@ public class MuseumEvents implements Listener {
 		val from = e.getFrom();
 		val to = e.getTo();
 
-		if (from.getBlockX() == to.getBlockX() && from.getBlockY() == to.getBlockY() && from.getBlockZ() == to.getBlockZ()) return;
+		if (from.getBlockX() == to.getBlockX() && from.getBlockY() == to.getBlockY() && from.getBlockZ() == to.getBlockZ())
+			return;
 
 		val player = e.getPlayer();
 		val user = app.getUser(player.getUniqueId());
 
-		if (user.getExcavation() != null)
+		if (user.getExcavation() != null || user.getCoins() == null)
 			return;
 
 		// Попытка скушать монетки

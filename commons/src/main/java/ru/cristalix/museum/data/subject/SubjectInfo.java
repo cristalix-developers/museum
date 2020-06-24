@@ -15,10 +15,8 @@ public class SubjectInfo implements Cloneable {
 	public V3 location;
 
 	public D2 rotation;
-
-	private Color color;
-
 	public String metadata;
+	private Color color;
 
 	@Override
 	public SubjectInfo clone() {

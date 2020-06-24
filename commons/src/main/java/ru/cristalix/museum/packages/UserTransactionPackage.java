@@ -6,7 +6,7 @@ import ru.cristalix.museum.donate.DonateType;
 import java.util.UUID;
 
 @Data
-@EqualsAndHashCode (callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class UserTransactionPackage extends MuseumPackage {

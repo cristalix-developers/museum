@@ -2,7 +2,6 @@ package ru.cristalix.museum.client;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.gson.Gson;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -38,16 +37,31 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
 	private static final Class<? extends SocketChannel> CHANNEL_CLASS;
 	private static final EventLoopGroup GROUP;
 
+	static {
+		boolean epoll;
+		try {
+			Class.forName("io.netty.channel.epoll.Epoll");
+			epoll = !Boolean.getBoolean("cristalix.net.disable-native-transport") && Epoll.isAvailable();
+		} catch (ClassNotFoundException ignored) {
+			epoll = false;
+		}
+		if (epoll) {
+			CHANNEL_CLASS = EpollSocketChannel.class;
+			GROUP = new EpollEventLoopGroup(1);
+		} else {
+			CHANNEL_CLASS = NioSocketChannel.class;
+			GROUP = new NioEventLoopGroup(1);
+		}
+	}
+
 	private final Cache<String, CompletableFuture> responseCache = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.SECONDS).build();
-
-	private Channel channel;
-
 	private final String host;
 	private final int port;
 	private final String password;
 	private final String serverName;
 
 	private final Map<Class<? extends MuseumPackage>, Consumer> handlersMap = new HashMap<>();
+	private Channel channel;
 
 	public void connect() {
 		new Bootstrap()
@@ -73,7 +87,7 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
 												false,
 												new DefaultHttpHeaders(),
 												65536
-																					  ),
+										),
 										true
 								))
 								.addLast(ClientSocket.this);
@@ -170,23 +184,6 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
 
 	public void schedule(Runnable command, long delay, TimeUnit unit) {
 		GROUP.schedule(command, delay, unit);
-	}
-
-	static {
-		boolean epoll;
-		try {
-			Class.forName("io.netty.channel.epoll.Epoll");
-			epoll = !Boolean.getBoolean("cristalix.net.disable-native-transport") && Epoll.isAvailable();
-		} catch (ClassNotFoundException ignored) {
-			epoll = false;
-		}
-		if (epoll) {
-			CHANNEL_CLASS = EpollSocketChannel.class;
-			GROUP = new EpollEventLoopGroup(1);
-		} else {
-			CHANNEL_CLASS = NioSocketChannel.class;
-			GROUP = new NioEventLoopGroup(1);
-		}
 	}
 
 }

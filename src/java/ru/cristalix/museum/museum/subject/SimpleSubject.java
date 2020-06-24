@@ -1,9 +1,7 @@
 package ru.cristalix.museum.museum.subject;
 
 import lombok.val;
-import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
-import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange;
 import org.bukkit.Location;
 import ru.cristalix.core.math.V3;
@@ -22,10 +20,10 @@ import ru.cristalix.museum.player.pickaxe.Pickaxe;
  */
 public class SimpleSubject implements Subject {
 
-	private final SubjectPrototype prototype;
 	protected final Museum museum;
 	protected final SubjectInfo info;
 	protected final Location location;
+	private final SubjectPrototype prototype;
 
 	public SimpleSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
 		this.museum = museum;
