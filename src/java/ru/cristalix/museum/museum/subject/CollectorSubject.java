@@ -75,7 +75,7 @@ public class CollectorSubject extends SimpleSubject {
 		if (navigator == null)
 			return;
 		val location = getLocation(iteration);
-		user.getCoins().removeIf(coin -> coin.pickUp(user, location, prototype.getRadius()));
+		user.getCoins().removeIf(coin -> coin.pickUp(user, location, prototype.getRadius(), id));
 		piece.update(user.getPlayer(), location);
 	}
 

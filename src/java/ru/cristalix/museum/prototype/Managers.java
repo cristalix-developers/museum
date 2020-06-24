@@ -20,10 +20,7 @@ import ru.cristalix.museum.museum.map.*;
 import ru.cristalix.museum.museum.subject.skeleton.Rarity;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Managers {
@@ -33,23 +30,12 @@ public class Managers {
     public static PrototypeManager<SkeletonPrototype> skeleton;
     public static PrototypeManager<ExcavationPrototype> excavation;
 
-    @SuppressWarnings("deprecation")
     public static void init() {
         subject = new PrototypeManager<>("subject", (address, box) -> {
-            String typeStr = box.requireLabel("type").getTag();
-            String title = box.requireLabel("title").getTag();
-            double price = box.getLabels("price").stream().findAny().map(Label::getTagDouble).orElse(Double.NaN);
-            int cristalixPrice = box.getLabels("cristalix-price").stream()
-                    .findAny().map(Label::getTag).map(Integer::parseInt).orElse(-1);
-            Location origin = box.getLabels("origin").stream()
-                    .findAny()
-                    .orElse(null);
-
-            if (origin == null)
-                origin = box.getCenter();
+            Optional<Label> label = box.getLabels("origin").stream().findAny();
 
             SubjectPrototype.SubjectPrototypeBuilder<?, ?> builder;
-            SubjectType<?> type = SubjectType.byString(typeStr);
+            SubjectType<?> type = SubjectType.byString(box.requireLabel("type").getTag());
 
             if (type == SubjectType.COLLECTOR)
                 builder = CollectorSubjectPrototype.builder()
@@ -62,16 +48,21 @@ public class Managers {
 
             else builder = SubjectPrototype.builder();
 
-            List<V3> manipulators = box.getLabels("manipulator").stream()
-                    .map(box::toRelativeVector)
-                    .collect(Collectors.toList());
-
-            return builder.relativeOrigin(box.toRelativeVector(origin))
-                    .relativeManipulators(manipulators)
-                    .address(address)
-                    .price(price)
-                    .cristalixPrice(cristalixPrice)
-                    .title(title)
+            return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
+                    .relativeManipulators(box.getLabels("manipulator").stream()
+                            .map(box::toRelativeVector)
+                            .collect(Collectors.toList())
+                    ).address(address)
+                    .price(box.getLabels("price").stream()
+                            .findAny()
+                            .map(Label::getTagDouble)
+                            .orElse(Double.NaN)
+                    ).cristalixPrice(box.getLabels("cristalix-price").stream()
+                            .findAny()
+                            .map(Label::getTag)
+                            .map(Integer::parseInt)
+                            .orElse(0)
+                    ).title(box.requireLabel("title").getTag())
                     .box(box)
                     .type(type)
                     .build();

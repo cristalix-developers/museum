@@ -45,7 +45,7 @@ public class MuseumEvents implements Listener {
 			return;
 
 		// Попытка скушать монетки
-		user.getCoins().removeIf(coin -> coin.pickUp(user, to, 1.7));
+		user.getCoins().removeIf(coin -> coin.pickUp(user, to, 1.7, player.getEntityId()));
 	}
 
 }
