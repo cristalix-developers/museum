@@ -45,7 +45,8 @@ public class MuseumService {
 		put(DonateType.GLOBAL_VISITORS_BOOSTER, globalBoosterPreAuthorize(BoosterType.VISITORS));
 	}};
 
-	private static final Map<DonateType, BiConsumer<UserTransactionPackage, UserInfo>> TRANSACTION_POST_AUTHORIZE_MAP = new HashMap<DonateType, BiConsumer<UserTransactionPackage, UserInfo>>() {{
+	private static final Map<DonateType, BiConsumer<UserTransactionPackage, UserInfo>> TRANSACTION_POST_AUTHORIZE_MAP
+			= new HashMap<DonateType, BiConsumer<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.LOCAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, false));
 		put(DonateType.GLOBAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, true));
 		put(DonateType.LOCAL_VISITORS_BOOSTER, boosterPostAuthorize(BoosterType.VISITORS, false));
@@ -134,7 +135,7 @@ public class MuseumService {
 			ServerSocketHandler.broadcast(broadcastPackage);
 		}));
 		registerHandler(ThanksExecutePackage.class, ((channel, serverName, museumPackage) -> {
-			int boosters = SQL_MANAGER.executeThanks(museumPackage.getUser());
+			long boosters = SQL_MANAGER.executeThanks(museumPackage.getUser());
 			extra(museumPackage.getUser(), null, (double) (THANKS_SECONDS * boosters));
 			museumPackage.setBoostersCount(boosters);
 			answer(channel, museumPackage);

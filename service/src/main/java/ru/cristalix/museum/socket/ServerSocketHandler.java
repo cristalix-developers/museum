@@ -25,7 +25,7 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 	private static final Map<String, Channel> connectedChannels = new ConcurrentHashMap<>();
 
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) throws Exception {
+	protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) {
 		if (msg instanceof TextWebSocketFrame) {
 			MuseumPackage museumPackage = UtilNetty.readFrame((TextWebSocketFrame) msg);
 			Channel channel = ctx.channel();
@@ -43,7 +43,7 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 				if (!pckg.getPassword().equals(MuseumService.PASSWORD)) {
 					System.out.println("Channel provided bad password: " + pckg.getPassword());
 					if (channel.remoteAddress() instanceof InetSocketAddress) {
-						System.out.println(((InetSocketAddress) channel.remoteAddress()).toString());
+						System.out.println(channel.remoteAddress().toString());
 					}
 					ctx.close();
 					return;
@@ -59,7 +59,7 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 				if (!channel.hasAttr(serverInfoKey)) {
 					System.out.println("Some channel tries to send packet without authorization!");
 					if (channel.remoteAddress() instanceof InetSocketAddress) {
-						System.out.println(((InetSocketAddress) channel.remoteAddress()).toString());
+						System.out.println(channel.remoteAddress().toString());
 					}
 					ctx.close();
 					return;
@@ -71,7 +71,7 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 	}
 
 	@Override
-	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+	public void channelInactive(ChannelHandlerContext ctx) {
 		Channel channel = ctx.channel();
 		if (channel.hasAttr(serverInfoKey)) {
 			String name = channel.attr(serverInfoKey).get();

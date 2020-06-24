@@ -1,6 +1,9 @@
 package ru.cristalix.museum.configuration;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.museum.packages.ConfigurationsPackage;
 import ru.cristalix.museum.socket.ServerSocketHandler;
@@ -14,47 +17,57 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class ConfigurationManager {
 
-	private final String configFile, guisFile, itemsFile;
+    private final String configFile, guiFile, itemsFile;
 
-	private String configData, guisData, itemsData;
+    private String configData, guiData, itemsData;
 
-	public void init() {
-		reload();
-		CoreApi.get().getPlatform().getScheduler().runAsyncRepeating(this::reload, 1L, TimeUnit.MINUTES);
-	}
+    public void init() {
+        reload();
+        CoreApi.get().getPlatform().getScheduler().runAsyncRepeating(this::reload, 1L, TimeUnit.MINUTES);
+    }
 
-	public void reload() {
-		boolean reload = false;
-		String config = read(configFile);
-		if (!Objects.equals(config, configData)) {
-			configData = config;
-			reload = true;
-		}
-		String guis = read(guisFile);
-		if (!Objects.equals(guis, guisData)) {
-			guisData = guis;
-			reload = true;
-		}
-		String items = read(itemsFile);
-		if (!Objects.equals(items, itemsData)) {
-			itemsData = items;
-			reload = true;
-		}
-		if (reload)
-			ServerSocketHandler.broadcast(pckg());
-	}
+    private Pair<String, Boolean> load(String file, String data) {
+        String readed = read(file);
+        if (Objects.equals(readed, data)) {
+            return new Pair<>(data, false);
+        }
+        data = readed;
+        return new Pair<>(data, true);
+    }
 
-	private String read(String file) {
-		try {
-			return Base64.getEncoder().encodeToString(String.join("\n", Files.readAllLines(new File(file).toPath())).getBytes());
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return null;
-		}
-	}
+    public void reload() {
+        val config = load(configFile, configData);
+        configData = config.getKey();
 
-	public ConfigurationsPackage pckg() {
-		return new ConfigurationsPackage(configData, guisData, itemsData);
-	}
+		val gui = load(guiFile, guiData);
+		guiData = gui.getKey();
 
+		val items = load(itemsFile, itemsData);
+		itemsData = items.getKey();
+
+        if (config.getValue() || gui.getValue() || items.getValue())
+            ServerSocketHandler.broadcast(pckg());
+    }
+
+    private String read(String file) {
+        try {
+            return Base64.getEncoder().encodeToString(String.join("\n", Files.readAllLines(new File(file).toPath())).getBytes());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public ConfigurationsPackage pckg() {
+        return new ConfigurationsPackage(configData, guiData, itemsData);
+    }
+
+    @Getter
+    @AllArgsConstructor
+    private static class Pair<K, V> {
+
+        private final K key;
+        private final V value;
+
+    }
 }

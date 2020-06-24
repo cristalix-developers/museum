@@ -15,6 +15,6 @@ public class ThanksExecutePackage extends MuseumPackage {
 	private UUID user;
 
 	// response
-	private int boostersCount; // Количество бустеров, за которые поблагодарил игрок
+	private long boostersCount; // Количество бустеров, за которые поблагодарил игрок
 
 }
