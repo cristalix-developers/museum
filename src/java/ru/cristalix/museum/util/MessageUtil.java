@@ -3,8 +3,8 @@ package ru.cristalix.museum.util;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
-import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.App;
+import ru.cristalix.museum.player.User;
 
 import java.text.DecimalFormat;
 
@@ -15,8 +15,8 @@ import java.text.DecimalFormat;
 @UtilityClass
 public class MessageUtil {
 
-	private static String PREFIX;
 	private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###,###.##$");
+	private static String PREFIX;
 
 	public static String toMoneyFormat(double money) {
 		return MONEY_FORMAT.format(money);

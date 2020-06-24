@@ -1,10 +1,10 @@
 package ru.cristalix.museum.excavation;
 
-import ru.cristalix.museum.prototype.Prototype;
-import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import lombok.Data;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Location;
+import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
+import ru.cristalix.museum.prototype.Prototype;
 
 import java.util.List;
 

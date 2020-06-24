@@ -21,7 +21,6 @@ import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.data.subject.SubjectInfo;
-import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.museum.map.MuseumPrototype;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.prepare.PrepareSteps;
@@ -36,135 +35,135 @@ import java.util.stream.Collectors;
 
 public class PlayerDataManager implements Listener {
 
-    private final App app;
-    private final Map<UUID, User> userMap = new HashMap<>();
-    private final MultiTimeBar timeBar;
-    private List<Booster> globalBoosters = new ArrayList<>(0);
+	private final App app;
+	private final Map<UUID, User> userMap = new HashMap<>();
+	private final MultiTimeBar timeBar;
+	private List<Booster> globalBoosters = new ArrayList<>(0);
 
-    public PlayerDataManager(App app) {
-        this.app = app;
+	public PlayerDataManager(App app) {
+		this.app = app;
 
-        ClientSocket client = app.getClientSocket();
-        CoreApi api = CoreApi.get();
+		ClientSocket client = app.getClientSocket();
+		CoreApi api = CoreApi.get();
 
-        api.bus().register(this, AccountEvent.Load.class, event -> {
-            if (event.isCancelled())
-                return;
-            val uuid = event.getUuid();
-            try {
-                UserInfoPackage userInfoPackage = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
-                        .get(5L, TimeUnit.SECONDS);
-                UserInfo userInfo = userInfoPackage.getUserInfo();
-                if (userInfo == null) {
-                    MuseumPrototype proto = Managers.museum.getPrototype("main");
-                    MuseumInfo startMuseum = new MuseumInfo(
-                            proto.getAddress(),
-                            "Музей археологии",
-                            new Date(),
-                            3,
-                            new ArrayList<>()
-                    );
-                    for (SubjectInfo subject : proto.getDefaultSubjects()) {
-                        startMuseum.getSubjectInfos().add(subject.clone());
-                    }
+		api.bus().register(this, AccountEvent.Load.class, event -> {
+			if (event.isCancelled())
+				return;
+			val uuid = event.getUuid();
+			try {
+				UserInfoPackage userInfoPackage = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
+						.get(5L, TimeUnit.SECONDS);
+				UserInfo userInfo = userInfoPackage.getUserInfo();
+				if (userInfo == null) {
+					MuseumPrototype proto = Managers.museum.getPrototype("main");
+					MuseumInfo startMuseum = new MuseumInfo(
+							proto.getAddress(),
+							"Музей археологии",
+							new Date(),
+							3,
+							new ArrayList<>()
+					);
+					for (SubjectInfo subject : proto.getDefaultSubjects()) {
+						startMuseum.getSubjectInfos().add(subject.clone());
+					}
 
-                    userInfo = new UserInfo(
-                            uuid,
-                            0,
-                            1000.0,
-                            PickaxeType.DEFAULT,
-                            Collections.singletonList(startMuseum),
-                            Collections.emptyList(),
-                            0,
-                            0,
-                            new ArrayList<>()
-                    );
-                } else {
-                	// No dynamic constructor :( thx java
-                    userInfo.setDonates(userInfo.getDonates() == null ?
-                            new ArrayList<>(1) :
-                            new ArrayList<>(userInfo.getDonates())
-                    );
-                }
-                userMap.put(uuid, new User(userInfo, new ArrayList<>(userInfoPackage.getLocalBoosters())));
-            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-                event.setCancelReason("Не удалось загрузить статистику о музее.");
-                event.setCancelled(true);
-                ex.printStackTrace();
-            }
-        }, 400);
-        api.bus().register(this, AccountEvent.Unload.class, event -> {
-            val data = userMap.remove(event.getUuid());
-            if (data == null)
-                return;
-            client.write(new SaveUserPackage(event.getUuid(), data.generateUserInfo()));
-        }, 100);
-        client.registerHandler(GlobalBoostersPackage.class, pckg -> globalBoosters = pckg.getBoosters());
-        client.registerHandler(ExtraDepositUserPackage.class, pckg -> {
-            User user = userMap.get(pckg.getUser());
-            if (user != null) {
-                if (pckg.getSum() != null)
-                    user.setMoney(user.getMoney() + pckg.getSum());
-                if (pckg.getSeconds() != null) {
-                    double result = pckg.getSeconds() * user.getCurrentMuseum().getIncome(); // Типа того
-                    user.setMoney(user.getMoney() + result);
-                }
-            }
-        });
-        this.timeBar = new MultiTimeBar(
-                () -> new ArrayList<>(globalBoosters),
-                5L, TimeUnit.SECONDS,
-                () -> Colors.cYellow + "Нет активных глобальных бустеров"
-        );
-    }
+					userInfo = new UserInfo(
+							uuid,
+							0,
+							1000.0,
+							PickaxeType.DEFAULT,
+							Collections.singletonList(startMuseum),
+							Collections.emptyList(),
+							0,
+							0,
+							new ArrayList<>()
+					);
+				} else {
+					// No dynamic constructor :( thx java
+					userInfo.setDonates(userInfo.getDonates() == null ?
+							new ArrayList<>(1) :
+							new ArrayList<>(userInfo.getDonates())
+					);
+				}
+				userMap.put(uuid, new User(userInfo, new ArrayList<>(userInfoPackage.getLocalBoosters())));
+			} catch (InterruptedException | ExecutionException | TimeoutException ex) {
+				event.setCancelReason("Не удалось загрузить статистику о музее.");
+				event.setCancelled(true);
+				ex.printStackTrace();
+			}
+		}, 400);
+		api.bus().register(this, AccountEvent.Unload.class, event -> {
+			val data = userMap.remove(event.getUuid());
+			if (data == null)
+				return;
+			client.write(new SaveUserPackage(event.getUuid(), data.generateUserInfo()));
+		}, 100);
+		client.registerHandler(GlobalBoostersPackage.class, pckg -> globalBoosters = pckg.getBoosters());
+		client.registerHandler(ExtraDepositUserPackage.class, pckg -> {
+			User user = userMap.get(pckg.getUser());
+			if (user != null) {
+				if (pckg.getSum() != null)
+					user.setMoney(user.getMoney() + pckg.getSum());
+				if (pckg.getSeconds() != null) {
+					double result = pckg.getSeconds() * user.getCurrentMuseum().getIncome(); // Типа того
+					user.setMoney(user.getMoney() + result);
+				}
+			}
+		});
+		this.timeBar = new MultiTimeBar(
+				() -> new ArrayList<>(globalBoosters),
+				5L, TimeUnit.SECONDS,
+				() -> Colors.cYellow + "Нет активных глобальных бустеров"
+		);
+	}
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        val player = e.getPlayer();
-        timeBar.onJoin(player.getUniqueId());
-        val user = userMap.get(player.getUniqueId());
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		val player = e.getPlayer();
+		timeBar.onJoin(player.getUniqueId());
+		val user = userMap.get(player.getUniqueId());
 
-        user.setConnection(((CraftPlayer) player).getHandle().playerConnection);
-        user.setPlayer(player);
+		user.setConnection(((CraftPlayer) player).getHandle().playerConnection);
+		user.setPlayer(player);
 
-        B.postpone(5, () -> {
-            for (val prepare : PrepareSteps.values())
-                prepare.getPrepare().execute(user, app);
-        });
+		B.postpone(5, () -> {
+			for (val prepare : PrepareSteps.values())
+				prepare.getPrepare().execute(user, app);
+		});
 
-        e.setJoinMessage(null);
-    }
+		e.setJoinMessage(null);
+	}
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerLogin(PlayerLoginEvent e) {
-        if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
-            userMap.remove(e.getPlayer().getUniqueId());
-    }
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerLogin(PlayerLoginEvent e) {
+		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
+			userMap.remove(e.getPlayer().getUniqueId());
+	}
 
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent e) {
-        timeBar.onQuit(e.getPlayer().getUniqueId());
-        e.setQuitMessage(null);
-    }
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		timeBar.onQuit(e.getPlayer().getUniqueId());
+		e.setQuitMessage(null);
+	}
 
-    public double calcMultiplier(UUID user, BoosterType type) {
-        // todo: useless method
-        return userMap.get(user).calcMultiplier(type) + globalBoosters.stream().filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis()).mapToDouble(
-                booster -> booster.getMultiplier() - 1.0).sum();
-    }
+	public double calcMultiplier(UUID user, BoosterType type) {
+		// todo: useless method
+		return userMap.get(user).calcMultiplier(type) + globalBoosters.stream().filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis()).mapToDouble(
+				booster -> booster.getMultiplier() - 1.0).sum();
+	}
 
-    public User getUser(UUID uuid) {
-        return userMap.get(uuid);
-    }
+	public User getUser(UUID uuid) {
+		return userMap.get(uuid);
+	}
 
-    public BulkSaveUserPackage bulk(boolean remove) {
-        return new BulkSaveUserPackage(Bukkit.getOnlinePlayers().stream().map(pl -> {
-            val uuid = pl.getUniqueId();
-            User user = remove ? userMap.remove(uuid) : userMap.get(uuid);
-            if (user == null)
-                return null;
-            return new SaveUserPackage(uuid, user.generateUserInfo());
-        }).filter(Objects::nonNull).collect(Collectors.toList()));
-    }
+	public BulkSaveUserPackage bulk(boolean remove) {
+		return new BulkSaveUserPackage(Bukkit.getOnlinePlayers().stream().map(pl -> {
+			val uuid = pl.getUniqueId();
+			User user = remove ? userMap.remove(uuid) : userMap.get(uuid);
+			if (user == null)
+				return null;
+			return new SaveUserPackage(uuid, user.generateUserInfo());
+		}).filter(Objects::nonNull).collect(Collectors.toList()));
+	}
 
 }

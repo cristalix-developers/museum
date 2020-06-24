@@ -14,7 +14,6 @@ import ru.cristalix.museum.museum.collector.CollectorNavigator;
 import ru.cristalix.museum.museum.map.MuseumPrototype;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.museum.map.SubjectType;
-import ru.cristalix.museum.museum.subject.CollectorSubject;
 import ru.cristalix.museum.museum.subject.MarkerSubject;
 import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
@@ -113,7 +112,7 @@ public class Museum implements Storable<MuseumInfo> {
 			income += subject.getIncome();
 	}
 
-	@SuppressWarnings ("unchecked")
+	@SuppressWarnings("unchecked")
 	public <T extends Subject> List<T> getSubjects(SubjectType<T> type) {
 		List<T> list = new ArrayList<>();
 		for (Subject subject : subjects) {

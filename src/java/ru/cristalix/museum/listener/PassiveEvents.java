@@ -20,84 +20,84 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
  */
 public class PassiveEvents implements Listener {
 
-    @EventHandler
-    public void onDamage(EntityDamageEvent e) {
-        e.setCancelled(true);
-    }
+	@EventHandler
+	public void onDamage(EntityDamageEvent e) {
+		e.setCancelled(true);
+	}
 
-    @EventHandler
-    public void onArmorstandManipulation(PlayerArmorStandManipulateEvent event) {
+	@EventHandler
+	public void onArmorstandManipulation(PlayerArmorStandManipulateEvent event) {
 		event.setCancelled(true);
-    }
+	}
 
-    @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event) {
+	@EventHandler
+	public void onBlockPlace(BlockPlaceEvent event) {
 		event.setCancelled(true);
-    }
+	}
 
-    @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
+	@EventHandler
+	public void onBlockBreak(BlockBreakEvent event) {
 		event.setCancelled(true);
-    }
+	}
 
-    @EventHandler
-    public void onFooLevenChange(FoodLevelChangeEvent event) {
+	@EventHandler
+	public void onFooLevenChange(FoodLevelChangeEvent event) {
 		event.setFoodLevel(20);
-    }
+	}
 
-    @EventHandler
-    public void onPhysics(BlockPhysicsEvent event) {
-        event.setCancelled(true);
-    }
+	@EventHandler
+	public void onPhysics(BlockPhysicsEvent event) {
+		event.setCancelled(true);
+	}
 
-    @EventHandler
-    public void onFromTo(BlockFromToEvent event) {
-        event.setCancelled(true);
-    }
+	@EventHandler
+	public void onFromTo(BlockFromToEvent event) {
+		event.setCancelled(true);
+	}
 
-    @EventHandler
-    public void onVillangerClick(PlayerInteractEntityEvent event) {
-        event.setCancelled(true);
-    }
+	@EventHandler
+	public void onVillangerClick(PlayerInteractEntityEvent event) {
+		event.setCancelled(true);
+	}
 
-    @EventHandler
-    public void onItemDrop(PlayerDropItemEvent event) {
-        event.setCancelled(true);
-    }
+	@EventHandler
+	public void onItemDrop(PlayerDropItemEvent event) {
+		event.setCancelled(true);
+	}
 
-    @EventHandler
-    public void onHangingBreak(HangingBreakByEntityEvent event) {
-        event.setCancelled(true);
-    }
+	@EventHandler
+	public void onHangingBreak(HangingBreakByEntityEvent event) {
+		event.setCancelled(true);
+	}
 
-    @EventHandler
-    public void onBurn(BlockBurnEvent event) {
-        event.setCancelled(true);
-    }
+	@EventHandler
+	public void onBurn(BlockBurnEvent event) {
+		event.setCancelled(true);
+	}
 
-    @EventHandler
-    public void onExplode(EntityExplodeEvent event) {
-        event.blockList().clear();
-    }
+	@EventHandler
+	public void onExplode(EntityExplodeEvent event) {
+		event.blockList().clear();
+	}
 
-    @EventHandler
-    public void onArmorStand(PlayerArmorStandManipulateEvent event) {
-        event.setCancelled(true);
-    }
+	@EventHandler
+	public void onArmorStand(PlayerArmorStandManipulateEvent event) {
+		event.setCancelled(true);
+	}
 
-    @EventHandler
-    public void onCreatureSpawn(CreatureSpawnEvent event) {
-        event.setCancelled(event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL);
-    }
+	@EventHandler
+	public void onCreatureSpawn(CreatureSpawnEvent event) {
+		event.setCancelled(event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL);
+	}
 
-    @EventHandler
-    public void onAchievement(PlayerAdvancementCriterionGrantEvent event) {
-        event.setCancelled(true);
-    }
+	@EventHandler
+	public void onAchievement(PlayerAdvancementCriterionGrantEvent event) {
+		event.setCancelled(true);
+	}
 
-    @EventHandler
-    public void onSwap(PlayerSwapHandItemsEvent event) {
-        event.setCancelled(true);
-    }
+	@EventHandler
+	public void onSwap(PlayerSwapHandItemsEvent event) {
+		event.setCancelled(true);
+	}
 
 }

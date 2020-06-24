@@ -37,14 +37,12 @@ public class MuseumService {
 	public static final String PASSWORD = System.getProperty("PASSWORD", "gVatjN43AJnbFq36Fa");
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
 	public static SqlManager SQL_MANAGER;
-	public static ConfigurationManager CONFIGURATION_MANAGER;
 	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
 		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
 		put(DonateType.LOCAL_VISITORS_BOOSTER, localBoosterPreAuthorize(BoosterType.VISITORS));
 		put(DonateType.GLOBAL_VISITORS_BOOSTER, globalBoosterPreAuthorize(BoosterType.VISITORS));
 	}};
-
 	private static final Map<DonateType, BiConsumer<UserTransactionPackage, UserInfo>> TRANSACTION_POST_AUTHORIZE_MAP
 			= new HashMap<DonateType, BiConsumer<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.LOCAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, false));
@@ -52,6 +50,7 @@ public class MuseumService {
 		put(DonateType.LOCAL_VISITORS_BOOSTER, boosterPostAuthorize(BoosterType.VISITORS, false));
 		put(DonateType.GLOBAL_VISITORS_BOOSTER, boosterPostAuthorize(BoosterType.VISITORS, true));
 	}};
+	public static ConfigurationManager CONFIGURATION_MANAGER;
 
 	public static void main(String[] args) {
 		MicroserviceBootstrap.bootstrap(new MicroServicePlatform(2));

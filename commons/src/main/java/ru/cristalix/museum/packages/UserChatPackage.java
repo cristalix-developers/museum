@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 @Data
-@EqualsAndHashCode (callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 @RequiredArgsConstructor
 public class UserChatPackage extends MuseumPackage {
 

@@ -2,7 +2,6 @@ package ru.cristalix.museum.museum.collector;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

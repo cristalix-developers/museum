@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.prototype.Prototype;
 
-import java.util.*;
+import java.util.List;
 
 @Data
 public class MuseumPrototype implements Prototype {

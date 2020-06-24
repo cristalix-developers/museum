@@ -17,6 +17,14 @@ public class Skeleton implements Storable<SkeletonInfo> {
 	private final SkeletonPrototype skeletonPrototype;
 	private final List<Fragment> unlockedFragments;
 
+	public Skeleton(SkeletonInfo info) {
+		this.info = info;
+		this.skeletonPrototype = Managers.skeleton.getPrototype(info.getAddress());
+		this.unlockedFragments = skeletonPrototype.getFragments().stream()
+				.filter(e -> info.getUnlockedFragmentAddresses().contains(e.getAddress()))
+				.collect(Collectors.toList());
+	}
+
 	@Override
 	public SkeletonInfo generateInfo() {
 		info.setUnlockedFragmentAddresses(unlockedFragments.stream()
@@ -24,14 +32,6 @@ public class Skeleton implements Storable<SkeletonInfo> {
 				.collect(Collectors.toList())
 		);
 		return info;
-	}
-
-	public Skeleton(SkeletonInfo info) {
-		this.info = info;
-		this.skeletonPrototype = Managers.skeleton.getPrototype(info.getAddress());
-		this.unlockedFragments = skeletonPrototype.getFragments().stream()
-				.filter(e -> info.getUnlockedFragmentAddresses().contains(e.getAddress()))
-				.collect(Collectors.toList());
 	}
 
 }

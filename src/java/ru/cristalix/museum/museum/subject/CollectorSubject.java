@@ -28,9 +28,9 @@ public class CollectorSubject extends SimpleSubject {
 	private final SubjectInfo info;
 	@Getter
 	private final int id;
+	private final Piece piece;
 	@Setter
 	private CollectorNavigator navigator;
-	private final Piece piece;
 
 	public CollectorSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
 		super(museum, info, prototype);

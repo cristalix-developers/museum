@@ -70,6 +70,8 @@ public class SkeletonPrototype implements Prototype {
 		if (!current.isEmpty()) recursiveTree(selection, walked);
 	}
 
-	public String getTitle() {return this.title;}
+	public String getTitle() {
+		return this.title;
+	}
 
 }

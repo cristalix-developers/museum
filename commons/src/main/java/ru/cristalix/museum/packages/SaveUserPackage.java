@@ -8,7 +8,7 @@ import ru.cristalix.museum.data.UserInfo;
 import java.util.UUID;
 
 @Data
-@EqualsAndHashCode (callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 @RequiredArgsConstructor
 public class SaveUserPackage extends MuseumPackage {
 
