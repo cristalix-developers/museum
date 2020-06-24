@@ -59,15 +59,14 @@ public class Museum implements Storable<MuseumInfo> {
 
 		;
 
-		for (CollectorSubject collector : getSubjects(SubjectType.COLLECTOR)) {
+		getSubjects(SubjectType.COLLECTOR).forEach(collector -> {
 			List<MarkerSubject> markers = getSubjects(SubjectType.MARKER).stream()
 					.filter(marker -> marker.getCollectorId() == collector.getId())
 					.collect(Collectors.toList());
 			List<MarkerSubject> route = LocationTree.order(markers, MarkerSubject::getLocation);
-
 			collector.setNavigator(new CollectorNavigator(prototype, App.getApp().getWorld(),
 					route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
-		}
+		});
 	}
 
 	@Override

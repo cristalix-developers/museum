@@ -24,7 +24,7 @@ public class Visitor {
                 meetingLocation.getX(),
                 meetingLocation.getY(),
                 meetingLocation.getZ(),
-                .6
+                .8
         );
     }
 

@@ -24,13 +24,10 @@ import ru.cristalix.museum.player.User;
 public class CollectorSubject extends SimpleSubject {
 
 	private final CollectorSubjectPrototype prototype;
-
 	@Delegate
 	private final SubjectInfo info;
-
 	@Getter
 	private final int id;
-
 	@Setter
 	private CollectorNavigator navigator;
 	private final Piece piece;

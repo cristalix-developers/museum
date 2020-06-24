@@ -27,7 +27,6 @@ import java.util.function.Consumer;
 public final class VirtualSign {
 
 	private final Map<Integer, String> defaultText = Maps.newHashMapWithExpectedSize(4);
-	private final Collection<UUID> viewers = Sets.newHashSet();
 
 	public VirtualSign(@NonNull List<String> text) {
 		Preconditions.checkState(text.size() == 4, "text size must be equal to 4!");
@@ -36,9 +35,6 @@ public final class VirtualSign {
 		}
 	}
 
-	public boolean hasViewer(UUID uuid) {
-		return viewers.contains(uuid);
-	}
 
 	public void setDefaultText(int line, String text) {
 		defaultText.put(line, text == null ? null : ChatColor.translateAlternateColorCodes('&', text));
@@ -50,7 +46,6 @@ public final class VirtualSign {
 
 	public void openSign(Player p, Consumer<String[]> response) {
 		UUID uuid = p.getUniqueId();
-		viewers.add(uuid);
 		PlayerConnection connection = ((CraftPlayer) p).getHandle().playerConnection;
 		Location location = p.getLocation();
 		BlockPosition position = new BlockPosition(location.getX(), 0, location.getZ());
@@ -66,8 +61,6 @@ public final class VirtualSign {
 		}
 		connection.sendPacket(new PacketPlayOutOpenSignEditor(position));
 		Channel channel = connection.networkManager.channel;
-		ChannelFutureListener listener = future -> viewers.remove(uuid);
-		channel.closeFuture().addListener(listener);
 		channel.pipeline().addAfter("decoder", "sign_handler", new MessageToMessageDecoder<Packet>() {
 			@Override
 			protected void decode(ChannelHandlerContext channelHandlerContext, Packet packet, List<Object> out) {
@@ -84,9 +77,7 @@ public final class VirtualSign {
 							t.printStackTrace();
 							((CraftPlayer) p).disconnect(t.getClass().getName() + ":" + t.getMessage());
 						} finally {
-							channel.closeFuture().removeListener(listener);
 							channel.pipeline().remove("sign_handler");
-							viewers.remove(uuid);
 						}
 					}
 				} finally {

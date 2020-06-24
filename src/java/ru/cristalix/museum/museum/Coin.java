@@ -54,6 +54,7 @@ public class Coin {
 			val connection = user.getConnection();
 
 			connection.sendPacket(new PacketPlayOutCollect(entityItem.getId(), collectorId, 1));
+			// todo: none completed
 //			connection.sendPacket(new PacketPlayOutEntityVelocity(entityItem.getId(), 0, .05, 0));
 //			connection.sendPacket(new PacketPlayOutEntityMetadata(entityItem.getId(), entityItem.getDataWatcher(), false));
 //

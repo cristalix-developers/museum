@@ -14,6 +14,7 @@ import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.player.User;
+import ru.cristalix.museum.player.pickaxe.Pickaxe;
 
 /**
  * @author func 22.05.2020
@@ -25,8 +26,6 @@ public class SimpleSubject implements Subject {
 	protected final Museum museum;
 	protected final SubjectInfo info;
 	protected final Location location;
-
-	private static final IBlockData AIR = Block.getByCombinedId(0);
 
 	public SimpleSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
 		this.museum = museum;
@@ -69,7 +68,7 @@ public class SimpleSubject implements Subject {
 							location.z + z
 					);
 					val packet = new PacketPlayOutBlockChange(world, destination);
-					packet.block = hide ? AIR : world.getType(new BlockPosition(source));
+					packet.block = hide ? Pickaxe.AIR_DATA : world.getType(new BlockPosition(source));
 					user.sendPacket(packet);
 				}
 			}

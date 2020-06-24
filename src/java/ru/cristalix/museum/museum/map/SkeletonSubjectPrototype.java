@@ -9,5 +9,4 @@ public class SkeletonSubjectPrototype extends SubjectPrototype {
 
 	private final int size;
 
-
 }

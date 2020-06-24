@@ -1,9 +1,13 @@
 package ru.cristalix.museum.util;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class LevelSystem {
 
+	private static final String LEVEL_FORMAT = "§b%d §7%d/%d";
+
 	public static long getRequiredExperience(int forLevel) {
-		forLevel--;
 		return 100 * forLevel * forLevel - 50 * forLevel;
 	}
 
@@ -13,7 +17,7 @@ public class LevelSystem {
 
 	public static String formatExperience(long experience) {
 		int level = getLevel(experience);
-		return "§b" + level + " §7" + experience + "/" + getRequiredExperience(++level);
+		return String.format(LEVEL_FORMAT, level, experience, getRequiredExperience(level));
 	}
 
 }

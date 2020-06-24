@@ -73,7 +73,6 @@ public class CollectorNavigator {
 		private double part;
 		@ToString.Exclude
 		private Node next;
-
 	}
 
 }

@@ -46,9 +46,7 @@ public class SubjectType<T extends Subject> {
 	}
 
 	public interface Provider {
-
 		Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype);
-
 	}
 
 }

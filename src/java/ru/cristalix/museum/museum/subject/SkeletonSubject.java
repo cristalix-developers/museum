@@ -23,8 +23,8 @@ public class SkeletonSubject extends SimpleSubject {
     public SkeletonSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
         super(museum, info, prototype);
 
-        V3 o = prototype.getRelativeOrigin();
-        this.skeletonLocation = prototype.getBox().getMin().clone().add(o.getX(), o.getY(), o.getZ());
+        V3 origin = prototype.getRelativeOrigin();
+        this.skeletonLocation = prototype.getBox().getMin().clone().add(origin.getX(), origin.getY(), origin.getZ());
 
         if (info.metadata == null) {
             this.skeleton = null;

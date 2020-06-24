@@ -32,7 +32,7 @@ public class Managers {
 
     public static void init() {
         subject = new PrototypeManager<>("subject", (address, box) -> {
-            Optional<Label> label = box.getLabels("origin").stream().findAny();
+            val label = box.getLabels("origin").stream().findAny();
 
             SubjectPrototype.SubjectPrototypeBuilder<?, ?> builder;
             SubjectType<?> type = SubjectType.byString(box.requireLabel("type").getTag());
@@ -68,10 +68,9 @@ public class Managers {
                     .build();
         });
 
-        museum = new PrototypeManager<>(
-                "museum", (address, box) -> {
+        museum = new PrototypeManager<>("museum", (address, box) -> {
             box.expandVert();
-            List<SubjectInfo> defaultInfos = new ArrayList<>();
+            val defaultInfos = new ArrayList<SubjectInfo>();
             for (Label label : box.getLabels("default")) {
                 String[] tag = label.getTag().split(" ");
                 SubjectPrototype prototype = subject.getPrototype(tag[0]);
@@ -83,20 +82,16 @@ public class Managers {
             return new MuseumPrototype(address, box.requireLabel("spawn"), defaultInfos);
         });
 
-        skeleton = new PrototypeManager<>(
-                "skeleton", (address, box) ->
-                new SkeletonPrototype(
-                        box.requireLabel("title").getTag(),
-                        box.requireLabel("size").getTagInt(),
-                        box.requireLabel("pieces").getTagInt(),
-                        Rarity.valueOf(box.requireLabel("rarity").getTag().toUpperCase()),
-                        address,
-                        box.requireLabel("origin")
-                ));
+        skeleton = new PrototypeManager<>("skeleton", (address, box) -> new SkeletonPrototype(
+                box.requireLabel("title").getTag(),
+                box.requireLabel("size").getTagInt(),
+                box.requireLabel("pieces").getTagInt(),
+                Rarity.valueOf(box.requireLabel("rarity").getTag().toUpperCase()),
+                address,
+                box.requireLabel("origin")
+        ));
 
-        excavation = new PrototypeManager<>(
-                "excavation", (address, box) -> {
-
+        excavation = new PrototypeManager<>("excavation", (address, box) -> {
             box.expandVert();
 
             List<int[]> pallette = box.getLabels("pallette").stream()
@@ -114,8 +109,8 @@ public class Managers {
             if (skeletonPrototypes.isEmpty())
                 throw new InvalidConfigException("No available skeletons (.p available) found for excavation " + address);
 
-            Location min = box.getMin();
-            Location max = box.getMax();
+            val min = box.getMin();
+            val max = box.getMax();
 
             List<Location> space = new ArrayList<>();
             for (int x = (int) min.getX(); x < (int) max.getX(); x++) {

@@ -51,10 +51,10 @@ public class User implements PlayerWrapper {
 		this.info = info;
 		this.museums = this.getMuseumInfos().stream()
 				.map(museumInfo -> new Museum(museumInfo, this))
-				.collect(Collectors.toMap(Museum::getAddress, m -> m));
+				.collect(Collectors.toMap(Museum::getAddress, museum -> museum));
 		this.skeletons = this.getSkeletonInfos().stream()
 				.map(Skeleton::new)
-				.collect(Collectors.toMap(Skeleton::getAddress, s -> s));
+				.collect(Collectors.toMap(Skeleton::getAddress, skeleton -> skeleton));
 		this.localBoosters = localBoosters;
 	}
 
@@ -72,16 +72,11 @@ public class User implements PlayerWrapper {
 		int prevLevel = getLevel();
 		info.experience += exp;
 		int newLevel = getLevel();
-		if (newLevel != prevLevel) {
+		if (newLevel != prevLevel)
 			MessageUtil.find("levelup")
 					.set("level", newLevel)
-					.set("exp", LevelSystem.getRequiredExperience(newLevel + 1) - getExperience())
+					.set("exp", LevelSystem.getRequiredExperience(newLevel) - getExperience())
 					.send(this);
-		}
-	}
-
-	public long getExperienceToNextLevel() {
-		return LevelSystem.getRequiredExperience(getLevel() + 1) - getExperience();
 	}
 
 	public int getLevel() {
@@ -93,18 +88,20 @@ public class User implements PlayerWrapper {
 	}
 
 	@Override
-	public Location getSpawnLocation() {
+	public final Location getSpawnLocation() {
+		// todo: useless method
 		return null;
 	}
 
 	@Override
-	public EventPipe<?> getEventPipe() {
+	public final EventPipe<?> getEventPipe() {
+		// todo: useless method
 		return null;
 	}
 
 	@Override
-	public void setup() {
-
+	public final void setup() {
+		// todo: useless method, fix PlayerWrapper
 	}
 
 	public Skeleton getSkeleton(String address) {

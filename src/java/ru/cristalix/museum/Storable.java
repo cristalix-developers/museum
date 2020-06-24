@@ -3,6 +3,7 @@ package ru.cristalix.museum;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@FunctionalInterface
 public interface Storable<T> {
 
 	T generateInfo();

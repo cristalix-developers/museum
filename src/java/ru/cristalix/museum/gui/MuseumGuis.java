@@ -73,9 +73,11 @@ public class MuseumGuis {
 
         B.regCommand((player, args) -> {
             User user = app.getUser(player);
-            if (args.length == 0) return null;
+            if (args.length == 0)
+                return null;
             ExcavationPrototype proto = Managers.excavation.getPrototype(args[0]);
-            if (proto == null) return null;
+            if (proto == null)
+                return null;
 
             player.closeInventory();
 
@@ -89,13 +91,14 @@ public class MuseumGuis {
 
             user.getCurrentMuseum().unload(user);
             excavation.load(user);
-            return "";
+            return null;
         }, "excavation", "exc");
 
         B.regCommand((player, args) -> {
             User user = app.getUser(player);
             PickaxeType pickaxe = user.getPickaxeType().getNext();
-            if (pickaxe == user.getPickaxeType()) return null;
+            if (pickaxe == user.getPickaxeType())
+                return null;
             player.closeInventory();
 
             if (user.getMoney() < pickaxe.getPrice())
@@ -115,11 +118,10 @@ public class MuseumGuis {
         });
 
         Guis.registerItemizer("excavation", (base, player, context, slotId) -> {
-            SlotData slotData = context.getOpenedGui().getSlotData(slotId);
-            String info = slotData.getInfo();
-            ExcavationPrototype excavation = Managers.excavation.getPrototype(info);
-            User user = App.getApp().getUser(player);
-            if (excavation == null || excavation.getRequiredLevel() > user.getLevel())
+            ExcavationPrototype excavation = Managers.excavation.getPrototype(
+                    context.getOpenedGui().getSlotData(slotId).getInfo()
+            );
+            if (excavation == null || excavation.getRequiredLevel() > app.getUser(player).getLevel())
                 return Lemonade.get("unavailable").render();
             return base.dynamic()
                     .fill("excavation", excavation.getTitle())

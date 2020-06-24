@@ -13,7 +13,7 @@ import java.util.List;
 public class SubjectPrototype implements Prototype {
 
 	private final String address;
-	private final SubjectType type;
+	private final SubjectType<?> type;
 	private final double price;
 	private final Box box;
 	private final String title;

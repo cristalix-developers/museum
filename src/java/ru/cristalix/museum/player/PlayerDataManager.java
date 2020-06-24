@@ -36,133 +36,135 @@ import java.util.stream.Collectors;
 
 public class PlayerDataManager implements Listener {
 
-	private final App app;
-	private final Map<UUID, User> userMap = new HashMap<>();
-	private final MultiTimeBar timeBar;
-	private List<Booster> globalBoosters = new ArrayList<>(0);
+    private final App app;
+    private final Map<UUID, User> userMap = new HashMap<>();
+    private final MultiTimeBar timeBar;
+    private List<Booster> globalBoosters = new ArrayList<>(0);
 
-	public PlayerDataManager(App app) {
-		this.app = app;
-		ClientSocket client = app.getClientSocket();
-		CoreApi api = CoreApi.get();
-		api.bus().register(this, AccountEvent.Load.class, e -> {
-			if (e.isCancelled())
-				return;
-			val uuid = e.getUuid();
-			try {
-				UserInfoPackage userInfoPackage = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
-						.get(5L, TimeUnit.SECONDS);
-				UserInfo userInfo = userInfoPackage.getUserInfo();
-				if (userInfo == null) {
-					MuseumPrototype proto = Managers.museum.getPrototype("main");
-					MuseumInfo startMuseum = new MuseumInfo(
-							proto.getAddress(),
-							"Музей археологии",
-							new Date(),
-							3,
-							new ArrayList<>()
-					);
-					for (SubjectInfo subject : proto.getDefaultSubjects()) {
-						startMuseum.getSubjectInfos().add(subject.clone());
-					}
+    public PlayerDataManager(App app) {
+        this.app = app;
 
-					userInfo = new UserInfo(
-							uuid,
-							0,
-							1000.0,
-							PickaxeType.DEFAULT,
-							Collections.singletonList(startMuseum),
-							Collections.emptyList(),
-							0,
-							0,
-							new ArrayList<>()
-					);
-				} else {
-					List<DonateType> donates;
-					if (userInfo.getDonates() == null)
-						donates = new ArrayList<>(1);
-					else
-						donates = new ArrayList<>(userInfo.getDonates());
-					userInfo.setDonates(donates);
-				}
-				userMap.put(uuid, new User(userInfo, new ArrayList<>(userInfoPackage.getLocalBoosters())));
-			} catch (InterruptedException | ExecutionException | TimeoutException ex) {
-				e.setCancelReason("Не удалось загрузить статистику о музее.");
-				e.setCancelled(true);
-				ex.printStackTrace();
-			}
-		}, 400);
-		api.bus().register(this, AccountEvent.Unload.class, e -> {
-			val data = userMap.remove(e.getUuid());
-			if (data == null)
-				return;
-			client.write(new SaveUserPackage(e.getUuid(), data.generateUserInfo()));
-		}, 100);
-		client.registerHandler(GlobalBoostersPackage.class, pckg -> globalBoosters = pckg.getBoosters());
-		client.registerHandler(ExtraDepositUserPackage.class, pckg -> {
-			User user = userMap.get(pckg.getUser());
-			if (user != null) {
-				if (pckg.getSum() != null)
-					user.setMoney(user.getMoney() + pckg.getSum());
-				if (pckg.getSeconds() != null) {
-					double result = pckg.getSeconds() * user.getCurrentMuseum().getIncome(); // Да?..
-					user.setMoney(user.getMoney() + result);
-				}
-			}
-		});
-		this.timeBar = new MultiTimeBar(
-				() -> new ArrayList<>(globalBoosters),
-				5L, TimeUnit.SECONDS,
-				() -> Colors.cYellow + "Нет активных глобальных бустеров"
-		);
-	}
+        ClientSocket client = app.getClientSocket();
+        CoreApi api = CoreApi.get();
 
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e) {
-		val player = e.getPlayer();
-		timeBar.onJoin(player.getUniqueId());
-		val user = userMap.get(player.getUniqueId());
+        api.bus().register(this, AccountEvent.Load.class, event -> {
+            if (event.isCancelled())
+                return;
+            val uuid = event.getUuid();
+            try {
+                UserInfoPackage userInfoPackage = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
+                        .get(5L, TimeUnit.SECONDS);
+                UserInfo userInfo = userInfoPackage.getUserInfo();
+                if (userInfo == null) {
+                    MuseumPrototype proto = Managers.museum.getPrototype("main");
+                    MuseumInfo startMuseum = new MuseumInfo(
+                            proto.getAddress(),
+                            "Музей археологии",
+                            new Date(),
+                            3,
+                            new ArrayList<>()
+                    );
+                    for (SubjectInfo subject : proto.getDefaultSubjects()) {
+                        startMuseum.getSubjectInfos().add(subject.clone());
+                    }
 
-		user.setConnection(((CraftPlayer) player).getHandle().playerConnection);
-		user.setPlayer(player);
+                    userInfo = new UserInfo(
+                            uuid,
+                            0,
+                            1000.0,
+                            PickaxeType.DEFAULT,
+                            Collections.singletonList(startMuseum),
+                            Collections.emptyList(),
+                            0,
+                            0,
+                            new ArrayList<>()
+                    );
+                } else {
+                	// No dynamic constructor :( thx java
+                    userInfo.setDonates(userInfo.getDonates() == null ?
+                            new ArrayList<>(1) :
+                            new ArrayList<>(userInfo.getDonates())
+                    );
+                }
+                userMap.put(uuid, new User(userInfo, new ArrayList<>(userInfoPackage.getLocalBoosters())));
+            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                event.setCancelReason("Не удалось загрузить статистику о музее.");
+                event.setCancelled(true);
+                ex.printStackTrace();
+            }
+        }, 400);
+        api.bus().register(this, AccountEvent.Unload.class, event -> {
+            val data = userMap.remove(event.getUuid());
+            if (data == null)
+                return;
+            client.write(new SaveUserPackage(event.getUuid(), data.generateUserInfo()));
+        }, 100);
+        client.registerHandler(GlobalBoostersPackage.class, pckg -> globalBoosters = pckg.getBoosters());
+        client.registerHandler(ExtraDepositUserPackage.class, pckg -> {
+            User user = userMap.get(pckg.getUser());
+            if (user != null) {
+                if (pckg.getSum() != null)
+                    user.setMoney(user.getMoney() + pckg.getSum());
+                if (pckg.getSeconds() != null) {
+                    double result = pckg.getSeconds() * user.getCurrentMuseum().getIncome(); // Типа того
+                    user.setMoney(user.getMoney() + result);
+                }
+            }
+        });
+        this.timeBar = new MultiTimeBar(
+                () -> new ArrayList<>(globalBoosters),
+                5L, TimeUnit.SECONDS,
+                () -> Colors.cYellow + "Нет активных глобальных бустеров"
+        );
+    }
 
-		B.postpone(5, () -> {
-			for (val prepare : PrepareSteps.values())
-				prepare.getPrepare().execute(user, app);
-		});
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        val player = e.getPlayer();
+        timeBar.onJoin(player.getUniqueId());
+        val user = userMap.get(player.getUniqueId());
 
-		e.setJoinMessage(null);
-	}
+        user.setConnection(((CraftPlayer) player).getHandle().playerConnection);
+        user.setPlayer(player);
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerLogin(PlayerLoginEvent e) {
-		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
-			userMap.remove(e.getPlayer().getUniqueId());
-	}
+        B.postpone(5, () -> {
+            for (val prepare : PrepareSteps.values())
+                prepare.getPrepare().execute(user, app);
+        });
 
-	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent e) {
-		timeBar.onQuit(e.getPlayer().getUniqueId());
-		e.setQuitMessage(null);
-	}
+        e.setJoinMessage(null);
+    }
 
-	public double calcMultiplier(UUID user, BoosterType type) {
-		return userMap.get(user).calcMultiplier(type) + globalBoosters.stream().filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis()).mapToDouble(
-				booster -> booster.getMultiplier() - 1.0).sum();
-	}
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerLogin(PlayerLoginEvent e) {
+        if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
+            userMap.remove(e.getPlayer().getUniqueId());
+    }
 
-	public User getUser(UUID uuid) {
-		return userMap.get(uuid);
-	}
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        timeBar.onQuit(e.getPlayer().getUniqueId());
+        e.setQuitMessage(null);
+    }
 
-	public BulkSaveUserPackage bulk(boolean remove) {
-		return new BulkSaveUserPackage(Bukkit.getOnlinePlayers().stream().map(pl -> {
-			val uuid = pl.getUniqueId();
-			User user = remove ? userMap.remove(uuid) : userMap.get(uuid);
-			if (user == null)
-				return null;
-			return new SaveUserPackage(uuid, user.generateUserInfo());
-		}).filter(Objects::nonNull).collect(Collectors.toList()));
-	}
+    public double calcMultiplier(UUID user, BoosterType type) {
+        // todo: useless method
+        return userMap.get(user).calcMultiplier(type) + globalBoosters.stream().filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis()).mapToDouble(
+                booster -> booster.getMultiplier() - 1.0).sum();
+    }
+
+    public User getUser(UUID uuid) {
+        return userMap.get(uuid);
+    }
+
+    public BulkSaveUserPackage bulk(boolean remove) {
+        return new BulkSaveUserPackage(Bukkit.getOnlinePlayers().stream().map(pl -> {
+            val uuid = pl.getUniqueId();
+            User user = remove ? userMap.remove(uuid) : userMap.get(uuid);
+            if (user == null)
+                return null;
+            return new SaveUserPackage(uuid, user.generateUserInfo());
+        }).filter(Objects::nonNull).collect(Collectors.toList()));
+    }
 
 }

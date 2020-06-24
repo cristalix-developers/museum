@@ -41,7 +41,7 @@ import ru.cristalix.museum.museum.subject.CollectorSubject;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
-import ru.cristalix.museum.util.BukkitChatService;
+import ru.cristalix.museum.util.MuseumChatService;
 import ru.cristalix.museum.listener.PassiveEvents;
 import ru.cristalix.museum.prototype.Managers;
 import ru.cristalix.museum.visitor.VisitorManager;
@@ -71,6 +71,7 @@ public final class App extends JavaPlugin {
     public void onEnable() {
         B.plugin = App.app = this;
 
+        // Загрузка карты с сервера BUIL-1
         MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("MODELS", "Dino")
                 .orElseThrow(() -> new RuntimeException("Map museum/main wasn't found in the MapService"));
 
@@ -81,10 +82,18 @@ public final class App extends JavaPlugin {
         }
         this.map.getWorld().setGameRuleValue("mobGriefing", "false");
 
+        // Загрузга всех построек (витрины/коллекторы), мэнеджеров
         SubjectType.init();
         Managers.init();
 
-        this.clientSocket = new ClientSocket("127.0.0.1", 14653, "gVatjN43AJnbFq36Fa", IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName());
+        // Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
+        this.clientSocket = new ClientSocket(
+                "127.0.0.1",
+                14653,
+                "gVatjN43AJnbFq36Fa",
+                IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName()
+        );
+
         clientSocket.connect();
         clientSocket.registerHandler(BroadcastTitlePackage.class, pckg -> {
             String[] data = pckg.getData();
@@ -100,24 +109,35 @@ public final class App extends JavaPlugin {
         });
         this.playerDataManager = new PlayerDataManager(this);
 
+        // Регистрация Core сервисов
         CoreApi.get().unregisterService(IChatService.class);
-        CoreApi.get().registerService(IChatService.class, new BukkitChatService(IPermissionService.get(), getServer()));
+        CoreApi.get().registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
         CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
         CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
+        // Регистрация обработчика пакета конфига
         clientSocket.registerHandler(ConfigurationsPackage.class, pckg -> {
             YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
-            for (String key : itemsConfig.getKeys(false)) {
-                Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key);
-            }
-
+            itemsConfig.getKeys(false)
+                    .forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
+            // Загрузка всех инвентарей
             Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));
 
             this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
         });
 
-        new MuseumGuis(this);
+        // todo: overwrite on packets, remove hardcode
+        // Создание посетителей / @OverwrittenInFuture
+        VisitorManager visitorManager = new VisitorManager(Collections.singletonList(new Location(getWorld(), -67, 91, 268)));
+        visitorManager.clear();
+        visitorManager.spawn(new Location(getWorld(), -67, 91, 268), 20);
 
+        // Инициализация промежуточных команд / Инвентарей
+        new MuseumGuis(this);
+        Bukkit.getPluginCommand("museum").setExecutor(new MuseumCommand(this));
+        Bukkit.getPluginCommand("visitor").setExecutor(new VisitorCommand(visitorManager));
+
+        // Регистрация обработчиков событий
         B.events(
                 playerDataManager,
                 new PassiveEvents(),
@@ -125,13 +145,7 @@ public final class App extends JavaPlugin {
                 new GuiEvents()
         );
 
-        VisitorManager visitorManager = new VisitorManager(Collections.singletonList(new Location(getWorld(), -67, 91, 268)));
-        visitorManager.clear();
-        visitorManager.spawn(new Location(getWorld(), -67, 91, 268), 20);
-
-        Bukkit.getPluginCommand("museum").setExecutor(new MuseumCommand(this));
-        Bukkit.getPluginCommand("visitor").setExecutor(new VisitorCommand(visitorManager));
-
+        // todo: delegate to another class
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -165,6 +179,8 @@ public final class App extends JavaPlugin {
             }
         }.runTaskTimer(this, 0, 1);
 
+        // todo: include in main cycle using mod operation
+        // Автосохранение всех игроков
         long autoSavePeriod = 20 * 60 * 3;
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () ->
                         clientSocket.write(playerDataManager.bulk(false)), autoSavePeriod, autoSavePeriod);
