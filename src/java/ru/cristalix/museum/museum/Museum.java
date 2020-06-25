@@ -56,8 +56,6 @@ public class Museum implements Storable<MuseumInfo> {
 					return prototype.getType().provide(this, subjectInfo, prototype);
 				}).collect(Collectors.toList());
 
-		;
-
 		getSubjects(SubjectType.COLLECTOR).forEach(collector -> {
 			List<MarkerSubject> markers = getSubjects(SubjectType.MARKER).stream()
 					.filter(marker -> marker.getCollectorId() == collector.getId())

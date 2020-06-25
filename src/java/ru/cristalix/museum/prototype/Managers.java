@@ -79,7 +79,7 @@ public class Managers {
 				if (prototype == null)
 					throw new MapServiceException("Illegal default subject '" + tag[0] + "' in museum " +
 							address + " on " + label.getCoords());
-				defaultInfos.add(new SubjectInfo(prototype.getAddress(), label.toV3(), D2.PX, Color.AQUA, tag.length > 1 ? tag[1] : null));
+				defaultInfos.add(new SubjectInfo(prototype.getAddress(), label.toV3(), D2.PX, tag.length > 1 ? tag[1] : null, Color.AQUA));
 			}
 			return new MuseumPrototype(address, box.requireLabel("spawn"), defaultInfos);
 		});
