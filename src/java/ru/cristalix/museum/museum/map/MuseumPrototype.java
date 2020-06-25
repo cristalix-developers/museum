@@ -11,7 +11,6 @@ import java.util.List;
 public class MuseumPrototype implements Prototype {
 
 	private final String address;
-	private final Location spawnPoint;
 	private final List<SubjectInfo> defaultSubjects;
 
 }

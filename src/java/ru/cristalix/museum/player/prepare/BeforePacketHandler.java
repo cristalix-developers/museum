@@ -111,7 +111,7 @@ public class BeforePacketHandler implements Prepare {
 		ExcavationPrototype prototype = user.getExcavation().getPrototype();
 		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 
-		double luckyBuffer = user.getLocation().getY() / prototype.getSpawnPoint().getBlockY();
+		double luckyBuffer = user.getLocation().getY() / 100;
 
 		double bingo = luckyBuffer / proto.getRarity().getRareScale() / 10;
 		if (bingo > Pickaxe.RANDOM.nextDouble()) {

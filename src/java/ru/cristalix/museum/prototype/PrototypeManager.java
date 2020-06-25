@@ -21,7 +21,7 @@ public class PrototypeManager<T extends Prototype> {
 		return map.get(address);
 	}
 
-	public void registerPrototype(T prototype) {
+	private void registerPrototype(T prototype) {
 		map.put(prototype.getAddress(), prototype);
 	}
 }

@@ -19,6 +19,7 @@ import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Managers;
 import ru.cristalix.museum.util.LocationTree;
+import ru.cristalix.museum.util.WarpUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,21 +80,18 @@ public class Museum implements Storable<MuseumInfo> {
 
 		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
 
-		user.setCurrentMuseum(this);
-		user.getPlayer().teleport(user.getCurrentMuseum().getPrototype().getSpawnPoint());
-
 		user.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
+		user.setCurrentMuseum(this);
+		new WarpUtil.WarpBuilder(prototype.getAddress())
+				.addAfter(usr -> {
+					user.getPlayer().getInventory().remove(Material.SADDLE);
 
-		user.getPlayer().getInventory().remove(Material.SADDLE);
-
-		if (this.owner != user) {
-			user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
-		}
-
-		user.getPlayer().teleport(prototype.getSpawnPoint());
-		subjects.forEach(space -> space.show(user));
-
-		updateIncrease();
+					if (this.owner != user) {
+						user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
+					}
+					subjects.forEach(space -> space.show(user));
+					updateIncrease();
+				}).build().warp(user);
 	}
 
 	public void unload(User user) {

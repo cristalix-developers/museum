@@ -17,7 +17,6 @@ public class ExcavationPrototype implements Prototype {
 	private final int requiredLevel;
 	private final double price;
 	private final String title;
-	private final Location spawnPoint;
 	private final List<PacketPlayOutMapChunk> packets;
 
 }

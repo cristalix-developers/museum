@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.util.MessageUtil;
+import ru.cristalix.museum.util.WarpUtil;
 
 @Data
 @AllArgsConstructor
@@ -26,18 +27,19 @@ public class Excavation {
 		Player player = user.getPlayer();
 		player.getInventory().clear();
 		player.getInventory().addItem(Lemonade.get("pickaxe-" + user.getPickaxeType().name().toLowerCase()).render());
-		player.teleport(prototype.getSpawnPoint());
+		new WarpUtil.WarpBuilder(prototype.getAddress())
+				.addAfter(usr -> {
+					IScoreboardService.get().setCurrentObjective(user.getUuid(), "excavation");
 
-		IScoreboardService.get().setCurrentObjective(user.getUuid(), "excavation");
+					String title = prototype.getTitle();
+					player.sendTitle("§6Прибытие!", title);
 
-		String title = prototype.getTitle();
-		player.sendTitle("§6Прибытие!", title);
+					MessageUtil.find("visitexcavation")
+							.set("title", title)
+							.send(user);
 
-		MessageUtil.find("visitexcavation")
-				.set("title", title)
-				.send(user);
-
-		prototype.getPackets().forEach(user::sendPacket);
+					prototype.getPackets().forEach(user::sendPacket);
+				}).build().warp(user);
 	}
 
 }

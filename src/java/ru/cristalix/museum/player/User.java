@@ -18,6 +18,7 @@ import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.excavation.Excavation;
+import ru.cristalix.museum.gallery.Warp;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.subject.Subject;
@@ -40,6 +41,7 @@ public class User implements PlayerWrapper {
 	private Player player;
 	private PlayerConnection connection;
 	private List<Booster> localBoosters;
+	private Warp lastWarp;
 	private Subject currentSubject;
 	private Museum currentMuseum;
 	private Set<Coin> coins;
