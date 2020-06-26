@@ -30,8 +30,8 @@ main:
       left-click: /invite
 
     - char: H
-      icon: goto_pickaxes_item
-      left-click: /gui pickaxes
+      icon: gallery
+      left-click: /gallery
 
     - char: J
       icon: goto_excavations_item

@@ -51,6 +51,16 @@ public class WarpUtil {
 			warp = new Warp(address, start[0], finish[0]);
 		}
 
+		public WarpBuilder onForward(Consumer<User> onForward) {
+			warp.setOnForward(onForward);
+			return this;
+		}
+
+		public WarpBuilder onBack(Consumer<User> onBack) {
+			warp.setOnBack(onBack);
+			return this;
+		}
+
 		public WarpBuilder addAfter(Consumer<User> after) {
 			warp.setAfter(after);
 			return this;

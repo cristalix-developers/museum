@@ -74,6 +74,9 @@ public class Museum implements Storable<MuseumInfo> {
 	}
 
 	public void load(User user) {
+		System.out.println("Загружаю");
+		new WarpUtil.WarpBuilder(prototype.getAddress()).build().warp(user);
+
 		info.views++;
 
 		user.sendAnime();
@@ -82,16 +85,14 @@ public class Museum implements Storable<MuseumInfo> {
 
 		user.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
 		user.setCurrentMuseum(this);
-		new WarpUtil.WarpBuilder(prototype.getAddress())
-				.addAfter(usr -> {
-					user.getPlayer().getInventory().remove(Material.SADDLE);
 
-					if (this.owner != user) {
-						user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
-					}
-					subjects.forEach(space -> space.show(user));
-					updateIncrease();
-				}).build().warp(user);
+		user.getPlayer().getInventory().remove(Material.SADDLE);
+
+		if (this.owner != user) {
+			user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
+		}
+		subjects.forEach(space -> space.show(user));
+		updateIncrease();
 	}
 
 	public void unload(User user) {

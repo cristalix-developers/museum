@@ -28,27 +28,37 @@ public class Warp {
 	private Consumer<User> after;
 	@Setter
 	private Consumer<User> before;
+	@Setter
+	private Consumer<User> onBack;
+	@Setter
+	private Consumer<User> onForward;
 
 	public void warp(User user) {
 		if (condition != null && !condition.test(user))
 			return;
-		Consumer<User> body = usr -> {
+		final boolean forward = user.getLastWarp() == null || !user.getLastWarp().equals(this);
+		Consumer<User> pipeline = usr -> {
 			Player player = usr.getPlayer();
-			if (usr.getLastWarp() != null && usr.getLastWarp().equals(this)) {
+			if (forward) {
+				player.teleport(finish);
+				usr.setLastWarp(this);
+			} else {
 				if (start != null)
 					player.teleport(start);
 				else
-					player.teleport(WarpUtil.get(user.getCurrentMuseum().getPrototype().getAddress()).getFinish());
-			} else
-				player.teleport(finish);
-			usr.setLastWarp(this);
+					user.getCurrentMuseum().load(user);
+				usr.setLastWarp(null);
+			}
 		};
-
 		if (before != null)
-			body = before.andThen(body);
+			pipeline = before.andThen(pipeline);
 		if (after != null)
-			body = body.andThen(after);
+			pipeline = pipeline.andThen(after);
+		if (forward && onForward != null)
+			pipeline = pipeline.andThen(onForward);
+		if (!forward && onBack != null)
+			pipeline = pipeline.andThen(onBack);
 
-		body.accept(user);
+		pipeline.accept(user);
 	}
 }

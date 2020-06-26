@@ -64,8 +64,7 @@ public class CollectorSubject extends SimpleSubject {
 	@Override
 	public void show(User user) {
 		super.show(user);
-		val location = getLocation(System.currentTimeMillis());
-		piece.show(user.getPlayer(), location);
+		piece.show(user.getPlayer(), getLocation(System.currentTimeMillis()));
 	}
 
 	public void move(User user, long iteration) {

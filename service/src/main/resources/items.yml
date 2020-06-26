@@ -20,6 +20,15 @@ museum:
 
     Создан &e<sinceCreation>назад
 
+gallery:
+  icon: storage-minecart
+  text: |
+    &bПостройки
+
+    Посетите галлерею построек
+    и выбирите, что ходите приобрести
+    для вашего музея!
+
 unavailable:
   icon: clay-ball
   nbt: {other: point}

@@ -7,26 +7,38 @@ import clepto.bukkit.gui.Guis;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.excavation.ExcavationPrototype;
+import ru.cristalix.museum.gallery.Warp;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Managers;
 import ru.cristalix.museum.util.LevelSystem;
 import ru.cristalix.museum.util.MessageUtil;
 import ru.cristalix.museum.util.VirtualSign;
+import ru.cristalix.museum.util.WarpUtil;
 
 public class MuseumGuis {
 
 	public MuseumGuis(App app) {
+		Warp warp = new WarpUtil.WarpBuilder("gallery")
+				.onForward(user -> user.getCurrentMuseum().unload(user))
+				.build();
+
 		B.regCommand((sender, args) -> {
 			Guis.registry.get(args[0]).open(sender, args.length > 1 ? args[1] : null);
 			return null;
 		}, "gui");
+
+		B.regCommand((sender, args) -> {
+			warp.warp(app.getUser(sender));
+			return null;
+		}, "gallery");
 
 		B.regCommand((sender, args) -> {
 			new VirtualSign().openSign(sender, lines -> {

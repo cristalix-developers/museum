@@ -1,3 +1,5 @@
+serviceRealm: MUSS-1
+
 chat:
   prefix: '§7[§l§bi§7] '
   messages:
@@ -20,11 +22,3 @@ chat:
     leavedfrommuseum: '§7%NAME% покинул ваш музей.'
     visitexcavation: 'Вы прибыли на §l§b%TITLE%.'
     visitaccepted: '%VISITOR% принял приглашение.'
-entity:
-  - '{"title":"LOL","subs":[{"title":"1\u003eКость 4","pieces":[{"vectorX":-0.5,"vectorY":0.0,"vectorZ":-1.5,"headRotation":{"x":0.008068660297802531,"y":-0.0793915368682442,"z":0.0},"material":"GOLD_HELMET"}]},{"title":"1\u003eКость
-       5","pieces":[{"vectorX":-0.5,"vectorY":0.0,"vectorZ":-2.5,"headRotation":{"x":0.03541479523846857,"y":0.10189174435810462,"z":0.0},"material":"IRON_HELMET"},{"vectorX":-0.5,"vectorY":0.0,"vectorZ":-3.5,"headRotation":{"x":0.0201098789310814,"y":0.011109476355806419,"z":0.0},"material":"LEATHER_HELMET"}]},{"title":"1\u003eКость
-       3","pieces":[{"vectorX":-0.5,"vectorY":0.0,"vectorZ":-0.5,"headRotation":{"x":0.012242057389876371,"y":0.028327977936145606,"z":0.0},"material":"CHAINMAIL_HELMET"}]},{"title":"1\u003eКость
-       2","pieces":[{"vectorX":-1.5,"vectorY":0.0,"vectorZ":-0.5,"headRotation":{"x":0.052279554124639575,"y":-0.15966652749385174,"z":0.0},"material":"DIAMOND_HELMET"}]}],"rare":"USUAL"}'
-
-
-serviceRealm: MUSS-1
