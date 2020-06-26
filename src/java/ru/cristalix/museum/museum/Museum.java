@@ -5,6 +5,7 @@ import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Delegate;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.museum.App;
@@ -74,7 +75,6 @@ public class Museum implements Storable<MuseumInfo> {
 	}
 
 	public void load(User user) {
-		System.out.println("Загружаю");
 		new WarpUtil.WarpBuilder(prototype.getAddress()).build().warp(user);
 
 		info.views++;
@@ -91,7 +91,8 @@ public class Museum implements Storable<MuseumInfo> {
 		if (this.owner != user) {
 			user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
 		}
-		subjects.forEach(space -> space.show(user));
+		Bukkit.getScheduler().runTaskLaterAsynchronously(App.getApp(), () ->
+				subjects.forEach(space -> space.show(user)), 20L);
 		updateIncrease();
 	}
 
