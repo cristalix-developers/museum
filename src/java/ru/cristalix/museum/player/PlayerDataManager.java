@@ -73,7 +73,7 @@ public class PlayerDataManager implements Listener {
 							1000.0,
 							PickaxeType.DEFAULT,
 							Collections.singletonList(startMuseum),
-							Collections.emptyList(),
+							new ArrayList<>(),
 							0,
 							0,
 							new ArrayList<>()

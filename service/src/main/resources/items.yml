@@ -34,6 +34,22 @@ unavailable:
   nbt: {other: point}
   text: '&7???'
 
+collector-free:
+  icon: clay-ball
+  nbt: {museum: car}
+
+collector-amateur:
+  icon: clay-ball
+  nbt: {museum: car1}
+
+collector-professional:
+  icon: clay-ball
+  nbt: {museum: car1}
+
+collector-prestige:
+  icon: clay-ball
+  nbt: {museum: parovoz}
+
 menu:
   icon: paper
   text: |
