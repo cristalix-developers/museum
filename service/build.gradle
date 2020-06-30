@@ -1,14 +1,18 @@
 dependencies {
     compile project(":commons")
+    compile 'org.mongodb:mongodb-driver-async:3.7.1'
     compile files("../external/microservice-1.0.jar")
     compile 'com.google.code.gson:gson:2.8.5'
     compile 'com.google.guava:guava:21.0'
     compile 'io.netty:netty-all:4.1.37.Final'
+    compile files("../external/waterfall-chat-1.0.jar")
+    compile files("../external/childrensql.jar")
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.20'
 }
 
 jar {
     manifest {
-        attributes "Main-Class": "ru.func.museum.MuseumService"
+        attributes "Main-Class": "ru.cristalix.museum.MuseumService"
     }
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }

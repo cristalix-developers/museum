@@ -1,11 +1,9 @@
 name: Museum
-version: ${project.version}
-main: ru.func.museum.App
-authors: [func]
+version: '1.2'
+main: ru.cristalix.museum.App
+authors: [func, DelfikPro, Ilya_FX]
 website: funcid.ru
 depend: [CoreAPI]
 commands:
-  museum:
-    usage:
-  visitor:
-    usage:
+  museum: {}
+  visitor: {}

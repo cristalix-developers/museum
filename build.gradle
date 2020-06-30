@@ -27,7 +27,6 @@ dependencies {
     compileOnly files('external/cristalix-core.jar')
     compile project(':commons')
     compile files('external/clepto-cristalix.jar')
-    compile 'org.mongodb:mongodb-driver-async:3.7.1'
 }
 
 sourceSets {
@@ -60,5 +59,6 @@ subprojects {
     dependencies {
         annotationProcessor 'org.projectlombok:lombok:1.18.12'
         compileOnly 'org.projectlombok:lombok:1.18.12'
+        compile 'com.google.code.gson:gson:2.8.6'
     }
 }

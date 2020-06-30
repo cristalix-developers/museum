@@ -1,0 +1,187 @@
+back:
+  icon: saddle
+  text: |
+    &bВернуться
+
+    &7Нажмите ПКМ, чтобы вернуться
+
+museum:
+  icon: clay-ball
+  nbt: {other: guild_bank}
+  text: |
+    &bМузей
+
+    Хозяин: &e<owner>
+    Название: &e<title>
+    Посещений: &e<views>
+
+    Доход: &e<income>
+    Витрин: &e<spaces>
+
+    Создан &e<sinceCreation>назад
+
+gallery:
+  icon: storage-minecart
+  text: |
+    &bПостройки
+
+    Посетите галлерею построек
+    и выбирите, что ходите приобрести
+    для вашего музея!
+
+unavailable:
+  icon: clay-ball
+  nbt: {other: point}
+  text: '&7???'
+
+collector-free:
+  icon: clay-ball
+  nbt: {museum: car}
+
+collector-amateur:
+  icon: clay-ball
+  nbt: {museum: car1}
+
+collector-professional:
+  icon: clay-ball
+  nbt: {museum: car1}
+
+collector-prestige:
+  icon: clay-ball
+  nbt: {museum: parovoz}
+
+menu:
+  icon: paper
+  text: |
+    §f>> §6§lМеню §f<<
+
+    Это меню, с помощью которого,
+    настраивать музей, приглашать
+    друзей, а так же смотреть
+    подробную статистику.
+
+coin:
+  icon: double-plant
+
+buy_collector:
+  icon: dispenser
+  text: |
+    §bКупить коллектор
+
+    Хороший коллектор способен
+    собрать больше монет!
+
+    [§bдля этого залла§f]
+
+invite:
+  icon: book-and-quill
+  text: |
+    §bПригласить друга
+
+    Нажмите и введите
+    никнейм приглашенного!
+
+profile:
+  icon: paper
+  text: |
+    §bПрофиль
+
+    Уровень: <level>
+    Денег: <money>
+    Опыт: <exp>
+    Опыта осталось: <need_exp>
+    Часов сыграно: <hours_played>
+    Монет собрано: <coins_picked>
+    Кирка: <pickaxe>
+    Раскопок: <excavations>
+    Фрагментов: <fragments>
+
+collectors:
+  icon: paper
+  text: |
+    §bКоллекторы
+
+    Купить за игрокую валюту - [ЛКМ],
+    за кристалики - [ПКМ]
+
+go:
+  text: |
+    §bВ путь!
+
+    Экспедиция: <excavation>
+    Цена: <cost>$
+    Минимальный уровень: <lvl>
+    Кол-во ударов: <breaks>
+
+goto_excavations_item:
+  icon: compass
+  text: |
+    §bЭкспедиции
+
+    Отправтесь на раскопки
+    и найдите следы прошлого.
+
+goto_pickaxes_item:
+  icon: diamond-pickaxe
+  text: |
+    §bКирки
+
+    Приобретите новую кирку,
+    и разгодайте тайны песка...
+
+already_have:
+  icon: emerald
+  text: |
+    §bПусто
+
+    Сдесь был коллектор,
+    который вам не нужен,
+    поэтому мы его убрали.
+
+goback:
+  icon: barrier
+  text: |
+    §cВернуться
+
+museum_change_title:
+  icon: sign
+  text: |
+    §bПереименовать музей
+
+    Если вам не нравтся
+    название вашего музея
+    вы можете его изменить.
+
+pickaxe-default:
+  icon: iron-pickaxe
+  unbreakable: true
+  text: |
+    §bКирка
+
+    Классическая кирка. Идеальна
+    для начинающего, ничего лишнего.
+
+pickaxe-professional:
+  icon: diamond-pickaxe
+  unbreakable: true
+  text: |
+    §bПрофессиональная кирка
+
+    Кирка для настоящего профи.
+    Ломает от 1 до 5 блоков.
+
+    Цена: 10'000$
+
+pickaxe-prestige:
+  icon: gold-pickaxe
+  unbreakable: true
+  enchant: ['32:1']
+  text: |
+    §bПрестижная кирка
+
+    Самая престижная и элегантная
+    кирка для истинного коллекционера.
+    Ломает 5 блоков. С вероятностью 50%.
+
+    Цена: 100'000$
+
