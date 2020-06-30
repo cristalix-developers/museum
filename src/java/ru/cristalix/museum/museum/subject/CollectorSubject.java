@@ -40,11 +40,8 @@ public class CollectorSubject extends SimpleSubject {
 		Lemonade lemonade = Lemonade.get(this.prototype.getAddress());
 		ItemStack item = lemonade == null ? new ItemStack(Material.WORKBENCH) : lemonade.render();
 		armorStand.setSlot(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(item));
-		armorStand.setBasePlate(false);
 		armorStand.setCustomName(prototype.getTitle());
 		armorStand.setCustomNameVisible(true);
-		armorStand.setInvisible(true);
-		armorStand.setNoGravity(true);
 		this.navigator = null;
 		this.piece = new Piece(armorStand, null);
 		this.id = info.getMetadata() == null ? 0 : Integer.parseInt(info.getMetadata());
@@ -64,7 +61,7 @@ public class CollectorSubject extends SimpleSubject {
 	@Override
 	public void show(User user) {
 		super.show(user);
-		piece.show(user.getPlayer(), getLocation(System.currentTimeMillis()));
+		piece.show(user.getPlayer(), getLocation(System.currentTimeMillis()), false);
 	}
 
 	public void move(User user, long iteration) {

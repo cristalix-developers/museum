@@ -48,7 +48,7 @@ public class SkeletonSubject extends SimpleSubject {
 		super.show(user);
 		if (skeleton == null)
 			return;
-		skeleton.getUnlockedFragments().forEach(fragment -> fragment.show(user.getPlayer(), skeletonLocation));
+		skeleton.getUnlockedFragments().forEach(fragment -> fragment.show(user.getPlayer(), skeletonLocation, false));
 	}
 
 	@Override

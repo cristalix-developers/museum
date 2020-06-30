@@ -21,9 +21,6 @@ public class Piece {
 	private final PacketPlayOutEntityDestroy destroyPacket;
 	private final Location worldOrigin;
 	private final Vector delta;
-	private final double deltaX;
-	private final double deltaY;
-	private final double deltaZ;
 	private final double distanceSq;
 	private final String name;
 	private final float yaw;
@@ -31,6 +28,9 @@ public class Piece {
 
 	// ToDo: Optimize via custom packets with pre-serialized byte data
 	public Piece(EntityArmorStand as, Location worldOrigin) {
+		as.setBasePlate(false);
+		as.setNoGravity(true);
+		as.setInvisible(true);
 		this.entityId = as.getId();
 		this.handle = as;
 		this.syncSpawnPacket = new PacketPlayOutSpawnEntity(as, 78);
@@ -44,10 +44,11 @@ public class Piece {
 		}
 		this.equipmentPackets = list.toArray(new PacketPlayOutEntityEquipment[0]);
 		this.worldOrigin = worldOrigin;
-		this.deltaX = worldOrigin != null ? as.locX - worldOrigin.getX() : 0;
-		this.deltaY = worldOrigin != null ? as.locY - worldOrigin.getY() : 0;
-		this.deltaZ = worldOrigin != null ? as.locZ - worldOrigin.getZ() : 0;
-		this.delta = new Vector(deltaX, deltaY, deltaZ);
+		this.delta = new Vector(
+				worldOrigin != null ? as.locX - worldOrigin.getX() : 0,
+				worldOrigin != null ? as.locY - worldOrigin.getY() : 0,
+				worldOrigin != null ? as.locZ - worldOrigin.getZ() : 0
+		);
 		this.distanceSq = delta.length();
 		this.name = as.getCustomName();
 		this.yaw = as.yaw;
@@ -72,11 +73,11 @@ public class Piece {
 		return buffer;
 	}
 
-	public void show(Player player, Location origin) {
+	public void show(Player player, Location origin, boolean inBlock) {
 		PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
-		syncSpawnPacket.c = origin.getX() + this.deltaX;
-		syncSpawnPacket.d = origin.getY() + this.deltaY;
-		syncSpawnPacket.e = origin.getZ() + this.deltaZ;
+		syncSpawnPacket.c = origin.getX() + (inBlock ? delta.getX() : delta.getX() % 1);
+		syncSpawnPacket.d = origin.getY() + (inBlock ? delta.getY() : delta.getY() % 1);
+		syncSpawnPacket.e = origin.getZ() + (inBlock ? delta.getZ() : delta.getZ() % 1);
 		syncSpawnPacket.j = MathHelper.d((origin.getYaw() + this.yaw) * 256.0F / 360.0F);
 		connection.sendPacket(syncSpawnPacket);
 		connection.sendPacket(metadataPacket);
@@ -92,9 +93,9 @@ public class Piece {
 		PlayerConnection con = ((CraftPlayer) player).getHandle().playerConnection;
 		PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport();
 		packet.a = this.entityId;
-		packet.b = origin.getX() + this.deltaX;
-		packet.c = origin.getY() + this.deltaY;
-		packet.d = origin.getZ() + this.deltaZ;
+		packet.b = origin.getX() + delta.getX();
+		packet.c = origin.getY() + delta.getY();
+		packet.d = origin.getZ() + delta.getZ();
 		packet.e = (byte) ((int) ((origin.getYaw() + this.yaw) * 256.0F / 360.0F));
 		packet.f = (byte) ((int) (origin.getPitch() * 256.0F / 360.0F));
 		con.sendPacket(packet);

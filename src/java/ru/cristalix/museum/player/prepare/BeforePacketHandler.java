@@ -13,6 +13,7 @@ import ru.cristalix.museum.data.SkeletonInfo;
 import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.excavation.ExcavationPrototype;
 import ru.cristalix.museum.museum.subject.skeleton.Fragment;
+import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import ru.cristalix.museum.player.User;
@@ -23,6 +24,7 @@ import ru.cristalix.museum.util.MessageUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntFunction;
 
 import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.*;
 
@@ -120,9 +122,9 @@ public class BeforePacketHandler implements Prepare {
 			List<Fragment> fragments = proto.getFragments();
 			Fragment fragment = ListUtils.random(fragments);
 
-			fragment.show(user.getPlayer(), new Location(user.getWorld(), position.getX(), position.getY(), position.getZ()));
+			fragment.show(user.getPlayer(), new Location(user.getWorld(), position.getX(), position.getY(), position.getZ()), true);
 
-			animateFragments(user.getConnection(), fragment.getLegacyIds(), app);
+			animateFragments(user, fragment);
 
 			// Проверка на дубликат
 			Skeleton skeleton = user.getSkeletons()
@@ -155,27 +157,29 @@ public class BeforePacketHandler implements Prepare {
 		}
 	}
 
-	private void animateFragments(PlayerConnection connection, int[] ids, App app) {
+	private void animateFragments(User user, Fragment fragment) {
 		val integer = new AtomicInteger(0);
 		new BukkitRunnable() {
 			@Override
 			public void run() {
+				PlayerConnection connection = user.getConnection();
+
+				int[] ids = fragment.getPieces().stream()
+						.map(Piece::getEntityId)
+						.mapToInt(Integer::valueOf)
+						.toArray();
+
 				if (integer.getAndIncrement() < 22) {
 					for (int id : ids) {
-						connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMove(
-								id, 0, 408, 0, false
-						));
+						connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMove(id, 0, 3, 0, false));
 						byte angle = (byte) (5 * integer.get() % 128);
-						connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(
-								id, angle, (byte) 0, false
-						));
+						connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(id, angle, (byte) 0, false));
 					}
 				} else {
 					connection.sendPacket(new PacketPlayOutEntityDestroy(ids));
 					cancel();
 				}
 			}
-		}.runTaskTimerAsynchronously(app, 5L, 3L);
+		}.runTaskTimerAsynchronously(App.getApp(), 5L, 3L);
 	}
-
 }
