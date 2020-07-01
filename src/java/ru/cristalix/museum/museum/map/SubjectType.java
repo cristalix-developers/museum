@@ -2,8 +2,8 @@ package ru.cristalix.museum.museum.map;
 
 import clepto.cristalix.MapServiceException;
 import ru.cristalix.museum.data.subject.SubjectInfo;
-import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.subject.*;
+import ru.cristalix.museum.player.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,12 +39,12 @@ public class SubjectType<T extends Subject> {
 		throw new MapServiceException("Subject type '" + query + "' is not a valid type.");
 	}
 
-	public Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
-		return provider.provide(museum, info, prototype);
+	public Subject provide(User user, SubjectInfo info, SubjectPrototype prototype) {
+		return provider.provide(user, info, prototype);
 	}
 
 	public interface Provider {
-		Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype);
+		Subject provide(User user, SubjectInfo info, SubjectPrototype prototype);
 	}
 
 }

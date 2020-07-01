@@ -15,10 +15,14 @@ public interface Subject extends Storable<SubjectInfo> {
 	default void update(User user) {
 	}
 
-	void hide(User user);
+	void hide(User user, boolean visually);
 
 	default double getIncome() {
 		return 0;
+	}
+
+	default Allocation getAllocation() {
+		return null;
 	}
 
 }

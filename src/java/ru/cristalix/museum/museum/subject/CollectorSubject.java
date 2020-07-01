@@ -13,7 +13,6 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.data.subject.SubjectInfo;
-import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.collector.CollectorNavigator;
 import ru.cristalix.museum.museum.map.CollectorSubjectPrototype;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
@@ -32,8 +31,8 @@ public class CollectorSubject extends SimpleSubject {
 	@Setter
 	private CollectorNavigator navigator;
 
-	public CollectorSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
-		super(museum, info, prototype);
+	public CollectorSubject(User owner, SubjectInfo info, SubjectPrototype prototype) {
+		super(owner, info, prototype);
 		this.info = info;
 		this.prototype = (CollectorSubjectPrototype) prototype;
 		EntityArmorStand armorStand = new EntityArmorStand(App.getApp().getNMSWorld());
@@ -68,13 +67,13 @@ public class CollectorSubject extends SimpleSubject {
 		if (navigator == null)
 			return;
 		val location = getLocation(iteration);
-		user.getCoins().removeIf(coin -> coin.pickUp(user, location, prototype.getRadius(), id));
+		user.getCoins().removeIf(coin -> coin.pickUp(user, location, prototype.getRadius(), piece.getEntityId()));
 		piece.update(user.getPlayer(), location);
 	}
 
 	@Override
-	public void hide(User user) {
-		super.hide(user);
+	public void hide(User user, boolean visually) {
+		super.hide(user, visually);
 		piece.hide(user.getPlayer());
 	}
 

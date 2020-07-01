@@ -21,6 +21,8 @@ public class UserInfoPackage extends MuseumPackage {
 
 	// response
 	private UserInfo userInfo;
+
+	// Ilyafx [yes discrimination]
 	private List<Booster> localBoosters;
 
 }

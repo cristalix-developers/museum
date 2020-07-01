@@ -1,6 +1,5 @@
 package ru.cristalix.museum.player.prepare;
 
-import org.apache.commons.io.input.ReaderInputStream;
 import ru.cristalix.core.display.IDisplayService;
 import ru.cristalix.core.display.messages.JavaScriptMessage;
 import ru.cristalix.museum.App;

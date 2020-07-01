@@ -72,16 +72,16 @@ public class Managers {
 
 		museum = new PrototypeManager<>("museum", (address, box) -> {
 			box.expandVert();
-			val defaultInfos = new ArrayList<SubjectInfo>();
+			List<SubjectInfo> defaultInfos = new ArrayList<>();
 			for (Label label : box.getLabels("default")) {
 				String[] tag = label.getTag().split(" ");
 				SubjectPrototype prototype = subject.getPrototype(tag[0]);
 				if (prototype == null)
 					throw new MapServiceException("Illegal default subject '" + tag[0] + "' in museum " +
 							address + " on " + label.getCoords());
-				defaultInfos.add(new SubjectInfo(prototype.getAddress(), label.toV3(), D2.PX, tag.length > 1 ? tag[1] : null, Color.AQUA));
+				defaultInfos.add(new SubjectInfo(prototype.getAddress(), label.toV3(), D2.PX, tag.length > 1 ? tag[1] : null, Color.LIME));
 			}
-			return new MuseumPrototype(address, defaultInfos);
+			return new MuseumPrototype(address, box, defaultInfos);
 		});
 
 		skeleton = new PrototypeManager<>("skeleton", (address, box) -> new SkeletonPrototype(

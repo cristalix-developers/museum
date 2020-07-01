@@ -1,5 +1,5 @@
 dependencies {
     compileOnly files("../external/cristalix-core.jar")
-    compile group: 'io.netty', name: 'netty-all', version: '4.1.50.Final'
-    compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+    compileOnly group: 'io.netty', name: 'netty-all', version: '4.1.50.Final'
+    compileOnly group: 'com.google.guava', name: 'guava', version: '29.0-jre'
 }
