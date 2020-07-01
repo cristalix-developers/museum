@@ -152,7 +152,7 @@ public final class App extends JavaPlugin {
 
 		// Обработка каждого тика
 		new TickTimerHandler(this, visitorManager, clientSocket, playerDataManager)
-				.runTaskTimerAsynchronously(this, 0, 1);
+				.runTaskTimer(this, 0, 1);
 	}
 
 	@Override

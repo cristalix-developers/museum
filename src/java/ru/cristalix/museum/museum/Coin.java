@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import ru.cristalix.museum.App;
+import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.player.pickaxe.Pickaxe;
 
@@ -27,8 +28,6 @@ public class Coin {
 	public Coin(Location location) {
 		this.location = location;
 		entityItem = new EntityItem(App.getApp().getNMSWorld(), location.getX(), location.getY(), location.getZ(), COIN);
-		entityItem.motX = 0;
-		entityItem.motZ = 0;
 		timestamp = System.currentTimeMillis();
 	}
 
@@ -45,29 +44,32 @@ public class Coin {
 		boolean close = this.location.distanceSquared(location) <= radius * radius;
 
 		if (close) {
-			entityItem.setCustomNameVisible(true);
-			entityItem.setNoGravity(true);
-
 			// Расчет стоимости монеты
 			val money = (user.getCurrentMuseum().getIncome() / user.getMuseums().size()) * (.5 + Pickaxe.RANDOM.nextDouble());
 			val format = Math.floor(money * 100) / 100;
-			entityItem.setCustomName("§6+ " + format + "$");
 
 			val connection = user.getConnection();
 
 			connection.sendPacket(new PacketPlayOutCollect(entityItem.getId(), collectorId, 1));
-			// todo: none completed
-//			connection.sendPacket(new PacketPlayOutEntityVelocity(entityItem.getId(), 0, .05, 0));
-//			connection.sendPacket(new PacketPlayOutEntityMetadata(entityItem.getId(), entityItem.getDataWatcher(), false));
-//
-//			user.setPickedCoinsCount(user.getPickedCoinsCount() + 1);
-//
+
+			App app = App.getApp();
+
+			val message = new EntityArmorStand(app.getNMSWorld(), entityItem.getX(), entityItem.getY(), entityItem.getZ());
+			message.setCustomNameVisible(true);
+			message.setMarker(true);
+			message.setInvisible(true);
+			message.setCustomName("§6+ " + format + "$");
+
+			connection.sendPacket(new PacketPlayOutSpawnEntityLiving(message));
+			connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMove(message.getId(), 0, 3000, 0, false));
+
+			user.setPickedCoinsCount(user.getPickedCoinsCount() + 1);
 			user.setMoney(user.getMoney() + money);
-			Bukkit.getScheduler().runTaskLaterAsynchronously(App.getApp(), () -> {
+
+			Bukkit.getScheduler().runTaskLaterAsynchronously(app, () -> {
 				remove(connection);
-//				user.getPlayer().playSound(this.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.WEATHER, .2F, 1);
-//				user.getPlayer().spawnParticle(Particle.TOTEM, this.location.add(0, 1.5, 0), 5, 0, 0, 0, .3);
-			}, 2);
+				connection.sendPacket(new PacketPlayOutEntityDestroy(message.getId()));
+			}, 30);
 		}
 		return close;
 	}

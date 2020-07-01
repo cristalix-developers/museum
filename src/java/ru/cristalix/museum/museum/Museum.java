@@ -94,7 +94,6 @@ public class Museum implements Storable<MuseumInfo> {
 	}
 
 	public void unload(User user) {
-
 		iterateSubjects(s -> s.hide(user, false));
 
 		Set<Coin> coins = user.getCoins();
