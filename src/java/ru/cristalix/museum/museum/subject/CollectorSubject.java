@@ -3,7 +3,6 @@ package ru.cristalix.museum.museum.subject;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Delegate;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
@@ -16,25 +15,22 @@ import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.museum.collector.CollectorNavigator;
 import ru.cristalix.museum.museum.map.CollectorSubjectPrototype;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
-import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import ru.cristalix.museum.player.User;
 
-public class CollectorSubject extends SimpleSubject {
+public class CollectorSubject extends Subject {
 
-	private final CollectorSubjectPrototype prototype;
-	@Delegate
-	private final SubjectInfo info;
 	@Getter
 	private final int id;
 	private final Piece piece;
 	@Setter
 	private CollectorNavigator navigator;
 
-	public CollectorSubject(User owner, SubjectInfo info, SubjectPrototype prototype) {
-		super(owner, info, prototype);
-		this.info = info;
-		this.prototype = (CollectorSubjectPrototype) prototype;
+	private final double radius;
+	private final int speed;
+
+	public CollectorSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
+		super(prototype, info, owner);
 		EntityArmorStand armorStand = new EntityArmorStand(App.getApp().getNMSWorld());
 		Lemonade lemonade = Lemonade.get(this.prototype.getAddress());
 		ItemStack item = lemonade == null ? new ItemStack(Material.WORKBENCH) : lemonade.render();
@@ -44,17 +40,13 @@ public class CollectorSubject extends SimpleSubject {
 		this.navigator = null;
 		this.piece = new Piece(armorStand, null);
 		this.id = info.getMetadata() == null ? 0 : Integer.parseInt(info.getMetadata());
+		this.speed = (int) ((CollectorSubjectPrototype) prototype).getSpeed();
+		this.radius = ((CollectorSubjectPrototype) prototype).getRadius();
 	}
 
 	@Override
-	public SubjectInfo generateInfo() {
-		info.metadata = String.valueOf(id);
-		return info;
-	}
-
-	@Override
-	public SubjectType<?> getType() {
-		return SubjectType.COLLECTOR;
+	public void updateInfo() {
+		cachedInfo.metadata = String.valueOf(id);
 	}
 
 	@Override
@@ -67,7 +59,7 @@ public class CollectorSubject extends SimpleSubject {
 		if (navigator == null)
 			return;
 		val location = getLocation(iteration);
-		user.getCoins().removeIf(coin -> coin.pickUp(user, location, prototype.getRadius(), piece.getEntityId()));
+		user.getCoins().removeIf(coin -> coin.pickUp(user, location, radius, piece.getEntityId()));
 		piece.update(user.getPlayer(), location);
 	}
 
@@ -78,7 +70,7 @@ public class CollectorSubject extends SimpleSubject {
 	}
 
 	private Location getLocation(long time) {
-		int secondsPerLap = 20000 / (int) prototype.getSpeed();
+		int secondsPerLap = 20000 / speed;
 		return navigator.getLocation(time % secondsPerLap / (double) secondsPerLap);
 	}
 }

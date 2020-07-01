@@ -26,7 +26,7 @@ public class MuseumGuis {
 
 	public MuseumGuis(App app) {
 		Warp warp = new WarpUtil.WarpBuilder("gallery")
-				.onForward(user -> user.getCurrentMuseum().unload(user))
+				.onForward(user -> user.getCurrentMuseum().hide(user))
 				.build();
 
 		B.regCommand((sender, args) -> {
@@ -99,7 +99,7 @@ public class MuseumGuis {
 			Excavation excavation = new Excavation(proto, proto.getHitCount());
 			user.setExcavation(excavation);
 
-			user.getCurrentMuseum().unload(user);
+			user.getCurrentMuseum().hide(user);
 			excavation.load(user);
 			return null;
 		}, "excavation", "exc");
@@ -152,7 +152,7 @@ public class MuseumGuis {
 					.fill("coins_picked", String.valueOf(user.getPickedCoinsCount()))
 					.fill("pickaxe", user.getPickaxeType().name())
 					.fill("excavations", String.valueOf(user.getExcavationCount()))
-					.fill("fragments", String.valueOf(user.getSkeletons().values().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum()))
+					.fill("fragments", String.valueOf(user.getSkeletons().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum()))
 					.render();
 		});
 

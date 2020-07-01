@@ -32,6 +32,7 @@ public class Managers {
 	public static PrototypeManager<SkeletonPrototype> skeleton;
 	public static PrototypeManager<ExcavationPrototype> excavation;
 
+	@SuppressWarnings("deprecation")
 	public static void init() {
 		subject = new PrototypeManager<>("subject", (address, box) -> {
 			val label = box.getLabels("origin").stream().findAny();
@@ -79,7 +80,7 @@ public class Managers {
 				if (prototype == null)
 					throw new MapServiceException("Illegal default subject '" + tag[0] + "' in museum " +
 							address + " on " + label.getCoords());
-				defaultInfos.add(new SubjectInfo(prototype.getAddress(), label.toV3(), D2.PX, tag.length > 1 ? tag[1] : null, Color.LIME));
+				defaultInfos.add(new SubjectInfo(prototype.getAddress(), label.toV3(), D2.PX, tag.length > 1 ? tag[1] : null, -1, Color.LIME));
 			}
 			return new MuseumPrototype(address, box, defaultInfos);
 		});

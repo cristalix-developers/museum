@@ -4,10 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.data.UserInfo;
 
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -21,8 +19,5 @@ public class UserInfoPackage extends MuseumPackage {
 
 	// response
 	private UserInfo userInfo;
-
-	// Ilyafx [yes discrimination]
-	private List<Booster> localBoosters;
 
 }

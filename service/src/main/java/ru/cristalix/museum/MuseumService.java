@@ -58,6 +58,7 @@ public class MuseumService {
 		ServerSocket serverSocket = new ServerSocket(14653);
 		serverSocket.start();
 
+
 		MongoManager.connect(
 				System.getenv("db_url"),
 				System.getenv("db_data"),
@@ -80,10 +81,7 @@ public class MuseumService {
 			MongoManager.load(pckg.getUuid())
 					.thenAccept(info -> {
 						pckg.setUserInfo(info);
-						SQL_MANAGER.receiveLocal(pckg.getUuid()).thenAccept(list -> {
-							pckg.setLocalBoosters(list);
-							answer(channel, pckg);
-						});
+                        answer(channel, pckg);
 					});
 		});
 		registerHandler(SaveUserPackage.class, (channel, source, pckg) -> {

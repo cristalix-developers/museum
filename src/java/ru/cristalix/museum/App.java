@@ -39,6 +39,7 @@ import ru.cristalix.museum.listener.PassiveEvents;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.museum.subject.CollectorSubject;
+import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
@@ -80,6 +81,14 @@ public final class App extends JavaPlugin {
 			getUser(sender).setMoney(Double.parseDouble(args[0]));
 			return "§aВаше количество денег изменено.";
 		}, "money");
+
+		B.regCommand((sender, args) -> {
+			if (args.length == 0) return "§cИспользование: §e/dino [Динозавр]";
+			SkeletonPrototype proto = Managers.skeleton.getPrototype(args[0]);
+			if (proto == null) return "§cПрототип динозавра §e" + args[0] + "§c не найден.";
+			getUser(sender).getSkeletons().get(proto).getUnlockedFragments().addAll(proto.getFragments());
+			return "";
+		}, "dino");
 
 		try {
 			this.map = new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get());

@@ -10,19 +10,17 @@ import ru.cristalix.core.util.UtilV3;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
-import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.player.User;
 
-public class MarkerSubject implements Subject {
+public class MarkerSubject extends Subject {
 
-	private final SubjectInfo info;
 	private final Location location;
 
 	@Getter
 	private final int collectorId;
 
-	public MarkerSubject(User user, SubjectInfo info, SubjectPrototype prototype) {
-		this.info = info;
+	public MarkerSubject(SubjectPrototype prototype, SubjectInfo info, User user) {
+		super(prototype, info, user);
 		this.location = UtilV3.toLocation(info.getLocation().clone().add(0.5, 0, 0.5), App.getApp().getWorld());
 		this.collectorId = info.getMetadata() == null ? 0 : Integer.parseInt(info.getMetadata());
 	}
@@ -46,14 +44,8 @@ public class MarkerSubject implements Subject {
 	}
 
 	@Override
-	public SubjectType<?> getType() {
-		return SubjectType.MARKER;
-	}
-
-	@Override
-	public SubjectInfo generateInfo() {
-		info.metadata = String.valueOf(collectorId);
-		return info;
+	public void updateInfo() {
+		cachedInfo.metadata = String.valueOf(collectorId);
 	}
 
 }

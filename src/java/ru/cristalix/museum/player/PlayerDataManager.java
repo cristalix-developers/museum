@@ -72,7 +72,8 @@ public class PlayerDataManager implements Listener {
 							new ArrayList<>(),
 							0,
 							0,
-							new ArrayList<>()
+							new ArrayList<>(),
+                            new ArrayList<>()
 					);
 					for (SubjectInfo subject : proto.getDefaultSubjects()) {
 						userInfo.getSubjectInfos().add(subject.clone());
@@ -84,7 +85,7 @@ public class PlayerDataManager implements Listener {
 							new ArrayList<>(userInfo.getDonates())
 					);
 				}
-				userMap.put(uuid, new User(userInfo, new ArrayList<>(userInfoPackage.getLocalBoosters())));
+				userMap.put(uuid, new User(userInfo));
 			} catch (InterruptedException | ExecutionException | TimeoutException ex) {
 				event.setCancelReason("Не удалось загрузить статистику о музее.");
 				event.setCancelled(true);
@@ -117,11 +118,11 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
-		val player = e.getPlayer();
+		val player = (CraftPlayer) e.getPlayer();
 		timeBar.onJoin(player.getUniqueId());
 		val user = userMap.get(player.getUniqueId());
 
-		user.setConnection(((CraftPlayer) player).getHandle().playerConnection);
+		user.setConnection(player.getHandle().playerConnection);
 		user.setPlayer(player);
 
 		B.postpone(5, () -> {

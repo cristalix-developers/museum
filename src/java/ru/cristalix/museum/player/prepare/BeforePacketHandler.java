@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.data.SkeletonInfo;
 import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.excavation.ExcavationPrototype;
 import ru.cristalix.museum.museum.subject.skeleton.Fragment;
@@ -21,7 +20,6 @@ import ru.cristalix.museum.player.pickaxe.Pickaxe;
 import ru.cristalix.museum.player.pickaxe.PickaxeType;
 import ru.cristalix.museum.util.MessageUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -61,7 +59,7 @@ public class BeforePacketHandler implements Prepare {
 							if (packet.c == STOP_DESTROY_BLOCK && valid) {
 								user.sendAnime();
 								if (tryReturnPlayer(user, app)) return;
-								acceptedBreak(user, packet, app);
+								acceptedBreak(user, packet);
 							} else if (packet.c == START_DESTROY_BLOCK) {
 								packet.c = ABORT_DESTROY_BLOCK;
 								packet.a = dummy;
@@ -87,7 +85,7 @@ public class BeforePacketHandler implements Prepare {
 			Bukkit.getScheduler().runTaskLater(app, () -> {
 				user.setExcavation(null);
 				PrepareSteps.INVENTORY.getPrepare().execute(user, app);
-				user.getCurrentMuseum().load(user);
+				user.getCurrentMuseum().show(user);
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			}, 10 * 20L);
 			return true;
@@ -96,20 +94,20 @@ public class BeforePacketHandler implements Prepare {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void acceptedBreak(User user, PacketPlayInBlockDig packet, App app) {
+	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
 					List<BlockPosition> positions = pickaxeType.getPickaxe().dig(user, packet.a);
 					user.giveExperience(pickaxeType.getExperience());
 					if (positions != null)
-						positions.forEach(position -> generateFragments(user, position, app));
+						positions.forEach(position -> generateFragments(user, position));
 				}
 			}
 		});
 	}
 
-	private void generateFragments(User user, BlockPosition position, App app) {
+	private void generateFragments(User user, BlockPosition position) {
 		ExcavationPrototype prototype = user.getExcavation().getPrototype();
 		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 
@@ -127,9 +125,7 @@ public class BeforePacketHandler implements Prepare {
 			animateFragments(user, fragment);
 
 			// Проверка на дубликат
-			Skeleton skeleton = user.getSkeletons()
-					.computeIfAbsent(proto.getAddress(), k ->
-							new Skeleton(new SkeletonInfo(k, new ArrayList<>())));
+			Skeleton skeleton = user.getSkeletons().get(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
 				double cost = proto.getRarity().getCost();

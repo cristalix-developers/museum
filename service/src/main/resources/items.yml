@@ -185,3 +185,15 @@ pickaxe-prestige:
 
     Цена: 100'000$
 
+
+subject:
+  text: |
+    Нажмите ПКМ чтобы поставить
+
+subject-case-small:
+  icon: beacon (subject)
+  text: |
+    &bВитрина для скелета
+
+
+

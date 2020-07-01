@@ -4,14 +4,13 @@ import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Delegate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.Storable;
+import ru.cristalix.museum.prototype.Storable;
 import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.museum.collector.CollectorNavigator;
 import ru.cristalix.museum.museum.map.MuseumPrototype;
@@ -20,14 +19,10 @@ import ru.cristalix.museum.museum.subject.Allocation;
 import ru.cristalix.museum.museum.subject.MarkerSubject;
 import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
-import ru.cristalix.museum.prototype.Managers;
 import ru.cristalix.museum.util.LocationTree;
 import ru.cristalix.museum.util.WarpUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -37,26 +32,21 @@ import java.util.stream.Collectors;
  */
 @Setter
 @Getter
-public class Museum implements Storable<MuseumInfo> {
+public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
-	private final User owner;
-	private final MuseumPrototype prototype;
 	private final CraftWorld world;
-
-	@Delegate
-	private final MuseumInfo info;
-
 	private double income;
+    private String title;
 
-	public Museum(MuseumInfo info, User owner) {
-		this.info = info;
-		this.owner = owner;
+    public Museum(MuseumPrototype prototype, MuseumInfo info, User owner) {
+		super(prototype, info, owner);
 		this.world = App.getApp().getWorld();
+		this.title = info.title;
 
-		this.prototype = Managers.museum.getPrototype(info.getAddress());
+		List<MarkerSubject> allMarkers = getSubjects(SubjectType.MARKER);
 
-		getSubjects(SubjectType.COLLECTOR).forEach(collector -> {
-			List<MarkerSubject> markers = getSubjects(SubjectType.MARKER).stream()
+		this.getSubjects(SubjectType.COLLECTOR).forEach(collector -> {
+			List<MarkerSubject> markers = allMarkers.stream()
 					.filter(marker -> marker.getCollectorId() == collector.getId())
 					.collect(Collectors.toList());
 			List<MarkerSubject> route = LocationTree.order(markers, MarkerSubject::getLocation);
@@ -65,15 +55,15 @@ public class Museum implements Storable<MuseumInfo> {
 		});
 	}
 
-	@Override
-	public MuseumInfo generateInfo() {
-		return info;
-	}
+    @Override
+    protected void updateInfo() {
+        cachedInfo.title = title;
+    }
 
-	public void load(User user) {
+    public void show(User user) {
 		new WarpUtil.WarpBuilder(prototype.getAddress()).build().warp(user);
 
-		info.views++;
+		cachedInfo.views++;
 
 		user.sendAnime();
 
@@ -93,7 +83,7 @@ public class Museum implements Storable<MuseumInfo> {
 		updateIncrease();
 	}
 
-	public void unload(User user) {
+	public void hide(User user) {
 
 		iterateSubjects(s -> s.hide(user, false));
 
@@ -126,7 +116,7 @@ public class Museum implements Storable<MuseumInfo> {
 	public <T extends Subject> List<T> getSubjects(SubjectType<T> type) {
 		List<T> list = new ArrayList<>();
 		iterateSubjects(s -> {
-			if (s.getType() == type) list.add((T) s);
+			if (s.getPrototype().getType() == type) list.add((T) s);
 		});
 		return list;
 	}
@@ -142,5 +132,17 @@ public class Museum implements Storable<MuseumInfo> {
 			}
 		}
 	}
+
+	public long getViews() {
+        return cachedInfo.getViews();
+    }
+
+    public Date getCreationDate() {
+        return cachedInfo.getCreationDate();
+    }
+
+    public void incrementViews() {
+        cachedInfo.views++;
+    }
 
 }

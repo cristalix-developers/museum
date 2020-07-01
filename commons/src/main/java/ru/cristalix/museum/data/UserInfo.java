@@ -2,6 +2,7 @@ package ru.cristalix.museum.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.donate.DonateType;
 
@@ -23,5 +24,6 @@ public class UserInfo {
 	public int excavationCount;
 	public long pickedCoinsCount;
 	public List<DonateType> donates;
+    private List<Booster> localBoosters;
 
 }
