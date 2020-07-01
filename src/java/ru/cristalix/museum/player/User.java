@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.util.UtilNetty;
+import ru.cristalix.museum.Storable;
 import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.data.UserInfo;
@@ -21,8 +22,10 @@ import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.gallery.Warp;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.Museum;
+import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
+import ru.cristalix.museum.prototype.Managers;
 import ru.cristalix.museum.util.LevelSystem;
 import ru.cristalix.museum.util.MessageUtil;
 
@@ -38,6 +41,7 @@ public class User implements PlayerWrapper {
 	private final UserInfo info;
 	private final Map<String, Museum> museums;
 	private final Map<String, Skeleton> skeletons;
+	private final List<Subject> subjects;
 	private Player player;
 	private PlayerConnection connection;
 	private List<Booster> localBoosters;
@@ -49,6 +53,14 @@ public class User implements PlayerWrapper {
 
 	public User(UserInfo info, List<Booster> localBoosters) {
 		this.info = info;
+		this.subjects = info.getSubjectInfos().stream()
+				.map(subjectInfo -> {
+					SubjectPrototype prototype = Managers.subject.getPrototype(subjectInfo.getPrototypeAddress());
+					System.out.println("Registering " + prototype + " subject for " + info.getUuid());
+					return prototype.getType().provide(this, subjectInfo, prototype);
+				}).collect(Collectors.toList());
+
+		System.out.println("Registered " + subjects.size() + " subjects.");
 		this.museums = this.getMuseumInfos().stream()
 				.map(museumInfo -> new Museum(museumInfo, this))
 				.collect(Collectors.toMap(Museum::getAddress, museum -> museum));
@@ -56,6 +68,7 @@ public class User implements PlayerWrapper {
 				.map(Skeleton::new)
 				.collect(Collectors.toMap(Skeleton::getAddress, skeleton -> skeleton));
 		this.localBoosters = localBoosters;
+
 	}
 
 	public CraftPlayer getPlayer() {
@@ -84,6 +97,9 @@ public class User implements PlayerWrapper {
 	}
 
 	public UserInfo generateUserInfo() {
+		info.museumInfos = Storable.store(museums.values());
+		info.skeletonInfos = Storable.store(skeletons.values());
+		info.subjectInfos = Storable.store(subjects);
 		return info;
 	}
 

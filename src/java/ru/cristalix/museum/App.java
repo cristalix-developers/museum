@@ -75,6 +75,12 @@ public final class App extends JavaPlugin {
 		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("MODELS", "Dino")
 				.orElseThrow(() -> new RuntimeException("Map museum/main wasn't found in the MapService"));
 
+		B.regCommand((sender, args) -> {
+			if (args.length == 0) return "§cИспользование: §e/money [Количество денег]";
+			getUser(sender).setMoney(Double.parseDouble(args[0]));
+			return "§aВаше количество денег изменено.";
+		}, "money");
+
 		try {
 			this.map = new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get());
 		} catch (InterruptedException | ExecutionException e) {

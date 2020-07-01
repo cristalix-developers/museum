@@ -24,9 +24,9 @@ import ru.cristalix.museum.util.MessageUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.IntFunction;
 
 import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.*;
+import static ru.cristalix.museum.excavation.Excavation.isAir;
 
 /**
  * @author func 31.05.2020
@@ -46,17 +46,17 @@ public class BeforePacketHandler implements Prepare {
 						if (packetObj instanceof PacketPlayInUseItem) {
 							val packet = (PacketPlayInUseItem) packetObj;
 							BlockPosition pos = packet.a;
-							if (packet.c == EnumHand.MAIN_HAND && Excavation.isAir(user, packet.a)) {
-								if (user.getExcavation() == null)
-									user.getCurrentMuseum().processClick(pos.getX(), pos.getY(), pos.getZ());
-								packet.a = dummy; // Genius
-							}
+							if (packet.c == EnumHand.MAIN_HAND)
+								if (isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
+									if (user.getExcavation() == null)
+										user.getCurrentMuseum().processClick(user, pos.getX(), pos.getY(), pos.getZ());
+									packet.a = dummy; // Genius
+								}
 							if (packet.c == EnumHand.OFF_HAND) packet.a = dummy;
 						} else if (packetObj instanceof PacketPlayInBlockDig) {
 							val packet = (PacketPlayInBlockDig) packetObj;
 							Excavation excavation = user.getExcavation();
-
-							boolean valid = excavation != null && Excavation.isAir(user, packet.a);
+							boolean valid = excavation != null && isAir(user, packet.a);
 
 							if (packet.c == STOP_DESTROY_BLOCK && valid) {
 								user.sendAnime();

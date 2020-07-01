@@ -27,6 +27,8 @@ public class Coin {
 	public Coin(Location location) {
 		this.location = location;
 		entityItem = new EntityItem(App.getApp().getNMSWorld(), location.getX(), location.getY(), location.getZ(), COIN);
+		entityItem.motX = 0;
+		entityItem.motZ = 0;
 		timestamp = System.currentTimeMillis();
 	}
 

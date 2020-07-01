@@ -12,7 +12,6 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
-import ru.cristalix.core.formatting.Colors;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
@@ -60,12 +59,8 @@ public class PlayerDataManager implements Listener {
 							proto.getAddress(),
 							"Музей археологии",
 							new Date(),
-							3,
-							new ArrayList<>()
+							3
 					);
-					for (SubjectInfo subject : proto.getDefaultSubjects()) {
-						startMuseum.getSubjectInfos().add(subject.clone());
-					}
 
 					userInfo = new UserInfo(
 							uuid,
@@ -74,10 +69,14 @@ public class PlayerDataManager implements Listener {
 							PickaxeType.DEFAULT,
 							Collections.singletonList(startMuseum),
 							new ArrayList<>(),
+							new ArrayList<>(),
 							0,
 							0,
 							new ArrayList<>()
 					);
+					for (SubjectInfo subject : proto.getDefaultSubjects()) {
+						userInfo.getSubjectInfos().add(subject.clone());
+					}
 				} else {
 					// No dynamic constructor :( thx java
 					userInfo.setDonates(userInfo.getDonates() == null ?
@@ -112,8 +111,7 @@ public class PlayerDataManager implements Listener {
 		});
 		this.timeBar = new MultiTimeBar(
 				() -> new ArrayList<>(globalBoosters),
-				5L, TimeUnit.SECONDS,
-				() -> Colors.cYellow + "Нет активных глобальных бустеров"
+				5L, TimeUnit.SECONDS, () -> null
 		);
 	}
 

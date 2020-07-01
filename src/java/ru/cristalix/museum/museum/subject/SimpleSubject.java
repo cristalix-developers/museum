@@ -1,18 +1,14 @@
 package ru.cristalix.museum.museum.subject;
 
-import lombok.val;
-import net.minecraft.server.v1_12_R1.BlockPosition;
-import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange;
+import clepto.bukkit.B;
+import lombok.Getter;
 import org.bukkit.Location;
-import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.data.subject.SubjectInfo;
-import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.player.User;
-import ru.cristalix.museum.player.pickaxe.Pickaxe;
 
 /**
  * @author func 22.05.2020
@@ -20,16 +16,18 @@ import ru.cristalix.museum.player.pickaxe.Pickaxe;
  */
 public class SimpleSubject implements Subject {
 
-	protected final Museum museum;
+	protected final User owner;
 	protected final SubjectInfo info;
-	protected final Location location;
-	private final SubjectPrototype prototype;
+	protected final SubjectPrototype prototype;
 
-	public SimpleSubject(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
-		this.museum = museum;
+	@Getter
+	private Allocation allocation;
+
+	public SimpleSubject(User owner, SubjectInfo info, SubjectPrototype prototype) {
+		this.owner = owner;
 		this.info = info;
-		this.location = UtilV3.toLocation(info.getLocation(), App.getApp().getWorld());
 		this.prototype = prototype;
+		B.run(() -> allocate(UtilV3.toLocation(info.getLocation(), App.getApp().getWorld())));
 	}
 
 	@Override
@@ -37,40 +35,21 @@ public class SimpleSubject implements Subject {
 		return SubjectType.DECORATION;
 	}
 
-	@Override
-	public void show(User owner) {
-		update(owner, false);
+	public Allocation allocate(Location origin) {
+		if (origin == null) System.out.println("Clearing allocation for " + prototype.getAddress());
+		return this.allocation = Allocation.allocate(info, prototype, origin);
 	}
 
 	@Override
-	public void hide(User owner) {
-		update(owner, true);
+	public void show(User user) {
+		if (allocation != null) allocation.getShowPackets().forEach(user::sendPacket);
 	}
 
-	private void update(User user, boolean hide) {
-		val start = prototype.getBox().getMin();
-		val world = App.getApp().getNMSWorld();
-		V3 dims = prototype.getBox().getDimensions();
-
-		for (int x = 0; x <= dims.getX(); x++) {
-			for (int y = 0; y <= dims.getY(); y++) {
-				for (int z = 0; z <= dims.getZ(); z++) {
-					val source = new BlockPosition(
-							start.x + x,
-							start.y + y,
-							start.z + z
-					);
-					val destination = new BlockPosition(
-							location.x + x,
-							location.y + y,
-							location.z + z
-					);
-					val packet = new PacketPlayOutBlockChange(world, destination);
-					packet.block = hide ? Pickaxe.AIR_DATA : world.getType(new BlockPosition(source));
-					user.sendPacket(packet);
-				}
-			}
-		}
+	@Override
+	public void hide(User user, boolean visually) {
+		if (allocation == null) return;
+		allocation.getHidePackets().forEach(user::sendPacket);
+		if (visually) allocation.getDestroyPackets().forEach(user::sendPacket);
 	}
 
 	@Override
