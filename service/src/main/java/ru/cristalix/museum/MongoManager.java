@@ -11,7 +11,6 @@ import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.museum.data.UserInfo;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -39,7 +38,7 @@ public class MongoManager {
 
 		userData
 				.find(Filters.eq("uuid", uuid.toString()))
-				.first((result, throwable) -> archaeologist.complete(result == null ? null : result.getString("data")));
+				.first((result, throwable) -> archaeologist.complete(result == null ? null : result.toJson()));
 		return archaeologist.thenApply(data -> data == null ? null : GlobalSerializers.fromJson(data, UserInfo.class));
 	}
 
@@ -47,10 +46,11 @@ public class MongoManager {
 		String uuid = user.getUuid().toString();
 		userData.updateOne(
 				Filters.eq("uuid", uuid),
-				new Document("$set", new Document("data", GlobalSerializers.toJson(user))),
+				new Document("$set", Document.parse(GlobalSerializers.toJson(user))),
 				new UpdateOptions().upsert(true),
 				(result, throwable) -> {
-                    Optional.ofNullable(throwable).ifPresent(Throwable::printStackTrace);
+					if (throwable != null)
+						throwable.printStackTrace();
 				}
 		);
 	}
@@ -58,7 +58,7 @@ public class MongoManager {
 	public static void bulkSave(List<UserInfo> users) {
 		List<UpdateOneModel<Document>> models = users.stream().map(info -> new UpdateOneModel<Document>(
 				Filters.eq("uuid", info.getUuid().toString()),
-				new Document("$set", new Document("data", GlobalSerializers.toJson(info))),
+				new Document("$set", Document.parse(GlobalSerializers.toJson(info))),
 				new UpdateOptions().upsert(true)
 		)).collect(Collectors.toList());
 		userData.bulkWrite(models, (result, throwable) -> {
