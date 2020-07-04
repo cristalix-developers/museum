@@ -1,37 +1,30 @@
 package ru.cristalix.museum.museum.subject.skeleton;
 
-import lombok.Data;
-import lombok.experimental.Delegate;
-import ru.cristalix.museum.Storable;
+import lombok.Getter;
+import ru.cristalix.museum.prototype.Storable;
 import ru.cristalix.museum.data.SkeletonInfo;
-import ru.cristalix.museum.prototype.Managers;
+import ru.cristalix.museum.player.User;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-@Data
-public class Skeleton implements Storable<SkeletonInfo> {
+@Getter
+public class Skeleton extends Storable<SkeletonInfo, SkeletonPrototype> {
 
-	@Delegate
-	private final SkeletonInfo info;
-	private final SkeletonPrototype skeletonPrototype;
-	private final List<Fragment> unlockedFragments;
+	private final Set<Fragment> unlockedFragments;
 
-	public Skeleton(SkeletonInfo info) {
-		this.info = info;
-		this.skeletonPrototype = Managers.skeleton.getPrototype(info.getAddress());
-		this.unlockedFragments = skeletonPrototype.getFragments().stream()
+	public Skeleton(SkeletonPrototype prototype, SkeletonInfo info, User user) {
+		super(prototype, info, user);
+		this.unlockedFragments = prototype.getFragments().stream()
 				.filter(e -> info.getUnlockedFragmentAddresses().contains(e.getAddress()))
-				.collect(Collectors.toList());
+				.collect(Collectors.toSet());
 	}
 
-	@Override
-	public SkeletonInfo generateInfo() {
-		info.setUnlockedFragmentAddresses(unlockedFragments.stream()
+	public void updateInfo() {
+		cachedInfo.setUnlockedFragmentAddresses(unlockedFragments.stream()
 				.map(Fragment::getAddress)
 				.collect(Collectors.toList())
 		);
-		return info;
 	}
 
 }

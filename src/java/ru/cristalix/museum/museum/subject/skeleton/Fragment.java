@@ -14,9 +14,9 @@ public class Fragment {
 	private final List<Piece> pieces;
 	private final int[] legacyIds;
 
-	public void show(Player player, Location origin) {
+	public void show(Player player, Location origin, boolean inBlock) {
 		for (Piece piece : pieces)
-			piece.show(player, origin);
+			piece.show(player, origin, inBlock);
 	}
 
 	public void hide(Player player) {

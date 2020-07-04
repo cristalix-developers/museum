@@ -2,19 +2,21 @@ package ru.cristalix.museum.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.cristalix.museum.data.subject.SubjectInfo;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class MuseumInfo {
+public class MuseumInfo implements Info {
 
-	public String address;
+	public final String prototypeAddress;
 	public String title;
 	public Date creationDate;
 	public long views;
-	public List<SubjectInfo> subjectInfos;
+
+	public MuseumInfo(String prototypeAddress) {
+	    this.prototypeAddress = prototypeAddress;
+	    this.creationDate = new Date();
+    }
 
 }

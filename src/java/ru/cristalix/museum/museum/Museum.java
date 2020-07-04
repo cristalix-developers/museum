@@ -4,29 +4,27 @@ import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Delegate;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.Storable;
+import ru.cristalix.museum.prototype.Storable;
 import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.museum.collector.CollectorNavigator;
 import ru.cristalix.museum.museum.map.MuseumPrototype;
-import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.museum.map.SubjectType;
+import ru.cristalix.museum.museum.subject.Allocation;
 import ru.cristalix.museum.museum.subject.MarkerSubject;
 import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
-import ru.cristalix.museum.prototype.Managers;
 import ru.cristalix.museum.util.LocationTree;
 import ru.cristalix.museum.util.WarpUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -34,50 +32,38 @@ import java.util.stream.Collectors;
  */
 @Setter
 @Getter
-public class Museum implements Storable<MuseumInfo> {
+public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
-	private final User owner;
-	private final MuseumPrototype prototype;
-
-	@Delegate
-	private final MuseumInfo info;
-
-	private final List<Subject> subjects;
-
+	private final CraftWorld world;
 	private double income;
+    private String title;
 
-	public Museum(MuseumInfo info, User owner) {
-		this.info = info;
-		this.owner = owner;
+    public Museum(MuseumPrototype prototype, MuseumInfo info, User owner) {
+		super(prototype, info, owner);
+		this.world = App.getApp().getWorld();
+		this.title = info.title;
 
-		this.prototype = Managers.museum.getPrototype(info.getAddress());
+		List<MarkerSubject> allMarkers = getSubjects(SubjectType.MARKER);
 
-		this.subjects = info.getSubjectInfos().stream()
-				.map(subjectInfo -> {
-					SubjectPrototype prototype = Managers.subject.getPrototype(subjectInfo.getPrototypeAddress());
-					return prototype.getType().provide(this, subjectInfo, prototype);
-				}).collect(Collectors.toList());
-
-		getSubjects(SubjectType.COLLECTOR).forEach(collector -> {
-			List<MarkerSubject> markers = getSubjects(SubjectType.MARKER).stream()
+		this.getSubjects(SubjectType.COLLECTOR).forEach(collector -> {
+			List<MarkerSubject> markers = allMarkers.stream()
 					.filter(marker -> marker.getCollectorId() == collector.getId())
 					.collect(Collectors.toList());
 			List<MarkerSubject> route = LocationTree.order(markers, MarkerSubject::getLocation);
-			collector.setNavigator(new CollectorNavigator(prototype, App.getApp().getWorld(),
+			collector.setNavigator(new CollectorNavigator(prototype, world,
 					route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 		});
 	}
 
-	@Override
-	public MuseumInfo generateInfo() {
-		this.info.subjectInfos = Storable.store(subjects);
-		return info;
-	}
+    @Override
+    protected void updateInfo() {
+        cachedInfo.title = title;
+    }
 
-	public void load(User user) {
+    public void show(User user) {
 		new WarpUtil.WarpBuilder(prototype.getAddress()).build().warp(user);
 
-		info.views++;
+		cachedInfo.views++;
 
 		user.sendAnime();
 
@@ -92,35 +78,71 @@ public class Museum implements Storable<MuseumInfo> {
 			user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
 		}
 		Bukkit.getScheduler().runTaskLaterAsynchronously(App.getApp(), () ->
-				subjects.forEach(space -> space.show(user)), 20L);
+				iterateSubjects(s -> s.show(user)), 20L);
+
 		updateIncrease();
 	}
 
-	public void unload(User user) {
-		subjects.forEach(space -> space.hide(user));
+	public void hide(User user) {
+
+		iterateSubjects(s -> s.hide(user, false));
 
 		Set<Coin> coins = user.getCoins();
 		coins.forEach(coin -> coin.remove(user.getConnection()));
 		coins.clear();
 	}
 
-	public void updateIncrease() {
-		income = .1;
-		for (Subject subject : subjects)
-			income += subject.getIncome();
+	private void iterateSubjects(Consumer<Subject> action) {
+		for (Subject subject : owner.getSubjects()) {
+			Allocation allocation = subject.getAllocation();
+//			if (allocation == null) continue;
+//			if (!prototype.getBox().contains(allocation.getOrigin())) continue;
+			action.accept(subject);
+		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends Subject> List<T> getSubjects(SubjectType<T> type) {
-		List<T> list = new ArrayList<>();
-		for (Subject subject : subjects) {
-			if (subject.getType() == type) list.add((T) subject);
-		}
+	public void updateIncrease() {
+		double[] i = {.1};
+		iterateSubjects(s -> i[0] += s.getIncome()); // Completely safe and professional code.
+		income = i[0];
+	}
+	public List<Subject> getSubjects() {
+		List<Subject> list = new ArrayList<>();
+		iterateSubjects(list::add);
 		return list;
 	}
 
-	public void processClick(int x, int y, int z) {
-		B.run(() -> B.bc("§aClick at " + x + " " + y + " " + z));
+	@SuppressWarnings ("unchecked")
+	public <T extends Subject> List<T> getSubjects(SubjectType<T> type) {
+		List<T> list = new ArrayList<>();
+		iterateSubjects(s -> {
+			if (s.getPrototype().getType() == type) list.add((T) s);
+		});
+		return list;
 	}
+
+	public void processClick(User user, int x, int y, int z) {
+		B.run(() -> B.bc("§aClick at " + x + " " + y + " " + z));
+		for (Subject subject : getSubjects()) {
+			if (subject.getAllocation() == null) continue;
+			for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
+				if (loc.getBlockX() == x && loc.getBlockY() == y && loc.getBlockZ() == z) {
+					subject.hide(user, true);
+				}
+			}
+		}
+	}
+
+	public long getViews() {
+        return cachedInfo.getViews();
+    }
+
+    public Date getCreationDate() {
+        return cachedInfo.getCreationDate();
+    }
+
+    public void incrementViews() {
+        cachedInfo.views++;
+    }
 
 }

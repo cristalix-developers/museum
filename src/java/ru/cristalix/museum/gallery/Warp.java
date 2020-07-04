@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import ru.cristalix.museum.player.User;
-import ru.cristalix.museum.util.WarpUtil;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -46,7 +45,7 @@ public class Warp {
 				if (start != null)
 					player.teleport(start);
 				else
-					user.getCurrentMuseum().load(user);
+					user.getCurrentMuseum().show(user);
 				usr.setLastWarp(null);
 			}
 		};

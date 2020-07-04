@@ -109,13 +109,15 @@ public final class MuseumChatService extends ChatService implements Listener {
 			}).thenApply(future ->
 					chatView.format(uuid, oldLegacy).thenAccept(builder::append)).thenApply(__ -> builder.create()));
 		}, EventPriority.LOW, true);
-		eventExecutor.registerListener(PlayerJoinEvent.class,
+		eventExecutor.registerListener(
+				PlayerJoinEvent.class,
 				this,
 				event -> event.setJoinMessage(null),
 				EventPriority.HIGH,
 				true
 		);
-		eventExecutor.registerListener(PlayerQuitEvent.class,
+		eventExecutor.registerListener(
+				PlayerQuitEvent.class,
 				this,
 				event -> {
 					event.setQuitMessage(null);

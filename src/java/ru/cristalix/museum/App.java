@@ -39,6 +39,7 @@ import ru.cristalix.museum.listener.PassiveEvents;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.museum.subject.CollectorSubject;
+import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
@@ -75,6 +76,20 @@ public final class App extends JavaPlugin {
 		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("MODELS", "Dino")
 				.orElseThrow(() -> new RuntimeException("Map museum/main wasn't found in the MapService"));
 
+		B.regCommand((sender, args) -> {
+			if (args.length == 0) return "§cИспользование: §e/money [Количество денег]";
+			getUser(sender).setMoney(Double.parseDouble(args[0]));
+			return "§aВаше количество денег изменено.";
+		}, "money");
+
+		B.regCommand((sender, args) -> {
+			if (args.length == 0) return "§cИспользование: §e/dino [Динозавр]";
+			SkeletonPrototype proto = Managers.skeleton.getPrototype(args[0]);
+			if (proto == null) return "§cПрототип динозавра §e" + args[0] + "§c не найден.";
+			getUser(sender).getSkeletons().get(proto).getUnlockedFragments().addAll(proto.getFragments());
+			return "";
+		}, "dino");
+
 		try {
 			this.map = new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get());
 		} catch (InterruptedException | ExecutionException e) {
@@ -93,19 +108,18 @@ public final class App extends JavaPlugin {
 				"gVatjN43AJnbFq36Fa",
 				IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName()
 		);
-
-		clientSocket.connect();
-		clientSocket.registerHandler(BroadcastTitlePackage.class, pckg -> {
+		this.clientSocket.connect();
+		this.clientSocket.registerHandler(BroadcastTitlePackage.class, pckg -> {
 			String[] data = pckg.getData();
 			Bukkit.getOnlinePlayers().forEach(pl -> pl.sendTitle(data[0], data[1], pckg.getFadeIn(), pckg.getStay(), pckg.getFadeOut()));
 		});
-		clientSocket.registerHandler(BroadcastMessagePackage.class, pckg -> {
-			BaseComponent[] msg = ComponentSerializer.parse(pckg.getJsonMessage());
-			Bukkit.getOnlinePlayers().forEach(pl -> pl.sendMessage(msg));
-		});
-		clientSocket.registerHandler(TargetMessagePackage.class, pckg -> {
-			BaseComponent[] msg = ComponentSerializer.parse(pckg.getJsonMessage());
-			pckg.getUsers().stream().map(Bukkit::getPlayer).filter(Objects::nonNull).forEach(pl -> pl.sendMessage(msg));
+		this.clientSocket.registerHandler(BroadcastMessagePackage.class, pckg -> Bukkit.getOnlinePlayers()
+				.forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage()))));
+		this.clientSocket.registerHandler(TargetMessagePackage.class, pckg -> {
+			pckg.getUsers().stream()
+					.map(Bukkit::getPlayer)
+					.filter(Objects::nonNull)
+					.forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage())));
 		});
 		this.playerDataManager = new PlayerDataManager(this);
 
@@ -145,45 +159,9 @@ public final class App extends JavaPlugin {
 				new GuiEvents()
 		);
 
-		// todo: delegate to another class
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				long time = System.currentTimeMillis();
-				val visitedPoint = visitorManager.getVictimFutureLocation();
-
-				for (Player player : Bukkit.getOnlinePlayers()) {
-					val user = getUser(player.getUniqueId());
-
-					if (user.getExcavation() != null || user.getCurrentMuseum() == null)
-						continue;
-
-					if (visitedPoint != null && user.getCoins().size() < 50) {
-						Coin coin = new Coin(visitedPoint);
-						coin.create(user.getConnection());
-						user.getCoins().add(coin);
-					}
-					for (CollectorSubject collector : user.getCurrentMuseum().getSubjects(SubjectType.COLLECTOR)) {
-						collector.move(user, time);
-					}
-
-					// Если монеты устарели, что бы не копились на клиенте, удаляю
-					user.getCoins().removeIf(coin -> {
-						if (coin.getTimestamp() + Coin.SECONDS_LIVE * 1000 < time) {
-							coin.remove(user.getConnection());
-							return true;
-						}
-						return false;
-					});
-				}
-			}
-		}.runTaskTimer(this, 0, 1);
-
-		// todo: include in main cycle using mod operation
-		// Автосохранение всех игроков
-		long autoSavePeriod = 20 * 60 * 3;
-		Bukkit.getScheduler().runTaskTimerAsynchronously(this, () ->
-				clientSocket.write(playerDataManager.bulk(false)), autoSavePeriod, autoSavePeriod);
+		// Обработка каждого тика
+		new TickTimerHandler(this, visitorManager, clientSocket, playerDataManager)
+				.runTaskTimer(this, 0, 1);
 	}
 
 	@Override

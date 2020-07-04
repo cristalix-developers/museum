@@ -2,8 +2,8 @@ package ru.cristalix.museum.museum.map;
 
 import clepto.cristalix.MapServiceException;
 import ru.cristalix.museum.data.subject.SubjectInfo;
-import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.subject.*;
+import ru.cristalix.museum.player.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ public class SubjectType<T extends Subject> {
 	private static final List<SubjectType<?>> registry = new ArrayList<>();
 
 	public static SubjectType<SkeletonSubject> SKELETON_CASE;
-	public static SubjectType<SimpleSubject> DECORATION;
+	public static SubjectType<Subject> DECORATION;
 	public static SubjectType<CollectorSubject> COLLECTOR;
 	public static SubjectType<MarkerSubject> MARKER;
 	private final String address;
@@ -26,7 +26,7 @@ public class SubjectType<T extends Subject> {
 
 	public static void init() {
 		SKELETON_CASE = new SubjectType<>("skeleton-case", SkeletonSubject::new);
-		DECORATION = new SubjectType<>("decoration", SimpleSubject::new);
+		DECORATION = new SubjectType<>("decoration", Subject::new);
 		COLLECTOR = new SubjectType<>("collector", CollectorSubject::new);
 		MARKER = new SubjectType<>("marker", MarkerSubject::new);
 	}
@@ -39,12 +39,12 @@ public class SubjectType<T extends Subject> {
 		throw new MapServiceException("Subject type '" + query + "' is not a valid type.");
 	}
 
-	public Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype) {
-		return provider.provide(museum, info, prototype);
+	public Subject provide(SubjectPrototype prototype, SubjectInfo info, User user) {
+		return provider.provide(prototype, info, user);
 	}
 
 	public interface Provider {
-		Subject provide(Museum museum, SubjectInfo info, SubjectPrototype prototype);
+		Subject provide(SubjectPrototype prototype, SubjectInfo info, User user);
 	}
 
 }

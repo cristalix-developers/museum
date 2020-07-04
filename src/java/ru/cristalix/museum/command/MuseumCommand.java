@@ -39,8 +39,8 @@ public class MuseumCommand implements CommandExecutor {
 					if (user.getCurrentMuseum().getOwner().equals(sender))
 						return true;
 
-					sender.getCurrentMuseum().unload(user);
-					userAuthor.getCurrentMuseum().load(user);
+					sender.getCurrentMuseum().hide(user);
+					userAuthor.getCurrentMuseum().show(user);
 
 					MessageUtil.find("visitaccept")
 							.set("visitor", user.getName())
