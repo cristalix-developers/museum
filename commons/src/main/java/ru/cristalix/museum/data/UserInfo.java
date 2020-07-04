@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-public class UserInfo {
+public class UserInfo implements Unique {
 
 	public final UUID uuid;
 

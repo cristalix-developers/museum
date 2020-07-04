@@ -22,21 +22,21 @@ import java.util.stream.Collectors;
 
 public class SqlManager {
 
-	private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS `boosters`" +
-			" (`id` varchar(36) NOT NULL," +
-			" `user` varchar(36) NOT NULL," +
-			" `username` varchar(36) NOT NULL," +
-			" `booster` varchar(50) NOT NULL," +
-			" `until` LONG NOT NULL," +
-			" `time` LONG NOT NULL," +
-			" `multiplier` DOUBLE NOT NULL," +
-			" `global` BOOLEAN NOT NULL," +
-			" PRIMARY KEY(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-	private static final String INSERT_BOOSTERS = "INSERT INTO boosters VALUES (?,?,?,?,?,?,?);";
-	private static final String SELECT_GLOBAL = "SELECT * FROM boosters WHERE global = 1 AND until > ?";
-	private final AsyncQueryFactory async;
-	@Getter
-	private Map<BoosterType, Booster> globalBoosters = new ConcurrentHashMap<>();
+//	private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS `boosters`" +
+//			" (`id` varchar(36) NOT NULL," +
+//			" `user` varchar(36) NOT NULL," +
+//			" `username` varchar(36) NOT NULL," +
+//			" `booster` varchar(50) NOT NULL," +
+//			" `until` LONG NOT NULL," +
+//			" `time` LONG NOT NULL," +
+//			" `multiplier` DOUBLE NOT NULL," +
+//			" `global` BOOLEAN NOT NULL," +
+//			" PRIMARY KEY(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+//	private static final String INSERT_BOOSTERS = "INSERT INTO boosters VALUES (?,?,?,?,?,?,?);";
+//	private static final String SELECT_GLOBAL = "SELECT * FROM boosters WHERE global = 1 AND until > ?";
+//	private final AsyncQueryFactory async;
+//	@Getter
+//	private Map<BoosterType, Booster> globalBoosters = new ConcurrentHashMap<>();
 
 	private Map<UUID, Set<UUID>> thanksMap = new ConcurrentHashMap<>();
 
