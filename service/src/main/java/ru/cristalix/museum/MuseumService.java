@@ -13,7 +13,6 @@ import ru.cristalix.core.network.ISocketClient;
 import ru.cristalix.core.network.packages.FillLauncherUserDataPackage;
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage;
 import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage;
-import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.configuration.ConfigurationManager;
 import ru.cristalix.museum.data.BoosterInfo;
@@ -23,8 +22,6 @@ import ru.cristalix.museum.handlers.PackageHandler;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.socket.ServerSocket;
 import ru.cristalix.museum.socket.ServerSocketHandler;
-import ru.ilyafx.sql.BaseSQL;
-import ru.ilyafx.sql.SQL;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -38,8 +35,7 @@ public class MuseumService {
 	public static final long DEFAULT_BOOSTER_TIME = TimeUnit.HOURS.toMillis(1L);
 	public static final int THANKS_SECONDS = 45;
 	public static final String PASSWORD = System.getProperty("PASSWORD", "gVatjN43AJnbFq36Fa");
-	public static final Map<Class<? extends MuseumPackage>, PackageHandler<?>> HANDLER_MAP = new HashMap<>();
-	public static SqlManager SQL_MANAGER;
+	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
 	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
 		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
@@ -141,7 +137,7 @@ public class MuseumService {
 			ServerSocketHandler.broadcast(broadcastPackage);
 		}));
 		registerHandler(ThanksExecutePackage.class, ((channel, serverName, museumPackage) -> {
-			long boosters = SQL_MANAGER.executeThanks(museumPackage.getUser());
+			long boosters = boosterManager.executeThanks(museumPackage.getUser());
 			extra(museumPackage.getUser(), null, (double) (THANKS_SECONDS * boosters));
 			museumPackage.setBoostersCount(boosters);
 			answer(channel, museumPackage);
@@ -236,13 +232,13 @@ public class MuseumService {
 	}
 
 	private static BiPredicate<UserTransactionPackage, UserInfo> globalBoosterPreAuthorize(BoosterType type) {
-		return (pckg, info) -> !SQL_MANAGER.getGlobalBoosters().containsKey(type);
+		return (pckg, info) -> !boosterManager.getGlobalBoosters().containsKey(type);
 	}
 
 	private static BiPredicate<UserTransactionPackage, UserInfo> localBoosterPreAuthorize(BoosterType type) {
 		return (pckg, info) -> {
 			try {
-				return SQL_MANAGER.receiveLocal(pckg.getUser()).get(2L, TimeUnit.SECONDS).stream().noneMatch(booster -> booster.getType() == type);
+				return boosterManager.receiveLocal(pckg.getUser()).get(2L, TimeUnit.SECONDS).stream().noneMatch(booster -> booster.getType() == type);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				return false;
@@ -252,7 +248,7 @@ public class MuseumService {
 
 	private static BiConsumer<UserTransactionPackage, UserInfo> boosterPostAuthorize(BoosterType type, boolean global) {
 		return (pckg, info) -> wrapUuid(Collections.singletonList(pckg.getUser())).thenApply(list -> list.get(0)).thenAccept(userName -> {
-			SQL_MANAGER.push(Booster.defaultInstance(pckg.getUser(), userName, type, DEFAULT_BOOSTER_TIME, global));
+			boosterManager.push(BoosterInfo.defaultInstance(pckg.getUser(), userName, type, DEFAULT_BOOSTER_TIME, global));
 		});
 	}
 

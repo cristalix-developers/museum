@@ -11,7 +11,6 @@ import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import ru.cristalix.core.util.UtilNetty;
-import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.SkeletonInfo;

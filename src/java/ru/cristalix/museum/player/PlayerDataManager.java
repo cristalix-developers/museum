@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.data.MuseumInfo;

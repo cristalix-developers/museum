@@ -1,19 +1,43 @@
 package ru.cristalix.museum.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import ru.cristalix.museum.boosters.BoosterType;
+import ru.cristalix.museum.utils.MultiTimeBar;
+import ru.cristalix.museum.utils.UtilTime;
 
 import java.util.UUID;
 
 @Data
-public class BoosterInfo implements Unique {
+@AllArgsConstructor
+public class BoosterInfo implements Unique, MultiTimeBar.MultiBarInstance {
 
 	private final UUID uuid;
 	private final UUID owner;
 	private final String ownerName;
-	private final BoosterType type;
+	private BoosterType type;
 	private final long until;
+	private final long time;
 	private final double multiplier;
 	private final boolean global;
 
+	public static BoosterInfo defaultInstance(UUID user, String userName, BoosterType type, long time, boolean global) {
+		return new BoosterInfo(UUID.randomUUID(), user, userName, type, System.currentTimeMillis() + time, time, global ? type.getGlobalMultiplier() : type.getLocalMultiplier(), global);
+	}
+
+	@Override
+	public double getPercentsOfFullTime() {
+		return ((until - System.currentTimeMillis()) / ((double) time)) * 100.0;
+	}
+
+	@Override
+	public String getTitle() {
+		return "§eБустер §a" + getType().getName() + " §eот §b" + getType().getName() + " §a(" + UtilTime.formatTime(until - System.currentTimeMillis(), false) + ") §b/thx";
+	}
+
+	public boolean hadExpire() {
+		return System.currentTimeMillis() < until;
+	}
 }
