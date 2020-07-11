@@ -56,7 +56,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 	}
 
     @Override
-    protected void updateInfo() {
+    public void updateInfo() {
         cachedInfo.title = title;
     }
 

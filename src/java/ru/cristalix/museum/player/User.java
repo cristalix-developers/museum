@@ -12,6 +12,7 @@ import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import ru.cristalix.core.util.UtilNetty;
 import ru.cristalix.museum.boosters.BoosterType;
+import ru.cristalix.museum.data.BoosterInfo;
 import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.SkeletonInfo;
 import ru.cristalix.museum.data.UserInfo;
@@ -90,10 +91,10 @@ public class User implements PlayerWrapper {
     }
 
     public double calcMultiplier(BoosterType type) {
-        info.getLocalBoosters().removeIf(Booster::hadExpire);
+        info.getLocalBoosters().removeIf(BoosterInfo::hadExpire);
 
         double sum = 1;
-        for (Booster booster : info.getLocalBoosters()) {
+        for (BoosterInfo booster : info.getLocalBoosters()) {
             if (booster.getType() == type) {
                 sum += booster.getMultiplier() - 1;
             }

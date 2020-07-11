@@ -23,6 +23,6 @@ public class UserInfo implements Unique {
 	public int excavationCount;
 	public long pickedCoinsCount;
 	public List<DonateType> donates;
-    private List<Booster> localBoosters;
+    private List<BoosterInfo> localBoosters;
 
 }

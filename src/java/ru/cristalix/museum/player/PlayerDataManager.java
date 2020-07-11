@@ -15,6 +15,7 @@ import ru.cristalix.core.event.AccountEvent;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.client.ClientSocket;
+import ru.cristalix.museum.data.BoosterInfo;
 import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.data.UserInfo;
@@ -36,7 +37,7 @@ public class PlayerDataManager implements Listener {
 	private final App app;
 	private final Map<UUID, User> userMap = new HashMap<>();
 	private final MultiTimeBar timeBar;
-	private List<Booster> globalBoosters = new ArrayList<>(0);
+	private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
 
 	public PlayerDataManager(App app) {
 		this.app = app;

@@ -7,10 +7,10 @@ import ru.cristalix.museum.player.User;
 
 import static lombok.AccessLevel.PROTECTED;
 
-@RequiredArgsConstructor (access = PROTECTED)
+@RequiredArgsConstructor(access = PROTECTED)
 public abstract class Storable<I extends Info, P extends Prototype> {
 
-    @Getter
+	@Getter
 	protected final P prototype;
 
 	protected final I cachedInfo;
@@ -18,6 +18,6 @@ public abstract class Storable<I extends Info, P extends Prototype> {
 	@Getter
 	protected final User owner;
 
-	protected void updateInfo() {}
+	protected abstract void updateInfo();
 
 }
