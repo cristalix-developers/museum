@@ -38,9 +38,12 @@ public class User implements PlayerWrapper {
 
     @Delegate
     private final UserInfo info;
-    private final Registry<MuseumInfo, MuseumPrototype, Museum> museums = new Registry<>(this, Managers.museum, MuseumInfo::new, Museum::new);
-    private final Registry<SkeletonInfo, SkeletonPrototype, Skeleton> skeletons = new Registry<>(this, Managers.skeleton, SkeletonInfo::new, Skeleton::new);
-    private final Registry<SubjectInfo, SubjectPrototype, Subject> subjects = new Registry<>(this, Managers.subject, SubjectInfo::new, SubjectPrototype::provide);
+    private final Registry<MuseumInfo, MuseumPrototype, Museum> museums
+            = new Registry<>(this, Managers.museum, MuseumInfo::new, Museum::new);
+    private final Registry<SkeletonInfo, SkeletonPrototype, Skeleton> skeletons
+            = new Registry<>(this, Managers.skeleton, SkeletonInfo::new, Skeleton::new);
+    private final Registry<SubjectInfo, SubjectPrototype, Subject> subjects
+            = new Registry<>(this, Managers.subject, SubjectInfo::new, SubjectPrototype::provide);
 
     private CraftPlayer player;
     private PlayerConnection connection;
@@ -55,7 +58,6 @@ public class User implements PlayerWrapper {
         this.subjects.addAll(info.getSubjectInfos());
         this.museums.addAll(info.getMuseumInfos());
         this.skeletons.addAll(info.getSkeletonInfos());
-
     }
 
     public void sendAnime() {

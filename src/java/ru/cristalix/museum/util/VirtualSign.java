@@ -35,7 +35,6 @@ public final class VirtualSign {
         }
     }
 
-
     public void setDefaultText(int line, String text) {
         defaultText.put(line, text == null ? null : ChatColor.translateAlternateColorCodes('&', text));
     }

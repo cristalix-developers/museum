@@ -11,6 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.excavation.ExcavationPrototype;
+import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.museum.subject.skeleton.Fragment;
 import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
@@ -46,9 +47,20 @@ public class BeforePacketHandler implements Prepare {
 							BlockPosition pos = packet.a;
 							if (packet.c == EnumHand.MAIN_HAND)
 								if (isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
-									if (user.getExcavation() == null)
-										user.getCurrentMuseum().processClick(user, pos.getX(), pos.getY(), pos.getZ());
-									packet.a = dummy; // Genius
+									if (user.getExcavation() == null) {
+										for (Subject subject : user.getCurrentMuseum().getSubjects()) {
+											if (subject.getAllocation() == null)
+												continue;
+											for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
+												if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
+													MinecraftServer.getServer().postToMainThread(() ->
+															user.getCurrentMuseum().processClick(user, subject));
+													break;
+												}
+											}
+										}
+										packet.a = dummy; // Genius
+									}
 								}
 							if (packet.c == EnumHand.OFF_HAND) packet.a = dummy;
 						} else if (packetObj instanceof PacketPlayInBlockDig) {

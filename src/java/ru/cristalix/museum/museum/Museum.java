@@ -121,16 +121,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		return list;
 	}
 
-	public void processClick(User user, int x, int y, int z) {
-		B.run(() -> B.bc("§aClick at " + x + " " + y + " " + z));
-		for (Subject subject : getSubjects()) {
-			if (subject.getAllocation() == null) continue;
-			for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
-				if (loc.getBlockX() == x && loc.getBlockY() == y && loc.getBlockZ() == z) {
-					subject.hide(user, true);
-				}
-			}
-		}
+	public void processClick(User user, Subject subject) {
+		user.performCommand("gui manipulator");
 	}
 
 	public long getViews() {
