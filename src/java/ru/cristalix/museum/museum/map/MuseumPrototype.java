@@ -1,6 +1,6 @@
 package ru.cristalix.museum.museum.map;
 
-import clepto.cristalix.Box;
+import clepto.cristalix.mapservice.Box;
 import lombok.Data;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.prototype.Prototype;

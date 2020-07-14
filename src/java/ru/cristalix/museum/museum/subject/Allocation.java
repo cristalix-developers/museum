@@ -1,6 +1,6 @@
 package ru.cristalix.museum.museum.subject;
 
-import clepto.cristalix.Box;
+import clepto.cristalix.mapservice.Box;
 import lombok.Data;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;

@@ -1,6 +1,6 @@
 package ru.cristalix.museum.museum.subject;
 
-import clepto.cristalix.Box;
+import clepto.cristalix.mapservice.Box;
 import lombok.Getter;
 import org.bukkit.Location;
 import ru.cristalix.core.math.V3;

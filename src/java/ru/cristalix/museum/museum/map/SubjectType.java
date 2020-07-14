@@ -1,8 +1,11 @@
 package ru.cristalix.museum.museum.map;
 
-import clepto.cristalix.MapServiceException;
+import clepto.cristalix.mapservice.MapServiceException;
 import ru.cristalix.museum.data.subject.SubjectInfo;
-import ru.cristalix.museum.museum.subject.*;
+import ru.cristalix.museum.museum.subject.CollectorSubject;
+import ru.cristalix.museum.museum.subject.MarkerSubject;
+import ru.cristalix.museum.museum.subject.SkeletonSubject;
+import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
 
 import java.util.ArrayList;
