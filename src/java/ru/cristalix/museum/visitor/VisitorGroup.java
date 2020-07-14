@@ -1,5 +1,6 @@
 package ru.cristalix.museum.visitor;
 
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -16,11 +17,8 @@ import java.util.List;
 public class VisitorGroup {
 
 	private final List<Visitor> visitors = new ArrayList<>();
-	private int offset;
 
-	public VisitorGroup(Location start, int amount, int offset) {
-		this.offset = offset;
-
+	public VisitorGroup(Location start, int amount) {
 		double size = Math.sqrt(amount);
 
 		for (int i = 0; i < amount; i++)

@@ -3,6 +3,7 @@ package ru.cristalix.museum;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.museum.client.ClientSocket;
@@ -36,7 +37,7 @@ public class TickTimerHandler extends BukkitRunnable {
 			counter++;
 
 		long time = System.currentTimeMillis();
-		val visitedPoint = null; // todo: do after
+		Location visitedPoint = null; // todo: do after
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			val user = app.getUser(player.getUniqueId());

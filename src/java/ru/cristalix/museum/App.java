@@ -27,7 +27,6 @@ import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.command.MuseumCommand;
-import ru.cristalix.museum.command.VisitorCommand;
 import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.gui.MuseumGuis;
 import ru.cristalix.museum.listener.MuseumEventHandler;
@@ -140,7 +139,6 @@ public final class App extends JavaPlugin {
 		// Инициализация промежуточных команд / Инвентарей
 		new MuseumGuis(this);
 		Bukkit.getPluginCommand("museum").setExecutor(new MuseumCommand(this));
-		Bukkit.getPluginCommand("visitor").setExecutor(new VisitorCommand(visitorManager));
 
 		// Регистрация обработчиков событий
 		B.events(
