@@ -20,8 +20,10 @@ public class VisitorManager {
 	private final int visitorInGroup;
 	private final int groupCount;
 	private int wait = 0;
+	private App app;
 
 	public VisitorManager(App app, int groupCount, int visitorInGroup) {
+		this.app = app;
 		groups = new ArrayList<>();
 
 		List<Label> labels = app.getMap().getLabels("move");
@@ -40,7 +42,7 @@ public class VisitorManager {
 			wait--;
 		if (groups.size() < groupCount && wait == 0) {
 			wait = 30;
-			groups.add(new VisitorGroup(node.get(0), visitorInGroup));
+			groups.add(new VisitorGroup(app, node.get(0), visitorInGroup));
 		}
 		for (int i = 0; i < groups.size(); i++)
 			groups.get(i).move(node.get((counter / 30 + i) % node.size()));
