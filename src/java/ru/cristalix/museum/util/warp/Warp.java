@@ -1,4 +1,4 @@
-package ru.cristalix.museum.gallery;
+package ru.cristalix.museum.util.warp;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

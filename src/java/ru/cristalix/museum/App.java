@@ -7,8 +7,6 @@ import clepto.bukkit.gui.Guis;
 import clepto.cristalix.Cristalix;
 import clepto.cristalix.WorldMeta;
 import lombok.Getter;
-import lombok.val;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
@@ -18,7 +16,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
@@ -34,11 +31,9 @@ import ru.cristalix.museum.command.MuseumCommand;
 import ru.cristalix.museum.command.VisitorCommand;
 import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.gui.MuseumGuis;
-import ru.cristalix.museum.listener.MuseumEvents;
-import ru.cristalix.museum.listener.PassiveEvents;
-import ru.cristalix.museum.museum.Coin;
+import ru.cristalix.museum.listener.MuseumEventHandler;
+import ru.cristalix.museum.listener.PassiveEventBlocker;
 import ru.cristalix.museum.museum.map.SubjectType;
-import ru.cristalix.museum.museum.subject.CollectorSubject;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
@@ -155,8 +150,8 @@ public final class App extends JavaPlugin {
 		// Регистрация обработчиков событий
 		B.events(
 				playerDataManager,
-				new PassiveEvents(),
-				new MuseumEvents(this),
+				new PassiveEventBlocker(),
+				new MuseumEventHandler(this),
 				new GuiEvents()
 		);
 

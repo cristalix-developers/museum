@@ -18,7 +18,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
  * @author func 04.06.2020
  * @project Museum
  */
-public class PassiveEvents implements Listener {
+public class PassiveEventBlocker implements Listener {
 
 	@EventHandler
 	public void onDamage(EntityDamageEvent e) {

@@ -13,14 +13,14 @@ import ru.cristalix.museum.App;
 import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.excavation.ExcavationPrototype;
-import ru.cristalix.museum.gallery.Warp;
+import ru.cristalix.museum.util.warp.Warp;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Managers;
 import ru.cristalix.museum.util.LevelSystem;
 import ru.cristalix.museum.util.MessageUtil;
 import ru.cristalix.museum.util.VirtualSign;
-import ru.cristalix.museum.util.WarpUtil;
+import ru.cristalix.museum.util.warp.WarpUtil;
 
 public class MuseumGuis {
 

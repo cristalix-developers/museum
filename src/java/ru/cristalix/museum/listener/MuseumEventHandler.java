@@ -12,15 +12,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.player.User;
-import ru.cristalix.museum.util.WarpUtil;
+import ru.cristalix.museum.util.warp.WarpUtil;
 
 /**
  * @author func 08.06.2020
  * @project Museum
  */
 @AllArgsConstructor
-public class MuseumEvents implements Listener {
+public class MuseumEventHandler implements Listener {
 
 	private final App app;
 

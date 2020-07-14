@@ -18,7 +18,7 @@ import ru.cristalix.museum.data.SkeletonInfo;
 import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.excavation.Excavation;
-import ru.cristalix.museum.gallery.Warp;
+import ru.cristalix.museum.util.warp.Warp;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.map.MuseumPrototype;

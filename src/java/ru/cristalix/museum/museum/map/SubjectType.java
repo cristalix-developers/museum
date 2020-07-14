@@ -16,8 +16,10 @@ public class SubjectType<T extends Subject> {
 	public static SubjectType<Subject> DECORATION;
 	public static SubjectType<CollectorSubject> COLLECTOR;
 	public static SubjectType<MarkerSubject> MARKER;
+
 	private final String address;
 	private final Provider provider;
+
 	public SubjectType(String address, Provider provider) {
 		this.provider = provider;
 		this.address = address;
@@ -46,5 +48,4 @@ public class SubjectType<T extends Subject> {
 	public interface Provider {
 		Subject provide(SubjectPrototype prototype, SubjectInfo info, User user);
 	}
-
 }

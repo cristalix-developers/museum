@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@Getter
 public class PrototypeManager<T extends Prototype> {
 
-	@Getter
 	private final String name;
 	private final Map<String, T> map = new HashMap<>();
 
