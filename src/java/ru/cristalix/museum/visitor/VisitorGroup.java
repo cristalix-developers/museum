@@ -1,11 +1,8 @@
 package ru.cristalix.museum.visitor;
 
-import lombok.Getter;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import ru.cristalix.core.math.V3;
-import ru.cristalix.museum.App;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +25,5 @@ public class VisitorGroup {
 
 	public void move(Location meetingLocation) {
 		visitors.forEach(visitor -> visitor.visit(meetingLocation));
-	}
-
-	public void clear() {
-		visitors.clear();
 	}
 }

@@ -3,7 +3,6 @@ package ru.cristalix.museum;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.museum.client.ClientSocket;
@@ -25,7 +24,7 @@ public class TickTimerHandler extends BukkitRunnable {
 	private final ClientSocket clientSocket;
 	private final static long AUTO_SAVE_PERIOD = 20 * 60 * 3;
 	private final PlayerDataManager dataManager;
-	private long counter = 1;
+	private int counter = 1;
 
 	@Override
 	public void run() {
@@ -37,7 +36,7 @@ public class TickTimerHandler extends BukkitRunnable {
 			counter++;
 
 		long time = System.currentTimeMillis();
-		Location visitedPoint = null; // todo: do after
+		visitorManager.update(counter);
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			val user = app.getUser(player.getUniqueId());
@@ -45,14 +44,8 @@ public class TickTimerHandler extends BukkitRunnable {
 			if (user.getExcavation() != null || user.getCurrentMuseum() == null)
 				continue;
 
-			if (visitedPoint != null && user.getCoins().size() < 50) {
-				Coin coin = new Coin(visitedPoint);
-				coin.create(user.getConnection());
-				user.getCoins().add(coin);
-			}
-			for (CollectorSubject collector : user.getCurrentMuseum().getSubjects(SubjectType.COLLECTOR)) {
+			for (CollectorSubject collector : user.getCurrentMuseum().getSubjects(SubjectType.COLLECTOR))
 				collector.move(user, time);
-			}
 
 			// Если монеты устарели, что бы не копились на клиенте, удаляю
 			user.getCoins().removeIf(coin -> {

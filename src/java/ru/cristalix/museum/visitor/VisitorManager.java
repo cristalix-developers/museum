@@ -1,11 +1,11 @@
 package ru.cristalix.museum.visitor;
 
+import clepto.cristalix.mapservice.Label;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import ru.cristalix.museum.App;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -14,33 +14,31 @@ import java.util.List;
  */
 public class VisitorManager {
 
-	private final List<Location> node;
+	private final List<? extends Location> node;
 	private final List<VisitorGroup> groups;
 	private final int visitorInGroup;
 	private final int groupCount;
 	private int wait = 0;
 
-	public VisitorManager(int groupCount, int visitorInGroup) {
-		node = new ArrayList<>();
+	public VisitorManager(App app, int groupCount, int visitorInGroup) {
 		groups = new ArrayList<>();
+
+		List<Label> labels = app.getMap().getLabels("move");
+		labels.sort(Comparator.comparingInt(Label::getTagInt));
+
+		this.node = labels;
 		this.groupCount = groupCount;
 		this.visitorInGroup = visitorInGroup;
 	}
 
-	private void update() {
+	public void update(int counter) {
 		if (wait > 0)
 			wait--;
 		if (groups.size() < groupCount && wait == 0) {
 			wait = 30;
 			groups.add(new VisitorGroup(node.get(0), visitorInGroup));
 		}
-		//groups.forEach(group -> group.move());
-	}
-
-	public void clear() {
-		groups.forEach(VisitorGroup::clear);
-		App.getApp().getWorld().getEntities().stream()
-				.filter(entity -> entity.getType() == EntityType.VILLAGER)
-				.forEach(Entity::remove);
+		for (int i = 0; i < groups.size(); i++)
+			groups.get(i).move(node.get((counter / 30 + i) % node.size()));
 	}
 }
