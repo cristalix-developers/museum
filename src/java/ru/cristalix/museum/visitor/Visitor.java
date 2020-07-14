@@ -17,6 +17,7 @@ public class Visitor {
 
 	public Visitor(org.bukkit.entity.Entity entity, V3 delta) {
 		this.entity = (EntityInsentient) ((CraftEntity) entity).getHandle();
+		this.entity.persistent = true;
 		this.delta = delta;
 	}
 }
