@@ -136,11 +136,8 @@ public final class App extends JavaPlugin {
 			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 		});
 
-		// todo: overwrite on packets, remove hardcode
-		// Создание посетителей / @OverwrittenInFuture
-		VisitorManager visitorManager = new VisitorManager(Collections.singletonList(new Location(getWorld(), -67, 91, 268)));
-		visitorManager.clear();
-		visitorManager.spawn(new Location(getWorld(), -67, 91, 268), 20);
+		// Создание посетителей
+		VisitorManager visitorManager = new VisitorManager(100, 10);
 
 		// Инициализация промежуточных команд / Инвентарей
 		new MuseumGuis(this);

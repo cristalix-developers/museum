@@ -36,7 +36,7 @@ public class TickTimerHandler extends BukkitRunnable {
 			counter++;
 
 		long time = System.currentTimeMillis();
-		val visitedPoint = visitorManager.getVictimFutureLocation();
+		val visitedPoint = null; // todo: do after
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			val user = app.getUser(player.getUniqueId());
