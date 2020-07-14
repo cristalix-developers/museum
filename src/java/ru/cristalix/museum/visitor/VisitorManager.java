@@ -1,6 +1,7 @@
 package ru.cristalix.museum.visitor;
 
 import clepto.cristalix.mapservice.Label;
+import clepto.cristalix.mapservice.MapServiceException;
 import org.bukkit.Location;
 import ru.cristalix.museum.App;
 
@@ -29,6 +30,9 @@ public class VisitorManager {
 		this.node = labels;
 		this.groupCount = groupCount;
 		this.visitorInGroup = visitorInGroup;
+
+		if (labels.isEmpty())
+			throw new MapServiceException("Not visitors nodes found.");
 	}
 
 	public void update(int counter) {

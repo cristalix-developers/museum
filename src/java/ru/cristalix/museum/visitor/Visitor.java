@@ -19,12 +19,10 @@ public class Visitor {
 
 	@Getter
 	private final EntityInsentient entity;
-	private final V3 offset;
 	private final App app = App.getApp();
 
-	public Visitor(org.bukkit.entity.Entity entity, V3 offset) {
+	public Visitor(org.bukkit.entity.Entity entity) {
 		this.entity = (EntityInsentient) ((CraftEntity) entity).getHandle();
-		this.offset = offset;
 	}
 
 	public void visit(Location meetingLocation) {
@@ -39,9 +37,9 @@ public class Visitor {
 
 		entity.ticksLived = 0;
 		entity.getNavigation().a(
-				meetingLocation.getX() + offset.getX(),
-				meetingLocation.getY() + offset.getY(),
-				meetingLocation.getZ() + offset.getZ(),
+				meetingLocation.getX(),
+				meetingLocation.getY(),
+				meetingLocation.getZ(),
 				.6
 		);
 	}

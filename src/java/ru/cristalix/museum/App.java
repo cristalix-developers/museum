@@ -134,7 +134,7 @@ public final class App extends JavaPlugin {
 		});
 
 		// Создание посетителей
-		VisitorManager visitorManager = new VisitorManager(this, 100, 10);
+		VisitorManager visitorManager = new VisitorManager(this, 1, 5);
 
 		// Инициализация промежуточных команд / Инвентарей
 		new MuseumGuis(this);
