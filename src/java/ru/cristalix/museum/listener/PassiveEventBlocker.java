@@ -1,13 +1,11 @@
 package ru.cristalix.museum.listener;
 
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -19,6 +17,12 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
  * @project Museum
  */
 public class PassiveEventBlocker implements Listener {
+
+	@EventHandler
+	public void onBlockChange(EntityChangeBlockEvent event){
+		if(event.getEntity() instanceof FallingBlock)
+			event.setCancelled(true);
+	}
 
 	@EventHandler
 	public void onDamage(EntityDamageEvent e) {

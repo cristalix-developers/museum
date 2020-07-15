@@ -1,4 +1,4 @@
-package ru.cristalix.museum.visitor;
+package ru.cristalix.museum.ticker.visitor;
 
 import lombok.val;
 import org.bukkit.Bukkit;

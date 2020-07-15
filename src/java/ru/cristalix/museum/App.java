@@ -37,11 +37,13 @@ import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Managers;
+import ru.cristalix.museum.ticker.detail.FountainHandler;
+import ru.cristalix.museum.ticker.visitor.VisitorHandler;
 import ru.cristalix.museum.util.MuseumChatService;
-import ru.cristalix.museum.visitor.VisitorManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
@@ -133,9 +135,6 @@ public final class App extends JavaPlugin {
 			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 		});
 
-		// Создание посетителей
-		VisitorManager visitorManager = new VisitorManager(this, 1, 5);
-
 		// Инициализация промежуточных команд / Инвентарей
 		new MuseumGuis(this);
 		Bukkit.getPluginCommand("museum").setExecutor(new MuseumCommand(this));
@@ -149,8 +148,10 @@ public final class App extends JavaPlugin {
 		);
 
 		// Обработка каждого тика
-		new TickTimerHandler(this, visitorManager, clientSocket, playerDataManager)
-				.runTaskTimer(this, 0, 1);
+		new TickTimerHandler(this, Arrays.asList(
+				new VisitorHandler(this, 1, 5),
+				new FountainHandler(this)
+		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 	}
 
 	@Override

@@ -1,9 +1,10 @@
-package ru.cristalix.museum.visitor;
+package ru.cristalix.museum.ticker.visitor;
 
 import clepto.cristalix.mapservice.Label;
 import clepto.cristalix.mapservice.MapServiceException;
 import org.bukkit.Location;
 import ru.cristalix.museum.App;
+import ru.cristalix.museum.ticker.Ticked;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,7 +14,7 @@ import java.util.List;
  * @author func 09.06.2020
  * @project Museum
  */
-public class VisitorManager {
+public class VisitorHandler implements Ticked {
 
 	private final List<? extends Location> node;
 	private final List<VisitorGroup> groups;
@@ -22,7 +23,7 @@ public class VisitorManager {
 	private int wait = 0;
 	private App app;
 
-	public VisitorManager(App app, int groupCount, int visitorInGroup) {
+	public VisitorHandler(App app, int groupCount, int visitorInGroup) {
 		this.app = app;
 		groups = new ArrayList<>();
 
@@ -37,14 +38,15 @@ public class VisitorManager {
 			throw new MapServiceException("Not visitors nodes found.");
 	}
 
-	public void update(int counter) {
+	@Override
+	public void tick(int... args) {
 		if (wait > 0)
 			wait--;
 		if (groups.size() < groupCount && wait == 0) {
-			wait = 30;
+			wait = 30 * 20;
 			groups.add(new VisitorGroup(app, node.get(0), visitorInGroup));
 		}
 		for (int i = 0; i < groups.size(); i++)
-			groups.get(i).move(node.get((counter / 30 + i) % node.size()));
+			groups.get(i).move(node.get((args[0] / 30 + i) % node.size()));
 	}
 }

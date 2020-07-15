@@ -15,7 +15,7 @@ import ru.cristalix.museum.prototype.Managers;
  * @project museum
  */
 @AllArgsConstructor
-public class GalleryHandler implements Listener {
+public class GalleryEventHandler implements Listener {
 
 	private final App app;
 

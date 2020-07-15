@@ -1,4 +1,4 @@
-package ru.cristalix.museum.visitor;
+package ru.cristalix.museum.ticker.visitor;
 
 import lombok.Getter;
 import net.minecraft.server.v1_12_R1.EntityInsentient;
