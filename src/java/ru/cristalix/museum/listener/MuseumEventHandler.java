@@ -12,7 +12,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.util.warp.WarpUtil;
 
 /**
  * @author func 08.06.2020
@@ -35,8 +34,7 @@ public class MuseumEventHandler implements Listener {
 
 	@EventHandler
 	public void onEntityInteract(PlayerInteractEntityEvent e) {
-		// todo: remake this hard code / u can get name from entity nbt
-		new WarpUtil.WarpBuilder("gallery").build().warp(app.getUser(e.getPlayer()));
+		// todo: remake | new WarpUtil.WarpBuilder("gallery").build().warp(app.getUser(e.getPlayer()));
 	}
 
 	@EventHandler

@@ -7,6 +7,7 @@ import clepto.bukkit.gui.Guis;
 import clepto.cristalix.Cristalix;
 import clepto.cristalix.mapservice.WorldMeta;
 import lombok.Getter;
+import lombok.val;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
@@ -16,6 +17,7 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.cristalix.core.CoreApi;
+import ru.cristalix.core.account.IAccountService;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
@@ -29,6 +31,7 @@ import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.command.MuseumCommand;
 import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.gui.MuseumGuis;
+import ru.cristalix.museum.listener.BlockClickHandler;
 import ru.cristalix.museum.listener.MuseumEventHandler;
 import ru.cristalix.museum.listener.PassiveEventBlocker;
 import ru.cristalix.museum.museum.map.SubjectType;
@@ -37,11 +40,14 @@ import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Managers;
+import ru.cristalix.museum.ticker.detail.FountainHandler;
+import ru.cristalix.museum.ticker.detail.HeadRewardHandler;
+import ru.cristalix.museum.ticker.visitor.VisitorHandler;
 import ru.cristalix.museum.util.MuseumChatService;
-import ru.cristalix.museum.visitor.VisitorManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
@@ -133,24 +139,28 @@ public final class App extends JavaPlugin {
 			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 		});
 
-		// Создание посетителей
-		VisitorManager visitorManager = new VisitorManager(this, 1, 5);
-
 		// Инициализация промежуточных команд / Инвентарей
 		new MuseumGuis(this);
 		Bukkit.getPluginCommand("museum").setExecutor(new MuseumCommand(this));
+
+		// Создание обработчика голов-подарков
+		val headRewardHandler = new HeadRewardHandler(this);
 
 		// Регистрация обработчиков событий
 		B.events(
 				playerDataManager,
 				new PassiveEventBlocker(),
 				new MuseumEventHandler(this),
-				new GuiEvents()
+				new GuiEvents(),
+				new BlockClickHandler(this, headRewardHandler)
 		);
 
 		// Обработка каждого тика
-		new TickTimerHandler(this, visitorManager, clientSocket, playerDataManager)
-				.runTaskTimer(this, 0, 1);
+		new TickTimerHandler(this, Arrays.asList(
+				new VisitorHandler(this, 1, 5),
+				new FountainHandler(this),
+				headRewardHandler
+		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 	}
 
 	@Override

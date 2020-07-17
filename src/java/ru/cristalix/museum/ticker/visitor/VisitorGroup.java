@@ -1,4 +1,4 @@
-package ru.cristalix.museum.visitor;
+package ru.cristalix.museum.ticker.visitor;
 
 import lombok.val;
 import org.bukkit.Bukkit;
@@ -30,19 +30,15 @@ public class VisitorGroup {
 
 	public void move(Location meetingLocation) {
 		visitors.forEach(visitor -> {
-			visitor.getEntity().ticksLived = 0;
-			visitor.getEntity().getNavigation().a(
-					meetingLocation.getX() + visitor.getDelta().getX(),
-					meetingLocation.getY(),
-					meetingLocation.getZ() + visitor.getDelta().getZ(),
-					.9
-			);
+			val location = meetingLocation.clone().add(visitor.getDelta().getX(), 0, visitor.getDelta().getZ());
+
+			visitor.getEntity().getNavigation().a(location.getX(), location.getY(), location.getZ(), .7);
 
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				val user = app.getUser(player);
 				if (user.getCurrentMuseum() == null || user.getCoins().size() > 50)
 					continue;
-				Coin coin = new Coin(meetingLocation);
+				Coin coin = new Coin(visitor.getEntity().getBukkitEntity().getLocation());
 				coin.create(user.getConnection());
 				user.getCoins().add(coin);
 			}

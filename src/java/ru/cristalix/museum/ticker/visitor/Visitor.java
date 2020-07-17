@@ -1,4 +1,4 @@
-package ru.cristalix.museum.visitor;
+package ru.cristalix.museum.ticker.visitor;
 
 import lombok.Getter;
 import net.minecraft.server.v1_12_R1.EntityInsentient;
@@ -17,6 +17,7 @@ public class Visitor {
 
 	public Visitor(org.bukkit.entity.Entity entity, V3 delta) {
 		this.entity = (EntityInsentient) ((CraftEntity) entity).getHandle();
+		this.entity.persistent = true;
 		this.delta = delta;
 	}
 }
