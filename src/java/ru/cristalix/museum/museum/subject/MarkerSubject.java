@@ -8,7 +8,7 @@ import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange;
 import org.bukkit.Location;
 import ru.cristalix.core.util.UtilV3;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.data.subject.SubjectInfo;
+import ru.cristalix.museum.data.SubjectInfo;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.player.User;
 

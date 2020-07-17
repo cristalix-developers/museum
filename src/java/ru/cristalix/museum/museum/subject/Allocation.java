@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.data.subject.SubjectInfo;
+import ru.cristalix.museum.data.SubjectInfo;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
 
 import java.util.ArrayList;
@@ -43,7 +43,9 @@ public class Allocation {
 			for (int y = (int) box.getMin().getY(); y <= box.getMax().getY(); y++) {
 				for (int z = (int) box.getMin().getZ(); z <= box.getMax().getZ(); z++) {
 					Location dst = box.transpose(absoluteOrigin, info.getRotation(), relativeOrigin, x, y, z);
-					if (dst.getBlock().getType() != Material.AIR || dst.clone().subtract(0, 1, 0).getBlock().getType() != Material.MELON_BLOCK)
+
+					// dst.clone().subtract(0, 1, 0).getBlock().getType() != Material.MELON_BLOCK
+					if (dst.getBlock().getType() != Material.AIR)
 						return null; // Невозможно разместить субъект - место занято или не доступно.
 					Location src = new Location(App.getApp().getWorld(), x, y, z);
 					if (src.getBlock().getType() == Material.AIR) continue;

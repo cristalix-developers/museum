@@ -16,7 +16,7 @@ import ru.cristalix.museum.data.BoosterInfo;
 import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.SkeletonInfo;
 import ru.cristalix.museum.data.UserInfo;
-import ru.cristalix.museum.data.subject.SubjectInfo;
+import ru.cristalix.museum.data.SubjectInfo;
 import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.util.warp.Warp;
 import ru.cristalix.museum.museum.Coin;
@@ -43,7 +43,7 @@ public class User implements PlayerWrapper {
     private final Registry<SkeletonInfo, SkeletonPrototype, Skeleton> skeletons
             = new Registry<>(this, Managers.skeleton, SkeletonInfo::new, Skeleton::new);
     private final Registry<SubjectInfo, SubjectPrototype, Subject> subjects
-            = new Registry<>(this, Managers.subject, SubjectInfo::new, SubjectPrototype::provide);
+            = new Registry<>(this, Managers.subject, SubjectInfo::generateNew, SubjectPrototype::provide);
 
     private CraftPlayer player;
     private PlayerConnection connection;

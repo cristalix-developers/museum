@@ -16,14 +16,10 @@ import ru.cristalix.museum.App;
 import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.data.BoosterInfo;
-import ru.cristalix.museum.data.MuseumInfo;
-import ru.cristalix.museum.data.PickaxeType;
 import ru.cristalix.museum.data.UserInfo;
-import ru.cristalix.museum.data.subject.SubjectInfo;
-import ru.cristalix.museum.museum.map.MuseumPrototype;
+import ru.cristalix.museum.museum.subject.DefaultElements;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.prepare.PrepareSteps;
-import ru.cristalix.museum.prototype.Managers;
 import ru.cristalix.museum.utils.MultiTimeBar;
 
 import java.util.*;
@@ -53,38 +49,8 @@ public class PlayerDataManager implements Listener {
 				UserInfoPackage userInfoPackage = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
 						.get(5L, TimeUnit.SECONDS);
 				UserInfo userInfo = userInfoPackage.getUserInfo();
-				if (userInfo == null) {
-					MuseumPrototype proto = Managers.museum.getPrototype("main");
-					MuseumInfo startMuseum = new MuseumInfo(
-							proto.getAddress(),
-							"Музей археологии",
-							new Date(),
-							3
-					);
-
-					userInfo = new UserInfo(
-							uuid,
-							0,
-							1000.0,
-							PickaxeType.DEFAULT,
-							Collections.singletonList(startMuseum),
-							new ArrayList<>(),
-							new ArrayList<>(),
-							0,
-							0,
-							new ArrayList<>(),
-                            new ArrayList<>()
-					);
-					for (SubjectInfo subject : proto.getDefaultSubjects()) {
-						userInfo.getSubjectInfos().add(subject.clone());
-					}
-				} else {
-					// No dynamic constructor :( thx java
-					userInfo.setDonates(userInfo.getDonates() == null ?
-							new ArrayList<>(1) :
-							new ArrayList<>(userInfo.getDonates())
-					);
-				}
+				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid);
+				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 				userMap.put(uuid, new User(userInfo));
 			} catch (InterruptedException | ExecutionException | TimeoutException ex) {
 				event.setCancelReason("Не удалось загрузить статистику о музее.");

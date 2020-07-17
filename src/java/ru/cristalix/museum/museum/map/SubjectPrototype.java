@@ -4,7 +4,7 @@ import clepto.cristalix.mapservice.Box;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import ru.cristalix.core.math.V3;
-import ru.cristalix.museum.data.subject.SubjectInfo;
+import ru.cristalix.museum.data.SubjectInfo;
 import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Prototype;

@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.bukkit.Location;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
-import ru.cristalix.museum.data.subject.SubjectInfo;
+import ru.cristalix.museum.data.SubjectInfo;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;

@@ -148,7 +148,7 @@ public class MuseumGuis {
 					.fill("money", MessageUtil.toMoneyFormat(user.getMoney()))
 					.fill("exp", String.valueOf(user.getExperience()))
 					.fill("need_exp", LevelSystem.formatExperience(user.getExperience()))
-					.fill("hours_played", String.valueOf(player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000))
+					.fill("hours_played", String.valueOf(player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000)) // ToDo: Replace with global value
 					.fill("coins_picked", String.valueOf(user.getPickedCoinsCount()))
 					.fill("pickaxe", user.getPickaxeType().name())
 					.fill("excavations", String.valueOf(user.getExcavationCount()))

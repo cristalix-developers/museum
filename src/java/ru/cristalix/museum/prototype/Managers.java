@@ -13,16 +13,13 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import ru.cristalix.core.formatting.Color;
 import ru.cristalix.core.math.D2;
-import ru.cristalix.museum.data.subject.SubjectInfo;
+import ru.cristalix.museum.data.SubjectInfo;
 import ru.cristalix.museum.excavation.ExcavationPrototype;
 import ru.cristalix.museum.museum.map.*;
 import ru.cristalix.museum.museum.subject.skeleton.Rarity;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Managers {
@@ -80,7 +77,7 @@ public class Managers {
 				if (prototype == null)
 					throw new MapServiceException("Illegal default subject '" + tag[0] + "' in museum " +
 							address + " on " + label.getCoords());
-				defaultInfos.add(new SubjectInfo(prototype.getAddress(), label.toV3(), D2.PX, tag.length > 1 ? tag[1] : null, -1, Color.LIME));
+				defaultInfos.add(new SubjectInfo(new UUID(0, 0), prototype.getAddress(), label.toV3(), D2.PX, tag.length > 1 ? tag[1] : null, -1, Color.LIME));
 			}
 			return new MuseumPrototype(address, box, defaultInfos);
 		});

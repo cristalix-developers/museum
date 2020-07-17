@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import ru.cristalix.core.util.UtilV3;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.prototype.Storable;
-import ru.cristalix.museum.data.subject.SubjectInfo;
+import ru.cristalix.museum.data.SubjectInfo;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.player.User;
 
