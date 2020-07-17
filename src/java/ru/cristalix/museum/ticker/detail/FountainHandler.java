@@ -22,11 +22,12 @@ public class FountainHandler implements Ticked {
 	private final List<Fountain> fountains;
 
 	public FountainHandler(App app) {
+		// Формат таблички: .p fountain <x> <y> <z> (power vector) <x> <y> <z> (noise vector)
 		fountains = app.getMap().getLabels("fountain").stream()
 				.map(label -> {
 					String[] tag = label.getTag().split("\\s+");
 					return new Fountain(
-							label.getBlock().getLocation(),
+							label,
 							new Vector(Double.parseDouble(tag[0]), Double.parseDouble(tag[1]), Double.parseDouble(tag[2])),
 							new Vector(Double.parseDouble(tag[3]), Double.parseDouble(tag[4]), Double.parseDouble(tag[5]))
 					);

@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.museum.map.SubjectPrototype;
 import ru.cristalix.museum.prototype.Managers;
-import ru.cristalix.museum.ticker.detail.HeadRewardHandler;
+import ru.cristalix.museum.ticker.detail.PresentHandler;
 import ru.cristalix.museum.util.MessageUtil;
 
 /**
@@ -24,9 +24,9 @@ import ru.cristalix.museum.util.MessageUtil;
 public class BlockClickHandler implements Listener {
 
 	private static final PotionEffect INVISIBLE =
-			new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 200000, 1, false, false);
+			new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false);
 	private final App app;
-	private final HeadRewardHandler headRewardHandler;
+	private final PresentHandler presentHandler;
 
 	@EventHandler
 	public void onBlockClick(PlayerInteractEvent event) {
@@ -49,14 +49,16 @@ public class BlockClickHandler implements Listener {
 			bat.addPotionEffect(INVISIBLE);
 			bat.addPassenger(player);
 		} else if (block.getType() == Material.SKULL) {
-			val reward = headRewardHandler.getHeadRewardByLocation(location);
+			val reward = presentHandler.getPresentByLocation(location);
 			if (reward == null)
 				return;
-			MessageUtil.find("reward")
-					.set("reward", MessageUtil.toMoneyFormat(reward.getReward()))
-					.send(user);
-			user.setMoney(user.getMoney() + reward.getReward());
 			reward.remove();
+			val type = reward.getType();
+			MessageUtil.find("reward")
+					.set("reward", MessageUtil.toMoneyFormat(type.getPrice()))
+					.send(user);
+			user.setMoney(user.getMoney() + type.getPrice());
+			type.getOnFind().onFind(user, location);
 		}
 	}
 }
