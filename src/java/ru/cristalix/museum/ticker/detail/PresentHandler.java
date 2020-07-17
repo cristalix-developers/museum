@@ -20,23 +20,27 @@ import java.util.stream.Collectors;
  * @author func 17.07.2020
  * @project museum
  */
-public class HeadRewardHandler implements Ticked {
+public class PresentHandler implements Ticked {
 
 	private static final long REWARD_RELOAD = 30 * 20L;
 	private final Random random = new Random();
-	private final List<HeadReward> rewards;
+	private final List<Present> rewards;
 	private final String[] strings = {"307264a1-2c69-11e8-b5ea-1cb72caa35fd"};
 
-	public HeadRewardHandler(App app) {
+	public PresentHandler(App app) {
+		// Формат таблички: .p head <common/epic/legendary>
 		rewards = app.getMap().getLabels("head").stream()
-				.map(label -> new HeadReward(label.getBlock().getLocation(), HeadRewardStatus.valueOf(label.getTag().toUpperCase()), false))
-				.collect(Collectors.toList());
+				.map(label -> new Present(
+						label.getBlock().getLocation(),
+						PresentType.valueOf(label.getTag().toUpperCase()),
+						false
+				)).collect(Collectors.toList());
 	}
 
-	public HeadReward getHeadRewardByLocation(Location location) {
-		for (HeadReward headReward : rewards)
-			if (headReward.active && headReward.location.equals(location))
-				return headReward;
+	public Present getPresentByLocation(Location location) {
+		for (Present present : rewards)
+			if (present.active && present.location.equals(location))
+				return present;
 		return null;
 	}
 
@@ -49,7 +53,7 @@ public class HeadRewardHandler implements Ticked {
 
 	@Getter
 	@AllArgsConstructor
-	public enum HeadRewardStatus {
+	public enum PresentType {
 		COMMON(50, ((user, location) -> {})),
 		EPIC(100, ((user, location) -> {})),
 		LEGENDARY(500, ((user, location) -> {})),
@@ -57,29 +61,26 @@ public class HeadRewardHandler implements Ticked {
 
 		private double price;
 		private Founded onFind;
+	}
 
-		@FunctionalInterface
-		public interface Founded {
-			void onFind(User user, Location location);
-		}
+	@FunctionalInterface
+	public interface Founded {
+		void onFind(User user, Location location);
 	}
 
 	@AllArgsConstructor
-	public static class HeadReward {
+	public static class Present {
 		private final Location location;
 		@Getter
-		private HeadRewardStatus status;
+		private PresentType type;
 		private boolean active;
 
 		public void generate(UUID owner) {
 			location.getBlock().setType(Material.SKULL);
-
 			Skull skull = (Skull) location.getBlock().getState();
-
 			skull.setSkullType(SkullType.PLAYER);
 			skull.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
 			skull.update();
-
 			active = true;
 		}
 

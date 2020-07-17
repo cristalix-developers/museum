@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -30,11 +29,6 @@ public class MuseumEventHandler implements Listener {
 		Material type = player.getInventory().getItemInMainHand().getType();
 		if (type == Material.PAPER)
 			player.performCommand("gui main");
-	}
-
-	@EventHandler
-	public void onEntityInteract(PlayerInteractEntityEvent e) {
-		// todo: remake | new WarpUtil.WarpBuilder("gallery").build().warp(app.getUser(e.getPlayer()));
 	}
 
 	@EventHandler

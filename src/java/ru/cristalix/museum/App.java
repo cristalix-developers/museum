@@ -17,7 +17,6 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.cristalix.core.CoreApi;
-import ru.cristalix.core.account.IAccountService;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
@@ -41,9 +40,11 @@ import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Managers;
 import ru.cristalix.museum.ticker.detail.FountainHandler;
-import ru.cristalix.museum.ticker.detail.HeadRewardHandler;
+import ru.cristalix.museum.ticker.detail.PresentHandler;
 import ru.cristalix.museum.ticker.visitor.VisitorHandler;
 import ru.cristalix.museum.util.MuseumChatService;
+import ru.cristalix.museum.worker.WorkerClickListener;
+import ru.cristalix.museum.worker.WorkerHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -144,7 +145,7 @@ public final class App extends JavaPlugin {
 		Bukkit.getPluginCommand("museum").setExecutor(new MuseumCommand(this));
 
 		// Создание обработчика голов-подарков
-		val headRewardHandler = new HeadRewardHandler(this);
+		val presentHandler = new PresentHandler(this);
 
 		// Регистрация обработчиков событий
 		B.events(
@@ -152,14 +153,15 @@ public final class App extends JavaPlugin {
 				new PassiveEventBlocker(),
 				new MuseumEventHandler(this),
 				new GuiEvents(),
-				new BlockClickHandler(this, headRewardHandler)
+				new BlockClickHandler(this, presentHandler),
+				new WorkerClickListener(this, new WorkerHandler(this))
 		);
 
 		// Обработка каждого тика
 		new TickTimerHandler(this, Arrays.asList(
 				new VisitorHandler(this, 1, 5),
 				new FountainHandler(this),
-				headRewardHandler
+				presentHandler
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 	}
 
