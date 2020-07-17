@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.block.Skull;
 import ru.cristalix.museum.App;
+import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.ticker.Ticked;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class HeadRewardHandler implements Ticked {
 
 	public HeadRewardHandler(App app) {
 		rewards = app.getMap().getLabels("head").stream()
-				.map(label -> new HeadReward(label.getBlock().getLocation(), label.getTagDouble(), false))
+				.map(label -> new HeadReward(label.getBlock().getLocation(), HeadRewardStatus.valueOf(label.getTag().toUpperCase()), false))
 				.collect(Collectors.toList());
 	}
 
@@ -46,11 +47,28 @@ public class HeadRewardHandler implements Ticked {
 		rewards.get(random.nextInt(rewards.size())).generate(UUID.fromString(strings[random.nextInt(strings.length)]));
 	}
 
+	@Getter
+	@AllArgsConstructor
+	public enum HeadRewardStatus {
+		COMMON(50, ((user, location) -> {})),
+		EPIC(100, ((user, location) -> {})),
+		LEGENDARY(500, ((user, location) -> {})),
+		;
+
+		private double price;
+		private Founded onFind;
+
+		@FunctionalInterface
+		public interface Founded {
+			void onFind(User user, Location location);
+		}
+	}
+
 	@AllArgsConstructor
 	public static class HeadReward {
 		private final Location location;
 		@Getter
-		private final double reward;
+		private HeadRewardStatus status;
 		private boolean active;
 
 		public void generate(UUID owner) {
@@ -58,10 +76,10 @@ public class HeadRewardHandler implements Ticked {
 
 			Skull skull = (Skull) location.getBlock().getState();
 
-			// todo: skin not working
 			skull.setSkullType(SkullType.PLAYER);
 			skull.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
 			skull.update();
+
 			active = true;
 		}
 

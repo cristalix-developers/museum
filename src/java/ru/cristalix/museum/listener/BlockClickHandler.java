@@ -52,10 +52,12 @@ public class BlockClickHandler implements Listener {
 			val reward = headRewardHandler.getHeadRewardByLocation(location);
 			if (reward == null)
 				return;
+			val price = reward.getStatus().getPrice();
 			MessageUtil.find("reward")
-					.set("reward", MessageUtil.toMoneyFormat(reward.getReward()))
+					.set("reward", MessageUtil.toMoneyFormat(price))
 					.send(user);
-			user.setMoney(user.getMoney() + reward.getReward());
+			user.setMoney(user.getMoney() + price);
+			reward.getStatus().getOnFind().onFind(user, location);
 			reward.remove();
 		}
 	}

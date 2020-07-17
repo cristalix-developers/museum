@@ -57,6 +57,7 @@ public class BeforePacketHandler implements Prepare {
 															user.getCurrentMuseum().processClick(user, subject));
 													break;
 												}
+
 											}
 										}
 									}
