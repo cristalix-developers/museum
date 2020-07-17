@@ -43,25 +43,26 @@ public class BeforePacketHandler implements Prepare {
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 						if (packetObj instanceof PacketPlayInUseItem) {
 							PacketPlayInUseItem packet = (PacketPlayInUseItem) packetObj;
-							BlockPosition pos = packet.a;
-							if (packet.c == EnumHand.MAIN_HAND)
+							if (packet.c == EnumHand.MAIN_HAND) {
 								if (isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
 									if (user.getExcavation() == null) {
 										for (Subject subject : user.getCurrentMuseum().getSubjects()) {
 											if (subject.getAllocation() == null)
 												continue;
 											for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
+												BlockPosition pos = packet.a;
 												if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
+													packet.a = dummy; // Genius
 													MinecraftServer.getServer().postToMainThread(() ->
 															user.getCurrentMuseum().processClick(user, subject));
 													break;
 												}
 											}
 										}
-										packet.a = dummy; // Genius
 									}
 								}
-							if (packet.c == EnumHand.OFF_HAND) packet.a = dummy;
+							} else if (packet.c == EnumHand.OFF_HAND)
+								packet.a = dummy;
 						} else if (packetObj instanceof PacketPlayInBlockDig) {
 							PacketPlayInBlockDig packet = (PacketPlayInBlockDig) packetObj;
 							Excavation excavation = user.getExcavation();

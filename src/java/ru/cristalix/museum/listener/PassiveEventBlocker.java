@@ -1,6 +1,8 @@
 package ru.cristalix.museum.listener;
 
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent;
+import lombok.val;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,6 +13,7 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.spigotmc.event.entity.EntityDismountEvent;
 
 /**
  * @author func 04.06.2020
@@ -19,14 +22,21 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 public class PassiveEventBlocker implements Listener {
 
 	@EventHandler
+	public void onGetUpFromBat(EntityDismountEvent event) {
+		val vehicle = event.getDismounted();
+		if (vehicle.getType() == EntityType.BAT)
+			vehicle.remove();
+	}
+
+	@EventHandler
 	public void onBlockChange(EntityChangeBlockEvent event){
 		if(event.getEntity() instanceof FallingBlock)
 			event.setCancelled(true);
 	}
 
 	@EventHandler
-	public void onDamage(EntityDamageEvent e) {
-		e.setCancelled(true);
+	public void onDamage(EntityDamageEvent event) {
+		event.setCancelled(true);
 	}
 
 	@EventHandler

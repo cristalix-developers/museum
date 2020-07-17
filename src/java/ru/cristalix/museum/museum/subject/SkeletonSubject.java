@@ -51,7 +51,7 @@ public class SkeletonSubject extends Subject {
 				(int) o.getX(),
 				(int) o.getY(),
 				(int) o.getZ()
-										  );
+		);
 
 		this.skeletonLocation.setYaw(skeletonYaw);
 

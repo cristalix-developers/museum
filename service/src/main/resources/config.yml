@@ -3,6 +3,7 @@ serviceRealm: MUSS-1
 chat:
   prefix: '§7[§l§bi§7] '
   messages:
+    reward: 'Вы нашли подарок! Вы получили %REWARD%!'
     levelup: 'Вы достигли §l§b%LEVEL% §7уровня! До следующего уровня осталось §l§b%EXP%§7 опыта.'
     excavationend: '§7Раскопки подошли к концу, сейчас вернем вас в музей!'
     findcopy: 'Вы нашли §b%NAME%, §7этот фрагмент - дубликат, его цена §l§6+%COST%.'
