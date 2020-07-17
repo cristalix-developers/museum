@@ -11,14 +11,14 @@ import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import ru.cristalix.core.util.UtilNetty;
-import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
+import ru.cristalix.museum.data.BoosterInfo;
 import ru.cristalix.museum.data.MuseumInfo;
 import ru.cristalix.museum.data.SkeletonInfo;
 import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.excavation.Excavation;
-import ru.cristalix.museum.gallery.Warp;
+import ru.cristalix.museum.util.warp.Warp;
 import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.Museum;
 import ru.cristalix.museum.museum.map.MuseumPrototype;
@@ -38,9 +38,12 @@ public class User implements PlayerWrapper {
 
     @Delegate
     private final UserInfo info;
-    private final Registry<MuseumInfo, MuseumPrototype, Museum> museums = new Registry<>(this, Managers.museum, MuseumInfo::new, Museum::new);
-    private final Registry<SkeletonInfo, SkeletonPrototype, Skeleton> skeletons = new Registry<>(this, Managers.skeleton, SkeletonInfo::new, Skeleton::new);
-    private final Registry<SubjectInfo, SubjectPrototype, Subject> subjects = new Registry<>(this, Managers.subject, SubjectInfo::new, SubjectPrototype::provide);
+    private final Registry<MuseumInfo, MuseumPrototype, Museum> museums
+            = new Registry<>(this, Managers.museum, MuseumInfo::new, Museum::new);
+    private final Registry<SkeletonInfo, SkeletonPrototype, Skeleton> skeletons
+            = new Registry<>(this, Managers.skeleton, SkeletonInfo::new, Skeleton::new);
+    private final Registry<SubjectInfo, SubjectPrototype, Subject> subjects
+            = new Registry<>(this, Managers.subject, SubjectInfo::new, SubjectPrototype::provide);
 
     private CraftPlayer player;
     private PlayerConnection connection;
@@ -55,7 +58,6 @@ public class User implements PlayerWrapper {
         this.subjects.addAll(info.getSubjectInfos());
         this.museums.addAll(info.getMuseumInfos());
         this.skeletons.addAll(info.getSkeletonInfos());
-
     }
 
     public void sendAnime() {
@@ -91,10 +93,10 @@ public class User implements PlayerWrapper {
     }
 
     public double calcMultiplier(BoosterType type) {
-        info.getLocalBoosters().removeIf(Booster::hadExpire);
+        info.getLocalBoosters().removeIf(BoosterInfo::hadExpire);
 
         double sum = 1;
-        for (Booster booster : info.getLocalBoosters()) {
+        for (BoosterInfo booster : info.getLocalBoosters()) {
             if (booster.getType() == type) {
                 sum += booster.getMultiplier() - 1;
             }

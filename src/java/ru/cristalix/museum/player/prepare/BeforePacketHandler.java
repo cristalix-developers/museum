@@ -3,7 +3,6 @@ package ru.cristalix.museum.player.prepare;
 import clepto.ListUtils;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import lombok.val;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -11,6 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.museum.App;
 import ru.cristalix.museum.excavation.Excavation;
 import ru.cristalix.museum.excavation.ExcavationPrototype;
+import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.museum.subject.skeleton.Fragment;
 import ru.cristalix.museum.museum.subject.skeleton.Piece;
 import ru.cristalix.museum.museum.subject.skeleton.Skeleton;
@@ -36,23 +36,36 @@ public class BeforePacketHandler implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		val connection = user.getConnection();
+		PlayerConnection connection = user.getConnection();
 		connection.networkManager.channel.pipeline().addBefore("packet_handler", user.getName(),
 				new ChannelDuplexHandler() {
 					@Override
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 						if (packetObj instanceof PacketPlayInUseItem) {
-							val packet = (PacketPlayInUseItem) packetObj;
-							BlockPosition pos = packet.a;
-							if (packet.c == EnumHand.MAIN_HAND)
+							PacketPlayInUseItem packet = (PacketPlayInUseItem) packetObj;
+							if (packet.c == EnumHand.MAIN_HAND) {
 								if (isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
-									if (user.getExcavation() == null)
-										user.getCurrentMuseum().processClick(user, pos.getX(), pos.getY(), pos.getZ());
-									packet.a = dummy; // Genius
+									if (user.getExcavation() == null) {
+										for (Subject subject : user.getCurrentMuseum().getSubjects()) {
+											if (subject.getAllocation() == null)
+												continue;
+											for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
+												BlockPosition pos = packet.a;
+												if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
+													packet.a = dummy; // Genius
+													MinecraftServer.getServer().postToMainThread(() ->
+															user.getCurrentMuseum().processClick(user, subject));
+													break;
+												}
+
+											}
+										}
+									}
 								}
-							if (packet.c == EnumHand.OFF_HAND) packet.a = dummy;
+							} else if (packet.c == EnumHand.OFF_HAND)
+								packet.a = dummy;
 						} else if (packetObj instanceof PacketPlayInBlockDig) {
-							val packet = (PacketPlayInBlockDig) packetObj;
+							PacketPlayInBlockDig packet = (PacketPlayInBlockDig) packetObj;
 							Excavation excavation = user.getExcavation();
 							boolean valid = excavation != null && isAir(user, packet.a);
 
@@ -154,7 +167,7 @@ public class BeforePacketHandler implements Prepare {
 	}
 
 	private void animateFragments(User user, Fragment fragment) {
-		val integer = new AtomicInteger(0);
+		AtomicInteger integer = new AtomicInteger(0);
 		new BukkitRunnable() {
 			@Override
 			public void run() {

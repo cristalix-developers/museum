@@ -1,5 +1,7 @@
 package ru.cristalix.museum;
 
+import com.mongodb.async.client.MongoClient;
+import com.mongodb.async.client.MongoClients;
 import io.netty.channel.Channel;
 import lombok.val;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -11,17 +13,15 @@ import ru.cristalix.core.network.ISocketClient;
 import ru.cristalix.core.network.packages.FillLauncherUserDataPackage;
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage;
 import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage;
-import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.boosters.BoosterType;
 import ru.cristalix.museum.configuration.ConfigurationManager;
+import ru.cristalix.museum.data.BoosterInfo;
 import ru.cristalix.museum.data.UserInfo;
 import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.handlers.PackageHandler;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.socket.ServerSocket;
 import ru.cristalix.museum.socket.ServerSocketHandler;
-import ru.ilyafx.sql.BaseSQL;
-import ru.ilyafx.sql.SQL;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -36,7 +36,6 @@ public class MuseumService {
 	public static final int THANKS_SECONDS = 45;
 	public static final String PASSWORD = System.getProperty("PASSWORD", "gVatjN43AJnbFq36Fa");
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
-	public static SqlManager SQL_MANAGER;
 	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
 		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
@@ -52,49 +51,55 @@ public class MuseumService {
 	}};
 	public static ConfigurationManager CONFIGURATION_MANAGER;
 
+	public static MongoAdapter<UserInfo> userData;
+	public static MongoAdapter<BoosterInfo> globalBoosters;
+
+	public static List<Subservice> subservices = new ArrayList<>();
+
+	private static BoosterManager boosterManager;
+
+
 	public static void main(String[] args) {
 		MicroserviceBootstrap.bootstrap(new MicroServicePlatform(2));
 
 		ServerSocket serverSocket = new ServerSocket(14653);
 		serverSocket.start();
 
+		String dbUrl = System.getenv("db_url");
+		String dbName = System.getenv("db_data");
+		MongoClient client = MongoClients.create(dbUrl);
+		userData = new MongoAdapter<>(client, dbName, "userData", UserInfo.class);
+		globalBoosters = new MongoAdapter<>(client, dbName, "globalBoosters", BoosterInfo.class);
 
-		MongoManager.connect(
-				System.getenv("db_url"),
-				System.getenv("db_data"),
-				System.getenv("db_collection")
-		);
+		boosterManager = new BoosterManager();
+		subservices.add(boosterManager);
 
-		SQL_MANAGER = new SqlManager(new BaseSQL(SQL.builder()
-				.host(System.getenv("SQL_HOST"))
-				.port(Integer.parseInt(System.getenv("SQL_PORT")))
-				.database(System.getenv("SQL_DATABASE"))
-				.password(System.getenv("SQL_PASSWORD"))
-				.user(System.getenv("SQL_USER"))
-				.build()));
 
 		CONFIGURATION_MANAGER = new ConfigurationManager("config.yml", "guis.yml", "items.yml");
 		CONFIGURATION_MANAGER.init();
 
 		registerHandler(UserInfoPackage.class, (channel, source, pckg) -> {
-			System.out.println("Receive UserInfoPackage from " + source + " for " + pckg.getUuid().toString());
-			MongoManager.load(pckg.getUuid())
+			System.out.println("Received UserInfoPackage from " + source + " for " + pckg.getUuid().toString());
+
+			userData.find(pckg.getUuid())
 					.thenAccept(info -> {
 						pckg.setUserInfo(info);
                         answer(channel, pckg);
 					});
 		});
 		registerHandler(SaveUserPackage.class, (channel, source, pckg) -> {
-			System.out.println("Receive SaveUserPackage from " + source + " for " + pckg.getUser().toString());
-			MongoManager.save(pckg.getUserInfo());
+			System.out.println("Received SaveUserPackage from " + source + " for " + pckg.getUser().toString());
+			userData.save(pckg.getUserInfo());
 		});
+
 		registerHandler(BulkSaveUserPackage.class, (channel, source, pckg) -> {
-			System.out.println("Receive BulkSaveUserPackage from " + source);
-			MongoManager.bulkSave(pckg.getPackages().stream().map(SaveUserPackage::getUserInfo).collect(Collectors.toList()));
+			System.out.println("Received BulkSaveUserPackage from " + source);
+			userData.save(pckg.getPackages().stream().map(SaveUserPackage::getUserInfo).collect(Collectors.toList()));
 		});
+
 		registerHandler(UserTransactionPackage.class, (channel, source, pckg) -> {
-			System.out.println("Receive UserTransactionPackage from " + source);
-			MongoManager.load(pckg.getUser()).thenAccept(info -> {
+			System.out.println("Received UserTransactionPackage from " + source);
+			userData.find(pckg.getUser()).thenAccept(info -> {
 				val preHandler = TRANSACTION_PRE_AUTHORIZE_MAP.get(pckg.getDonate());
 				if (preHandler != null && !preHandler.test(pckg, info)) {
 					pckg.setResponse(UserTransactionPackage.TransactionResponse.INTERNAL_ERROR);
@@ -108,7 +113,7 @@ public class MuseumService {
 					UserTransactionPackage.TransactionResponse resp = UserTransactionPackage.TransactionResponse.OK;
 					if (response.getErrorMessage() != null) {
 						String err = response.getErrorMessage();
-						if (err.equalsIgnoreCase("Недостаточно средств на счёте"))
+						if (err.equalsIgnoreCase("Недостаточно средств на счету"))
 							resp = UserTransactionPackage.TransactionResponse.INSUFFICIENT_FUNDS;
 						else {
 							System.out.println(err);
@@ -132,7 +137,7 @@ public class MuseumService {
 			ServerSocketHandler.broadcast(broadcastPackage);
 		}));
 		registerHandler(ThanksExecutePackage.class, ((channel, serverName, museumPackage) -> {
-			long boosters = SQL_MANAGER.executeThanks(museumPackage.getUser());
+			long boosters = boosterManager.executeThanks(museumPackage.getUser());
 			extra(museumPackage.getUser(), null, (double) (THANKS_SECONDS * boosters));
 			museumPackage.setBoostersCount(boosters);
 			answer(channel, museumPackage);
@@ -227,13 +232,13 @@ public class MuseumService {
 	}
 
 	private static BiPredicate<UserTransactionPackage, UserInfo> globalBoosterPreAuthorize(BoosterType type) {
-		return (pckg, info) -> !SQL_MANAGER.getGlobalBoosters().containsKey(type);
+		return (pckg, info) -> !boosterManager.getGlobalBoosters().containsKey(type);
 	}
 
 	private static BiPredicate<UserTransactionPackage, UserInfo> localBoosterPreAuthorize(BoosterType type) {
 		return (pckg, info) -> {
 			try {
-				return SQL_MANAGER.receiveLocal(pckg.getUser()).get(2L, TimeUnit.SECONDS).stream().noneMatch(booster -> booster.getType() == type);
+				return boosterManager.receiveLocal(pckg.getUser()).get(2L, TimeUnit.SECONDS).stream().noneMatch(booster -> booster.getType() == type);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				return false;
@@ -243,7 +248,7 @@ public class MuseumService {
 
 	private static BiConsumer<UserTransactionPackage, UserInfo> boosterPostAuthorize(BoosterType type, boolean global) {
 		return (pckg, info) -> wrapUuid(Collections.singletonList(pckg.getUser())).thenApply(list -> list.get(0)).thenAccept(userName -> {
-			SQL_MANAGER.push(Booster.defaultInstance(pckg.getUser(), userName, type, DEFAULT_BOOSTER_TIME, global));
+			boosterManager.push(BoosterInfo.defaultInstance(pckg.getUser(), userName, type, DEFAULT_BOOSTER_TIME, global));
 		});
 	}
 

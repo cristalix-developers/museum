@@ -3,7 +3,7 @@ package ru.cristalix.museum.packages;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import ru.cristalix.museum.boosters.Booster;
+import ru.cristalix.museum.data.BoosterInfo;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
 public class GlobalBoostersPackage extends MuseumPackage {
 
 	// request
-	private final List<Booster> boosters;
+	private final List<BoosterInfo> boosters;
 
 	// no response
 

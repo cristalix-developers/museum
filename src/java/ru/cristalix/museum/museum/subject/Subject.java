@@ -48,4 +48,8 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 		return 0;
 	}
 
+	@Override
+	protected void updateInfo() {
+		// todo: useless method
+	}
 }

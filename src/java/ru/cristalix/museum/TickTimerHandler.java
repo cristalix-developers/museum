@@ -10,7 +10,9 @@ import ru.cristalix.museum.museum.Coin;
 import ru.cristalix.museum.museum.map.SubjectType;
 import ru.cristalix.museum.museum.subject.CollectorSubject;
 import ru.cristalix.museum.player.PlayerDataManager;
-import ru.cristalix.museum.visitor.VisitorManager;
+import ru.cristalix.museum.ticker.Ticked;
+
+import java.util.List;
 
 /**
  * @author func 30.06.2020
@@ -20,11 +22,11 @@ import ru.cristalix.museum.visitor.VisitorManager;
 public class TickTimerHandler extends BukkitRunnable {
 
 	private final App app;
-	private final VisitorManager visitorManager;
+	private final List<Ticked> ticked;
 	private final ClientSocket clientSocket;
 	private final static long AUTO_SAVE_PERIOD = 20 * 60 * 3;
 	private final PlayerDataManager dataManager;
-	private long counter = 1;
+	private int counter = 1;
 
 	@Override
 	public void run() {
@@ -36,7 +38,10 @@ public class TickTimerHandler extends BukkitRunnable {
 			counter++;
 
 		long time = System.currentTimeMillis();
-		val visitedPoint = visitorManager.getVictimFutureLocation();
+
+		// Вызов обработки тиков у всех побочных обработчиков
+		for (Ticked ticked : ticked)
+			ticked.tick(counter);
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			val user = app.getUser(player.getUniqueId());
@@ -44,14 +49,8 @@ public class TickTimerHandler extends BukkitRunnable {
 			if (user.getExcavation() != null || user.getCurrentMuseum() == null)
 				continue;
 
-			if (visitedPoint != null && user.getCoins().size() < 50) {
-				Coin coin = new Coin(visitedPoint);
-				coin.create(user.getConnection());
-				user.getCoins().add(coin);
-			}
-			for (CollectorSubject collector : user.getCurrentMuseum().getSubjects(SubjectType.COLLECTOR)) {
+			for (CollectorSubject collector : user.getCurrentMuseum().getSubjects(SubjectType.COLLECTOR))
 				collector.move(user, time);
-			}
 
 			// Если монеты устарели, что бы не копились на клиенте, удаляю
 			user.getCoins().removeIf(coin -> {

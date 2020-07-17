@@ -5,20 +5,17 @@ import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
 import clepto.bukkit.gui.Guis;
 import clepto.cristalix.Cristalix;
-import clepto.cristalix.WorldMeta;
+import clepto.cristalix.mapservice.WorldMeta;
 import lombok.Getter;
 import lombok.val;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
@@ -31,26 +28,28 @@ import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 import ru.cristalix.museum.client.ClientSocket;
 import ru.cristalix.museum.command.MuseumCommand;
-import ru.cristalix.museum.command.VisitorCommand;
 import ru.cristalix.museum.donate.DonateType;
 import ru.cristalix.museum.gui.MuseumGuis;
-import ru.cristalix.museum.listener.MuseumEvents;
-import ru.cristalix.museum.listener.PassiveEvents;
-import ru.cristalix.museum.museum.Coin;
+import ru.cristalix.museum.listener.BlockClickHandler;
+import ru.cristalix.museum.listener.MuseumEventHandler;
+import ru.cristalix.museum.listener.PassiveEventBlocker;
 import ru.cristalix.museum.museum.map.SubjectType;
-import ru.cristalix.museum.museum.subject.CollectorSubject;
 import ru.cristalix.museum.museum.subject.skeleton.SkeletonPrototype;
 import ru.cristalix.museum.packages.*;
 import ru.cristalix.museum.player.PlayerDataManager;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.prototype.Managers;
+import ru.cristalix.museum.ticker.detail.FountainHandler;
+import ru.cristalix.museum.ticker.detail.PresentHandler;
+import ru.cristalix.museum.ticker.visitor.VisitorHandler;
 import ru.cristalix.museum.util.MuseumChatService;
-import ru.cristalix.museum.visitor.VisitorManager;
+import ru.cristalix.museum.worker.WorkerClickListener;
+import ru.cristalix.museum.worker.WorkerHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -76,6 +75,7 @@ public final class App extends JavaPlugin {
 		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("MODELS", "Dino")
 				.orElseThrow(() -> new RuntimeException("Map museum/main wasn't found in the MapService"));
 
+		// todo: temp commands
 		B.regCommand((sender, args) -> {
 			if (args.length == 0) return "§cИспользование: §e/money [Количество денег]";
 			getUser(sender).setMoney(Double.parseDouble(args[0]));
@@ -140,28 +140,29 @@ public final class App extends JavaPlugin {
 			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 		});
 
-		// todo: overwrite on packets, remove hardcode
-		// Создание посетителей / @OverwrittenInFuture
-		VisitorManager visitorManager = new VisitorManager(Collections.singletonList(new Location(getWorld(), -67, 91, 268)));
-		visitorManager.clear();
-		visitorManager.spawn(new Location(getWorld(), -67, 91, 268), 20);
-
 		// Инициализация промежуточных команд / Инвентарей
 		new MuseumGuis(this);
 		Bukkit.getPluginCommand("museum").setExecutor(new MuseumCommand(this));
-		Bukkit.getPluginCommand("visitor").setExecutor(new VisitorCommand(visitorManager));
+
+		// Создание обработчика голов-подарков
+		val presentHandler = new PresentHandler(this);
 
 		// Регистрация обработчиков событий
 		B.events(
 				playerDataManager,
-				new PassiveEvents(),
-				new MuseumEvents(this),
-				new GuiEvents()
+				new PassiveEventBlocker(),
+				new MuseumEventHandler(this),
+				new GuiEvents(),
+				new BlockClickHandler(this, presentHandler),
+				new WorkerClickListener(this, new WorkerHandler(this))
 		);
 
 		// Обработка каждого тика
-		new TickTimerHandler(this, visitorManager, clientSocket, playerDataManager)
-				.runTaskTimer(this, 0, 1);
+		new TickTimerHandler(this, Arrays.asList(
+				new VisitorHandler(this, 1, 5),
+				new FountainHandler(this),
+				presentHandler
+		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 	}
 
 	@Override

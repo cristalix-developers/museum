@@ -1,9 +1,8 @@
-package ru.cristalix.museum.util;
+package ru.cristalix.museum.util.warp;
 
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.gallery.Warp;
 import ru.cristalix.museum.player.User;
 
 import java.util.HashMap;

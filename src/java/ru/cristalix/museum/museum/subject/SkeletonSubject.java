@@ -1,6 +1,6 @@
 package ru.cristalix.museum.museum.subject;
 
-import clepto.cristalix.Box;
+import clepto.cristalix.mapservice.Box;
 import lombok.Getter;
 import org.bukkit.Location;
 import ru.cristalix.core.math.V3;
@@ -41,6 +41,10 @@ public class SkeletonSubject extends Subject {
 
 	@Override
 	public Allocation allocate(Location origin) {
+		if (origin == null) {
+			skeletonLocation = null;
+			return super.allocate(null);
+		}
 		Box box = prototype.getBox();
 		V3 o = prototype.getRelativeOrigin();
 		// ToDo: Debug, this should count from boxMin, not from origin (center)
@@ -51,7 +55,7 @@ public class SkeletonSubject extends Subject {
 				(int) o.getX(),
 				(int) o.getY(),
 				(int) o.getZ()
-										  );
+		);
 
 		this.skeletonLocation.setYaw(skeletonYaw);
 

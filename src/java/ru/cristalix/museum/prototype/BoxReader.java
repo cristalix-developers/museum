@@ -1,6 +1,6 @@
 package ru.cristalix.museum.prototype;
 
-import clepto.cristalix.Box;
+import clepto.cristalix.mapservice.Box;
 
 @FunctionalInterface
 public interface BoxReader<T extends Prototype> {

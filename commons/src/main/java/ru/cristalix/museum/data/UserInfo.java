@@ -2,7 +2,6 @@ package ru.cristalix.museum.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.cristalix.museum.boosters.Booster;
 import ru.cristalix.museum.data.subject.SubjectInfo;
 import ru.cristalix.museum.donate.DonateType;
 
@@ -11,7 +10,7 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-public class UserInfo {
+public class UserInfo implements Unique {
 
 	public final UUID uuid;
 
@@ -24,6 +23,6 @@ public class UserInfo {
 	public int excavationCount;
 	public long pickedCoinsCount;
 	public List<DonateType> donates;
-    private List<Booster> localBoosters;
+    private List<BoosterInfo> localBoosters;
 
 }

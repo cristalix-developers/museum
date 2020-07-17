@@ -1,8 +1,11 @@
 package ru.cristalix.museum.museum.map;
 
-import clepto.cristalix.MapServiceException;
+import clepto.cristalix.mapservice.MapServiceException;
 import ru.cristalix.museum.data.subject.SubjectInfo;
-import ru.cristalix.museum.museum.subject.*;
+import ru.cristalix.museum.museum.subject.CollectorSubject;
+import ru.cristalix.museum.museum.subject.MarkerSubject;
+import ru.cristalix.museum.museum.subject.SkeletonSubject;
+import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
 
 import java.util.ArrayList;
@@ -16,8 +19,10 @@ public class SubjectType<T extends Subject> {
 	public static SubjectType<Subject> DECORATION;
 	public static SubjectType<CollectorSubject> COLLECTOR;
 	public static SubjectType<MarkerSubject> MARKER;
+
 	private final String address;
 	private final Provider provider;
+
 	public SubjectType(String address, Provider provider) {
 		this.provider = provider;
 		this.address = address;
@@ -46,5 +51,4 @@ public class SubjectType<T extends Subject> {
 	public interface Provider {
 		Subject provide(SubjectPrototype prototype, SubjectInfo info, User user);
 	}
-
 }

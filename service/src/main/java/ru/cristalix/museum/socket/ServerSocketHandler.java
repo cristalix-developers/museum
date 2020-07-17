@@ -67,7 +67,6 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 				channel.attr(serverInfoKey).set(pckg.getServerName());
 				connectedChannels.put(pckg.getServerName(), channel);
 				CoreApi.get().getPlatform().getScheduler().runAsyncDelayed(() -> {
-					send(channel, MuseumService.SQL_MANAGER.pckg());
 					send(channel, MuseumService.CONFIGURATION_MANAGER.pckg());
 				}, 1L, TimeUnit.SECONDS);
 				System.out.println("Server authorized! " + pckg.getServerName());
@@ -81,7 +80,8 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 					return;
 				}
 				String info = channel.attr(serverInfoKey).get();
-				Optional.ofNullable(MuseumService.HANDLER_MAP.get(museumPackage.getClass())).ifPresent(handler -> handler.handle(channel, info, museumPackage));
+				Optional.ofNullable(MuseumService.HANDLER_MAP.get(museumPackage.getClass()))
+						.ifPresent(handler -> handler.handle(channel, info, museumPackage));
 			}
 		}
 	}

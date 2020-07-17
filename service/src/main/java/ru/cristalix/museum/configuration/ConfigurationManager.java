@@ -3,7 +3,6 @@ package ru.cristalix.museum.configuration;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.museum.packages.ConfigurationsPackage;
 import ru.cristalix.museum.socket.ServerSocketHandler;
@@ -36,13 +35,13 @@ public class ConfigurationManager {
 	}
 
 	public void reload() {
-		val config = load(configFile, configData);
+		Pair<String, Boolean> config = load(configFile, configData);
 		configData = config.getKey();
 
-		val gui = load(guiFile, guiData);
+		Pair<String, Boolean> gui = load(guiFile, guiData);
 		guiData = gui.getKey();
 
-		val items = load(itemsFile, itemsData);
+		Pair<String, Boolean> items = load(itemsFile, itemsData);
 		itemsData = items.getKey();
 
 		if (config.getValue() || gui.getValue() || items.getValue())

@@ -7,20 +7,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import ru.cristalix.museum.App;
-import ru.cristalix.museum.player.User;
-import ru.cristalix.museum.util.WarpUtil;
 
 /**
  * @author func 08.06.2020
  * @project Museum
  */
 @AllArgsConstructor
-public class MuseumEvents implements Listener {
+public class MuseumEventHandler implements Listener {
 
 	private final App app;
 
@@ -32,12 +29,6 @@ public class MuseumEvents implements Listener {
 		Material type = player.getInventory().getItemInMainHand().getType();
 		if (type == Material.PAPER)
 			player.performCommand("gui main");
-	}
-
-	@EventHandler
-	public void onEntityInteract(PlayerInteractEntityEvent e) {
-		// todo: remake this hard code / u can get name from entity nbt
-		new WarpUtil.WarpBuilder("gallery").build().warp(app.getUser(e.getPlayer()));
 	}
 
 	@EventHandler

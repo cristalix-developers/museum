@@ -3,7 +3,6 @@ package ru.cristalix.museum.museum.subject;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
@@ -58,7 +57,7 @@ public class CollectorSubject extends Subject {
 	public void move(User user, long iteration) {
 		if (navigator == null)
 			return;
-		val location = getLocation(iteration);
+		Location location = getLocation(iteration);
 		user.getCoins().removeIf(coin -> coin.pickUp(user, location, radius, piece.getEntityId()));
 		piece.update(user.getPlayer(), location);
 	}

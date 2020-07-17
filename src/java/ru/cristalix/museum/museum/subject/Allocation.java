@@ -1,6 +1,6 @@
 package ru.cristalix.museum.museum.subject;
 
-import clepto.cristalix.Box;
+import clepto.cristalix.mapservice.Box;
 import lombok.Data;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
@@ -43,9 +43,8 @@ public class Allocation {
 			for (int y = (int) box.getMin().getY(); y <= box.getMax().getY(); y++) {
 				for (int z = (int) box.getMin().getZ(); z <= box.getMax().getZ(); z++) {
 					Location dst = box.transpose(absoluteOrigin, info.getRotation(), relativeOrigin, x, y, z);
-					if (dst.getBlock().getType() != Material.AIR) {
-//						return null; // Невозможно разместить субъект - место занято.
-					}
+					//if (dst.getBlock().getType() != Material.AIR || dst.clone().subtract(0, 1, 0).getBlock().getType() != Material.MELON_BLOCK)
+					//	return null; // Невозможно разместить субъект - место занято или не доступно.
 					Location src = new Location(App.getApp().getWorld(), x, y, z);
 					if (src.getBlock().getType() == Material.AIR) continue;
 

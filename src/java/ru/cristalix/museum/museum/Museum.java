@@ -1,11 +1,9 @@
 package ru.cristalix.museum.museum;
 
-import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import ru.cristalix.core.scoreboard.IScoreboardService;
@@ -20,7 +18,7 @@ import ru.cristalix.museum.museum.subject.MarkerSubject;
 import ru.cristalix.museum.museum.subject.Subject;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.util.LocationTree;
-import ru.cristalix.museum.util.WarpUtil;
+import ru.cristalix.museum.util.warp.WarpUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,7 +54,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 	}
 
     @Override
-    protected void updateInfo() {
+    public void updateInfo() {
         cachedInfo.title = title;
     }
 
@@ -121,16 +119,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		return list;
 	}
 
-	public void processClick(User user, int x, int y, int z) {
-		B.run(() -> B.bc("§aClick at " + x + " " + y + " " + z));
-		for (Subject subject : getSubjects()) {
-			if (subject.getAllocation() == null) continue;
-			for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
-				if (loc.getBlockX() == x && loc.getBlockY() == y && loc.getBlockZ() == z) {
-					subject.hide(user, true);
-				}
-			}
-		}
+	public void processClick(User user, Subject subject) {
+		user.performCommand("gui manipulator");
 	}
 
 	public long getViews() {

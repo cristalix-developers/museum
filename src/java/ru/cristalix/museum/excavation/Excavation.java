@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.museum.player.User;
 import ru.cristalix.museum.util.MessageUtil;
-import ru.cristalix.museum.util.WarpUtil;
+import ru.cristalix.museum.util.warp.WarpUtil;
 
 @Data
 @AllArgsConstructor

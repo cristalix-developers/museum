@@ -2,8 +2,8 @@ package ru.cristalix.museum.prototype;
 
 import clepto.ListUtils;
 import clepto.bukkit.InvalidConfigException;
-import clepto.cristalix.Label;
-import clepto.cristalix.MapServiceException;
+import clepto.cristalix.mapservice.Label;
+import clepto.cristalix.mapservice.MapServiceException;
 import lombok.val;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Chunk;
@@ -119,7 +119,7 @@ public class Managers {
 			for (int x = (int) min.getX(); x < (int) max.getX(); x++) {
 				for (int y = (int) min.getY(); y < (int) max.getY(); y++) {
 					for (int z = (int) min.getZ(); z < (int) max.getZ(); z++) {
-						Location loc = new Location(box.getMeta().getWorld(), x, y, z);
+						Location loc = new Location(box.getWorld(), x, y, z);
 						Block block = loc.getBlock();
 						if (block.getType() == Material.IRON_BLOCK)
 							space.add(loc);

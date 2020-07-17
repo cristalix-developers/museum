@@ -52,6 +52,10 @@ public class MessageUtil {
 			return set(key, value + "");
 		}
 
+		public Message set(String key, double value) {
+			return set(key, value + "");
+		}
+
 		public void send(User user) {
 			user.getPlayer().sendMessage(text);
 		}
