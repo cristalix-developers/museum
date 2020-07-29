@@ -1,4 +1,5 @@
 rootProject.name = 'museum'
-include 'commons'
-include 'service'
+include 'museum-game'
+include 'museum-service'
+include 'museum-commons'
 

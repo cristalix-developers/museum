@@ -1,64 +1,51 @@
 apply plugin: 'java'
 
-group 'ru.cristalix'
-version '1.2'
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
-compileJava.options.encoding = 'UTF-8'
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
-
-jar {
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
-
-dependencies {
-    annotationProcessor 'org.projectlombok:lombok:1.18.12'
-    compileOnly 'org.projectlombok:lombok:1.18.12'
-    compileOnly files('external/paper-1.12.2.jar')
-    compileOnly files('external/cristalix-core.jar')
-    compile project(':commons')
-    compile files('external/clepto-cristalix.jar')
-}
-
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/java']
-        }
-        resources {
-            srcDirs = ['src/resources']
-        }
-    }
-}
-
 subprojects {
     apply plugin: 'java'
-    group 'ru.cristalix'
-    version '1.2'
+
+    targetCompatibility = sourceCompatibility = '1.8'
 
     repositories {
         mavenLocal()
         mavenCentral()
+        maven {
+            url "http://45.89.66.50:6650/releases"
+            credentials {
+                username = mavenUser
+                password = mavenPassword
+            }
+        }
     }
 
-    compileJava.options.encoding = 'UTF-8'
+    compileJava.options.encoding 'UTF-8'
 
     tasks.withType(JavaCompile) {
-        options.encoding = "UTF-8"
+        options.encoding 'UTF-8'
     }
 
     dependencies {
         annotationProcessor 'org.projectlombok:lombok:1.18.12'
         compileOnly 'org.projectlombok:lombok:1.18.12'
-        compile 'com.google.code.gson:gson:2.8.6'
+        compileOnly 'io.netty:netty-all:4.1.50.Final'
+        compileOnly 'com.google.guava:guava:29.0-jre'
+        implementation 'com.google.code.gson:gson:2.8.6'
+        implementation 'clepto:clepto-java:0.3.1'
     }
+
+    jar {
+        from sourceSets.main.resources
+        from {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+    }
+
+    task deploy(type: Copy) {
+        dependsOn build
+        from jar
+        into rootProject.buildDir
+    }
+
 }
+
+

@@ -1,0 +1,44 @@
+dependencies {
+    compileOnly 'implario:paper:1.12.2'
+    compileOnly files('../external/cristalix-core-r5.jar')
+    implementation project(':museum-commons')
+    implementation 'clepto:clepto-bukkit:2.4.0'
+    implementation 'clepto:clepto-cristalix:2.4.0'
+}
+
+ext.genOutputDir = file("$buildDir/generated/resources")
+
+processResources {
+    File outputFile = file("$genOutputDir/plugin.yml")
+    outputs.file(outputFile)
+    doLast {
+        outputFile.text = new BukkitPlugin(
+                name: 'Museum',
+                mainClass: 'museum.App',
+                dependencies: ['CoreAPI']
+        ).generatePluginYML()
+    }
+}
+
+jar.from genOutputDir
+
+import java.text.SimpleDateFormat
+
+class BukkitPlugin {
+    String name
+    String mainClass
+    String[] dependencies
+
+    String generatePluginYML() {
+        String version = new SimpleDateFormat('HH:mm:ss dd.MM.yyyy').format(new Date())
+        return [
+                "name: '$name'",
+                "version: '$version'",
+                "main: $mainClass",
+                "depend: [${dependencies.join(", ")}]"
+        ].join("\n")
+    }
+
+}
+
+
