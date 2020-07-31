@@ -14,7 +14,6 @@ import java.util.function.Predicate;
  * @author func 25.06.2020
  * @project museum
  */
-@UtilityClass
 public class WarpUtil {
 
 	private static final Map<String, Warp> warps = new HashMap<>();
@@ -23,7 +22,7 @@ public class WarpUtil {
 		return warps.getOrDefault(address, null);
 	}
 
-	public class WarpBuilder {
+	public static class WarpBuilder {
 
 		private final Warp warp;
 
