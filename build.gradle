@@ -9,6 +9,7 @@ subprojects {
         mavenLocal()
         mavenCentral()
         maven {
+            // test
             url "https://repo.implario.cc/public"
             credentials {
                 username = mavenUser
