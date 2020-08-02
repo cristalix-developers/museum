@@ -24,7 +24,6 @@ public class Excavation {
 
 	@SuppressWarnings("deprecation")
 	public void load(User user) {
-
 		Player player = user.getPlayer();
 		player.getInventory().clear();
 		player.getInventory().addItem(Lemonade.get("pickaxe-" + user.getPickaxeType().name().toLowerCase()).render());
