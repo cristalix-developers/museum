@@ -9,7 +9,7 @@ subprojects {
         mavenLocal()
         mavenCentral()
         maven {
-            url "http://45.89.66.50:6650/releases"
+            url "https://repo.implario.cc/public"
             credentials {
                 username = mavenUser
                 password = mavenPassword
