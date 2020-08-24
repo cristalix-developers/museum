@@ -9,15 +9,7 @@ subprojects {
         mavenLocal()
         mavenCentral()
         maven {
-            // test 2
-            url "https://repo.implario.cc/public"
-            credentials {
-                username = mavenUser
-                password = mavenPassword
-            }
-            authentication {
-                basic(BasicAuthentication)
-            }
+            url "https://repo.implario.dev/public"
         }
     }
 
@@ -33,7 +25,7 @@ subprojects {
         compileOnly 'io.netty:netty-all:4.1.50.Final'
         compileOnly 'com.google.guava:guava:29.0-jre'
         implementation 'com.google.code.gson:gson:2.8.6'
-        implementation 'clepto:clepto-java:0.3.1'
+        implementation 'clepto:clepto-java:0.3.8'
     }
 
     jar {
