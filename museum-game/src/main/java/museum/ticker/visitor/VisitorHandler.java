@@ -6,7 +6,6 @@ import museum.App;
 import museum.ticker.Ticked;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -15,7 +14,7 @@ import java.util.List;
  */
 public class VisitorHandler implements Ticked {
 
-	public static final int VISITORS_IN_GROUP = 5;
+	public static final int VISITORS_IN_GROUP = 10;
 	private final List<VisitorGroup> groups;
 
 	public VisitorHandler() {
@@ -23,17 +22,19 @@ public class VisitorHandler implements Ticked {
 
 		List<Label> labels = App.getApp().getMap().getLabels("move");
 
+		System.out.println(labels.size());
+
 		labels.forEach(node -> {
 			String[] ss = node.getTag().split("\\s+");
 
 			for (VisitorGroup visitorGroup : groups) {
 				if (visitorGroup.getName().equals(ss[0])) {
 					visitorGroup.getRoute().add(node);
-					break;
+					return;
 				}
-				groups.add(new VisitorGroup(ss[0]));
-				groups.get(groups.size() - 1).getRoute().add(node);
 			}
+			groups.add(new VisitorGroup(ss[0]));
+			groups.get(groups.size() - 1).getRoute().add(node);
 		});
 
 		if (labels.isEmpty())
@@ -42,7 +43,7 @@ public class VisitorHandler implements Ticked {
 
 	@Override
 	public void tick(int... args) {
-		if (args[0] % 20 == 0)
+		if (args[0] % 30 == 0)
 			for (VisitorGroup group : groups)
 				group.next();
 	}
