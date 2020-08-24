@@ -159,7 +159,7 @@ public final class App extends JavaPlugin {
 
 		// Обработка каждого тика
 		new TickTimerHandler(this, Arrays.asList(
-				new VisitorHandler(this, 1, 5),
+				new VisitorHandler(),
 				new FountainHandler(this),
 				presentHandler
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
