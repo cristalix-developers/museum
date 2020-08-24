@@ -1,54 +1,52 @@
 package museum.command;
 
+import clepto.bukkit.B;
 import lombok.AllArgsConstructor;
 import lombok.val;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import museum.App;
 import museum.util.MessageUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 /**
  * @author func 04.06.2020
  * @project Museum
  */
 @AllArgsConstructor
-public class MuseumCommand implements CommandExecutor {
+public class MuseumCommand implements B.Executor {
 
 	private App app;
 
 	@Override
-	public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-		if (commandSender instanceof Player) {
-			val user = app.getUser((Player) commandSender);
+	public String execute(Player sender, String[] args) {
+		if (sender == null) return "Only for players.";
+		val user = app.getUser(sender);
 
-			if (strings.length == 2) {
-				if (strings[0].equals("accept")) {
-					val author = Bukkit.getPlayer(strings[1]);
+		if (args.length == 0)
+			return "§cИспользование: §f/museum [accept]";
 
-					if (author == null || !author.isOnline()) {
-						MessageUtil.find("playeroffline").send(user);
-						return true;
-					}
-					val userAuthor = app.getUser(author);
+		if (args[0].equals("accept")) {
+			if (args.length < 2)
+				return "§cИспользование: §f/museum accept Игрок";
+			val visitorPlayer = Bukkit.getPlayer(args[1]);
 
-					val sender = app.getUser(author.getUniqueId());
+			if (visitorPlayer == null || !visitorPlayer.isOnline())
+				return MessageUtil.find("playeroffline").getText();
 
-					if (user.getCurrentMuseum().getOwner().equals(sender))
-						return true;
+			val visitorUser = app.getUser(visitorPlayer);
 
-					sender.getCurrentMuseum().hide(user);
-					userAuthor.getCurrentMuseum().show(user);
+			if (user.getCurrentMuseum().getOwner().equals(user))
+				return "§eПригласил сам себя?";
 
-					MessageUtil.find("visitaccept")
-							.set("visitor", user.getName())
-							.send(sender);
-				}
-			}
+			visitorUser.getCurrentMuseum().hide(visitorUser);
+			user.getCurrentMuseum().show(visitorUser);
+
+			return MessageUtil.find("visitaccept")
+					.set("visitor", user.getName()).getText();
 		}
-		return true;
+
+		return "§cНеизвестная подкоманда.";
+
 	}
 
 }

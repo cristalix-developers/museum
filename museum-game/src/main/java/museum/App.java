@@ -72,8 +72,8 @@ public final class App extends JavaPlugin {
 		B.plugin = App.app = this;
 
 		// Загрузка карты с сервера BUIL-1
-		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("MODELS", "Dino")
-				.orElseThrow(() -> new RuntimeException("Map museum/main wasn't found in the MapService"));
+		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("Museum", "release")
+				.orElseThrow(() -> new RuntimeException("Map Museum/release wasn't found in the MapService"));
 
 		// todo: temp commands
 		B.regCommand((sender, args) -> {
@@ -142,7 +142,7 @@ public final class App extends JavaPlugin {
 
 		// Инициализация промежуточных команд / Инвентарей
 		new MuseumGuis(this);
-		Bukkit.getPluginCommand("museum").setExecutor(new MuseumCommand(this));
+		B.regCommand(new MuseumCommand(this), "museum");
 
 		// Создание обработчика голов-подарков
 		val presentHandler = new PresentHandler(this);
