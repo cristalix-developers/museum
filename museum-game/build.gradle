@@ -28,7 +28,7 @@ dependencies {
     compileOnly 'cristalix:bukkit-core:20.08.28'
     implementation project(':museum-commons')
     implementation 'clepto:clepto-bukkit:2.4.3'
-    implementation 'clepto:clepto-cristalix:2.4.1'
+    implementation 'clepto:clepto-cristalix:2.4.2'
 }
 
 ext.genOutputDir = file("$buildDir/generated/resources")
