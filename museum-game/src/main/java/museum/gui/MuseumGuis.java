@@ -2,6 +2,7 @@ package museum.gui;
 
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
+import clepto.bukkit.gui.Gui;
 import clepto.bukkit.gui.Guis;
 import clepto.humanize.TimeFormatter;
 import museum.App;
@@ -32,7 +33,11 @@ public class MuseumGuis {
 				.build();
 
 		B.regCommand((sender, args) -> {
-			Guis.registry.get(args[0]).open(sender, args.length > 1 ? args[1] : null);
+			if (args.length == 0) return "§cИспользование: §e/gui [адрес]";
+			Gui gui = Guis.registry.get(args[0]);
+			if (gui == null) return "§cМеню с адресом §e" + args[0] + "§c не найдено.";
+
+			gui.open(sender, args.length > 1 ? args[1] : null);
 			return null;
 		}, "gui");
 
@@ -133,7 +138,7 @@ public class MuseumGuis {
 			ExcavationPrototype excavation = Managers.excavation.getPrototype(
 					context.getOpenedGui().getSlotData(slotId).getInfo()
 			);
-			if (excavation == null || excavation.getRequiredLevel() > app.getUser(player).getLevel())
+			if (excavation == null)// || excavation.getRequiredLevel() > app.getUser(player).getLevel())
 				return Lemonade.get("unavailable").render();
 			return base.dynamic()
 					.fill("excavation", excavation.getTitle())

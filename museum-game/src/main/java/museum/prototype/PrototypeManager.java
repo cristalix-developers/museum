@@ -19,6 +19,7 @@ public class PrototypeManager<T extends Prototype> {
 				.map(entry -> reader.readBox(entry.getKey(), entry.getValue()))
 				.filter(Objects::nonNull)
 				.forEach(this::registerPrototype);
+		System.out.println(mapSignKey + " manager has loaded " + map.size() + " entries.");
 	}
 
 	public T getPrototype(String address) {

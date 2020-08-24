@@ -96,7 +96,11 @@ public class Managers {
 
 			List<int[]> pallette = box.getLabels("pallette").stream()
 					.map(location -> location.add(0, -1, 0).getBlock())
-					.map(block -> new int[]{block.getType().getId(), block.getData()})
+					.map(block -> {
+						int[] data = {block.getType().getId(), block.getData()};
+						block.setType(Material.AIR);
+						return data;
+					})
 					.collect(Collectors.toList());
 
 			if (pallette.isEmpty())
@@ -129,7 +133,12 @@ public class Managers {
 				Block block = location.getBlock();
 				int[] random = ListUtils.random(pallette);
 				block.setTypeIdAndData(random[0], (byte) random[1], false);
+				location.getWorld().loadChunk(location.getChunk());
 				chunks.add(location.getChunk());
+			}
+
+			for (Chunk chunk : chunks) {
+				chunk.getWorld().loadChunk(chunk);
 			}
 
 			val packets = chunks.stream()

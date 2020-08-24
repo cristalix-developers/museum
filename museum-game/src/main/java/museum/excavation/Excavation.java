@@ -1,5 +1,6 @@
 package museum.excavation;
 
+import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,7 +40,9 @@ public class Excavation {
 							.set("title", title)
 							.send(user);
 
-					prototype.getPackets().forEach(user::sendPacket);
+					B.postpone(20, () -> {
+						prototype.getPackets().forEach(user::sendPacket);
+					});
 				}).build().warp(user);
 	}
 
