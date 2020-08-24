@@ -33,7 +33,7 @@ dependencies {
 
 ext.genOutputDir = file("$buildDir/generated/resources")
 
-processResources {
+classes {
     File outputFile = file("$genOutputDir/plugin.yml")
     outputs.file(outputFile)
     doLast {
