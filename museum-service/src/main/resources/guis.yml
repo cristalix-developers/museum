@@ -57,9 +57,9 @@ excavations:
     native: excavation
 
   buttons:
-    - {<<: *exc, info: 'dirt'}
-    - {<<: *exc, info: 2}
-    - {<<: *exc, info: 3}
+    - {<<: *exc, info: 'desert'}
+    - {<<: *exc, info: 'island'}
+    - {<<: *exc, info: 'jungle'}
     - {<<: *exc, info: 4}
     - {<<: *exc, info: 5}
     - {<<: *exc, info: 6}
