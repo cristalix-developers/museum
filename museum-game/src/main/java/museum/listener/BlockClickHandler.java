@@ -36,7 +36,7 @@ public class BlockClickHandler implements Listener {
 		val location = block.getLocation();
 		val player = event.getPlayer();
 		val user = app.getUser(player);
-		
+
 		if (block.getType() == Material.PISTON_EXTENSION) {
 			Bat bat = (Bat) location.getWorld().spawnEntity(location.clone().add(.5, .2, .5), EntityType.BAT);
 			bat.setAI(false);

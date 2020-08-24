@@ -10,6 +10,7 @@ import clepto.cristalix.mapservice.WorldMeta;
 import lombok.Getter;
 import lombok.val;
 import museum.client.ClientSocket;
+import museum.command.AdminCommand;
 import museum.command.MuseumCommand;
 import museum.donate.DonateType;
 import museum.gui.MuseumGuis;
@@ -74,20 +75,8 @@ public final class App extends JavaPlugin {
 		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("Museum", "release")
 				.orElseThrow(() -> new RuntimeException("Map Museum/release wasn't found in the MapService"));
 
-		// todo: temp commands
-		B.regCommand((sender, args) -> {
-			if (args.length == 0) return "§cИспользование: §e/money [Количество денег]";
-			getUser(sender).setMoney(Double.parseDouble(args[0]));
-			return "§aВаше количество денег изменено.";
-		}, "money");
-
-		B.regCommand((sender, args) -> {
-			if (args.length == 0) return "§cИспользование: §e/dino [Динозавр]";
-			SkeletonPrototype proto = Managers.skeleton.getPrototype(args[0]);
-			if (proto == null) return "§cПрототип динозавра §e" + args[0] + "§c не найден.";
-			getUser(sender).getSkeletons().get(proto).getUnlockedFragments().addAll(proto.getFragments());
-			return "";
-		}, "dino");
+		// Добавление админ-команд
+		AdminCommand.init(this);
 
 		try {
 			this.map = new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get());

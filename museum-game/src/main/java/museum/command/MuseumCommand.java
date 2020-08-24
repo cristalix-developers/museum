@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 @AllArgsConstructor
 public class MuseumCommand implements B.Executor {
 
-	private App app;
+	private final App app;
 
 	@Override
 	public String execute(Player sender, String[] args) {
