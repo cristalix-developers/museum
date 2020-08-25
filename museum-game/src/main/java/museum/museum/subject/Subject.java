@@ -37,10 +37,10 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 		if (allocation != null) allocation.getShowPackets().forEach(user::sendPacket);
 	}
 
-	public void hide(User user, boolean visually) {
+	public void hide(User user, boolean playEffects) {
 		if (allocation == null) return;
 		allocation.getHidePackets().forEach(user::sendPacket);
-		if (visually) allocation.getDestroyPackets().forEach(user::sendPacket);
+		if (playEffects) allocation.getDestroyPackets().forEach(user::sendPacket);
 		allocate(null);
 	}
 

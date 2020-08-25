@@ -37,7 +37,7 @@ public class MarkerSubject extends Subject {
 	}
 
 	@Override
-	public void hide(User user, boolean visually) {
+	public void hide(User user, boolean playEffects) {
 		val packet = new PacketPlayOutBlockChange(App.getApp().getNMSWorld(), new BlockPosition(location.x, location.y, location.z));
 		packet.block = Blocks.AIR.blockData;
 		user.sendPacket(packet);

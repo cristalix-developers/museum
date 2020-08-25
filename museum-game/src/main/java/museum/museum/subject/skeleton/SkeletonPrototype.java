@@ -1,77 +1,84 @@
 package museum.museum.subject.skeleton;
 
 import lombok.Getter;
-import lombok.NonNull;
+import museum.prototype.Prototype;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import museum.App;
-import museum.prototype.Prototype;
+import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-/**
- * Обеспечивает одинаковое расположение костей при каждом перезапуске
- */
+import static java.util.stream.Collectors.groupingBy;
+import static museum.museum.subject.skeleton.Displayable.orientedOffset;
+
 @Getter
-public class SkeletonPrototype implements Prototype {
+public class SkeletonPrototype implements Prototype, Displayable {
 
 	private final String title;
 	private final int size;
-	private final int piecesAmount;
 	private final String address;
 	private final Rarity rarity;
-	private final List<Piece> pieces;
-	private final List<Fragment> fragments;
+	private final Map<Fragment, V4> fragmentOffsetMap = new HashMap<>();
 
-	public SkeletonPrototype(String title, int size, int piecesAmount, Rarity rarity, @NonNull String address, Location worldOrigin) {
+	public SkeletonPrototype(String address, String title, Location worldOrigin, int size, Rarity rarity, List<ArmorStand> stands) {
 		this.title = title;
 		this.size = size;
-		this.piecesAmount = piecesAmount;
 		this.address = address;
 		this.rarity = rarity;
-		Map<ArmorStand, Location> allStands = new HashMap<>();
-		for (Entity entity : App.getApp().getMap().getWorld().getEntities()) {
-			if (entity.getType() != EntityType.ARMOR_STAND)
-				continue;
-			allStands.put((ArmorStand) entity, entity.getLocation());
-		}
 
-		List<ArmorStand> stands = new ArrayList<>();
-		recursiveTree(allStands, stands);
+		stands.stream()
+				.collect(groupingBy(as -> as.getCustomName() == null ? "???" : as.getCustomName()))
+				.forEach((fragmentAddress, fragmentStands) -> {
+					double x = 0, y = 0, z = 0;
+					for (ArmorStand stand : fragmentStands) {
+						Location loc = stand.getLocation();
+						x += loc.x;
+						y += loc.y;
+						z += loc.z;
+					}
+					int amount = fragmentStands.size();
+					V4 fragmentOffset = new V4(x / amount, y / amount, z / amount, 0);
+					Fragment fragment = new Fragment(fragmentAddress);
 
-		this.pieces = stands.stream()
-				.map(as -> new Piece(((CraftArmorStand) as).getHandle(), worldOrigin))
-				.collect(Collectors.toList());
+					for (ArmorStand stand : fragmentStands) {
+						Piece piece = new Piece(((CraftArmorStand) stand).getHandle());
+						V4 pieceOffset = V4.fromLocation(stand.getLocation().subtract(fragmentOffset.toVector()));
+						pieceOffset.setRot(stand.getLocation().getYaw());
+						fragment.getPieceOffsetMap().put(piece, pieceOffset);
+					}
 
-		this.fragments = pieces.stream()
-				.collect(Collectors.groupingBy(Piece::getName))
-				.entrySet().stream()
-				.map(e -> new Fragment(address, e.getKey(), e.getValue(), e.getValue().stream().mapToInt(p -> p.getHandle().getId()).toArray()))
-				.collect(Collectors.toList());
+					this.fragmentOffsetMap.put(fragment, V4.fromVector(fragmentOffset.toVector().subtract(worldOrigin.toVector())));
+
+				});
+
 	}
 
-	public static void recursiveTree(Map<ArmorStand, Location> selection, List<ArmorStand> walked) {
-		List<ArmorStand> current = new ArrayList<>();
-		for (Map.Entry<ArmorStand, Location> e : selection.entrySet()) {
-			if (walked.contains(e.getKey())) continue;
-			for (Map.Entry<ArmorStand, Location> e1 : selection.entrySet()) {
-				if (e1.getValue().distanceSquared(e.getValue()) < 16)
-					current.add(e1.getKey());
-			}
-		}
-		walked.addAll(current);
-		if (!current.isEmpty()) recursiveTree(selection, walked);
+	public Collection<Fragment> getFragments() {
+		return fragmentOffsetMap.keySet();
 	}
 
-	public String getTitle() {
-		return this.title;
+	@Override
+	public void show(Player player, V4 position) {
+		fragmentOffsetMap.forEach((fragment, offset) -> fragment.show(player, orientedOffset(position, offset)));
+	}
+
+	@Override
+	public void update(Player player, V4 position) {
+		fragmentOffsetMap.forEach((fragment, offset) -> fragment.show(player, orientedOffset(position, offset)));
+	}
+
+	@Override
+	public void hide(Player player) {
+		for (Fragment fragment : this.getFragments())
+			fragment.hide(player);
+	}
+
+	public V4 getOffset(Fragment fragment) {
+		return this.fragmentOffsetMap.get(fragment);
 	}
 
 }

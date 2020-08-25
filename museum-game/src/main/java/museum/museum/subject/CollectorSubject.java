@@ -3,6 +3,8 @@ package museum.museum.subject;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
+import museum.museum.subject.skeleton.Piece;
+import museum.museum.subject.skeleton.V4;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
@@ -14,7 +16,6 @@ import museum.data.SubjectInfo;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.CollectorSubjectPrototype;
 import museum.museum.map.SubjectPrototype;
-import museum.museum.subject.skeleton.Piece;
 import museum.player.User;
 
 public class CollectorSubject extends Subject {
@@ -37,7 +38,7 @@ public class CollectorSubject extends Subject {
 		armorStand.setCustomName(prototype.getTitle());
 		armorStand.setCustomNameVisible(true);
 		this.navigator = null;
-		this.piece = new Piece(armorStand, null);
+		this.piece = new Piece(armorStand);
 		this.id = info.getMetadata() == null ? 0 : Integer.parseInt(info.getMetadata());
 		this.speed = (int) ((CollectorSubjectPrototype) prototype).getSpeed();
 		this.radius = ((CollectorSubjectPrototype) prototype).getRadius();
@@ -51,20 +52,20 @@ public class CollectorSubject extends Subject {
 	@Override
 	public void show(User user) {
 		super.show(user);
-		piece.show(user.getPlayer(), getLocation(System.currentTimeMillis()), false);
+		piece.show(user.getPlayer(), V4.fromLocation(getLocation(System.currentTimeMillis())));
 	}
 
 	public void move(User user, long iteration) {
 		if (navigator == null)
 			return;
 		Location location = getLocation(iteration);
-		user.getCoins().removeIf(coin -> coin.pickUp(user, location, radius, piece.getEntityId()));
+		user.getCoins().removeIf(coin -> coin.pickUp(user, location, radius, piece.getStand().id));
 		piece.update(user.getPlayer(), location);
 	}
 
 	@Override
-	public void hide(User user, boolean visually) {
-		super.hide(user, visually);
+	public void hide(User user, boolean playEffects) {
+		super.hide(user, playEffects);
 		piece.hide(user.getPlayer());
 	}
 

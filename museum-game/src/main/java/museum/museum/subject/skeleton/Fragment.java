@@ -1,32 +1,33 @@
 package museum.museum.subject.skeleton;
 
+import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import lombok.Data;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.List;
+import java.util.Map;
+
+import static museum.museum.subject.skeleton.Displayable.orientedOffset;
 
 @Data
-public class Fragment {
+public class Fragment implements Displayable {
 
-	private final String parentAddress;
 	private final String address;
-	private final List<Piece> pieces;
-	private final int[] legacyIds;
+	private final Map<Piece, V4> pieceOffsetMap = new Reference2ObjectArrayMap<>();
 
-	public void show(Player player, Location origin, boolean inBlock) {
-		for (Piece piece : pieces)
-			piece.show(player, origin, inBlock);
+	@Override
+	public void show(Player player, V4 position) {
+		pieceOffsetMap.forEach((piece, offset) -> piece.show(player, orientedOffset(position, offset)));
 	}
 
+	@Override
+	public void update(Player player, V4 position) {
+		pieceOffsetMap.forEach((piece, offset) -> piece.update(player, orientedOffset(position, offset)));
+	}
+
+	@Override
 	public void hide(Player player) {
-		for (Piece piece : pieces)
+		for (Piece piece : pieceOffsetMap.keySet())
 			piece.hide(player);
-	}
-
-	public void update(Player player, Location newLocation) {
-		for (Piece piece : pieces)
-			piece.update(player, newLocation);
 	}
 
 }

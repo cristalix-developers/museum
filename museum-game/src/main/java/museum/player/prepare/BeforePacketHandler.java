@@ -3,6 +3,7 @@ package museum.player.prepare;
 import clepto.ListUtils;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import museum.museum.subject.skeleton.V4;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,7 +13,6 @@ import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Fragment;
-import museum.museum.subject.skeleton.Piece;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
@@ -130,10 +130,9 @@ public class BeforePacketHandler implements Prepare {
 		if (bingo > Pickaxe.RANDOM.nextDouble()) {
 			// Если повезло, то будет проиграна анимация и тд
 			user.giveExperience(25);
-			List<Fragment> fragments = proto.getFragments();
-			Fragment fragment = ListUtils.random(fragments);
+			Fragment fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
 
-			fragment.show(user.getPlayer(), new Location(user.getWorld(), position.getX(), position.getY(), position.getZ()), true);
+			fragment.show(user.getPlayer(), new V4(position.getX(), position.getY(), position.getZ(), (float) (Math.random() * 360 - 180)));
 
 			animateFragments(user, fragment);
 
@@ -173,15 +172,15 @@ public class BeforePacketHandler implements Prepare {
 			public void run() {
 				PlayerConnection connection = user.getConnection();
 
-				int[] ids = fragment.getPieces().stream()
-						.map(Piece::getEntityId)
-						.mapToInt(Integer::valueOf)
+				int[] ids = fragment.getPieceOffsetMap().keySet().stream()
+						.mapToInt(piece -> piece.getStand().id)
 						.toArray();
 
 				if (integer.getAndIncrement() < 22) {
 					for (int id : ids) {
 						connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMove(id, 0, 3, 0, false));
 						byte angle = (byte) (5 * integer.get() % 128);
+						// ToDo: Разве оно не сломает структуру фрагмента из нескольких стендов?
 						connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(id, angle, (byte) 0, false));
 					}
 				} else {

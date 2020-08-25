@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
+import org.bukkit.entity.ArmorStand;
 import ru.cristalix.core.formatting.Color;
 import ru.cristalix.core.math.D2;
 import museum.data.SubjectInfo;
@@ -82,14 +83,20 @@ public class Managers {
 			return new MuseumPrototype(address, box, defaultInfos);
 		});
 
-		skeleton = new PrototypeManager<>("skeleton", (address, box) -> new SkeletonPrototype(
-				box.requireLabel("title").getTag(),
-				box.requireLabel("size").getTagInt(),
-				box.requireLabel("pieces").getTagInt(),
-				Rarity.valueOf(box.requireLabel("rarity").getTag().toUpperCase()),
-				address,
-				box.requireLabel("origin")
-		));
+		skeleton = new PrototypeManager<>("skeleton", (address, box) -> {
+
+			String title = box.requireLabel("title").getTag();
+			int size = box.requireLabel("size").getTagInt();
+			Rarity rarity = Rarity.valueOf(box.requireLabel("rarity").getTag().toUpperCase());
+			Label origin = box.requireLabel("origin");
+
+			box.loadChunks();
+
+			List<ArmorStand> stands = box.getEntities(ArmorStand.class);
+			if (stands.isEmpty()) throw new MapServiceException("Skeleton " + address + " has no bone armorstands!");
+
+			return new SkeletonPrototype(address, title, origin, size, rarity, stands);
+		});
 
 		excavation = new PrototypeManager<>("excavation", (address, box) -> {
 			box.expandVert();
