@@ -47,9 +47,8 @@ public class SkeletonSubject extends Subject {
 		}
 		Box box = prototype.getBox();
 		V3 o = prototype.getRelativeOrigin();
-		// ToDo: Debug, this should count from boxMin, not from origin (center)
 		this.skeletonLocation = box.transpose(
-				UtilV3.fromVector(origin.toVector()),
+				UtilV3.fromVector(box.getMin().toVector()),
 				cachedInfo.getRotation(),
 				new V3(0, 0, 0),
 				(int) o.getX(),
