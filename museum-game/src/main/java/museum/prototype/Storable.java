@@ -18,6 +18,6 @@ public abstract class Storable<I extends Info, P extends Prototype> {
 	@Getter
 	protected final User owner;
 
-	protected abstract void updateInfo();
+	protected void updateInfo() {}
 
 }
