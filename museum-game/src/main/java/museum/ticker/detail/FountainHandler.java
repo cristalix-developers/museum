@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class FountainHandler implements Ticked {
 
-	private Random random = new Random();
+	private final Random random = new Random();
 	private final List<Fountain> fountains;
 
 	public FountainHandler(App app) {
@@ -27,7 +27,7 @@ public class FountainHandler implements Ticked {
 				.map(label -> {
 					String[] tag = label.getTag().split("\\s+");
 					return new Fountain(
-							label,
+							label.toCenterLocation(),
 							new Vector(Double.parseDouble(tag[0]), Double.parseDouble(tag[1]), Double.parseDouble(tag[2])),
 							new Vector(Double.parseDouble(tag[3]), Double.parseDouble(tag[4]), Double.parseDouble(tag[5]))
 					);
@@ -44,16 +44,16 @@ public class FountainHandler implements Ticked {
 
 	@AllArgsConstructor
 	class Fountain {
-		private Location location;
-		private Vector vector;
-		private Vector noise;
+		private final Location location;
+		private final Vector vector;
+		private final Vector noise;
 
 		public void spawnParticle() {
 			FallingBlock particle = location.getWorld().spawnFallingBlock(location, Material.STAINED_GLASS, (byte) 3);
 			particle.setDropItem(false);
 			particle.setVelocity(vector.clone().add(new Vector(
 					(random.nextDouble() - .5) * noise.getX(),
-					(random.nextDouble() - .5) * noise.getY(),
+					(random.nextDouble()) * noise.getY(),
 					(random.nextDouble() - .5) * noise.getZ()
 			)));
 		}

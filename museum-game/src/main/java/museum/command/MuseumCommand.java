@@ -42,7 +42,7 @@ public class MuseumCommand implements B.Executor {
 			val visitorUser = app.getUser(visitorPlayer);
 
 			if (user.getCurrentMuseum().getOwner().equals(user))
-				return "§eПригласил сам себя?";
+				return MessageUtil.find("inviteyourself").getText();
 
 			visitorUser.getCurrentMuseum().hide(visitorUser);
 			user.getCurrentMuseum().show(visitorUser);

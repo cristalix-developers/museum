@@ -1,4 +1,4 @@
-package museum.museum.subject;
+package museum.player;
 
 import museum.data.MuseumInfo;
 import museum.data.PickaxeType;

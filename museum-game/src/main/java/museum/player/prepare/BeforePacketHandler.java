@@ -1,12 +1,15 @@
 package museum.player.prepare;
 
 import clepto.ListUtils;
+import clepto.bukkit.Lemonade;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.val;
 import museum.museum.subject.skeleton.V4;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import museum.App;
 import museum.excavation.Excavation;
@@ -33,6 +36,7 @@ import static museum.excavation.Excavation.isAir;
 public class BeforePacketHandler implements Prepare {
 
 	private final BlockPosition dummy = new BlockPosition(0, 0, 0);
+	private final ItemStack menu = Lemonade.get("menu").render();
 
 	@Override
 	public void execute(User user, App app) {
@@ -97,7 +101,9 @@ public class BeforePacketHandler implements Prepare {
 			excavation.setHitsLeft(-1);
 			Bukkit.getScheduler().runTaskLater(app, () -> {
 				user.setExcavation(null);
-				PrepareSteps.INVENTORY.getPrepare().execute(user, app);
+				val inventory = user.getPlayer().getInventory();
+				inventory.clear();
+				inventory.setItem(0, menu);
 				user.getCurrentMuseum().show(user);
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			}, 10 * 20L);

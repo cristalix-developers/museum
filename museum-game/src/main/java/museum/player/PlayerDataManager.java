@@ -2,7 +2,10 @@ package museum.player;
 
 import clepto.bukkit.B;
 import lombok.val;
+import museum.player.prepare.*;
+import museum.prototype.Managers;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -17,9 +20,7 @@ import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.data.BoosterInfo;
 import museum.data.UserInfo;
-import museum.museum.subject.DefaultElements;
 import museum.packages.*;
-import museum.player.prepare.PrepareSteps;
 import museum.utils.MultiTimeBar;
 
 import java.util.*;
@@ -92,8 +93,16 @@ public class PlayerDataManager implements Listener {
 		user.setPlayer(player);
 
 		B.postpone(5, () -> {
-			for (val prepare : PrepareSteps.values())
-				prepare.getPrepare().execute(user, app);
+			Arrays.asList(
+					new BeforePacketHandler(),
+					new PrepareInventory(),
+					new PrepareJSAnime(),
+					(usr, app) -> user.getMuseums().get(Managers.museum.getPrototype("main")).show(user), // Музей
+					new PrepareScoreBoard(),
+					(usr, app) -> Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current)), // Скрытие игроков
+					(usr, app) -> user.getPlayer().setGameMode(GameMode.ADVENTURE), // Режим игры
+					new PreparePlayerBrain()
+			).forEach(prepare -> prepare.execute(user, app));
 		});
 
 		e.setJoinMessage(null);
