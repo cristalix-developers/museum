@@ -95,7 +95,7 @@ public class Managers {
 			List<ArmorStand> stands = box.getEntities(ArmorStand.class);
 			if (stands.isEmpty()) throw new MapServiceException("Skeleton " + address + " has no bone armorstands!");
 
-			return new SkeletonPrototype(address, title, origin, size, rarity, stands);
+			return new SkeletonPrototype(address, title, origin, size, rarity, stands, box.requireLabel("price").getTagInt());
 		});
 
 		excavation = new PrototypeManager<>("excavation", (address, box) -> {

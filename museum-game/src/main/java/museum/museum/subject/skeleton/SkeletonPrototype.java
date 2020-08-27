@@ -22,13 +22,15 @@ public class SkeletonPrototype implements Prototype, Displayable {
 	private final int size;
 	private final String address;
 	private final Rarity rarity;
+	private final int price;
 	private final Map<Fragment, V4> fragmentOffsetMap = new HashMap<>();
 
-	public SkeletonPrototype(String address, String title, Location worldOrigin, int size, Rarity rarity, List<ArmorStand> stands) {
+	public SkeletonPrototype(String address, String title, Location worldOrigin, int size, Rarity rarity, List<ArmorStand> stands, int price) {
 		this.title = title;
 		this.size = size;
 		this.address = address;
 		this.rarity = rarity;
+		this.price = price;
 
 		stands.stream()
 				.collect(groupingBy(as -> as.getCustomName() == null ? "???" : as.getCustomName()))

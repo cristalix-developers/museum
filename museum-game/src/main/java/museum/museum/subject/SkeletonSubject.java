@@ -88,7 +88,7 @@ public class SkeletonSubject extends Subject {
 
 	public double getIncome() {
 		if (skeleton == null) return 0;
-		return skeleton.getUnlockedFragments().size() * skeleton.getPrototype().getRarity().getIncrease();
+		return skeleton.getUnlockedFragments().size() * skeleton.getPrototype().getPrice();
 	}
 
 }

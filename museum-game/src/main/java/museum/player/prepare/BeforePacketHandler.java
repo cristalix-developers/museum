@@ -146,7 +146,7 @@ public class BeforePacketHandler implements Prepare {
 			Skeleton skeleton = user.getSkeletons().get(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
-				double cost = proto.getRarity().getCost();
+				double cost = proto.getPrice();
 				double prize = cost * (.75 + Math.random() * .50);
 
 				String value = String.format("%.2f$", prize);

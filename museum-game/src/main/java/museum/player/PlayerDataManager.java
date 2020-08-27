@@ -13,6 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
 import museum.App;
@@ -35,6 +37,7 @@ public class PlayerDataManager implements Listener {
 	private final Map<UUID, User> userMap = new HashMap<>();
 	private final MultiTimeBar timeBar;
 	private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
+	public static final PotionEffect NIGHT_VISION = new PotionEffect(PotionEffectType.NIGHT_VISION, 65536, 10, false, false);
 
 	public PlayerDataManager(App app) {
 		this.app = app;
@@ -99,9 +102,10 @@ public class PlayerDataManager implements Listener {
 					new PrepareJSAnime(),
 					(usr, app) -> user.getMuseums().get(Managers.museum.getPrototype("main")).show(user), // Музей
 					new PrepareScoreBoard(),
+					(usr, app) -> user.getPlayer().addPotionEffect(NIGHT_VISION),
 					(usr, app) -> Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current)), // Скрытие игроков
 					(usr, app) -> user.getPlayer().setGameMode(GameMode.ADVENTURE), // Режим игры
-					new PreparePlayerBrain()
+					new PreparePlayerBrain(app)
 			).forEach(prepare -> prepare.execute(user, app));
 		});
 
