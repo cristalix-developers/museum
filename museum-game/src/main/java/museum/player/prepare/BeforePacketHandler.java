@@ -2,8 +2,10 @@ package museum.player.prepare;
 
 import clepto.ListUtils;
 import clepto.bukkit.Lemonade;
+import com.destroystokyo.paper.antixray.PacketPlayOutMapChunkInfo;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import lombok.val;
 import museum.museum.subject.skeleton.V4;
 import net.minecraft.server.v1_12_R1.*;
@@ -43,6 +45,29 @@ public class BeforePacketHandler implements Prepare {
 		PlayerConnection connection = user.getConnection();
 		connection.networkManager.channel.pipeline().addBefore("packet_handler", user.getName(),
 				new ChannelDuplexHandler() {
+					@Override
+					public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+						try {
+							// Обработка отправки чанков
+							if (msg instanceof PacketPlayOutMapChunk) {
+								val mapChunk = (PacketPlayOutMapChunk) msg;
+								if (user.getExcavation() != null) {
+									// Если загружается чанк шахты, то новой
+									val prototype = user.getExcavation().getPrototype();
+									for (PacketPlayOutMapChunk packet : prototype.getPackets()) {
+										if (packet.a == mapChunk.a && packet.b == mapChunk.b) {
+											super.write(ctx, packet, promise);
+											return;
+										}
+									}
+								}
+							}
+						} catch (Exception ignored) {
+						}
+						if (msg != null) {
+							super.write(ctx, msg, promise);
+						}
+					}
 					@Override
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 						if (packetObj instanceof PacketPlayInUseItem) {
