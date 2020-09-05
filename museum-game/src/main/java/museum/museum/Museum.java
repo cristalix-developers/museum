@@ -79,7 +79,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
 		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
 
-		user.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
+		user.setCoins(ConcurrentHashMap.newKeySet());
 		user.setCurrentMuseum(this);
 
 		user.getPlayer().getInventory().remove(Material.SADDLE);

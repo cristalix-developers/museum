@@ -36,13 +36,14 @@ public class BlockClickHandler implements Listener {
 		val location = block.getLocation();
 		val player = event.getPlayer();
 		val user = app.getUser(player);
+		val blockType = block.getType();
 
-		if (block.getType() == Material.PISTON_EXTENSION) {
+		if (blockType == Material.PISTON_EXTENSION) {
 			Bat bat = (Bat) location.getWorld().spawnEntity(location.clone().add(.5, .2, .5), EntityType.BAT);
 			bat.setAI(false);
 			bat.addPotionEffect(INVISIBLE);
 			bat.addPassenger(player);
-		} else if (block.getType() == Material.SKULL) {
+		} else if (blockType == Material.SKULL) {
 			val reward = presentHandler.getPresentByLocation(location);
 			if (reward == null)
 				return;
