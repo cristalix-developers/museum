@@ -43,8 +43,7 @@ public class VisitorHandler implements Ticked {
 
 	@Override
 	public void tick(int... args) {
-		if (args[0] % 30 == 0)
-			for (VisitorGroup group : groups)
-				group.next();
+		for (VisitorGroup group : groups)
+			group.next();
 	}
 }

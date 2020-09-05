@@ -41,12 +41,12 @@ public class VisitorGroup {
 
 		val app = App.getApp();
 
-		counter = ++counter % (route.size() * 2);
+		counter = ++counter % (route.size() * 30);
 
 		visitors.forEach(visitor -> {
-			val location = route.get(counter / 2).clone().add(visitor.getDelta().getX(), 0, visitor.getDelta().getZ());
+			val location = route.get(counter / 30).clone().add(visitor.getDelta().getX(), 0, visitor.getDelta().getZ());
 
-			visitor.getEntity().getNavigation().a(location.getX(), location.getY(), location.getZ(), .9);
+			visitor.getEntity().getNavigation().a(location.getX(), location.getY(), location.getZ(), .77);
 
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				if (player.getLocation().distanceSquared(location) > 10000)
