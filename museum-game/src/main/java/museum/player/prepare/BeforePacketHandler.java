@@ -1,35 +1,36 @@
 package museum.player.prepare;
 
 import clepto.ListUtils;
+import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
-import com.destroystokyo.paper.antixray.PacketPlayOutMapChunkInfo;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import lombok.val;
+import museum.App;
+import museum.excavation.Excavation;
+import museum.excavation.ExcavationPrototype;
+import museum.museum.subject.Allocation;
+import museum.museum.subject.Subject;
+import museum.museum.subject.skeleton.Fragment;
+import museum.museum.subject.skeleton.Skeleton;
+import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.museum.subject.skeleton.V4;
+import museum.player.User;
+import museum.player.pickaxe.Pickaxe;
+import museum.player.pickaxe.PickaxeType;
+import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import museum.App;
-import museum.excavation.Excavation;
-import museum.excavation.ExcavationPrototype;
-import museum.museum.subject.Subject;
-import museum.museum.subject.skeleton.Fragment;
-import museum.museum.subject.skeleton.Skeleton;
-import museum.museum.subject.skeleton.SkeletonPrototype;
-import museum.player.User;
-import museum.player.pickaxe.Pickaxe;
-import museum.player.pickaxe.PickaxeType;
-import museum.util.MessageUtil;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.*;
 import static museum.excavation.Excavation.isAir;
+import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.*;
 
 /**
  * @author func 31.05.2020
@@ -59,6 +60,12 @@ public class BeforePacketHandler implements Prepare {
 											super.write(ctx, packet, promise);
 											return;
 										}
+									}
+								} else {
+									for (Subject subject : user.getCurrentMuseum().getSubjects()) {
+										Allocation allocation = subject.getAllocation();
+										if (allocation == null) continue;
+										B.run(() -> allocation.getShowPackets().forEach(user::sendPacket));
 									}
 								}
 							}
