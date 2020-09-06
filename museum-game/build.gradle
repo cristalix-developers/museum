@@ -27,7 +27,7 @@ dependencies {
     compileOnly 'com.destroystokyo.paper:paper:1.12.2-escalated'
     compileOnly 'cristalix:bukkit-core:20.08.28'
     implementation project(':museum-commons')
-    implementation 'clepto:clepto-bukkit:2.4.16'
+    implementation 'clepto:clepto-bukkit:2.4.20'
     implementation 'clepto:clepto-cristalix:2.4.5'
 }
 

@@ -1,9 +1,8 @@
 package museum.util.warp;
 
-import lombok.experimental.UtilityClass;
-import org.bukkit.Location;
 import museum.App;
 import museum.player.User;
+import org.bukkit.Location;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,9 +39,9 @@ public class WarpUtil {
 					.forEach(label -> {
 						String[] ss = label.getTag().split(" ");
 						if ("start".equals(ss[1]))
-							start[0] = label.getBlock().getLocation();
+							start[0] = label.toCenterLocation();
 						else if ("finish".equals(ss[1]))
-							finish[0] = label.getBlock().getLocation();
+							finish[0] = label.toCenterLocation();
 					});
 			warp = new Warp(address, start[0], finish[0]);
 		}

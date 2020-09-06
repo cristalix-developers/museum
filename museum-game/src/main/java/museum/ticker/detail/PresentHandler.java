@@ -31,7 +31,7 @@ public class PresentHandler implements Ticked {
 		// Формат таблички: .p head <common/epic/legendary>
 		rewards = app.getMap().getLabels("head").stream()
 				.map(label -> new Present(
-						label.getBlock().getLocation(),
+						label.toBlockLocation(),
 						PresentType.valueOf(label.getTag().toUpperCase()),
 						false
 				)).collect(Collectors.toList());

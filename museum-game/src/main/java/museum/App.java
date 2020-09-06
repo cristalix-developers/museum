@@ -5,7 +5,6 @@ import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
 import clepto.bukkit.gui.Guis;
 import clepto.cristalix.Cristalix;
-import clepto.cristalix.mapservice.Label;
 import clepto.cristalix.mapservice.WorldMeta;
 import lombok.Getter;
 import lombok.val;
@@ -18,7 +17,6 @@ import museum.listener.BlockClickHandler;
 import museum.listener.MuseumEventHandler;
 import museum.listener.PassiveEventBlocker;
 import museum.museum.map.SubjectType;
-import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.packages.*;
 import museum.player.PlayerDataManager;
 import museum.player.User;
@@ -38,7 +36,6 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.cristalix.core.CoreApi;
-import ru.cristalix.core.build.models.Point;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
@@ -51,7 +48,10 @@ import ru.cristalix.core.scoreboard.ScoreboardService;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -80,18 +80,6 @@ public final class App extends JavaPlugin {
 
 		try {
 			this.map = new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get());
-			int total = 0;
-			for (Map.Entry<String, List<Point>> e : this.map.getCristalixMap().getBuildWorldState().getPoints().entrySet()) {
-				System.out.println("cristalix point " + e.getKey() + ": ");
-				for (Point point : e.getValue()) {
-					total++;
-					System.out.println(point.getTag() + " " + point.getV3());
-				}
-			}
-			System.out.println(total + " cristalix points in total.");
-			for (Label label : this.map.getLabels())
-				System.out.println(label);
-			System.out.println(this.map.getLabels().size() + " labels in total.");
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}

@@ -39,6 +39,7 @@ public class PlayerDataManager implements Listener {
 	private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
 	public static final PotionEffect NIGHT_VISION = new PotionEffect(PotionEffectType.NIGHT_VISION, 65536, 10, false, false);
 
+	@SuppressWarnings ("deprecation")
 	public PlayerDataManager(App app) {
 		this.app = app;
 
@@ -95,24 +96,22 @@ public class PlayerDataManager implements Listener {
 		user.setConnection(player.getHandle().playerConnection);
 		user.setPlayer(player);
 
-		B.postpone(5, () -> {
-			Arrays.asList(
-					new BeforePacketHandler(),
-					new PrepareInventory(),
-					new PrepareJSAnime(),
-					(usr, app) -> user.getMuseums().get(Managers.museum.getPrototype("main")).show(user), // Музей
-					new PrepareScoreBoard(),
-					(usr, app) -> user.getPlayer().addPotionEffect(NIGHT_VISION),
-					(usr, app) -> Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current)), // Скрытие игроков
-					(usr, app) -> user.getPlayer().setGameMode(GameMode.ADVENTURE), // Режим игры
-					new PreparePlayerBrain(app)
-			).forEach(prepare -> prepare.execute(user, app));
-		});
+		B.postpone(5, () -> Arrays.asList(
+				new BeforePacketHandler(),
+				new PrepareInventory(),
+				new PrepareJSAnime(),
+				(usr, app) -> user.getMuseums().get(Managers.museum.getPrototype("main")).show(user), // Музей
+				new PrepareScoreBoard(),
+				(usr, app) -> user.getPlayer().addPotionEffect(NIGHT_VISION),
+				(usr, app) -> Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current)), // Скрытие игроков
+				(usr, app) -> user.getPlayer().setGameMode(GameMode.ADVENTURE), // Режим игры
+				new PreparePlayerBrain(app)
+		).forEach(prepare -> prepare.execute(user, app)));
 
 		e.setJoinMessage(null);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler (priority = EventPriority.MONITOR)
 	public void onPlayerLogin(PlayerLoginEvent e) {
 		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
 			userMap.remove(e.getPlayer().getUniqueId());

@@ -22,8 +22,6 @@ public class VisitorHandler implements Ticked {
 
 		List<Label> labels = App.getApp().getMap().getLabels("move");
 
-		System.out.println(labels.size());
-
 		labels.forEach(node -> {
 			String[] ss = node.getTag().split("\\s+");
 
