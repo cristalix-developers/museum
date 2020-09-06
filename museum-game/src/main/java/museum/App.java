@@ -22,7 +22,6 @@ import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.ticker.detail.FountainHandler;
-import museum.ticker.detail.PresentHandler;
 import museum.ticker.visitor.VisitorHandler;
 import museum.util.MuseumChatService;
 import museum.worker.WorkerClickListener;
@@ -132,24 +131,20 @@ public final class App extends JavaPlugin {
 		new MuseumGuis(this);
 		B.regCommand(new MuseumCommand(this), "museum");
 
-		// Создание обработчика голов-подарков
-		val presentHandler = new PresentHandler(this);
-
 		// Регистрация обработчиков событий
 		B.events(
 				playerDataManager,
 				new PassiveEventBlocker(),
 				new MuseumEventHandler(this),
 				new GuiEvents(),
-				new BlockClickHandler(this, presentHandler),
+				new BlockClickHandler(this),
 				new WorkerClickListener(this, new WorkerHandler(this))
 		);
 
 		// Обработка каждого тика
 		new TickTimerHandler(this, Arrays.asList(
 				new VisitorHandler(),
-				new FountainHandler(this),
-				presentHandler
+				new FountainHandler(this)
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 	}
 
