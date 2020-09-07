@@ -43,12 +43,8 @@ public class PreparePlayerBrain implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		if (user.getPlayer().hasPlayedBefore())
+		if (user.getPlayer().hasPlayedBefore() || user.getExperience() > 100)
 			return;
-
-		// ToDo: Выяснить, в чём причина
-		// user.getConnection().sendPacket(new PacketPlayOutCustomPayload("ilyafx:radio", new PacketDataSerializer(
-		// Unpooled.wrappedBuffer("{\"enabled\": false, \"link\": \"https://bw.vime.red/music.mp3\"}".getBytes(StandardCharsets.UTF_8)))));
 
 		new BukkitRunnable() {
 			int counter = 0;
