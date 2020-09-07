@@ -1,27 +1,33 @@
 package museum.player;
 
 import clepto.bukkit.B;
+import com.destroystokyo.paper.event.player.PlayerInitialSpawnEvent;
 import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.data.BoosterInfo;
 import museum.data.UserInfo;
+import museum.museum.Museum;
 import museum.packages.*;
 import museum.player.prepare.*;
 import museum.prototype.Managers;
+import museum.util.warp.Warp;
 import museum.utils.MultiTimeBar;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
 
@@ -86,6 +92,45 @@ public class PlayerDataManager implements Listener {
 				5L, TimeUnit.SECONDS, () -> null
 		);
 	}
+
+	@EventHandler
+	public void onPreLogin(AsyncPlayerPreLoginEvent e) {
+		try {
+			UserInfoPackage userInfoPackage = app.getClientSocket().writeAndAwaitResponse(new UserInfoPackage(e.getUniqueId()))
+					.get(5L, TimeUnit.SECONDS);
+			UserInfo userInfo = userInfoPackage.getUserInfo();
+			if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(e.getUniqueId());
+			if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
+			userMap.put(e.getUniqueId(), new User(userInfo));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	@EventHandler
+	public void onSpawn(PlayerSpawnLocationEvent e) {
+		UUID uniqueId = e.getPlayer().getUniqueId();
+		User user = app.getUser(uniqueId);
+		Museum currentMuseum = user.getCurrentMuseum();
+		Warp warp = currentMuseum.getWarp();
+		Location finish = warp.getFinish();
+		e.setSpawnLocation(finish);
+	}
+
+	@EventHandler
+	public void onSpawn(PlayerInitialSpawnEvent e) {
+		UUID uniqueId = e.getPlayer().getUniqueId();
+		User user = app.getUser(uniqueId);
+		Museum currentMuseum = user.getCurrentMuseum();
+		Warp warp = currentMuseum.getWarp();
+		Location finish = warp.getFinish();
+		e.setSpawnLocation(finish);
+	}
+
+//	@EventHandler
+//	public void onSpawn(PlayerLoginEvent e) {
+//		e.setSpawnLocation(app.getUser(e.getPlayer().getUniqueId()).getCurrentMuseum().getWarp().getFinish());
+//	}
 
 	@SuppressWarnings("deprecation")
 	@EventHandler

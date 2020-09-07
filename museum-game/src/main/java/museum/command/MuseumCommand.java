@@ -4,6 +4,7 @@ import clepto.bukkit.B;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import museum.App;
+import museum.museum.Museum;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.prototype.Managers;
@@ -26,7 +27,7 @@ public class MuseumCommand implements B.Executor {
 	@Override
 	public String execute(Player sender, String[] args) {
 		if (sender == null) return "Only for players.";
-		val user = app.getUser(sender);
+		val visitorUser = app.getUser(sender);
 
 		if (args.length == 0)
 			return "§cИспользование: §f/museum [accept]";
@@ -34,21 +35,25 @@ public class MuseumCommand implements B.Executor {
 		if (args[0].equals("accept")) {
 			if (args.length < 2)
 				return "§cИспользование: §f/museum accept Игрок";
-			val visitorPlayer = Bukkit.getPlayer(args[1]);
+			val ownerPlayer = Bukkit.getPlayer(args[1]);
 
-			if (visitorPlayer == null || !visitorPlayer.isOnline())
+			if (ownerPlayer == null || !ownerPlayer.isOnline())
 				return MessageUtil.find("playeroffline").getText();
 
-			val visitorUser = app.getUser(visitorPlayer);
+			val ownerUser = app.getUser(ownerPlayer);
 
-			if (user.getCurrentMuseum().getOwner().equals(user))
+			Museum museum = ownerUser.getCurrentMuseum();
+			if (museum.getOwner() != ownerUser)
+				return MessageUtil.find("playerbusy").getText();
+
+			if (ownerUser.equals(visitorUser))
 				return MessageUtil.find("inviteyourself").getText();
 
 			visitorUser.getCurrentMuseum().hide(visitorUser);
-			user.getCurrentMuseum().show(visitorUser);
+			museum.show(visitorUser);
 
 			return MessageUtil.find("visitaccept")
-					.set("visitor", user.getName()).getText();
+					.set("visitor", visitorUser.getName()).getText();
 		}
 
 		if (args[0].equals("dino")) {

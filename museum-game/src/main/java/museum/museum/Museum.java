@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Getter
 public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
-	private static Warp warp;
+	private Warp warp;
 	private final CraftWorld world;
 	private double income;
     private String title;
@@ -54,6 +54,9 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 					route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 		});
 
+		// ToDo: Это костыль, музей должен устанавливаться по-нормальному
+		owner.setCurrentMuseum(this);
+
 	    warp = new WarpUtil.WarpBuilder(prototype.getAddress()).build();
 	}
 
@@ -63,7 +66,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
     }
 
     public void show(User user) {
-    	if (!user.getLastWarp().equals(warp))
+    	if (!Objects.equals(user.getLastWarp(), warp))
     		warp.warp(user);
 
 		cachedInfo.views++;

@@ -11,6 +11,8 @@ import museum.data.PickaxeType;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
+import museum.museum.subject.Allocation;
+import museum.museum.subject.Subject;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.util.LevelSystem;
@@ -21,10 +23,12 @@ import museum.util.warp.WarpUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
+import java.util.List;
 
 public class MuseumGuis {
 
@@ -32,6 +36,20 @@ public class MuseumGuis {
 		Warp warp = new WarpUtil.WarpBuilder("gallery")
 				.onForward(user -> user.getCurrentMuseum().hide(user))
 				.build();
+
+		B.regCommand((sender, args) -> {
+			List<Subject> subjects = app.getUser(sender).getCurrentMuseum().getSubjects();
+			for (Subject subject : subjects) {
+				String allocationInfo = "§cno allocation";
+				Allocation allocation = subject.getAllocation();
+				if (allocation != null) {
+					Location origin = allocation.getOrigin();
+					allocationInfo = allocation.getAllocatedBlocks().size() + " blocks, §f" + origin.getX() + " " + origin.getY() + " " + origin.getZ();
+				}
+				sender.sendMessage("§e" + subject.getPrototype().getAddress() + "§f: " + subject.getOwner().getName() + ", " + allocationInfo);
+			}
+			return "§e" + subjects.size() + " in total.";
+		}, "subjects", "sj");
 
 		B.regCommand((sender, args) -> {
 			if (args.length == 0) return "§cИспользование: §e/gui [адрес]";

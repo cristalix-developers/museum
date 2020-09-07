@@ -4,15 +4,6 @@ import com.mongodb.async.client.MongoClient;
 import com.mongodb.async.client.MongoClients;
 import io.netty.channel.Channel;
 import lombok.val;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
-import ru.cristalix.core.microservice.MicroServicePlatform;
-import ru.cristalix.core.microservice.MicroserviceBootstrap;
-import ru.cristalix.core.network.ISocketClient;
-import ru.cristalix.core.network.packages.FillLauncherUserDataPackage;
-import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage;
-import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage;
 import museum.boosters.BoosterType;
 import museum.configuration.ConfigurationManager;
 import museum.data.BoosterInfo;
@@ -22,6 +13,16 @@ import museum.handlers.PackageHandler;
 import museum.packages.*;
 import museum.socket.ServerSocket;
 import museum.socket.ServerSocketHandler;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
+import ru.cristalix.core.GlobalSerializers;
+import ru.cristalix.core.microservice.MicroServicePlatform;
+import ru.cristalix.core.microservice.MicroserviceBootstrap;
+import ru.cristalix.core.network.ISocketClient;
+import ru.cristalix.core.network.packages.FillLauncherUserDataPackage;
+import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage;
+import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -142,6 +143,42 @@ public class MuseumService {
 			museumPackage.setBoostersCount(boosters);
 			answer(channel, museumPackage);
 		}));
+
+		Thread consoleThread = new Thread(MuseumService::handleConsole);
+		consoleThread.setDaemon(true);
+		consoleThread.start();
+
+	}
+
+	private static void handleConsole() {
+		Scanner scanner = new Scanner(System.in);
+		scanner.useDelimiter("\n");
+		while (true) {
+			String s = scanner.next();
+			String[] args = s.split(" ");
+			if (s.equals("stop")) {
+				System.exit(0);
+				return;
+			}
+			if (s.equals("players")) {
+				try {
+					Map<UUID, UserInfo> uuidUserInfoMap = userData.findAll().get(5, TimeUnit.SECONDS);
+					uuidUserInfoMap.forEach((k, v) -> System.out.println(k + ": " + GlobalSerializers.toJson(v)));
+					System.out.println(uuidUserInfoMap.size() + " players in total.");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+			if (args[0].equals("delete")) {
+				if (args.length < 2) System.out.println("Usage: delete [uuid]");
+				else {
+					UUID uuid = UUID.fromString(args[1]);
+					userData.clear(uuid);
+					System.out.println("Removed " + uuid + "'s data from db...");
+				}
+			}
+		}
 	}
 
 	/**

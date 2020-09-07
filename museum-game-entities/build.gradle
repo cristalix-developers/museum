@@ -1,0 +1,22 @@
+repositories {
+
+    maven {
+        def args = nmsMavenUri.split ' '
+        url args[0]
+        credentials {
+            username = args[1]
+            password = args[2]
+        }
+        authentication {
+            basic(BasicAuthentication)
+        }
+    }
+
+}
+
+dependencies {
+    // This module uses unmodified spigot 1.12.2 because paper has
+    // some compilation issues when extending from NMS-entities classes
+    compileOnly 'org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT'
+    compileOnly 'clepto:clepto-bukkit:2.4.3'
+}

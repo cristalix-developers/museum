@@ -2,14 +2,14 @@ package museum.museum.subject;
 
 import clepto.cristalix.mapservice.Box;
 import lombok.Data;
+import museum.App;
+import museum.data.SubjectInfo;
+import museum.museum.map.SubjectPrototype;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
-import museum.App;
-import museum.data.SubjectInfo;
-import museum.museum.map.SubjectPrototype;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -40,7 +40,7 @@ public class MessageUtil {
 		private String text;
 
 		public Message(String locator) {
-			text = PREFIX + App.getApp().getConfig().getString("chat.messages." + locator);
+			text = PREFIX + App.getApp().getConfig().getString("chat.messages." + locator, locator);
 		}
 
 		public Message set(String key, String value) {

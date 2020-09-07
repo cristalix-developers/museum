@@ -65,16 +65,19 @@ public class BeforePacketHandler implements Prepare {
 									for (Subject subject : user.getCurrentMuseum().getSubjects()) {
 										Allocation allocation = subject.getAllocation();
 										if (allocation == null) continue;
-										B.run(() -> allocation.getShowPackets().forEach(user::sendPacket));
+										B.postpone(10, () -> allocation.getShowPackets().forEach(packet -> {
+											if (packet.a.getX() / 16 == mapChunk.a && packet.a.getZ() / 16 == mapChunk.b)
+												user.sendPacket(packet);
+										}));
 									}
 								}
 							}
-						} catch (Exception ignored) {
-						}
+						} catch (Exception ignored) {}
 						if (msg != null) {
 							super.write(ctx, msg, promise);
 						}
 					}
+
 					@Override
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 						if (packetObj instanceof PacketPlayInUseItem) {
@@ -117,7 +120,7 @@ public class BeforePacketHandler implements Prepare {
 						super.channelRead(channelHandlerContext, packetObj);
 					}
 				}
-		);
+															  );
 	}
 
 	private boolean tryReturnPlayer(User user, App app) {
@@ -144,7 +147,7 @@ public class BeforePacketHandler implements Prepare {
 		return excavation.getHitsLeft() < 0;
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings ("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
@@ -228,4 +231,5 @@ public class BeforePacketHandler implements Prepare {
 			}
 		}.runTaskTimerAsynchronously(App.getApp(), 5L, 3L);
 	}
+
 }

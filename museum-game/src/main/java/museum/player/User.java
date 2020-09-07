@@ -27,6 +27,7 @@ import museum.util.LevelSystem;
 import museum.util.MessageUtil;
 import museum.util.warp.Warp;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -46,7 +47,7 @@ public class User implements PlayerWrapper {
 	private Warp lastWarp;
 	private Museum currentMuseum;
 	private Excavation excavation;
-	private Set<Coin> coins;
+	private Set<Coin> coins = new HashSet<>();
 
 	public User(UserInfo info) {
 		this.info = info;
