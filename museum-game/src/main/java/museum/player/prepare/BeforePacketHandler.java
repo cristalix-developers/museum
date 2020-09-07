@@ -36,7 +36,7 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
 public class BeforePacketHandler implements Prepare {
 
 	private final BlockPosition dummy = new BlockPosition(0, 0, 0);
-	private final ItemStack menu = Lemonade.get("menu").render();
+	private final ItemStack emerald = Lemonade.get("emerald").render();
 
 	@Override
 	public void execute(User user, App app) {
@@ -144,9 +144,6 @@ public class BeforePacketHandler implements Prepare {
 			excavation.setHitsLeft(-1);
 			Bukkit.getScheduler().runTaskLater(app, () -> {
 				user.setExcavation(null);
-				val inventory = user.getPlayer().getInventory();
-				inventory.clear();
-				inventory.setItem(0, menu);
 				user.getCurrentMuseum().show(user);
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			}, 10 * 20L);
@@ -158,6 +155,10 @@ public class BeforePacketHandler implements Prepare {
 	@SuppressWarnings ("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
+			// С некоторым шансом может выпасть эмеральд
+			if (Pickaxe.RANDOM.nextFloat() > .9)
+				user.getPlayer().getInventory().addItem(emerald);
+			// Перебрать все кирки и эффекты на них
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
 					List<BlockPosition> positions = pickaxeType.getPickaxe().dig(user, packet.a);
@@ -186,7 +187,7 @@ public class BeforePacketHandler implements Prepare {
 			location.add(0, 0.5, 0);
 			fragment.show(user.getPlayer(), location);
 
-			animateFragments(user, fragment, location);
+			animateFragments(user, fragment);
 
 			// Проверка на дубликат
 			Skeleton skeleton = user.getSkeletons().get(proto);
@@ -217,7 +218,7 @@ public class BeforePacketHandler implements Prepare {
 		}
 	}
 
-	private void animateFragments(User user, Fragment fragment, V4 location) {
+	private void animateFragments(User user, Fragment fragment) {
 		AtomicInteger integer = new AtomicInteger(0);
 		new BukkitRunnable() {
 			@Override

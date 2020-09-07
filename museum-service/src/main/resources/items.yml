@@ -150,6 +150,14 @@ museum_change_title:
     название вашего музея
     вы можете его изменить.
 
+emerald:
+  icon: emerald
+  text: |
+    §aДрагоценный камень
+
+    Иногда его можно найти
+    на раскопках, стоит не много.
+
 pickaxe-default:
   icon: iron-pickaxe
   unbreakable: true
