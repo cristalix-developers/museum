@@ -3,6 +3,7 @@ package museum.museum;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
+import museum.util.warp.Warp;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 @Getter
 public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
+	private static Warp warp;
 	private final CraftWorld world;
 	private double income;
     private String title;
@@ -51,6 +53,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 			collector.setNavigator(new CollectorNavigator(prototype, world,
 					route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 		});
+
+	    warp = new WarpUtil.WarpBuilder(prototype.getAddress()).build();
 	}
 
     @Override
@@ -59,7 +63,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
     }
 
     public void show(User user) {
-		new WarpUtil.WarpBuilder(prototype.getAddress()).build().warp(user);
+	    warp.warp(user);
 
 		cachedInfo.views++;
 
