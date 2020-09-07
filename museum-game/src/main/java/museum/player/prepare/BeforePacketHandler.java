@@ -104,10 +104,10 @@ public class BeforePacketHandler implements Prepare {
 															user.getCurrentMuseum().processClick(user, subject));
 													break;
 												}
-
 											}
 										}
 									}
+									packet.a = dummy;
 								}
 							} else if (packet.c == EnumHand.OFF_HAND)
 								packet.a = dummy;
@@ -186,7 +186,7 @@ public class BeforePacketHandler implements Prepare {
 			location.add(0, 0.5, 0);
 			fragment.show(user.getPlayer(), location);
 
-//			animateFragments(user, fragment, location);
+			animateFragments(user, fragment, location);
 
 			// Проверка на дубликат
 			Skeleton skeleton = user.getSkeletons().get(proto);
