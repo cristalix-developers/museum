@@ -64,8 +64,8 @@ public class CollectorSubject extends Subject {
 	}
 
 	@Override
-	public void hide(User user, boolean playEffects) {
-		super.hide(user, playEffects);
+	public void hide(User user) {
+		super.hide(user);
 		piece.hide(user.getPlayer());
 	}
 

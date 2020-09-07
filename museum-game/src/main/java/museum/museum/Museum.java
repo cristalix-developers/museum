@@ -103,7 +103,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
 	public void hide(User user) {
 
-		iterateSubjects(s -> s.hide(user, false));
+		iterateSubjects(s -> s.hide(user));
 
 		Set<Coin> coins = user.getCoins();
 		coins.forEach(coin -> coin.remove(user.getConnection()));

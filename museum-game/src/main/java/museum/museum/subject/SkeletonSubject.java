@@ -43,24 +43,21 @@ public class SkeletonSubject extends Subject {
 
 	@Override
 	public Allocation allocate(Location origin) {
-		if (origin == null) {
-			skeletonLocation = null;
-			return super.allocate(null);
+		if (origin == null) skeletonLocation = null;
+		else {
+			float rot = this.skeletonLocation.rot;
+			Box box = prototype.getBox();
+			V3 o = prototype.getRelativeOrigin();
+			this.skeletonLocation = V4.fromLocation(box.transpose(
+					UtilV3.fromVector(box.getMin().toVector()),
+					cachedInfo.getRotation(),
+					new V3(0, 0, 0),
+					(int) o.getX(),
+					(int) o.getY(),
+					(int) o.getZ()
+																 ));
+			this.skeletonLocation.setRot(rot);
 		}
-		float rot = this.skeletonLocation.rot;
-
-		Box box = prototype.getBox();
-		V3 o = prototype.getRelativeOrigin();
-		this.skeletonLocation = V4.fromLocation(box.transpose(
-				UtilV3.fromVector(box.getMin().toVector()),
-				cachedInfo.getRotation(),
-				new V3(0, 0, 0),
-				(int) o.getX(),
-				(int) o.getY(),
-				(int) o.getZ()
-		));
-
-		this.skeletonLocation.setRot(rot);
 
 		return super.allocate(origin);
 	}
@@ -80,8 +77,8 @@ public class SkeletonSubject extends Subject {
 	}
 
 	@Override
-	public void hide(User user, boolean playEffects) {
-		super.hide(user, playEffects);
+	public void hide(User user) {
+		super.hide(user);
 		if (skeleton == null) return;
 		skeleton.getPrototype().hide(user.getPlayer());
 	}
