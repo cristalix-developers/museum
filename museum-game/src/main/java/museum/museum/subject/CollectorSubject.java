@@ -3,25 +3,25 @@ package museum.museum.subject;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
+import museum.App;
+import museum.data.SubjectInfo;
+import museum.museum.collector.CollectorNavigator;
+import museum.museum.map.CollectorSubjectPrototype;
+import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.Piece;
-import museum.museum.subject.skeleton.V4;
+import museum.player.User;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
-import museum.App;
-import museum.data.SubjectInfo;
-import museum.museum.collector.CollectorNavigator;
-import museum.museum.map.CollectorSubjectPrototype;
-import museum.museum.map.SubjectPrototype;
-import museum.player.User;
 
 public class CollectorSubject extends Subject {
 
 	@Getter
 	private final int id;
+	@Getter
 	private final Piece piece;
 	@Setter
 	private CollectorNavigator navigator;
@@ -52,7 +52,7 @@ public class CollectorSubject extends Subject {
 	@Override
 	public void show(User user) {
 		super.show(user);
-		piece.show(user.getPlayer(), V4.fromLocation(getLocation(System.currentTimeMillis())));
+		piece.show(user.getPlayer(), this.getCollectorLocation());
 	}
 
 	public void move(User user, long iteration) {
@@ -67,6 +67,10 @@ public class CollectorSubject extends Subject {
 	public void hide(User user) {
 		super.hide(user);
 		piece.hide(user.getPlayer());
+	}
+
+	public Location getCollectorLocation() {
+		return this.getLocation(System.currentTimeMillis());
 	}
 
 	private Location getLocation(long time) {

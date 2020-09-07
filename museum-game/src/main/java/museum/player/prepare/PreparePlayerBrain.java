@@ -63,6 +63,7 @@ public class PreparePlayerBrain implements Prepare {
 					user.getPlayer().sendMessage("§fон может устроить §6раскопки!");
 					user.getPlayer().sendMessage("§6Внутри музея, Сатоши §fможет показать вам");
 					user.getPlayer().sendMessage("§6постройки §fдля кастомизации помещения.");
+					user.giveExperience(100);
 
 					this.cancel();
 					return;

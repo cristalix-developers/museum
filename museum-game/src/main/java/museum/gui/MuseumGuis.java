@@ -38,6 +38,18 @@ public class MuseumGuis {
 				.build();
 
 		B.regCommand((sender, args) -> {
+			User user = app.getUser(sender);
+			if (user.getExcavation() != null)
+				user.setExcavation(null);
+			else if (user.getCurrentMuseum().getOwner() != user)
+				user.getCurrentMuseum().hide(user);
+			else
+				return MessageUtil.find("already-at-home").getText();
+			user.getMuseums().get(Managers.museum.getPrototype("main")).show(user);
+			return MessageUtil.find("welcome-home").getText();
+		}, "home", "leave", "spawn");
+
+		B.regCommand((sender, args) -> {
 			List<Subject> subjects = app.getUser(sender).getCurrentMuseum().getSubjects();
 			for (Subject subject : subjects) {
 				String allocationInfo = "§cno allocation";

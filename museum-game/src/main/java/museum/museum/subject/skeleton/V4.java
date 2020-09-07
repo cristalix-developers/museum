@@ -39,6 +39,7 @@ public class V4 implements Cloneable {
 		this.y += y;
 		this.z += z;
 		this.rot += rot;
+		this.rot %= 360;
 		return this;
 	}
 

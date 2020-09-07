@@ -101,7 +101,13 @@ public class PlayerDataManager implements Listener {
 			UserInfo userInfo = userInfoPackage.getUserInfo();
 			if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(e.getUniqueId());
 			if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
-			userMap.put(e.getUniqueId(), new User(userInfo));
+			User user = new User(userInfo);
+			userMap.put(e.getUniqueId(), user);
+
+			Museum currentMuseum = user.getCurrentMuseum();
+			Warp warp = currentMuseum.getWarp();
+			Location finish = warp.getFinish();
+			e.setSpawnLocation(finish);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

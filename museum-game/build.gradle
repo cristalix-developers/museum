@@ -24,7 +24,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.destroystokyo.paper:paper:1.12.2-escalated'
+    compileOnly 'bottle:bottle-minecraft:1.0'
+    compileOnly 'bottle:bottle-libs:1.0'
     compileOnly 'cristalix:bukkit-core:20.08.28'
     implementation project(':museum-commons')
     implementation 'clepto:clepto-bukkit:2.4.20'

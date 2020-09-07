@@ -10,12 +10,9 @@ import lombok.val;
 import museum.App;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
-import museum.museum.subject.Allocation;
+import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.Subject;
-import museum.museum.subject.skeleton.Fragment;
-import museum.museum.subject.skeleton.Skeleton;
-import museum.museum.subject.skeleton.SkeletonPrototype;
-import museum.museum.subject.skeleton.V4;
+import museum.museum.subject.skeleton.*;
 import museum.player.User;
 import museum.player.pickaxe.Pickaxe;
 import museum.player.pickaxe.PickaxeType;
@@ -63,12 +60,22 @@ public class BeforePacketHandler implements Prepare {
 									}
 								} else {
 									for (Subject subject : user.getCurrentMuseum().getSubjects()) {
-										Allocation allocation = subject.getAllocation();
+										val allocation = subject.getAllocation();
 										if (allocation == null) continue;
-										B.postpone(10, () -> allocation.getShowPackets().forEach(packet -> {
-											if (packet.a.getX() / 16 == mapChunk.a && packet.a.getZ() / 16 == mapChunk.b)
-												user.sendPacket(packet);
-										}));
+										B.postpone(10, () -> {
+											allocation.getShowPackets().forEach(packet -> {
+												if (packet.a.getX() / 16 == mapChunk.a && packet.a.getZ() / 16 == mapChunk.b)
+													user.sendPacket(packet);
+											});
+											if (subject instanceof CollectorSubject) {
+												val loc = ((CollectorSubject) subject).getCollectorLocation();
+												if (loc.getBlockX() / 16 == mapChunk.a && loc.getBlockZ() / 16 == mapChunk.b) {
+													val piece = ((CollectorSubject) subject).getPiece();
+													piece.hide(user.getPlayer());
+													piece.show(user.getPlayer(), loc);
+												}
+											}
+										});
 									}
 								}
 							}
@@ -78,6 +85,7 @@ public class BeforePacketHandler implements Prepare {
 						}
 					}
 
+					@SuppressWarnings ("deprecation")
 					@Override
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 						if (packetObj instanceof PacketPlayInUseItem) {
@@ -167,15 +175,18 @@ public class BeforePacketHandler implements Prepare {
 
 		double luckyBuffer = user.getLocation().getY() / 100;
 
-		double bingo = luckyBuffer / proto.getRarity().getRareScale() / 10;
+//		double bingo = luckyBuffer / proto.getRarity().getRareScale() / 10;
+		double bingo = 1;
 		if (bingo > Pickaxe.RANDOM.nextDouble()) {
 			// Если повезло, то будет проиграна анимация и тд
 			user.giveExperience(25);
 			Fragment fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
 
-			fragment.show(user.getPlayer(), new V4(position.getX(), position.getY(), position.getZ(), (float) (Math.random() * 360 - 180)));
+			V4 location = new V4(position.getX(), position.getY(), position.getZ(), (float) (Math.random() * 360 - 180));
+			location.add(0, 0.5, 0);
+			fragment.show(user.getPlayer(), location);
 
-			animateFragments(user, fragment);
+//			animateFragments(user, fragment, location);
 
 			// Проверка на дубликат
 			Skeleton skeleton = user.getSkeletons().get(proto);
@@ -206,7 +217,7 @@ public class BeforePacketHandler implements Prepare {
 		}
 	}
 
-	private void animateFragments(User user, Fragment fragment) {
+	private void animateFragments(User user, Fragment fragment, V4 location) {
 		AtomicInteger integer = new AtomicInteger(0);
 		new BukkitRunnable() {
 			@Override

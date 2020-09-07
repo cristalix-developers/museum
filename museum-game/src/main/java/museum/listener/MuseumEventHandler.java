@@ -29,6 +29,8 @@ public class MuseumEventHandler implements Listener {
 		Material type = player.getInventory().getItemInMainHand().getType();
 		if (type == Material.PAPER)
 			player.performCommand("gui main");
+		if (type == Material.SADDLE)
+			player.performCommand("home");
 	}
 
 	@EventHandler
