@@ -63,7 +63,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
     }
 
     public void show(User user) {
-	    warp.warp(user);
+    	if (!user.getLastWarp().equals(warp))
+    		warp.warp(user);
 
 		cachedInfo.views++;
 
