@@ -46,7 +46,7 @@ public class VisitorGroup {
 		visitors.forEach(visitor -> {
 			val location = route.get(counter / 30).clone().add(visitor.getDelta().getX(), 0, visitor.getDelta().getZ());
 
-			visitor.getEntity().getNavigation().a(location.getX(), location.getY(), location.getZ(), .77);
+			visitor.getEntity().getNavigation().a(location.getX(), location.getY(), location.getZ(), .85);
 
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				if (player.getLocation().distanceSquared(location) > 10000)

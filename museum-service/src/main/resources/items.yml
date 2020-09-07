@@ -106,10 +106,8 @@ collectors:
 
 go:
   text: |
-    §bВ путь!
+    §b<excavation> §6<cost>$
 
-    Экспедиция: <excavation>
-    Цена: <cost>$
     Минимальный уровень: <lvl>
     Кол-во ударов: <breaks>
 

@@ -5,6 +5,7 @@ import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.Gui;
 import clepto.bukkit.gui.Guis;
 import clepto.humanize.TimeFormatter;
+import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
 import museum.excavation.Excavation;
@@ -140,12 +141,14 @@ public class MuseumGuis {
 			);
 			if (excavation == null)// || excavation.getRequiredLevel() > app.getUser(player).getLevel())
 				return Lemonade.get("unavailable").render();
-			return base.dynamic()
+			val item = base.dynamic()
 					.fill("excavation", excavation.getTitle())
 					.fill("cost", String.format("%.2f", excavation.getPrice()))
 					.fill("lvl", String.valueOf(excavation.getRequiredLevel()))
 					.fill("breaks", String.valueOf(excavation.getHitCount()))
 					.render();
+			item.setType(excavation.getIcon());
+			return item;
 		});
 
 		Guis.registerItemizer("profile", (base, player, context, slotId) -> {

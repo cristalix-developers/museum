@@ -2,8 +2,15 @@ package museum.player;
 
 import clepto.bukkit.B;
 import lombok.val;
+import museum.App;
+import museum.boosters.BoosterType;
+import museum.client.ClientSocket;
+import museum.data.BoosterInfo;
+import museum.data.UserInfo;
+import museum.packages.*;
 import museum.player.prepare.*;
 import museum.prototype.Managers;
+import museum.utils.MultiTimeBar;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -17,13 +24,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
-import museum.App;
-import museum.boosters.BoosterType;
-import museum.client.ClientSocket;
-import museum.data.BoosterInfo;
-import museum.data.UserInfo;
-import museum.packages.*;
-import museum.utils.MultiTimeBar;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -39,7 +39,7 @@ public class PlayerDataManager implements Listener {
 	private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
 	public static final PotionEffect NIGHT_VISION = new PotionEffect(PotionEffectType.NIGHT_VISION, 65536, 10, false, false);
 
-	@SuppressWarnings ("deprecation")
+	@SuppressWarnings("deprecation")
 	public PlayerDataManager(App app) {
 		this.app = app;
 
@@ -87,6 +87,7 @@ public class PlayerDataManager implements Listener {
 		);
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		val player = (CraftPlayer) e.getPlayer();
@@ -100,6 +101,7 @@ public class PlayerDataManager implements Listener {
 				new BeforePacketHandler(),
 				new PrepareInventory(),
 				new PrepareJSAnime(),
+				(usr, app) -> usr.getPlayer().setWalkSpeed(.33F),
 				(usr, app) -> user.getMuseums().get(Managers.museum.getPrototype("main")).show(user), // Музей
 				new PrepareScoreBoard(),
 				(usr, app) -> user.getPlayer().addPotionEffect(NIGHT_VISION),
@@ -111,7 +113,7 @@ public class PlayerDataManager implements Listener {
 		e.setJoinMessage(null);
 	}
 
-	@EventHandler (priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLogin(PlayerLoginEvent e) {
 		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
 			userMap.remove(e.getPlayer().getUniqueId());

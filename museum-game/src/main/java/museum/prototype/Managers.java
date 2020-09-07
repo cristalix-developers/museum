@@ -160,7 +160,8 @@ public class Managers {
 					box.requireLabel("required-level").getTagInt(),
 					box.requireLabel("price").getTagDouble(),
 					box.requireLabel("title").getTag(),
-					packets
+					packets,
+					Material.getMaterial(box.requireLabel("icon").getTag().toUpperCase())
 			);
 		});
 	}

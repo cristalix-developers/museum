@@ -33,6 +33,7 @@ public class WorkerHandler {
 					String[] ss = label.getTag().split("\\s+");
 					val villager = (Villager) app.getWorld().spawnEntity(label, EntityType.VILLAGER);
 					villager.setCustomName(ss[0]);
+					villager.setAI(false);
 					villager.setCustomNameVisible(true);
 					villager.addPotionEffect(SLOWNESS);
 					villager.setMetadata("type", new FixedMetadataValue(app, ss[1].toUpperCase()));
