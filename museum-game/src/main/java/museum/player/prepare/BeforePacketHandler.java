@@ -36,7 +36,7 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
 public class BeforePacketHandler implements Prepare {
 
 	private final BlockPosition dummy = new BlockPosition(0, 0, 0);
-	private final ItemStack emerald = Lemonade.get("emerald").render();
+	private final ItemStack emerald = Lemonade.get("emerald-item").render();
 
 	@Override
 	public void execute(User user, App app) {
@@ -142,7 +142,7 @@ public class BeforePacketHandler implements Prepare {
 			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
 			MessageUtil.find("excavationend").send(user);
 			excavation.setHitsLeft(-1);
-			Bukkit.getScheduler().runTaskLater(app, () -> {
+			Bukkit.getScheduler().runTaskLaterAsynchronously(app, () -> {
 				user.setExcavation(null);
 				user.getCurrentMuseum().show(user);
 				user.setExcavationCount(user.getExcavationCount() + 1);
