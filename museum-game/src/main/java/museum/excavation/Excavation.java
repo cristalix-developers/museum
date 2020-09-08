@@ -31,18 +31,16 @@ public class Excavation {
 		player.getInventory().addItem(Lemonade.get("pickaxe-" + user.getPickaxeType().name().toLowerCase()).render());
 		new WarpUtil.WarpBuilder(prototype.getAddress())
 				.addAfter(usr -> {
-					IScoreboardService.get().setCurrentObjective(user.getUuid(), "excavation");
+					IScoreboardService.get().setCurrentObjective(usr.getUuid(), "excavation");
 
 					String title = prototype.getTitle();
-					player.sendTitle("§6Прибытие!", title);
+					usr.getPlayer().sendTitle("§6Прибытие!", title);
 
 					MessageUtil.find("visitexcavation")
 							.set("title", title)
-							.send(user);
+							.send(usr);
 
-					B.postpone(20, () -> {
-						prototype.getPackets().forEach(user::sendPacket);
-					});
+					B.postpone(20, () -> prototype.getPackets().forEach(usr::sendPacket));
 				}).build().warp(user);
 	}
 

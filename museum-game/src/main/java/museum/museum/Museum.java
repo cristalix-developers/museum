@@ -3,10 +3,12 @@ package museum.museum;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import museum.util.warp.Warp;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import museum.App;
 import museum.data.MuseumInfo;
@@ -32,6 +34,8 @@ import java.util.stream.Collectors;
 @Setter
 @Getter
 public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
+
+	private final ItemStack menu = Lemonade.get("menu").render();
 
 	private Warp warp;
 	private final CraftWorld world;
@@ -80,7 +84,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 					.append('_').append(subject.getPrototype().getPrice());
 		}
 		String payload = builder.toString();
-		System.out.println("Sent " + payload + " to " + user.getName());
 		user.sendPayload("museumsubjects", payload);
 
 		user.sendAnime();
@@ -90,7 +93,9 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		user.setCoins(ConcurrentHashMap.newKeySet());
 		user.setCurrentMuseum(this);
 
-		user.getPlayer().getInventory().remove(Material.SADDLE);
+	    val inventory = user.getPlayer().getInventory();
+	    inventory.clear();
+	    inventory.setItem(0, menu);
 
 		if (this.owner != user) {
 			user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
