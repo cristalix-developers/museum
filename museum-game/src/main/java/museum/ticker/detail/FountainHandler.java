@@ -1,6 +1,7 @@
 package museum.ticker.detail;
 
 import lombok.AllArgsConstructor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.FallingBlock;
@@ -26,8 +27,18 @@ public class FountainHandler implements Ticked {
 		fountains = app.getMap().getLabels("fountain").stream()
 				.map(label -> {
 					String[] tag = label.getTag().split("\\s+");
+					Chunk chunk = label.getChunk();
+					Chunk[] chunks = new Chunk[9];
+					int i = 0;
+					for (int x = chunk.getX() - 1; x <= chunk.getX() + 1; x++) {
+						for (int z = chunk.getZ() - 1; z <= chunk.getZ() + 1; z++) {
+							chunks[i++] = chunk.getWorld().getChunkAt(x, z);
+						}
+
+					}
 					return new Fountain(
 							label.toCenterLocation(),
+							chunks,
 							new Vector(Double.parseDouble(tag[0]), Double.parseDouble(tag[1]), Double.parseDouble(tag[2])),
 							new Vector(Double.parseDouble(tag[3]), Double.parseDouble(tag[4]), Double.parseDouble(tag[5]))
 					);
@@ -45,10 +56,13 @@ public class FountainHandler implements Ticked {
 	@AllArgsConstructor
 	class Fountain {
 		private final Location location;
+		private final Chunk[] chunks;
 		private final Vector vector;
 		private final Vector noise;
 
 		public void spawnParticle() {
+			for (Chunk chunk : chunks) if (!chunk.isLoaded()) return;
+
 			FallingBlock particle = location.getWorld().spawnFallingBlock(location, Material.STAINED_GLASS, (byte) 3);
 			particle.setDropItem(false);
 			particle.setVelocity(vector.clone().add(new Vector(
