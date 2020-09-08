@@ -30,6 +30,15 @@ public class V4 implements Cloneable {
 		return this;
 	}
 
+	public V4 add(V4 that) {
+		if (that == null) return this;
+		this.x += that.x;
+		this.y += that.y;
+		this.z += that.z;
+		this.rot += that.rot;
+		return this;
+	}
+
 	public V4 add(double x, double y, double z) {
 		return add(x, y, z, 0);
 	}

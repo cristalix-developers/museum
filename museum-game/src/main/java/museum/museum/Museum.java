@@ -1,15 +1,10 @@
 package museum.museum;
 
+import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import museum.util.warp.Warp;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.inventory.ItemStack;
-import ru.cristalix.core.scoreboard.IScoreboardService;
 import museum.App;
 import museum.data.MuseumInfo;
 import museum.museum.collector.CollectorNavigator;
@@ -21,7 +16,11 @@ import museum.museum.subject.Subject;
 import museum.player.User;
 import museum.prototype.Storable;
 import museum.util.LocationTree;
+import museum.util.warp.Warp;
 import museum.util.warp.WarpUtil;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.inventory.ItemStack;
+import ru.cristalix.core.scoreboard.IScoreboardService;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -100,8 +99,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		if (this.owner != user) {
 			user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
 		}
-		Bukkit.getScheduler().runTaskLaterAsynchronously(App.getApp(), () ->
-				iterateSubjects(s -> s.show(user)), 20L);
+		B.postpone(20, () -> iterateSubjects(subject -> subject.show(user)));
 
 		updateIncrease();
 	}

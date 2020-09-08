@@ -107,7 +107,9 @@ public class PlayerDataManager implements Listener {
 			Museum currentMuseum = user.getCurrentMuseum();
 			Warp warp = currentMuseum.getWarp();
 			Location finish = warp.getFinish();
-			e.setSpawnLocation(finish);
+			try {
+				e.setSpawnLocation(finish);
+			} catch (NoSuchMethodError ignored) {}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -138,7 +140,6 @@ public class PlayerDataManager implements Listener {
 //		e.setSpawnLocation(app.getUser(e.getPlayer().getUniqueId()).getCurrentMuseum().getWarp().getFinish());
 //	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		val player = (CraftPlayer) e.getPlayer();
@@ -149,7 +150,7 @@ public class PlayerDataManager implements Listener {
 		user.setPlayer(player);
 
 		B.postpone(5, () -> Arrays.asList(
-				new BeforePacketHandler(),
+				BeforePacketHandler.INSTANCE,
 				new PrepareInventory(),
 				new PrepareJSAnime(),
 				(usr, app) -> usr.getPlayer().setWalkSpeed(.33F),

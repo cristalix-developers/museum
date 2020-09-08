@@ -2,6 +2,7 @@ package museum.player.prepare;
 
 import clepto.ListUtils;
 import clepto.bukkit.B;
+import clepto.bukkit.Cycle;
 import clepto.bukkit.Lemonade;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,13 +22,9 @@ import museum.player.pickaxe.Pickaxe;
 import museum.player.pickaxe.PickaxeType;
 import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static museum.excavation.Excavation.isAir;
 import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.*;
@@ -38,8 +35,8 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
  */
 public class BeforePacketHandler implements Prepare {
 
-	private final BlockPosition dummy = new BlockPosition(0, 0, 0);
-	private final ItemStack emerald = Lemonade.get("emerald-item").render();
+	public static final BeforePacketHandler INSTANCE = new BeforePacketHandler();
+	private static final BlockPosition dummy = new BlockPosition(0, 0, 0);
 
 	@Override
 	public void execute(User user, App app) {
@@ -67,7 +64,7 @@ public class BeforePacketHandler implements Prepare {
 										if (allocation == null) continue;
 										B.postpone(10, () -> {
 											allocation.getShowPackets().forEach(packet -> {
-												if (packet.a.getX() / 16 == mapChunk.a && packet.a.getZ() / 16 == mapChunk.b)
+												if (packet.a.x == mapChunk.a && packet.a.z / 16 == mapChunk.b)
 													user.sendPacket(packet);
 											});
 											if (subject instanceof CollectorSubject) {
@@ -146,11 +143,11 @@ public class BeforePacketHandler implements Prepare {
 			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
 			MessageUtil.find("excavationend").send(user);
 			excavation.setHitsLeft(-1);
-			Bukkit.getScheduler().runTaskLaterAsynchronously(app, () -> {
+			B.postpone(200, () -> {
 				user.setExcavation(null);
 				user.getCurrentMuseum().show(user);
 				user.setExcavationCount(user.getExcavationCount() + 1);
-			}, 10 * 20L);
+			});
 			return true;
 		}
 		return excavation.getHitsLeft() < 0;
@@ -161,7 +158,7 @@ public class BeforePacketHandler implements Prepare {
 		MinecraftServer.getServer().postToMainThread(() -> {
 			// С некоторым шансом может выпасть эмеральд
 			if (Pickaxe.RANDOM.nextFloat() > .9)
-				user.getPlayer().getInventory().addItem(emerald);
+				user.getPlayer().getInventory().addItem(Lemonade.get("emerald-item").render());
 			// Перебрать все кирки и эффекты на них
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
@@ -187,11 +184,10 @@ public class BeforePacketHandler implements Prepare {
 			user.giveExperience(1);
 			Fragment fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
 
-			V4 location = new V4(position.getX(), position.getY(), position.getZ(), (float) (Math.random() * 360 - 180));
-			location.add(0, 0.5, 0);
-			fragment.show(user.getPlayer(), location);
+			V4 location = new V4(position.getX(), position.getY() + 0.5, position.getZ(), (float) (Math.random() * 360 - 180));
 
-			animateFragments(user, fragment);
+			fragment.show(user.getPlayer(), location);
+			animateFragments(user, fragment, location);
 
 			// Проверка на дубликат
 			Skeleton skeleton = user.getSkeletons().get(proto);
@@ -222,30 +218,13 @@ public class BeforePacketHandler implements Prepare {
 		}
 	}
 
-	private void animateFragments(User user, Fragment fragment) {
-		AtomicInteger integer = new AtomicInteger(0);
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				PlayerConnection connection = user.getConnection();
+	public static final V4 offset = new V4(0, 0.03, 0, 4);
 
-				int[] ids = fragment.getPieceOffsetMap().keySet().stream()
-						.mapToInt(piece -> piece.getStand().id)
-						.toArray();
-
-				if (integer.getAndIncrement() < 22) {
-					for (int id : ids) {
-						connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMove(id, 0, 3, 0, false));
-						byte angle = (byte) (5 * integer.get() % 128);
-						// ToDo: Разве оно не сломает структуру фрагмента из нескольких стендов?
-						connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(id, angle, (byte) 0, false));
-					}
-				} else {
-					connection.sendPacket(new PacketPlayOutEntityDestroy(ids));
-					cancel();
-				}
-			}
-		}.runTaskTimerAsynchronously(App.getApp(), 5L, 3L);
+	private void animateFragments(User user, Fragment fragment, V4 location) {
+		Cycle.run(1, 60, tick -> {
+			if (tick == 59) fragment.hide(user.getPlayer());
+			else fragment.update(user.getPlayer(), location.add(offset));
+		});
 	}
 
 }
