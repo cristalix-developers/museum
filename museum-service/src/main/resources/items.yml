@@ -150,8 +150,26 @@ museum_change_title:
     название вашего музея
     вы можете его изменить.
 
+emerald-item:
+  icon: emerald
+  text: |
+    §aДрагоценный камень
+
+    Иногда его можно найти
+    на раскопках, стоит не много.
+
+pickaxe:
+  nbt:
+    CanDestroy:
+      - 'minecraft:dirt'
+      - 'minecraft:sand'
+      - 'minecraft:soul_sand'
+      - 'minecraft:grass'
+      - 'minecraft:concrete_powder'
+      - 'minecraft:snow'
+
 pickaxe-default:
-  icon: iron-pickaxe
+  icon: iron-pickaxe pickaxe
   unbreakable: true
   text: |
     §bКирка
@@ -160,7 +178,7 @@ pickaxe-default:
     для начинающего, ничего лишнего.
 
 pickaxe-professional:
-  icon: diamond-pickaxe
+  icon: diamond-pickaxe pickaxe
   unbreakable: true
   text: |
     §bПрофессиональная кирка
@@ -171,7 +189,7 @@ pickaxe-professional:
     Цена: 10'000$
 
 pickaxe-prestige:
-  icon: gold-pickaxe
+  icon: gold-pickaxe pickaxe
   unbreakable: true
   enchant: ['32:1']
   text: |
