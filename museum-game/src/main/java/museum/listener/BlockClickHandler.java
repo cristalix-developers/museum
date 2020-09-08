@@ -31,7 +31,6 @@ public class BlockClickHandler implements Listener {
 			return;
 		val location = block.getLocation();
 		val player = event.getPlayer();
-		val user = app.getUser(player);
 		val blockType = block.getType();
 
 		if (blockType == Material.PISTON_EXTENSION) {

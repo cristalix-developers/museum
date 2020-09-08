@@ -43,7 +43,7 @@ public class PreparePlayerBrain implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		if (user.getPlayer().hasPlayedBefore() || user.getExperience() > 100)
+		if (user.getPlayer().hasPlayedBefore() || user.getExperience() > 10)
 			return;
 
 		new BukkitRunnable() {
@@ -63,7 +63,7 @@ public class PreparePlayerBrain implements Prepare {
 					user.getPlayer().sendMessage("§fон может устроить §6раскопки!");
 					user.getPlayer().sendMessage("§6Внутри музея, Сатоши §fможет показать вам");
 					user.getPlayer().sendMessage("§6постройки §fдля кастомизации помещения.");
-					user.giveExperience(100);
+					user.giveExperience(10);
 
 					this.cancel();
 					return;
@@ -72,7 +72,7 @@ public class PreparePlayerBrain implements Prepare {
 				user.getPlayer().teleport(dots.get(counter).toCenterLocation());
 				counter++;
 			}
-		}.runTaskTimer(app, 3 * 20L, 7 * 20L);
+		}.runTaskTimer(app, 3 * 20L, 6 * 20L);
 	}
 
 }

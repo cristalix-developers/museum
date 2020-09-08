@@ -12,7 +12,10 @@ import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.Subject;
-import museum.museum.subject.skeleton.*;
+import museum.museum.subject.skeleton.Fragment;
+import museum.museum.subject.skeleton.Skeleton;
+import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.player.pickaxe.Pickaxe;
 import museum.player.pickaxe.PickaxeType;
@@ -79,13 +82,14 @@ public class BeforePacketHandler implements Prepare {
 									}
 								}
 							}
-						} catch (Exception ignored) {}
+						} catch (Exception ignored) {
+						}
 						if (msg != null) {
 							super.write(ctx, msg, promise);
 						}
 					}
 
-					@SuppressWarnings ("deprecation")
+					@SuppressWarnings("deprecation")
 					@Override
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 						if (packetObj instanceof PacketPlayInUseItem) {
@@ -128,7 +132,7 @@ public class BeforePacketHandler implements Prepare {
 						super.channelRead(channelHandlerContext, packetObj);
 					}
 				}
-															  );
+		);
 	}
 
 	private boolean tryReturnPlayer(User user, App app) {
@@ -152,7 +156,7 @@ public class BeforePacketHandler implements Prepare {
 		return excavation.getHitsLeft() < 0;
 	}
 
-	@SuppressWarnings ("deprecation")
+	@SuppressWarnings("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
 			// С некоторым шансом может выпасть эмеральд
@@ -180,7 +184,7 @@ public class BeforePacketHandler implements Prepare {
 		double bingo = 1;
 		if (bingo > Pickaxe.RANDOM.nextDouble()) {
 			// Если повезло, то будет проиграна анимация и тд
-			user.giveExperience(25);
+			user.giveExperience(1);
 			Fragment fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
 
 			V4 location = new V4(position.getX(), position.getY(), position.getZ(), (float) (Math.random() * 360 - 180));
