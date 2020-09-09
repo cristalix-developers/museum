@@ -37,6 +37,7 @@ main:
       icon: goto_excavations_item
       left-click: /gui excavations
 
+
 pickaxes:
   title: Инструменты
   layout: ----S---B
@@ -46,6 +47,36 @@ pickaxes:
       left-click: /pickaxe
 
     - <<: *back
+
+
+manipulator:
+  title: Манипуляция постройкой
+  layout: -I-C-S-D-
+  buttons:
+    - char: I
+      icon: subject-info
+      native: subject-info
+
+    - char: C
+      native: subject-color
+      left-click: /gui subject-color <info>
+
+    - char: S
+      native: subject-special
+      left-click: /gui subject-special <info>
+
+    - char: D
+      icon: barrier
+      text: '&cУдалить'
+      left-click: /subject destroy <info>
+
+subject-color:
+  title: Изменить цвет
+  layout: |
+    ---------
+    ---------
+
+
 
 excavations:
   title: Экспедиции
