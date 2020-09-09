@@ -1,5 +1,6 @@
 package museum.ticker.detail;
 
+import clepto.bukkit.B;
 import lombok.AllArgsConstructor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -70,6 +71,7 @@ public class FountainHandler implements Ticked {
 					(random.nextDouble()) * noise.getY(),
 					(random.nextDouble() - .5) * noise.getZ()
 			)));
+			B.postpone(10, particle::remove);
 		}
 	}
 }
