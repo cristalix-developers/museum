@@ -5,6 +5,11 @@ import clepto.bukkit.InvalidConfigException;
 import clepto.cristalix.mapservice.Label;
 import clepto.cristalix.mapservice.MapServiceException;
 import lombok.val;
+import museum.data.SubjectInfo;
+import museum.excavation.ExcavationPrototype;
+import museum.museum.map.*;
+import museum.museum.subject.skeleton.Rarity;
+import museum.museum.subject.skeleton.SkeletonPrototype;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -15,11 +20,6 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import org.bukkit.entity.ArmorStand;
 import ru.cristalix.core.formatting.Color;
 import ru.cristalix.core.math.D2;
-import museum.data.SubjectInfo;
-import museum.excavation.ExcavationPrototype;
-import museum.museum.map.*;
-import museum.museum.subject.skeleton.Rarity;
-import museum.museum.subject.skeleton.SkeletonPrototype;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,6 +57,8 @@ public class Managers {
 			} catch (NullPointerException e) {
 				throw new MapServiceException("Logo for " + label.toString() + " not found.");
 			}
+			if (!chest.getChunk().isLoaded())
+				chest.getChunk().load();
 			chest.setType(Material.AIR);
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
