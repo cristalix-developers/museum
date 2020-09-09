@@ -27,6 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import ru.cristalix.core.formatting.Color;
 
 import java.time.Duration;
 import java.util.List;
@@ -169,9 +170,11 @@ public class MuseumGuis {
 		});
 
 		Guis.registerItemizer("subject-color", (base, player, context, slotId) -> {
-			User user = app.getUser(player);
-			PickaxeType pickaxe = user.getPickaxeType().getNext();
-			return Lemonade.get("pickaxe-" + pickaxe.name()).render();
+			String info = context.getOpenedGui().getSlotData(slotId).getInfo();
+			Color color = Color.valueOf(info.toUpperCase());
+			ItemStack item = base.dynamic().fill("color-name", color.getTeamName()).render();
+			item.setDurability((short) color.getWoolData());
+			return item;
 		});
 
 		Guis.registerItemizer("excavation", (base, player, context, slotId) -> {

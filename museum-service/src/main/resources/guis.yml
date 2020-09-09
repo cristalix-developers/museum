@@ -58,24 +58,47 @@ manipulator:
       native: subject-info
 
     - char: C
-      icon: subject-color
-      native: subject-color
-      left-click: /gui subject-color <info>
+      icon: subject-change-color
+      left-click: /gui subject-color <payload>
 
     - char: S
       icon: subject-special
       native: subject-special
-      left-click: /gui subject-special <info>
+      left-click: /gui subject-special <payload>
 
     - char: D
       icon: subject-destroy
-      left-click: /subject destroy <info>
+      left-click: /subject destroy <payload>
 
 subject-color:
   title: Изменить цвет
   layout: |
     ---------
-    ---------
+    --OOOOO--
+    --OOOOO--
+    --OOOOO--
+    --------B
+  $color-button: &color-button
+    char: O
+    icon: subject-color
+    native: subject-color
+    left-click: /subject color <payload> <info>
+  buttons:
+    - {<<: *color-button, info: CYAN}
+    - {<<: *color-button, info: ORANGE}
+    - {<<: *color-button, info: MAGENTA}
+    - {<<: *color-button, info: AQUA}
+    - {<<: *color-button, info: YELLOW}
+    - {<<: *color-button, info: LIME}
+    - {<<: *color-button, info: PINK}
+    - {<<: *color-button, info: GRAY}
+    - {<<: *color-button, info: SILVER}
+    - {<<: *color-button, info: PURPLE}
+    - {<<: *color-button, info: BLUE}
+    - {<<: *color-button, info: BROWN}
+    - {<<: *color-button, info: GREEN}
+    - {<<: *color-button, info: RED}
+    - {<<: *color-button, info: BLACK}
 
 excavations:
   title: Экспедиции

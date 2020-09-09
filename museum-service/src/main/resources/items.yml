@@ -158,10 +158,10 @@ emerald-item:
     Иногда его можно найти
     на раскопках, стоит не много.
 
-color:
+subject-color:
   icon: concrete
   text: |
-    §bВыбрать цвет!
+    &bВыбрать <color-name>&b цвет!
 
 subject-info:
   icon: paper
@@ -170,8 +170,8 @@ subject-info:
 
     <lore>
 
-subject-color:
-  icon: milk-bukkit
+subject-change-color:
+  icon: milk-bucket
   text: |
     §bИзменить цвет
 
