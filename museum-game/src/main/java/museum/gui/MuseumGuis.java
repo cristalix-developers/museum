@@ -25,16 +25,12 @@ import museum.util.warp.Warp;
 import museum.util.warp.WarpUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Statistic;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftItem;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Color;
-import ru.cristalix.core.nbt.NbtCompound;
 
 import java.time.Duration;
 import java.util.List;
@@ -193,9 +189,11 @@ public class MuseumGuis {
 				else if (subject instanceof CollectorSubject)
 					player.performCommand("gui collector-manipulator " + subjectUuid.toString());
 			} else if ("destroy".equals(args[0])) {
+				if (!subject.isAllocated())
+					return null;
 				subject.getAllocation().getDestroyPackets().forEach(user::sendPacket);
-				subject.allocate(null);
 				subject.hide(user);
+				subject.allocate(null);
 
 				player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 				return MessageUtil.find("destroyed").getText();

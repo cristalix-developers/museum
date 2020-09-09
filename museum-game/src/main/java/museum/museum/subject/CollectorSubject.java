@@ -46,6 +46,7 @@ public class CollectorSubject extends Subject {
 
 	@Override
 	public void updateInfo() {
+		super.updateInfo();
 		cachedInfo.metadata = String.valueOf(id);
 	}
 
@@ -74,7 +75,7 @@ public class CollectorSubject extends Subject {
 	}
 
 	private Location getLocation(long time) {
-		int secondsPerLap = 2000000 / speed;
+		int secondsPerLap = 200000 / speed;
 		return navigator.getLocation(time % secondsPerLap / (double) secondsPerLap);
 	}
 }

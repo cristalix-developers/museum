@@ -11,6 +11,7 @@ import lombok.val;
 import museum.App;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
+import museum.museum.subject.Allocation;
 import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Fragment;
@@ -21,8 +22,11 @@ import museum.player.User;
 import museum.player.pickaxe.Pickaxe;
 import museum.player.pickaxe.PickaxeType;
 import museum.util.MessageUtil;
+import museum.util.SubjectLogoUtil;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -35,6 +39,7 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
  */
 public class BeforePacketHandler implements Prepare {
 
+	private static final org.bukkit.inventory.ItemStack AIR_ITEM = new ItemStack(Material.AIR);
 	public static final BeforePacketHandler INSTANCE = new BeforePacketHandler();
 	private static final BlockPosition dummy = new BlockPosition(0, 0, 0);
 
@@ -107,6 +112,8 @@ public class BeforePacketHandler implements Prepare {
 												}
 											}
 										}
+										BlockPosition blockPos = new BlockPosition(packet.a);
+										B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, blockPos));
 									}
 									packet.a = dummy;
 								}
@@ -130,6 +137,25 @@ public class BeforePacketHandler implements Prepare {
 					}
 				}
 		);
+	}
+
+	public void acceptSubjectPlace(User user, BlockPosition a) {
+		B.bc("Got blockPlaceEvent by " + user);
+
+		if (user.getCurrentMuseum() == null) return;
+
+		val item = user.getInventory().getItemInMainHand();
+		val subject = SubjectLogoUtil.decodeItemStackToSubject(user, item);
+		B.bc(user.getName() + " placed " + subject);
+
+		if (subject == null)
+			return;
+
+		user.getInventory().setItemInMainHand(AIR_ITEM);
+		Allocation allocation = subject.allocate(new Location(user.getWorld(), a.getX(), a.getY() + 1, a.getZ()));
+		subject.show(user);
+		user.msg(allocation + "");
+		MessageUtil.find("placed").send(user);
 	}
 
 	private boolean tryReturnPlayer(User user, App app) {

@@ -109,7 +109,7 @@ public class Allocation {
 			for (int i = 0; i < list.size(); i++) {
 				BlockData blockData = list.get(i);
 				showPacket.b[i] = showPacket.new MultiBlockChangeInfo(blockData.offset, blockData.blockData);
-				hidePacket.b[i] = showPacket.new MultiBlockChangeInfo(blockData.offset, Pickaxe.AIR_DATA);
+				hidePacket.b[i] = hidePacket.new MultiBlockChangeInfo(blockData.offset, Pickaxe.AIR_DATA);
 			}
 			showPackets.add(showPacket);
 			hidePackets.add(hidePacket);
@@ -118,6 +118,11 @@ public class Allocation {
 		String clientData = minX + "_" + minY + "_" + minZ + "_" + maxX + "_" + maxY + "_" + maxZ;
 
 		return new Allocation(origin, showPackets, destroyPackets, hidePackets, allocated, clientData);
+	}
+
+	@Override
+	public String toString() {
+		return origin + " " + clientData;
 	}
 
 }

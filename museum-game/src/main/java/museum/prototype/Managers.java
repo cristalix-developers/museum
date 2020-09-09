@@ -57,8 +57,7 @@ public class Managers {
 			} catch (NullPointerException e) {
 				throw new MapServiceException("Logo for " + label.toString() + " not found.");
 			}
-			if (!chest.getChunk().isLoaded())
-				chest.getChunk().load();
+			chest.getChunk().load();
 			chest.setType(Material.AIR);
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))

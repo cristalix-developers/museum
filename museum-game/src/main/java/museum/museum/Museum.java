@@ -106,8 +106,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 			subject.show(user);
 			val allocation = subject.getAllocation();
 			if (allocation == null)
-				return;
-			if (allocation.getOrigin() == null)
 				player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 		}));
 

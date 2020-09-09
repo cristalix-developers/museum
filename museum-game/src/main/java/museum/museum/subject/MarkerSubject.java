@@ -45,6 +45,7 @@ public class MarkerSubject extends Subject {
 
 	@Override
 	public void updateInfo() {
+		super.updateInfo();
 		cachedInfo.metadata = String.valueOf(collectorId);
 	}
 

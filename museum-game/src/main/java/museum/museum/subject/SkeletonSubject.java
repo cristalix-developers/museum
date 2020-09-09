@@ -45,7 +45,7 @@ public class SkeletonSubject extends Subject {
 	public Allocation allocate(Location origin) {
 		if (origin == null) skeletonLocation = null;
 		else {
-			float rot = this.skeletonLocation.rot;
+			float rot = this.skeletonLocation == null ? 0 : this.skeletonLocation.rot;
 			Box box = prototype.getBox();
 			V3 o = prototype.getRelativeOrigin();
 			this.skeletonLocation = V4.fromLocation(box.transpose(
@@ -54,8 +54,7 @@ public class SkeletonSubject extends Subject {
 					new V3(0, 0, 0),
 					(int) o.getX(),
 					(int) o.getY(),
-					(int) o.getZ()
-																 ));
+					(int) o.getZ()));
 			this.skeletonLocation.setRot(rot);
 		}
 
@@ -64,6 +63,7 @@ public class SkeletonSubject extends Subject {
 
 	@Override
 	public void updateInfo() {
+		super.updateInfo();
 		if (skeleton == null) cachedInfo.metadata = null;
 		else cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + skeletonLocation.rot;
 	}

@@ -4,13 +4,13 @@ import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import museum.player.User;
+import museum.util.MessageUtil;
+import museum.util.warp.WarpUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.IScoreboardService;
-import museum.player.User;
-import museum.util.MessageUtil;
-import museum.util.warp.WarpUtil;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +23,6 @@ public class Excavation {
 		return user.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ()).getType() == Material.AIR;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void load(User user) {
 		Player player = user.getPlayer();
 		player.getInventory().clear();

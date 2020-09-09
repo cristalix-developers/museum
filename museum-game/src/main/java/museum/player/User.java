@@ -108,4 +108,9 @@ public class User implements PlayerWrapper {
 		player.getHandle().playerConnection.sendPacket(packet);
 	}
 
+	@Override
+	public String toString() {
+		return this.getDisplayName();
+	}
+
 }
