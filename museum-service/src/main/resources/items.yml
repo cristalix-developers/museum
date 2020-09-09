@@ -63,7 +63,7 @@ menu:
 coin:
   icon: double-plant
 
-buy_collector:
+buy-collector:
   icon: dispenser
   text: |
     §bКупить коллектор
@@ -111,7 +111,7 @@ go:
     Минимальный уровень: <lvl>
     Кол-во ударов: <breaks>
 
-goto_excavations_item:
+goto-excavations-item:
   icon: compass
   text: |
     §bЭкспедиции
@@ -119,7 +119,7 @@ goto_excavations_item:
     Отправтесь на раскопки
     и найдите следы прошлого.
 
-goto_pickaxes_item:
+goto-pickaxes-item:
   icon: diamond-pickaxe
   text: |
     §bКирки
@@ -127,7 +127,7 @@ goto_pickaxes_item:
     Приобретите новую кирку,
     и разгодайте тайны песка...
 
-already_have:
+already-have:
   icon: emerald
   text: |
     §bПусто
@@ -141,7 +141,7 @@ goback:
   text: |
     §cВернуться
 
-museum_change_title:
+museum-change-title:
   icon: sign
   text: |
     §bПереименовать музей
@@ -157,6 +157,43 @@ emerald-item:
 
     Иногда его можно найти
     на раскопках, стоит не много.
+
+color:
+  icon: concrete
+  text: |
+    §bВыбрать цвет!
+
+subject-info:
+  icon: paper
+  text: |
+    §b<title>
+
+    <lore>
+
+subject-color:
+  icon: milk-bukkit
+  text: |
+    §bИзменить цвет
+
+    Кастомизируйте цвета построек,
+    так, как вам нравится!
+
+subject-special:
+  icon: clay-ball
+  nbt: { other: settings }
+  text: |
+    §bНастроить
+
+    Настройки для постройки!
+
+subject-destroy:
+  icon: clay-ball
+  nbt: { other: guild_shop }
+  text: |
+    §bВ инвентарь!
+
+    Переместит выбранную постройку,
+    вам в инвентарь.
 
 pickaxe:
   nbt:

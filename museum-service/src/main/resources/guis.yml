@@ -14,7 +14,7 @@ main:
       native: profile
 
     - char: S
-      icon: buy_collector
+      icon: buy-collector
       left-click: /gui collectors
 
     - char: M
@@ -22,7 +22,7 @@ main:
       native: museum
 
     - char: T
-      icon: museum_change_title
+      icon: museum-change-title
       left-click: /changetitle
 
     - char: A
@@ -34,7 +34,7 @@ main:
       left-click: /gallery
 
     - char: J
-      icon: goto_excavations_item
+      icon: goto-excavations-item
       left-click: /gui excavations
 
 
@@ -58,16 +58,17 @@ manipulator:
       native: subject-info
 
     - char: C
+      icon: subject-color
       native: subject-color
       left-click: /gui subject-color <info>
 
     - char: S
+      icon: subject-special
       native: subject-special
       left-click: /gui subject-special <info>
 
     - char: D
-      icon: barrier
-      text: '&cУдалить'
+      icon: subject-destroy
       left-click: /subject destroy <info>
 
 subject-color:
@@ -75,8 +76,6 @@ subject-color:
   layout: |
     ---------
     ---------
-
-
 
 excavations:
   title: Экспедиции

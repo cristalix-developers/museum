@@ -7,15 +7,14 @@ import museum.player.User;
 
 import static lombok.AccessLevel.PROTECTED;
 
+@Getter
 @RequiredArgsConstructor(access = PROTECTED)
 public abstract class Storable<I extends Info, P extends Prototype> {
 
-	@Getter
 	protected final P prototype;
 
 	protected final I cachedInfo;
 
-	@Getter
 	protected final User owner;
 
 	protected void updateInfo() {}

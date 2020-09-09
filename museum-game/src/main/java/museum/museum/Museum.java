@@ -18,6 +18,7 @@ import museum.prototype.Storable;
 import museum.util.LocationTree;
 import museum.util.warp.Warp;
 import museum.util.warp.WarpUtil;
+import museum.util.MessageUtil;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.IScoreboardService;
@@ -39,9 +40,9 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 	private Warp warp;
 	private final CraftWorld world;
 	private double income;
-    private String title;
+	private String title;
 
-    public Museum(MuseumPrototype prototype, MuseumInfo info, User owner) {
+	public Museum(MuseumPrototype prototype, MuseumInfo info, User owner) {
 		super(prototype, info, owner);
 		this.world = App.getApp().getWorld();
 		this.title = info.title;
@@ -60,17 +61,17 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		// ToDo: Это костыль, музей должен устанавливаться по-нормальному
 		owner.setCurrentMuseum(this);
 
-	    warp = new WarpUtil.WarpBuilder(prototype.getAddress()).build();
+		warp = new WarpUtil.WarpBuilder(prototype.getAddress()).build();
 	}
 
-    @Override
-    public void updateInfo() {
-        cachedInfo.title = title;
-    }
+	@Override
+	public void updateInfo() {
+		cachedInfo.title = title;
+	}
 
-    public void show(User user) {
-    	if (!Objects.equals(user.getLastWarp(), warp))
-    		warp.warp(user);
+	public void show(User user) {
+		if (!Objects.equals(user.getLastWarp(), warp))
+			warp.warp(user);
 
 		cachedInfo.views++;
 
@@ -92,9 +93,9 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		user.setCoins(ConcurrentHashMap.newKeySet());
 		user.setCurrentMuseum(this);
 
-	    val inventory = user.getPlayer().getInventory();
-	    inventory.clear();
-	    inventory.setItem(0, menu);
+		val inventory = user.getPlayer().getInventory();
+		inventory.clear();
+		inventory.setItem(0, menu);
 
 		if (this.owner != user) {
 			user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
@@ -124,16 +125,17 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
 	public void updateIncrease() {
 		double[] i = {.1};
-		iterateSubjects(s -> i[0] += s.getIncome()); // Completely safe and professional code.
+		iterateSubjects(s -> i[0] += s.getIncome());
 		income = i[0];
 	}
+
 	public List<Subject> getSubjects() {
 		List<Subject> list = new ArrayList<>();
 		iterateSubjects(list::add);
 		return list;
 	}
 
-	@SuppressWarnings ("unchecked")
+	@SuppressWarnings("unchecked")
 	public <T extends Subject> List<T> getSubjects(SubjectType<T> type) {
 		List<T> list = new ArrayList<>();
 		iterateSubjects(s -> {
@@ -143,19 +145,23 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 	}
 
 	public void processClick(User user, Subject subject) {
-		user.performCommand("gui manipulator");
+		if (user.getMuseums().stream().noneMatch(museum -> user.getCurrentMuseum().equals(museum))) {
+			MessageUtil.find("non-root").send(user);
+			return;
+		}
+		user.performCommand("gui manipulator " + subject.getCachedInfo().getUuid().toString());
 	}
 
 	public long getViews() {
-        return cachedInfo.getViews();
-    }
+		return cachedInfo.getViews();
+	}
 
-    public Date getCreationDate() {
-        return cachedInfo.getCreationDate();
-    }
+	public Date getCreationDate() {
+		return cachedInfo.getCreationDate();
+	}
 
-    public void incrementViews() {
-        cachedInfo.views++;
-    }
+	public void incrementViews() {
+		cachedInfo.views++;
+	}
 
 }

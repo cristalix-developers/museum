@@ -26,11 +26,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.time.Duration;
 import java.util.List;
 
 public class MuseumGuis {
+
+	private ItemStack 
 
 	public MuseumGuis(App app) {
 		Warp warp = new WarpUtil.WarpBuilder("gallery")
@@ -165,11 +168,17 @@ public class MuseumGuis {
 			return Lemonade.get("pickaxe-" + pickaxe.name()).render();
 		});
 
+		Guis.registerItemizer("subject-color", (base, player, context, slotId) -> {
+			User user = app.getUser(player);
+			PickaxeType pickaxe = user.getPickaxeType().getNext();
+			return Lemonade.get("pickaxe-" + pickaxe.name()).render();
+		});
+
 		Guis.registerItemizer("excavation", (base, player, context, slotId) -> {
 			ExcavationPrototype excavation = Managers.excavation.getPrototype(
 					context.getOpenedGui().getSlotData(slotId).getInfo()
 			);
-			if (excavation == null)// || excavation.getRequiredLevel() > app.getUser(player).getLevel())
+			if (excavation == null  || excavation.getRequiredLevel() > app.getUser(player).getLevel())
 				return Lemonade.get("unavailable").render();
 			val item = base.dynamic()
 					.fill("excavation", excavation.getTitle())
