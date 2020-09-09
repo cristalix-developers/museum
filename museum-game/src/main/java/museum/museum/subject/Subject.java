@@ -2,7 +2,11 @@ package museum.museum.subject;
 
 import clepto.bukkit.B;
 import lombok.Getter;
+import lombok.val;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.util.UtilV3;
 import museum.App;
 import museum.prototype.Storable;
@@ -14,9 +18,9 @@ import museum.player.User;
  * @author func 22.05.2020
  * @project Museum
  */
+@Getter
 public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 
-	@Getter
 	private Allocation allocation;
 
 	public Subject(SubjectPrototype prototype, SubjectInfo info, User owner) {

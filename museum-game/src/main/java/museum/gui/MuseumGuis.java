@@ -12,29 +12,35 @@ import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
+import museum.museum.subject.CollectorSubject;
+import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
+import museum.util.SubjectLogoUtil;
 import museum.util.VirtualSign;
 import museum.util.warp.Warp;
 import museum.util.warp.WarpUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Statistic;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Color;
+import ru.cristalix.core.nbt.NbtCompound;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 public class MuseumGuis {
-
-	private ItemStack 
 
 	public MuseumGuis(App app) {
 		Warp warp = new WarpUtil.WarpBuilder("gallery")
@@ -162,6 +168,40 @@ public class MuseumGuis {
 			return MessageUtil.get("newpickaxe");
 
 		}, "pickaxe");
+
+		B.regCommand((player, args) -> {
+			if (args.length < 2)
+				return null;
+
+			UUID subjectUuid;
+
+			try {
+				subjectUuid = UUID.fromString(args[1]);
+			} catch (IllegalArgumentException ignored) {
+				return null;
+			}
+
+			val user = app.getUser(player);
+			val subject = user.getCurrentMuseum().getSubjectByUuid(subjectUuid);
+
+			if (subject == null)
+				return null;
+
+			if ("special".equals(args[0])) {
+				if (subject instanceof SkeletonSubject)
+					player.performCommand("gui skeleton-manipulator " + subjectUuid.toString());
+				else if (subject instanceof CollectorSubject)
+					player.performCommand("gui collector-manipulator " + subjectUuid.toString());
+			} else if ("destroy".equals(args[0])) {
+				subject.getAllocation().getDestroyPackets().forEach(user::sendPacket);
+				subject.allocate(null);
+				subject.hide(user);
+
+				player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
+				return MessageUtil.find("destroyed").getText();
+			}
+			return null;
+		}, "subject");
 
 		Guis.registerItemizer("upgrade-pickaxe", (base, player, context, slotId) -> {
 			User user = app.getUser(player);

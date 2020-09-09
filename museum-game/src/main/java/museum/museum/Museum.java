@@ -16,9 +16,10 @@ import museum.museum.subject.Subject;
 import museum.player.User;
 import museum.prototype.Storable;
 import museum.util.LocationTree;
+import museum.util.MessageUtil;
+import museum.util.SubjectLogoUtil;
 import museum.util.warp.Warp;
 import museum.util.warp.WarpUtil;
-import museum.util.MessageUtil;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.IScoreboardService;
@@ -93,14 +94,22 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		user.setCoins(ConcurrentHashMap.newKeySet());
 		user.setCurrentMuseum(this);
 
-		val inventory = user.getPlayer().getInventory();
+		val player = user.getPlayer();
+		val inventory = player.getInventory();
 		inventory.clear();
 		inventory.setItem(0, menu);
 
 		if (this.owner != user) {
-			user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
+			player.getInventory().setItem(8, Lemonade.get("back").render());
 		}
-		B.postpone(20, () -> iterateSubjects(subject -> subject.show(user)));
+		B.postpone(20, () -> iterateSubjects(subject -> {
+			subject.show(user);
+			val allocation = subject.getAllocation();
+			if (allocation == null)
+				return;
+			if (allocation.getOrigin() == null)
+				player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
+		}));
 
 		updateIncrease();
 	}
@@ -133,6 +142,13 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		List<Subject> list = new ArrayList<>();
 		iterateSubjects(list::add);
 		return list;
+	}
+
+	public Subject getSubjectByUuid(UUID uuid) {
+		for (val subject : getSubjects())
+			if (subject.getCachedInfo().getUuid().equals(uuid))
+				return subject;
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")

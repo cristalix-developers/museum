@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import org.bukkit.entity.ArmorStand;
 import ru.cristalix.core.formatting.Color;
@@ -48,6 +49,15 @@ public class Managers {
 						.size(box.requireLabel("size").getTagInt());
 
 			else builder = SubjectPrototype.builder();
+
+			val logoLabel = box.getLabel("logo");
+			Chest chest = (Chest) logoLabel.subtract(0, 1, 0).getBlock().getState();
+			try {
+				builder.logo(chest.getBlockInventory().getItem(0));
+			} catch (NullPointerException e) {
+				throw new MapServiceException("Logo for " + label.toString() + " not found.");
+			}
+			chest.setType(Material.AIR);
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
 					.relativeManipulators(box.getLabels("manipulator").stream()

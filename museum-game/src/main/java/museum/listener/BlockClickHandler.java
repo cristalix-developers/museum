@@ -22,7 +22,6 @@ public class BlockClickHandler implements Listener {
 
 	private static final PotionEffect INVISIBLE =
 			new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false);
-	private final App app;
 
 	@EventHandler
 	public void onBlockClick(PlayerInteractEvent event) {

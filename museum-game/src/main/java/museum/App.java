@@ -16,6 +16,7 @@ import museum.gui.MuseumGuis;
 import museum.listener.BlockClickHandler;
 import museum.listener.MuseumEventHandler;
 import museum.listener.PassiveEventBlocker;
+import museum.listener.SubjectPlaceListener;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
 import museum.player.PlayerDataManager;
@@ -137,7 +138,8 @@ public final class App extends JavaPlugin {
 				new PassiveEventBlocker(),
 				new MuseumEventHandler(this),
 				new GuiEvents(),
-				new BlockClickHandler(this),
+				new BlockClickHandler(),
+				new SubjectPlaceListener(this),
 				new WorkerClickListener(this, new WorkerHandler(this))
 		);
 

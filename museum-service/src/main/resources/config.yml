@@ -3,6 +3,8 @@ serviceRealm: MUSS-1
 chat:
   prefix: '§7[§l§bi§7] '
   messages:
+    placed: 'Постройка установлена!'
+    destroyed: 'Постройка убрана в инвентарь!'
     non-root: 'Эта постройка вам не принадлежит.'
     emerald: '§6+200$'
     reward: 'Вы нашли подарок! Вы получили %REWARD%!'

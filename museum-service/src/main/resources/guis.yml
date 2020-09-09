@@ -48,6 +48,21 @@ pickaxes:
 
     - <<: *back
 
+skeleton-manipulator:
+  title: Настройка витрины
+  layout: |
+    ----X----
+    -OOOOOOO-
+    -OOOOOOO-
+    -OOOOOOO-
+    ---------
+  buttons:
+    - char: X
+      icon: goback
+      left-click: /gui manipulator <payload>
+    - char: O
+      native: subjects-select-dino
+      left-click: /subject setdino <payload>
 
 manipulator:
   title: Манипуляция постройкой
@@ -63,8 +78,7 @@ manipulator:
 
     - char: S
       icon: subject-special
-      native: subject-special
-      left-click: /gui subject-special <payload>
+      left-click: /subject special <payload>
 
     - char: D
       icon: subject-destroy
@@ -73,32 +87,35 @@ manipulator:
 subject-color:
   title: Изменить цвет
   layout: |
+    ----X----
+    --OOOOO--
+    --OOOOO--
+    --OOOOO--
     ---------
-    --OOOOO--
-    --OOOOO--
-    --OOOOO--
-    --------B
   $color-button: &color-button
     char: O
     icon: subject-color
     native: subject-color
     left-click: /subject color <payload> <info>
   buttons:
-    - {<<: *color-button, info: CYAN}
-    - {<<: *color-button, info: ORANGE}
-    - {<<: *color-button, info: MAGENTA}
-    - {<<: *color-button, info: AQUA}
-    - {<<: *color-button, info: YELLOW}
-    - {<<: *color-button, info: LIME}
-    - {<<: *color-button, info: PINK}
-    - {<<: *color-button, info: GRAY}
-    - {<<: *color-button, info: SILVER}
-    - {<<: *color-button, info: PURPLE}
-    - {<<: *color-button, info: BLUE}
-    - {<<: *color-button, info: BROWN}
-    - {<<: *color-button, info: GREEN}
-    - {<<: *color-button, info: RED}
-    - {<<: *color-button, info: BLACK}
+    - char: X
+        icon: goback
+        left-click: /gui manipulator <payload>
+    - { <<: *color-button, info: CYAN }
+    - { <<: *color-button, info: ORANGE }
+    - { <<: *color-button, info: MAGENTA }
+    - { <<: *color-button, info: AQUA }
+    - { <<: *color-button, info: YELLOW }
+    - { <<: *color-button, info: LIME }
+    - { <<: *color-button, info: PINK }
+    - { <<: *color-button, info: GRAY }
+    - { <<: *color-button, info: SILVER }
+    - { <<: *color-button, info: PURPLE }
+    - { <<: *color-button, info: BLUE }
+    - { <<: *color-button, info: BROWN }
+    - { <<: *color-button, info: GREEN }
+    - { <<: *color-button, info: RED }
+    - { <<: *color-button, info: BLACK }
 
 excavations:
   title: Экспедиции
@@ -110,13 +127,13 @@ excavations:
     native: excavation
 
   buttons:
-    - {<<: *exc, info: 'desert'}
-    - {<<: *exc, info: 'island'}
-    - {<<: *exc, info: 'jungle'}
-    - {<<: *exc, info: 4}
-    - {<<: *exc, info: 5}
-    - {<<: *exc, info: 6}
-    - {<<: *exc, info: 7}
-    - {<<: *exc, info: 8}
+    - { <<: *exc, info: 'desert' }
+    - { <<: *exc, info: 'island' }
+    - { <<: *exc, info: 'jungle' }
+    - { <<: *exc, info: 4 }
+    - { <<: *exc, info: 5 }
+    - { <<: *exc, info: 6 }
+    - { <<: *exc, info: 7 }
+    - { <<: *exc, info: 8 }
     - <<: *back
 
