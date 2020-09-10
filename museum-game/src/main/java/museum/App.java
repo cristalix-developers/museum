@@ -121,14 +121,16 @@ public final class App extends JavaPlugin {
 			YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
 			itemsConfig.getKeys(false)
 					.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
+
+			// Инициализация "умных" иконок в гуишках
+			MuseumGuis.registerItemizers(this);
+
 			// Загрузка всех инвентарей
 			Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));
 
 			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 		});
 
-		// Инициализация "умных" иконок в гуишках
-		new MuseumGuis(this);
 		// Инициализация команд
 		new MuseumCommands(this);
 		B.regCommand(new MuseumCommand(this), "museum");

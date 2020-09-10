@@ -17,7 +17,7 @@ import java.util.UUID;
 public class SubjectLogoUtil {
 
 	public static ItemStack encodeSubjectToItemStack(Subject subject) {
-		val itemProto = subject.getPrototype().getLogo().clone();
+		val itemProto = subject.getPrototype().getIcon().render();
 
 
 		val nmsItem = CraftItemStack.asNMSCopy(itemProto);

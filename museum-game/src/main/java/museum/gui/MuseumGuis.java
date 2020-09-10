@@ -3,6 +3,7 @@ package museum.gui;
 import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.Guis;
 import clepto.humanize.TimeFormatter;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
@@ -22,12 +23,14 @@ import ru.cristalix.core.formatting.Color;
 
 import java.time.Duration;
 
+@UtilityClass
 public class MuseumGuis {
 
 	public static final ItemStack AIR_ITEM = new ItemStack(Material.AIR);
-	private static final ItemStack LOCK = Lemonade.get("lock").render();
 
-	public MuseumGuis(App app) {
+	public static void registerItemizers(App app) {
+
+		ItemStack lockItem = Lemonade.get("lock").render();
 
 		Guis.registerItemizer("subjects-select-dino", (base, player, context, slotId) -> {
 
@@ -38,7 +41,7 @@ public class MuseumGuis {
 			try {
 				prototype = Managers.skeleton.getByIndex(index);
 			} catch (IndexOutOfBoundsException e) {
-				return LOCK;
+				return lockItem;
 			}
 
 			val user = app.getUser(player);
@@ -46,7 +49,7 @@ public class MuseumGuis {
 			// Если любая витрина уже использует этот прототип, то поставить lock предмет
 			for (SkeletonSubject skeletonSubject : user.getCurrentMuseum().getSubjects(SubjectType.SKELETON_CASE))
 				if (skeletonSubject.getSkeleton().getCachedInfo().getPrototypeAddress().equals(prototype.getAddress()))
-					return LOCK;
+					return lockItem;
 
 			/*base.dynamic().fill("")
 			user.getSkeletonInfos().
