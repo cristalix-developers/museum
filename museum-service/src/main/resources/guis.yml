@@ -51,7 +51,7 @@ pickaxes:
 skeleton-manipulator:
   title: Настройка витрины
   layout: |
-    ----X----
+    ---X-Y---
     -OOOOOOO-
     -OOOOOOO-
     -OOOOOOO-
@@ -61,8 +61,11 @@ skeleton-manipulator:
       icon: goback
       left-click: /gui manipulator <payload>
     - char: O
+      icon:
       native: subjects-select-dino
-      left-click: /subject setdino <payload>
+      left-click: /subject setdino <payload> <index>
+    - char: Y
+      left-click: /subject cleardino <payload>
 
 manipulator:
   title: Манипуляция постройкой

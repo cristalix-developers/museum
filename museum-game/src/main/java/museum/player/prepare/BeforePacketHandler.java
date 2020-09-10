@@ -11,6 +11,7 @@ import lombok.val;
 import museum.App;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
+import museum.gui.MuseumGuis;
 import museum.museum.subject.Allocation;
 import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.Subject;
@@ -39,7 +40,6 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
  */
 public class BeforePacketHandler implements Prepare {
 
-	private static final org.bukkit.inventory.ItemStack AIR_ITEM = new ItemStack(Material.AIR);
 	public static final BeforePacketHandler INSTANCE = new BeforePacketHandler();
 	private static final BlockPosition dummy = new BlockPosition(0, 0, 0);
 
@@ -151,7 +151,7 @@ public class BeforePacketHandler implements Prepare {
 		if (subject == null)
 			return;
 
-		user.getInventory().setItemInMainHand(AIR_ITEM);
+		user.getInventory().setItemInMainHand(MuseumGuis.AIR_ITEM);
 		Allocation allocation = subject.allocate(new Location(user.getWorld(), a.getX(), a.getY() + 1, a.getZ()));
 		subject.show(user);
 		user.msg(allocation + "");
