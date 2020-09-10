@@ -10,6 +10,7 @@ import lombok.Getter;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommand;
+import museum.command.MuseumCommands;
 import museum.donate.DonateType;
 import museum.gui.MuseumGuis;
 import museum.listener.BlockClickHandler;
@@ -126,8 +127,10 @@ public final class App extends JavaPlugin {
 			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 		});
 
-		// Инициализация промежуточных команд / Инвентарей
+		// Инициализация "умных" иконок в гуишках
 		new MuseumGuis(this);
+		// Инициализация команд
+		new MuseumCommands(this);
 		B.regCommand(new MuseumCommand(this), "museum");
 
 		// Регистрация обработчиков событий

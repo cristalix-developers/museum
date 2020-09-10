@@ -70,12 +70,6 @@ public class VisitorGroup {
 		Node target = ListUtils.random(mainToVisit);
 		mainToVisit.remove(target);
 
-		List<Node> routeBuffer = new ArrayList<>();
-
-
-
-
-
 		Set<Node> visited = new LinkedHashSet<>();
 		Queue<Node> queue = new LinkedList<>();
 		queue.add(currentNode);
@@ -93,22 +87,9 @@ public class VisitorGroup {
 				}
 			}
 		}
-	}
 
-	private boolean traverse0(Node current, Node destination, Collection<Node> visited, Collection<Node> routeBuffer) {
-		visited.add(current);
-		for (int i = 0; i < current.connections.length; i++) {
-			Node node = this.nodes[i];
-			if (visited.contains(node) || !current.connections[i]) continue;
-			if (node == destination) {
-				return true;
-			}
-			if (traverse0(node, destination, visited, routeBuffer)) {
-				routeBuffer.add(node);
-				return true;
-			}
-		}
-		return false;
+		this.currentRoute = new ArrayList<>(visited);
+
 	}
 
 	public void spawn(Node node) {
@@ -127,7 +108,7 @@ public class VisitorGroup {
 	}
 
 	@Data
-	public class Node {
+	public static class Node {
 		private final int id;
 		private final boolean[] connections;
 		private final Location location;

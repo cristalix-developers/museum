@@ -1,14 +1,14 @@
 package museum.museum.map;
 
+import clepto.bukkit.DynamicItem;
 import clepto.cristalix.mapservice.Box;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
-import org.bukkit.inventory.ItemStack;
-import ru.cristalix.core.math.V3;
 import museum.data.SubjectInfo;
 import museum.museum.subject.Subject;
 import museum.player.User;
 import museum.prototype.Prototype;
+import ru.cristalix.core.math.V3;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class SubjectPrototype implements Prototype {
 	private final int cristalixPrice;
 	private final V3 relativeOrigin;
 	private final List<V3> relativeManipulators;
-	private final ItemStack logo;
+	private final DynamicItem icon;
 
 	public Subject provide(SubjectInfo info, User owner) {
 		return type.provide(this, info, owner);

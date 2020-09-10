@@ -1,6 +1,7 @@
 package museum.prototype;
 
 import clepto.ListUtils;
+import clepto.bukkit.DynamicItem;
 import clepto.bukkit.InvalidConfigException;
 import clepto.cristalix.mapservice.Label;
 import clepto.cristalix.mapservice.MapServiceException;
@@ -18,6 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Color;
 import ru.cristalix.core.math.D2;
 
@@ -50,15 +52,24 @@ public class Managers {
 
 			else builder = SubjectPrototype.builder();
 
-			val logoLabel = box.getLabel("logo");
-			Chest chest = (Chest) logoLabel.subtract(0, 1, 0).getBlock().getState();
-			try {
-				builder.logo(chest.getBlockInventory().getItem(0));
-			} catch (NullPointerException e) {
-				throw new MapServiceException("Logo for " + label.toString() + " not found.");
-			}
-			chest.getChunk().load();
-			chest.setType(Material.AIR);
+			val iconLabel = box.getLabel("icon");
+			DynamicItem icon = null;
+			if (iconLabel != null) {
+//				String tag = iconLabel.getTag();
+//				if (tag != null && !tag.isEmpty()) {
+//					icon = Lemonade.get(tag).dynamic();
+//				}
+				Block iconBlock = iconLabel.subtract(0, 1, 0).getBlock();
+				iconBlock.getChunk().load();
+				if (iconBlock.getType() == Material.CHEST) try {
+					icon = new DynamicItem(((Chest) iconBlock.getState()).getBlockInventory().getItem(0));
+				} catch (Exception ignored) {}
+
+				if (icon == null) icon = new DynamicItem(iconBlock.getDrops().iterator().next());
+				iconBlock.setType(Material.AIR);
+			} else icon = new DynamicItem(new ItemStack(Material.PACKED_ICE));
+
+			builder.icon(icon);
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
 					.relativeManipulators(box.getLabels("manipulator").stream()
