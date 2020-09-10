@@ -1,5 +1,6 @@
 package museum.museum.subject.skeleton;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import museum.prototype.Storable;
 import museum.data.SkeletonInfo;

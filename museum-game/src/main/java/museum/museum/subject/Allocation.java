@@ -63,7 +63,6 @@ public class Allocation {
 				for (int z = (int) box.getMin().getZ(); z <= box.getMax().getZ(); z++) {
 					Location dst = box.transpose(absoluteOrigin, info.getRotation(), relativeOrigin, x, y, z);
 
-					// dst.clone().subtract(0, 1, 0).getBlock().getType() != Material.MELON_BLOCK
 					if (dst.getBlock().getType() != Material.AIR) {
 						return null; // Невозможно разместить субъект - место занято или не доступно.
 					}

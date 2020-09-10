@@ -7,7 +7,7 @@ back:
 
 museum:
   icon: clay-ball
-  nbt: {other: guild_bank}
+  nbt: { other: guild_bank }
   text: |
     &bМузей
 
@@ -31,24 +31,24 @@ gallery:
 
 unavailable:
   icon: clay-ball
-  nbt: {other: point}
+  nbt: { other: point }
   text: '&7???'
 
 collector-free:
   icon: clay-ball
-  nbt: {museum: car}
+  nbt: { museum: car }
 
 collector-amateur:
   icon: clay-ball
-  nbt: {museum: car1}
+  nbt: { museum: car1 }
 
 collector-professional:
   icon: clay-ball
-  nbt: {museum: car1}
+  nbt: { museum: car2 }
 
 collector-prestige:
   icon: clay-ball
-  nbt: {museum: parovoz}
+  nbt: { museum: parovoz }
 
 menu:
   icon: paper
@@ -228,7 +228,7 @@ pickaxe-professional:
 pickaxe-prestige:
   icon: gold-pickaxe pickaxe
   unbreakable: true
-  enchant: ['32:1']
+  enchant: [ '32:1' ]
   text: |
     §bПрестижная кирка
 
@@ -238,6 +238,13 @@ pickaxe-prestige:
 
     Цена: 100'000$
 
+lock:
+  icon: clay-ball
+  nbt: { other: lock }
+  text: |
+    §cНедоступно
+
+    Вы еще не открыли этого динозавра!
 
 subject:
   text: |

@@ -2,6 +2,7 @@ package museum.museum.subject;
 
 import clepto.cristalix.mapservice.Box;
 import lombok.Getter;
+import museum.data.SkeletonInfo;
 import museum.museum.subject.skeleton.V4;
 import org.bukkit.Location;
 import ru.cristalix.core.math.V3;
@@ -79,13 +80,29 @@ public class SkeletonSubject extends Subject {
 	@Override
 	public void hide(User user) {
 		super.hide(user);
-		if (skeleton == null) return;
+		if (skeleton == null)
+			return;
 		skeleton.getPrototype().hide(user.getPlayer());
 	}
 
 	public double getIncome() {
-		if (skeleton == null) return 0;
+		if (skeleton == null)
+			return 0;
 		return skeleton.getUnlockedFragments().size() * skeleton.getPrototype().getPrice();
+	}
+
+	public void setSkeleton(User user, Skeleton skeleton) {
+		if (this.skeleton != null)
+			return;
+		this.skeleton = skeleton;
+		updateInfo();
+		show(user);
+	}
+
+	public void clear(User user) {
+		hide(user);
+		skeleton = null;
+		updateInfo();
 	}
 
 }

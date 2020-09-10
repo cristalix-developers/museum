@@ -11,10 +11,13 @@ import museum.data.PickaxeType;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
+import museum.museum.map.SubjectType;
 import museum.museum.subject.Allocation;
 import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
+import museum.museum.subject.skeleton.Skeleton;
+import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.util.LevelSystem;
@@ -27,16 +30,21 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Color;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class MuseumGuis {
+
+	public static final ItemStack AIR_ITEM = new ItemStack(Material.AIR);
+	private static final ItemStack LOCK = Lemonade.get("lock").render();
 
 	public MuseumGuis(App app) {
 		Warp warp = new WarpUtil.WarpBuilder("gallery")
@@ -165,6 +173,9 @@ public class MuseumGuis {
 
 		}, "pickaxe");
 
+		int dinoOffset = 9;
+		val dinosaurs = new ArrayList<>(Managers.skeleton.getMap().values());
+
 		B.regCommand((player, args) -> {
 			if (args.length < 2)
 				return null;
@@ -196,10 +207,71 @@ public class MuseumGuis {
 				subject.allocate(null);
 
 				player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
+				player.closeInventory();
 				return MessageUtil.find("destroyed").getText();
+			} else if ("cleardino".equals(args[0])) {
+				if (!(subject instanceof SkeletonSubject))
+					return null;
+				((SkeletonSubject) subject).clear(user);
+				player.closeInventory();
+				return MessageUtil.find("freestand").getText();
+			} else if ("setdino".equals(args[0]) && args.length == 3) {
+				if (!(subject instanceof SkeletonSubject))
+					return null;
+
+				Skeleton currentSkeleton = null;
+
+				String dinosaur;
+				try {
+					dinosaur = dinosaurs.get(Integer.parseInt(args[2])).getAddress();
+				} catch (Exception e) {
+					return null;
+				}
+
+				for (Skeleton skeleton : user.getSkeletons())
+					if (skeleton.getCachedInfo().getPrototypeAddress().equals(dinosaur))
+						currentSkeleton = skeleton;
+
+				if (currentSkeleton == null)
+					return null;
+
+				// todo: Не забыть про проверку на занятость другой витриной
+
+				((SkeletonSubject) subject).setSkeleton(user, currentSkeleton);
+				player.closeInventory();
+				return MessageUtil.find("standplaced").getText();
 			}
 			return null;
 		}, "subject");
+
+		Guis.registerItemizer("subjects-select-dino", (base, player, context, slotId) -> {
+			if (slotId < dinoOffset)
+				return AIR_ITEM;
+
+			SkeletonPrototype prototype;
+
+			try {
+				prototype = dinosaurs.get(slotId - dinoOffset);
+			} catch (IndexOutOfBoundsException e) {
+				return LOCK;
+			}
+
+			val user = app.getUser(player);
+
+			// Если любая витрина уже использует этот прототип, то поставить lock предмет
+			for (SkeletonSubject skeletonSubject : user.getCurrentMuseum().getSubjects(SubjectType.SKELETON_CASE))
+				if (skeletonSubject.getSkeleton().getCachedInfo().getPrototypeAddress().equals(prototype.getAddress()))
+					return LOCK;
+
+			/*base.dynamic().fill("")
+			user.getSkeletonInfos().
+			val item = base.dynamic().
+					item.setDurability((short) color.getWoolData());
+					User user = app.getUser(player);
+			PickaxeType pickaxe = user.getPickaxeType().getNext();
+			return Lemonade.get("pickaxe-" + pickaxe.name()).render();*/
+			return null;
+		});
 
 		Guis.registerItemizer("upgrade-pickaxe", (base, player, context, slotId) -> {
 			User user = app.getUser(player);
@@ -219,7 +291,7 @@ public class MuseumGuis {
 			ExcavationPrototype excavation = Managers.excavation.getPrototype(
 					context.getOpenedGui().getSlotData(slotId).getInfo()
 			);
-			if (excavation == null  || excavation.getRequiredLevel() > app.getUser(player).getLevel())
+			if (excavation == null || excavation.getRequiredLevel() > app.getUser(player).getLevel())
 				return Lemonade.get("unavailable").render();
 			val item = base.dynamic()
 					.fill("excavation", excavation.getTitle())
