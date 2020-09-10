@@ -9,33 +9,18 @@ import museum.data.PickaxeType;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
 import museum.museum.map.SubjectType;
-import museum.museum.subject.Allocation;
-import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.SkeletonSubject;
-import museum.museum.subject.Subject;
-import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
-import museum.util.SubjectLogoUtil;
-import museum.util.VirtualSign;
-import museum.util.warp.Warp;
-import museum.util.warp.WarpUtil;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Color;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class MuseumGuis {
 
@@ -45,13 +30,13 @@ public class MuseumGuis {
 	public MuseumGuis(App app) {
 
 		Guis.registerItemizer("subjects-select-dino", (base, player, context, slotId) -> {
-			if (slotId < dinoOffset)
-				return AIR_ITEM;
 
 			SkeletonPrototype prototype;
 
+			int index = context.getOpenedGui().getIndex(slotId);
+
 			try {
-				prototype = dinosaurs.get(slotId - dinoOffset);
+				prototype = Managers.skeleton.getByIndex(index);
 			} catch (IndexOutOfBoundsException e) {
 				return LOCK;
 			}

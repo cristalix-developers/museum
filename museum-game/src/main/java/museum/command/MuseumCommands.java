@@ -12,6 +12,7 @@ import museum.museum.subject.Allocation;
 import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
+import museum.museum.subject.skeleton.Skeleton;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
@@ -187,7 +188,7 @@ public class MuseumCommands {
 			return null;
 		}
 
-		val user = this.app.getUser(player);
+		val user = app.getUser(player);
 		val subject = user.getCurrentMuseum().getSubjectByUuid(subjectUuid);
 
 		if (subject == null)
@@ -206,7 +207,39 @@ public class MuseumCommands {
 			subject.allocate(null);
 
 			player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
+			player.closeInventory();
 			return MessageUtil.find("destroyed").getText();
+		} else if ("cleardino".equals(args[0])) {
+			if (!(subject instanceof SkeletonSubject))
+				return null;
+			((SkeletonSubject) subject).clear(user);
+			player.closeInventory();
+			return MessageUtil.find("freestand").getText();
+		} else if ("setdino".equals(args[0]) && args.length == 3) {
+			if (!(subject instanceof SkeletonSubject))
+				return null;
+
+			Skeleton currentSkeleton = null;
+
+			String dinosaur;
+			try {
+				dinosaur = Managers.skeleton.getByIndex(Integer.parseInt(args[2])).getAddress();
+			} catch (Exception e) {
+				return null;
+			}
+
+			for (Skeleton skeleton : user.getSkeletons())
+				if (skeleton.getCachedInfo().getPrototypeAddress().equals(dinosaur))
+					currentSkeleton = skeleton;
+
+			if (currentSkeleton == null)
+				return null;
+
+			// todo: Не забыть про проверку на занятость другой витриной
+
+			((SkeletonSubject) subject).setSkeleton(user, currentSkeleton);
+			player.closeInventory();
+			return MessageUtil.find("standplaced").getText();
 		}
 		return null;
 	}
