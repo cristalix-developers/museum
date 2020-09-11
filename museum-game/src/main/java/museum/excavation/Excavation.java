@@ -5,6 +5,7 @@ import clepto.bukkit.Lemonade;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import museum.player.User;
+import museum.player.prepare.BeforePacketHandler;
 import museum.util.MessageUtil;
 import museum.util.warp.WarpUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -27,6 +28,7 @@ public class Excavation {
 		Player player = user.getPlayer();
 		player.getInventory().clear();
 		player.getInventory().addItem(Lemonade.get("pickaxe-" + user.getPickaxeType().name().toLowerCase()).render());
+		player.getInventory().setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 		new WarpUtil.WarpBuilder(prototype.getAddress())
 				.addAfter(usr -> {
 					IScoreboardService.get().setCurrentObjective(usr.getUuid(), "excavation");

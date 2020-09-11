@@ -27,6 +27,7 @@ import museum.util.SubjectLogoUtil;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
 public class BeforePacketHandler implements Prepare {
 
 	public static final BeforePacketHandler INSTANCE = new BeforePacketHandler();
+	public static final ItemStack EMERGENCY_STOP = Lemonade.get("go-back-item").render();
 	private static final BlockPosition dummy = new BlockPosition(0, 0, 0);
 
 	@Override
@@ -97,6 +99,8 @@ public class BeforePacketHandler implements Prepare {
 							PacketPlayInUseItem packet = (PacketPlayInUseItem) packetObj;
 							if (packet.c == EnumHand.MAIN_HAND) {
 								if (isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
+									val itemInMainHand = user.getPlayer().getInventory().getItemInMainHand();
+
 									if (user.getExcavation() == null) {
 										for (Subject subject : user.getCurrentMuseum().getSubjects()) {
 											if (subject.getAllocation() == null)
@@ -113,7 +117,8 @@ public class BeforePacketHandler implements Prepare {
 										}
 										BlockPosition blockPos = new BlockPosition(packet.a);
 										B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, blockPos));
-									}
+									} else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP))
+										tryReturnPlayer(user, true);
 									packet.a = dummy;
 								}
 							} else if (packet.c == EnumHand.OFF_HAND)
@@ -125,7 +130,8 @@ public class BeforePacketHandler implements Prepare {
 
 							if (packet.c == STOP_DESTROY_BLOCK && valid) {
 								user.sendAnime();
-								if (tryReturnPlayer(user, app)) return;
+								if (tryReturnPlayer(user, false))
+									return;
 								acceptedBreak(user, packet);
 							} else if (packet.c == START_DESTROY_BLOCK) {
 								packet.c = ABORT_DESTROY_BLOCK;
@@ -159,14 +165,14 @@ public class BeforePacketHandler implements Prepare {
 		MessageUtil.find("placed").send(user);
 	}
 
-	private boolean tryReturnPlayer(User user, App app) {
+	private boolean tryReturnPlayer(User user, boolean force) {
 		Excavation excavation = user.getExcavation();
 
 		if (excavation.getHitsLeft() == -1)
 			return true;
 
 		excavation.setHitsLeft(excavation.getHitsLeft() - 1);
-		if (excavation.getHitsLeft() == 0) {
+		if (excavation.getHitsLeft() == 0 || force) {
 			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
 			MessageUtil.find("excavationend").send(user);
 			excavation.setHitsLeft(-1);
