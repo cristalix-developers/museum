@@ -14,8 +14,8 @@ main:
       native: profile
 
     - char: S
-      icon: buy-collector
-      left-click: /gui collectors
+      icon: buy-floor
+      left-click: /gui floor
 
     - char: M
       icon: museum

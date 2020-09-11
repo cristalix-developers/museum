@@ -63,15 +63,13 @@ menu:
 coin:
   icon: double-plant
 
-buy-collector:
-  icon: dispenser
+buy-floor:
+  icon: stone-slab2
   text: |
-    §bКупить коллектор
+    §bКупить пол | §eСкоро...
 
-    Хороший коллектор способен
-    собрать больше монет!
-
-    [§bдля этого залла§f]
+    Приобретите полы, которые
+    подходят вашему музею.
 
 invite:
   icon: book-and-quill

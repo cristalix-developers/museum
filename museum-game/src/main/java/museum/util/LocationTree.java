@@ -10,7 +10,7 @@ import java.util.function.Function;
 @UtilityClass
 public class LocationTree {
 
-	public static <T> List<T> order(List<T> points, Function<T, Location> converter) {
+	public <T> List<T> order(List<T> points, Function<T, Location> converter) {
 		List<T> result = new ArrayList<>();
 		T currentNode = points.iterator().next();
 		points.remove(currentNode);
