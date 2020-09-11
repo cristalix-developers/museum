@@ -37,15 +37,16 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 	@Override
 	protected void updateInfo() {
 		super.updateInfo();
-		this.cachedInfo.location = allocation == null ? null : UtilV3.fromVector(allocation.getOrigin().toVector());
+		this.cachedInfo.location = isAllocated() ? UtilV3.fromVector(allocation.getOrigin().toVector()) : null;
 	}
 
 	public void show(User user) {
-		if (allocation != null) allocation.getShowPackets().forEach(user::sendPacket);
+		if (isAllocated())
+			allocation.getShowPackets().forEach(user::sendPacket);
 	}
 
 	public void hide(User user) {
-		if (allocation == null)
+		if (!isAllocated())
 			return;
 		allocation.getHidePackets().forEach(user::sendPacket);
 	}

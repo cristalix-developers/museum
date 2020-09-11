@@ -52,10 +52,11 @@ public class SkeletonSubject extends Subject {
 			this.skeletonLocation = V4.fromLocation(box.transpose(
 					UtilV3.fromVector(box.getMin().toVector()),
 					cachedInfo.getRotation(),
-					new V3(0, 0, 0),
+					new V3(o.getX(), 0, o.getZ()),
 					(int) o.getX(),
 					(int) o.getY(),
-					(int) o.getZ()));
+					(int) o.getZ()
+			));
 			this.skeletonLocation.setRot(rot);
 		}
 
