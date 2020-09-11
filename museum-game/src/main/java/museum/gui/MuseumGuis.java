@@ -32,14 +32,12 @@ import static java.util.Objects.requireNonNull;
 @UtilityClass
 public class MuseumGuis {
 
-	public static final ItemStack AIR_ITEM = new ItemStack(Material.AIR);
+	public final ItemStack AIR_ITEM = new ItemStack(Material.AIR);
 
-	public static void registerItemizers(App app) {
-
+	public void registerItemizers(App app) {
 		ItemStack lockItem = Lemonade.get("lock").render();
 
 		Guis.registerItemizer("subjects-select-dino", (base, player, context, slotId) -> {
-
 			val user = app.getUser(player);
 			SkeletonPrototype skeletonType;
 			SkeletonSubject subject;
@@ -55,7 +53,7 @@ public class MuseumGuis {
 			}
 
 			if (skeletonType.getSize() > ((SkeletonSubjectPrototype) subject.getPrototype()).getSize())
-				return Items.builder().type(Material.BARRIER).displayName("§e" + skeletonType.getTitle() +  " §7(§cСлишком башой для етой витрины§7)").build();
+				return Lemonade.get("too-huge").dynamic().fill("dino", skeletonType.getTitle()).render();
 
 			// Если любая витрина уже использует этот прототип, то поставить lock предмет
 			for (SkeletonSubject skeletonSubject : user.getCurrentMuseum().getSubjects(SubjectType.SKELETON_CASE)) {
@@ -65,14 +63,20 @@ public class MuseumGuis {
 					return lockItem;
 			}
 
-			/*base.dynamic().fill("")
-			user.getSkeletonInfos().
-			val item = base.dynamic().
-					item.setDurability((short) color.getWoolData());
-					User user = app.getUser(player);
-			PickaxeType pickaxe = user.getPickaxeType().getNext();
-			return Lemonade.get("pickaxe-" + pickaxe.name()).render();*/
-			return Items.builder().type(Material.SKULL_ITEM).displayName("Динозавр " + skeletonType.getTitle()).build();
+			Skeleton playerSkeleton = null;
+
+			for (Skeleton skeleton : user.getSkeletons())
+				if (skeleton.getPrototype().getAddress().equals(skeletonType.getAddress()))
+					playerSkeleton = skeleton;
+
+			if (playerSkeleton == null)
+				return lockItem;
+
+			return Items.builder()
+					.displayName(skeletonType.getTitle() + " / " + skeletonType.getRarity().getWord().toUpperCase())
+					.type(Material.BONE_BLOCK)
+					.lore("Собрано " + playerSkeleton.getUnlockedFragments().size() + "/" + skeletonType.getFragments().size())
+					.build();
 		});
 
 		Guis.registerItemizer("upgrade-pickaxe", (base, player, context, slotId) -> {

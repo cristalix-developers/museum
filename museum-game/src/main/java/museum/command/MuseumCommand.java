@@ -38,22 +38,23 @@ public class MuseumCommand implements B.Executor {
 			val ownerPlayer = Bukkit.getPlayer(args[1]);
 
 			if (ownerPlayer == null || !ownerPlayer.isOnline())
-				return MessageUtil.find("playeroffline").getText();
+				return MessageUtil.get("playeroffline");
 
 			val ownerUser = app.getUser(ownerPlayer);
 
 			Museum museum = ownerUser.getCurrentMuseum();
 			if (museum.getOwner() != ownerUser)
-				return MessageUtil.find("playerbusy").getText();
+				return MessageUtil.get("playerbusy");
 
 			if (ownerUser.equals(visitorUser))
-				return MessageUtil.find("inviteyourself").getText();
+				return MessageUtil.get("inviteyourself");
 
 			visitorUser.getCurrentMuseum().hide(visitorUser);
 			museum.show(visitorUser);
 
 			return MessageUtil.find("visitaccept")
-					.set("visitor", visitorUser.getName()).getText();
+					.set("visitor", visitorUser.getName())
+					.getText();
 		}
 
 		if (args[0].equals("dino")) {
@@ -81,11 +82,7 @@ public class MuseumCommand implements B.Executor {
 				proto.show(sender, location);
 				return "§aДинозавр §e" + proto.getTitle() + "§a отображён рядом с вами.";
 			}
-
 		}
-
 		return "§cНеизвестная подкоманда.";
-
 	}
-
 }

@@ -71,7 +71,7 @@ public class FountainHandler implements Ticked {
 					(random.nextDouble()) * noise.getY(),
 					(random.nextDouble() - .5) * noise.getZ()
 			)));
-			B.postpone(10, particle::remove);
+			B.postpone(30, particle::remove);
 		}
 	}
 }

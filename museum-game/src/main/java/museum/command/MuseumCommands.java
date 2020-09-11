@@ -53,7 +53,6 @@ public class MuseumCommands {
 		B.regCommand(this::cmdExcavation, "excavation", "exc");
 		B.regCommand(this::cmdPickaxe, "pickaxe");
 		B.regCommand(this::cmdSubject, "subject");
-
 	}
 
 	private String cmdHome(Player sender, String[] args) {
@@ -63,9 +62,9 @@ public class MuseumCommands {
 		else if (user.getCurrentMuseum().getOwner() != user)
 			user.getCurrentMuseum().hide(user);
 		else
-			return MessageUtil.find("already-at-home").getText();
+			return MessageUtil.get("already-at-home");
 		user.getMuseums().supply(Managers.museum.getPrototype("main")).show(user);
-		return MessageUtil.find("welcome-home").getText();
+		return MessageUtil.get("welcome-home");
 	}
 
 	private String cmdSubjects(Player sender, String[] args) {
@@ -176,7 +175,6 @@ public class MuseumCommands {
 		user.setMoney(user.getMoney() - pickaxe.getPrice());
 		player.performCommand("gui pickaxes");
 		return MessageUtil.get("newpickaxe");
-
 	}
 
 	private String cmdSubject(Player player, String[] args) {
@@ -195,7 +193,7 @@ public class MuseumCommands {
 		Museum museum = user.getCurrentMuseum();
 		val subject = museum.getSubjectByUuid(subjectUuid);
 		if (museum.getOwner() != user)
-			return "Вы не в своей тарелке, откуда вы знаете uuid субъекта?))))";
+			return MessageUtil.get("owner-crash");
 
 		if (subject == null)
 			return null;
@@ -214,7 +212,7 @@ public class MuseumCommands {
 
 			player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 			player.closeInventory();
-			return MessageUtil.find("destroyed").getText();
+			return MessageUtil.get("destroyed");
 		} else if ("setdino".equals(args[0]) && args.length == 3) {
 			if (!(subject instanceof SkeletonSubject))
 				return null;
@@ -236,13 +234,12 @@ public class MuseumCommands {
 					if (skeleton == null) continue;
 					if (skeleton.getCachedInfo().getPrototypeAddress().equals(newSkeletonType.getAddress())) {
 						user.closeInventory();
-						return MessageUtil.find("standlocked").getText();
+						return MessageUtil.get("standlocked");
 					}
 				}
 
 				if (newSkeletonType.getSize() > ((SkeletonSubjectPrototype) subject.getPrototype()).getSize())
-					return "не влазит толстый))0"; // ToDo: в конфиг
-
+					return null;
 
 				val newSkeleton = user.getSkeletons().get(newSkeletonType);
 

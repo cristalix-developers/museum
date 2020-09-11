@@ -61,7 +61,6 @@ skeleton-manipulator:
       icon: goback
       left-click: /gui manipulator <payload>
     - char: O
-      icon:
       native: subjects-select-dino
       left-click: /subject setdino <payload> <index>
     - char: 'Y'

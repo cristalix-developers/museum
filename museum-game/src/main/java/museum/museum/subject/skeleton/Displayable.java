@@ -21,7 +21,6 @@ public interface Displayable {
 
 	static V4 orientedOffset(V4 positionRotation, V4 offset) {
 		V4 orientedOffset = offset.clone().rotate(V4.Y, positionRotation.rot);
-//		B.bc("§8Orienting §7" + offset + "§8 around §7" + positionRotation + "§8, res: §7" + orientedOffset);
 		return V4.sum(positionRotation, orientedOffset).setRot(orientedOffset.rot);
 	}
 
