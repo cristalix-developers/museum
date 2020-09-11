@@ -1,18 +1,18 @@
 package museum.museum.subject;
 
+import clepto.bukkit.B;
 import clepto.cristalix.mapservice.Box;
 import lombok.Getter;
-import museum.data.SkeletonInfo;
-import museum.museum.subject.skeleton.V4;
-import org.bukkit.Location;
-import ru.cristalix.core.math.V3;
-import ru.cristalix.core.util.UtilV3;
 import museum.data.SubjectInfo;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.prototype.Managers;
+import org.bukkit.Location;
+import ru.cristalix.core.math.V3;
+import ru.cristalix.core.util.UtilV3;
 
 import static museum.museum.subject.skeleton.Displayable.orientedOffset;
 
@@ -38,7 +38,7 @@ public class SkeletonSubject extends Subject {
 		String skeletonAddress = ss[0];
 		SkeletonPrototype skeletonProto = Managers.skeleton.getPrototype(skeletonAddress);
 		if (skeletonProto == null) return;
-		this.skeleton = owner.getSkeletons().get(skeletonProto);
+		this.skeleton = owner.getSkeletons().supply(skeletonProto);
 		this.skeletonLocation.rot = Float.parseFloat(ss[1]);
 	}
 
@@ -73,8 +73,12 @@ public class SkeletonSubject extends Subject {
 	public void show(User user) {
 		super.show(user);
 		if (skeleton == null) return;
+		if (!isAllocated()) return;
+		V4 absoluteLocation = V4.fromLocation(this.getAllocation().getOrigin()).add(this.skeletonLocation);
+		B.bc("§eskeletonLocation: §f" + absoluteLocation);
+		skeleton.getPrototype().show(user.getPlayer(), absoluteLocation);
 		skeleton.getUnlockedFragments().forEach(fragment ->
-				fragment.show(user.getPlayer(), orientedOffset(skeletonLocation, skeleton.getPrototype().getOffset(fragment))));
+				fragment.show(user.getPlayer(), orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment))));
 	}
 
 	@Override
@@ -91,17 +95,8 @@ public class SkeletonSubject extends Subject {
 		return skeleton.getUnlockedFragments().size() * skeleton.getPrototype().getPrice();
 	}
 
-	public void setSkeleton(User user, Skeleton skeleton) {
-		if (this.skeleton != null)
-			return;
+	public void setSkeleton(Skeleton skeleton) {
 		this.skeleton = skeleton;
-		updateInfo();
-		show(user);
-	}
-
-	public void clear(User user) {
-		hide(user);
-		skeleton = null;
 		updateInfo();
 	}
 

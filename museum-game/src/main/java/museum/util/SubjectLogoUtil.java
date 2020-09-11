@@ -1,6 +1,5 @@
 package museum.util;
 
-import clepto.bukkit.B;
 import lombok.val;
 import museum.museum.subject.Subject;
 import museum.player.User;
@@ -18,8 +17,6 @@ public class SubjectLogoUtil {
 
 	public static ItemStack encodeSubjectToItemStack(Subject subject) {
 		val itemProto = subject.getPrototype().getIcon().render();
-
-
 		val nmsItem = CraftItemStack.asNMSCopy(itemProto);
 		val nbtTagCompound = nmsItem.getTag() != null ? nmsItem.getTag() : new NBTTagCompound();
 		nbtTagCompound.setString("subject-uuid", String.valueOf(subject.getCachedInfo().getUuid()));
@@ -33,7 +30,6 @@ public class SubjectLogoUtil {
 
 		val nmsCopy = CraftItemStack.asNMSCopy(itemStack);
 		val tag = nmsCopy.getTag();
-		B.bc(tag + "");
 
 		if (tag == null || !tag.hasKey("subject-uuid"))
 			return null;

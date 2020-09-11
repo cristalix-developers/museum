@@ -9,8 +9,10 @@ import museum.App;
 import museum.data.PickaxeType;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
+import museum.museum.map.SkeletonSubjectPrototype;
 import museum.museum.map.SubjectType;
 import museum.museum.subject.SkeletonSubject;
+import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
 import museum.prototype.Managers;
@@ -20,8 +22,12 @@ import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Color;
+import ru.cristalix.core.item.Items;
 
 import java.time.Duration;
+import java.util.UUID;
+
+import static java.util.Objects.requireNonNull;
 
 @UtilityClass
 public class MuseumGuis {
@@ -34,22 +40,30 @@ public class MuseumGuis {
 
 		Guis.registerItemizer("subjects-select-dino", (base, player, context, slotId) -> {
 
-			SkeletonPrototype prototype;
+			val user = app.getUser(player);
+			SkeletonPrototype skeletonType;
+			SkeletonSubject subject;
 
 			int index = context.getOpenedGui().getIndex(slotId);
 
 			try {
-				prototype = Managers.skeleton.getByIndex(index);
-			} catch (IndexOutOfBoundsException e) {
+				skeletonType = requireNonNull(Managers.skeleton.getByIndex(index));
+				subject = requireNonNull((SkeletonSubject) user.getCurrentMuseum().getSubjectByUuid(UUID.fromString(context.getPayload())));
+				requireNonNull(user.getSkeletons().supply(skeletonType));
+			} catch (Exception e) {
 				return lockItem;
 			}
 
-			val user = app.getUser(player);
+			if (skeletonType.getSize() > ((SkeletonSubjectPrototype) subject.getPrototype()).getSize())
+				return Items.builder().type(Material.BARRIER).displayName("§e" + skeletonType.getTitle() +  " §7(§cСлишком башой для етой витрины§7)").build();
 
 			// Если любая витрина уже использует этот прототип, то поставить lock предмет
-			for (SkeletonSubject skeletonSubject : user.getCurrentMuseum().getSubjects(SubjectType.SKELETON_CASE))
-				if (skeletonSubject.getSkeleton().getCachedInfo().getPrototypeAddress().equals(prototype.getAddress()))
+			for (SkeletonSubject skeletonSubject : user.getCurrentMuseum().getSubjects(SubjectType.SKELETON_CASE)) {
+				Skeleton skeleton = skeletonSubject.getSkeleton();
+				if (skeleton == null) continue;
+				if (skeleton.getCachedInfo().getPrototypeAddress().equals(skeletonType.getAddress()))
 					return lockItem;
+			}
 
 			/*base.dynamic().fill("")
 			user.getSkeletonInfos().
@@ -58,7 +72,7 @@ public class MuseumGuis {
 					User user = app.getUser(player);
 			PickaxeType pickaxe = user.getPickaxeType().getNext();
 			return Lemonade.get("pickaxe-" + pickaxe.name()).render();*/
-			return null;
+			return Items.builder().type(Material.SKULL_ITEM).displayName("Динозавр " + skeletonType.getTitle()).build();
 		});
 
 		Guis.registerItemizer("upgrade-pickaxe", (base, player, context, slotId) -> {

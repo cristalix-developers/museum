@@ -12,7 +12,7 @@ import museum.App;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.gui.MuseumGuis;
-import museum.museum.subject.Allocation;
+import museum.museum.Museum;
 import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Fragment;
@@ -26,8 +26,7 @@ import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.Sound;
 
 import java.util.List;
 
@@ -140,21 +139,23 @@ public class BeforePacketHandler implements Prepare {
 	}
 
 	public void acceptSubjectPlace(User user, BlockPosition a) {
-		B.bc("Got blockPlaceEvent by " + user);
-
-		if (user.getCurrentMuseum() == null) return;
+		Museum museum = user.getCurrentMuseum();
+		if (museum == null || museum.getOwner() != user) return;
 
 		val item = user.getInventory().getItemInMainHand();
 		val subject = SubjectLogoUtil.decodeItemStackToSubject(user, item);
-		B.bc(user.getName() + " placed " + subject);
 
 		if (subject == null)
 			return;
 
 		user.getInventory().setItemInMainHand(MuseumGuis.AIR_ITEM);
-		Allocation allocation = subject.allocate(new Location(user.getWorld(), a.getX(), a.getY() + 1, a.getZ()));
-		subject.show(user);
-		user.msg(allocation + "");
+		Location origin = new Location(user.getWorld(), a.getX(), a.getY() + 1, a.getZ());
+		subject.allocate(origin);
+		for (User viewer : App.getApp().getUsers()) {
+			if (viewer.getCurrentMuseum() != museum) continue;
+			subject.show(user);
+			user.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
+		}
 		MessageUtil.find("placed").send(user);
 	}
 
@@ -216,7 +217,7 @@ public class BeforePacketHandler implements Prepare {
 			animateFragments(user, fragment, location);
 
 			// Проверка на дубликат
-			Skeleton skeleton = user.getSkeletons().get(proto);
+			Skeleton skeleton = user.getSkeletons().supply(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
 				double cost = proto.getPrice();

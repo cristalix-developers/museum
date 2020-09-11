@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class Registry<I extends Info, P extends Prototype, S extends Storable<I, P>> implements Iterable<S> {
+public class Registry<I extends Info, P extends Prototype, S extends Storable<I, P>> implements Collection<S> {
 
 	private final User owner;
 	private final PrototypeManager<P> manager;
@@ -19,11 +19,11 @@ public class Registry<I extends Info, P extends Prototype, S extends Storable<I,
 	private final Function<String, I> generator;
 	private final Reader<I, P, S> reader;
 
-	public void addAll(Collection<I> data) {
-		for (I info : data) add(info);
+	public void importInfos(Collection<I> data) {
+		for (I info : data) importInfo(info);
 	}
 
-	public void add(I info) {
+	public void importInfo(I info) {
 		P prototype = manager.getPrototype(info.getPrototypeAddress());
 		if (prototype == null) {
 			Bukkit.getLogger().warning(owner.getUuid() + " (" + IAccountService.get().getNameByUuid(owner.getUuid()) +
@@ -44,14 +44,19 @@ public class Registry<I extends Info, P extends Prototype, S extends Storable<I,
 		return list;
 	}
 
-
 	public S get(P prototype) {
 		for (S storable : elements) {
 			if (storable.getPrototype() == prototype) return storable;
 		}
+		return null;
+	}
+
+	public S supply(P prototype) {
+		S existing = this.get(prototype);
+		if (existing != null) return existing;
 		if (generator == null) return null;
 		S generated = reader.read(prototype, generator.apply(prototype.getAddress()), owner);
-		elements.add(generated);
+		this.add(generated);
 		return generated;
 	}
 
@@ -60,12 +65,72 @@ public class Registry<I extends Info, P extends Prototype, S extends Storable<I,
 		return elements.iterator();
 	}
 
+	@Override
 	public int size() {
 		return elements.size();
 	}
 
+	@Override
+	public boolean isEmpty() {
+		return elements.isEmpty();
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		return elements.contains(o);
+	}
+
+	public boolean containsEntry(P prototype) {
+		return this.get(prototype) != null;
+	}
+
+	@Override
+	public Object[] toArray() {
+		return elements.toArray();
+	}
+
+	@Override
+	public <T> T[] toArray(T[] ts) {
+		return elements.toArray(ts);
+	}
+
+	@Override
+	public boolean add(S element) {
+		return elements.add(element);
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		return elements.remove(o);
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> elements) {
+		return this.elements.containsAll(elements);
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends S> collection) {
+		return elements.addAll(collection);
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> elements) {
+		return this.elements.removeAll(elements);
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> elements) {
+		return this.elements.retainAll(elements);
+	}
+
+	@Override
+	public void clear() {
+		this.elements.clear();
+	}
+
 	public Stream<S> stream() {
-		return elements.stream();
+		return this.elements.stream();
 	}
 
 	@FunctionalInterface

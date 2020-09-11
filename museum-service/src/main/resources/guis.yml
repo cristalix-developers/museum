@@ -65,7 +65,7 @@ skeleton-manipulator:
       native: subjects-select-dino
       left-click: /subject setdino <payload> <index>
     - char: 'Y'
-      left-click: /subject cleardino <payload>
+      left-click: /subject setdino <payload> empty
 
 manipulator:
   title: Манипуляция постройкой

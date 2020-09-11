@@ -52,9 +52,9 @@ public class User implements PlayerWrapper {
 	public User(UserInfo info) {
 		this.info = info;
 
-		this.subjects.addAll(info.getSubjectInfos());
-		this.museums.addAll(info.getMuseumInfos());
-		this.skeletons.addAll(info.getSkeletonInfos());
+		this.subjects.importInfos(info.getSubjectInfos());
+		this.museums.importInfos(info.getMuseumInfos());
+		this.skeletons.importInfos(info.getSkeletonInfos());
 	}
 
 	public void sendAnime() {

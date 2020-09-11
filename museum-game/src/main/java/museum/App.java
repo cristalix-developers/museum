@@ -47,10 +47,7 @@ import ru.cristalix.core.scoreboard.ScoreboardService;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -189,6 +186,10 @@ public final class App extends JavaPlugin {
 
 	public CraftWorld getWorld() {
 		return map.getWorld();
+	}
+
+	public Collection<User> getUsers() {
+		return playerDataManager.getUsers();
 	}
 
 }

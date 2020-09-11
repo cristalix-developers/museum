@@ -154,7 +154,7 @@ public class PlayerDataManager implements Listener {
 				new PrepareInventory(),
 				new PrepareJSAnime(),
 				(usr, app) -> usr.getPlayer().setWalkSpeed(.33F),
-				(usr, app) -> user.getMuseums().get(Managers.museum.getPrototype("main")).show(user), // Музей
+				(usr, app) -> user.getMuseums().supply(Managers.museum.getPrototype("main")).show(user), // Музей
 				new PrepareScoreBoard(),
 				(usr, app) -> user.getPlayer().addPotionEffect(NIGHT_VISION),
 				(usr, app) -> Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current)), // Скрытие игроков
@@ -195,6 +195,10 @@ public class PlayerDataManager implements Listener {
 				return null;
 			return new SaveUserPackage(uuid, user.generateUserInfo());
 		}).filter(Objects::nonNull).collect(Collectors.toList()));
+	}
+
+	public Collection<User> getUsers() {
+		return userMap.values();
 	}
 
 }

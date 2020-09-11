@@ -8,11 +8,14 @@ import museum.App;
 import museum.data.PickaxeType;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
+import museum.museum.Museum;
+import museum.museum.map.SkeletonSubjectPrototype;
+import museum.museum.map.SubjectType;
 import museum.museum.subject.Allocation;
 import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
-import museum.museum.subject.skeleton.Skeleton;
+import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
@@ -61,7 +64,7 @@ public class MuseumCommands {
 			user.getCurrentMuseum().hide(user);
 		else
 			return MessageUtil.find("already-at-home").getText();
-		user.getMuseums().get(Managers.museum.getPrototype("main")).show(user);
+		user.getMuseums().supply(Managers.museum.getPrototype("main")).show(user);
 		return MessageUtil.find("welcome-home").getText();
 	}
 
@@ -189,7 +192,10 @@ public class MuseumCommands {
 		}
 
 		val user = app.getUser(player);
-		val subject = user.getCurrentMuseum().getSubjectByUuid(subjectUuid);
+		Museum museum = user.getCurrentMuseum();
+		val subject = museum.getSubjectByUuid(subjectUuid);
+		if (museum.getOwner() != user)
+			return "Вы не в своей тарелке, откуда вы знаете uuid субъекта?))))";
 
 		if (subject == null)
 			return null;
@@ -209,37 +215,52 @@ public class MuseumCommands {
 			player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 			player.closeInventory();
 			return MessageUtil.find("destroyed").getText();
-		} else if ("cleardino".equals(args[0])) {
-			if (!(subject instanceof SkeletonSubject))
-				return null;
-			((SkeletonSubject) subject).clear(user);
-			player.closeInventory();
-			return MessageUtil.find("freestand").getText();
 		} else if ("setdino".equals(args[0]) && args.length == 3) {
 			if (!(subject instanceof SkeletonSubject))
 				return null;
+			val skeletonSubject = (SkeletonSubject) subject;
+			val previousSkeleton = skeletonSubject.getSkeleton();
 
-			Skeleton currentSkeleton = null;
-
-			String dinosaur;
+			SkeletonPrototype newSkeletonType = null;
 			try {
-				dinosaur = Managers.skeleton.getByIndex(Integer.parseInt(args[2])).getAddress();
-			} catch (Exception e) {
-				return null;
+				newSkeletonType = Managers.skeleton.getByIndex(Integer.parseInt(args[2]));
+			} catch (Exception ignored) {}
+
+			if (newSkeletonType == null) skeletonSubject.setSkeleton(null);
+			else {
+				// Если этот скелет уже выставлен на другой витрине, потребовать сперва убрать его оттуда
+				for (val anotherSubject : museum.getSubjects(SubjectType.SKELETON_CASE)) {
+					if (anotherSubject == subject)
+						continue;
+					val skeleton = anotherSubject.getSkeleton();
+					if (skeleton == null) continue;
+					if (skeleton.getCachedInfo().getPrototypeAddress().equals(newSkeletonType.getAddress())) {
+						user.closeInventory();
+						return MessageUtil.find("standlocked").getText();
+					}
+				}
+
+				if (newSkeletonType.getSize() > ((SkeletonSubjectPrototype) subject.getPrototype()).getSize())
+					return "не влазит толстый))0"; // ToDo: в конфиг
+
+
+				val newSkeleton = user.getSkeletons().get(newSkeletonType);
+
+				if (newSkeleton == null || newSkeleton == previousSkeleton)
+					return null;
+
+				skeletonSubject.setSkeleton(newSkeleton);
 			}
 
-			for (Skeleton skeleton : user.getSkeletons())
-				if (skeleton.getCachedInfo().getPrototypeAddress().equals(dinosaur))
-					currentSkeleton = skeleton;
+			for (User watcher : app.getUsers()) {
+				if (watcher.getCurrentMuseum() != museum) continue;
+				if (previousSkeleton != null)
+					previousSkeleton.getPrototype().hide(watcher.getPlayer());
+				skeletonSubject.show(watcher);
+			}
 
-			if (currentSkeleton == null)
-				return null;
-
-			// todo: Не забыть про проверку на занятость другой витриной
-
-			((SkeletonSubject) subject).setSkeleton(user, currentSkeleton);
 			player.closeInventory();
-			return MessageUtil.find("standplaced").getText();
+			return MessageUtil.find(newSkeletonType == null ? "freestand" : "standplaced").getText();
 		}
 		return null;
 	}

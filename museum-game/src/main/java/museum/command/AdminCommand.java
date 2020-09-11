@@ -41,7 +41,7 @@ public class AdminCommand {
 			SkeletonPrototype proto = Managers.skeleton.getPrototype(args[0]);
 			if (proto == null)
 				return "§cПрототип динозавра §e" + args[0] + "§c не найден.";
-			app.getUser(sender).getSkeletons().get(proto).getUnlockedFragments().addAll(proto.getFragments());
+			app.getUser(sender).getSkeletons().supply(proto).getUnlockedFragments().addAll(proto.getFragments());
 			return "";
 		}, "dino");
 	}

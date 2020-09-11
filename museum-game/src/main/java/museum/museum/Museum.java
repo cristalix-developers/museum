@@ -104,9 +104,11 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		}
 		B.postpone(20, () -> iterateSubjects(subject -> {
 			subject.show(user);
-			val allocation = subject.getAllocation();
-			if (allocation == null)
-				player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
+			if (user == owner) {
+				val allocation = subject.getAllocation();
+				if (allocation == null)
+					player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
+			}
 		}));
 
 		updateIncrease();
