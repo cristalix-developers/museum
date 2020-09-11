@@ -3,6 +3,7 @@ package museum.util.warp;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import museum.prototype.Managers;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import museum.player.User;
@@ -42,10 +43,11 @@ public class Warp {
 				player.teleport(finish);
 				usr.setLastWarp(this);
 			} else {
-				if (start != null)
+				if (start != null) {
 					player.teleport(start);
-				else
-					user.getCurrentMuseum().show(user);
+					return;
+				}
+				user.getCurrentMuseum().show(user);
 				usr.setLastWarp(null);
 			}
 		};

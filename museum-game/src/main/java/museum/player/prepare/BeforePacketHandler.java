@@ -171,8 +171,8 @@ public class BeforePacketHandler implements Prepare {
 			MessageUtil.find("excavationend").send(user);
 			excavation.setHitsLeft(-1);
 			B.postpone(200, () -> {
-				user.setExcavation(null);
 				user.getCurrentMuseum().show(user);
+				user.setExcavation(null);
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			});
 			return true;
@@ -202,14 +202,13 @@ public class BeforePacketHandler implements Prepare {
 		ExcavationPrototype prototype = user.getExcavation().getPrototype();
 		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 
-		double luckyBuffer = user.getLocation().getY() / 100;
+		val luckyBuffer = user.getLocation().getY() / 100;
+		val bingo = luckyBuffer / proto.getRarity().getRareScale() / 10;
 
-//		double bingo = luckyBuffer / proto.getRarity().getRareScale() / 10;
-		double bingo = 1;
 		if (bingo > Pickaxe.RANDOM.nextDouble()) {
 			// Если повезло, то будет проиграна анимация и тд
 			user.giveExperience(1);
-			Fragment fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
+			val fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
 
 			V4 location = new V4(position.getX(), position.getY() + 0.5, position.getZ(), (float) (Math.random() * 360 - 180));
 

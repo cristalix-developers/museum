@@ -28,6 +28,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import ru.cristalix.core.formatting.Color;
 
 import java.util.List;
 import java.util.UUID;
@@ -198,7 +199,22 @@ public class MuseumCommands {
 		if (subject == null)
 			return null;
 
-		if ("special".equals(args[0])) {
+		if ("color".equals(args[0]) && args.length == 3) {
+			if (!subject.isAllocated())
+				return null;
+
+			Color color;
+			try {
+				color = Color.valueOf(args[2]);
+			} catch (Exception e) {
+				return null;
+			}
+
+			subject.getCachedInfo().setColor(color);
+			subject.allocate(subject.getAllocation().getOrigin());
+			subject.show(user);
+			return MessageUtil.get("color-changed");
+		} else if ("special".equals(args[0])) {
 			if (subject instanceof SkeletonSubject)
 				player.performCommand("gui skeleton-manipulator " + subjectUuid.toString());
 			else if (subject instanceof CollectorSubject)

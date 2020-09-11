@@ -99,6 +99,7 @@ subject-color:
     icon: subject-color
     native: subject-color
     left-click: /subject color <payload> <info>
+
   buttons:
     - char: X
       icon: goback

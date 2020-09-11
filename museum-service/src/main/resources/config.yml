@@ -3,6 +3,7 @@ serviceRealm: MUSS-1
 chat:
   prefix: '§7[§l§bi§7] '
   messages:
+    color-changed: 'Цвет витрины изменен.'
     owner-crash: 'UUID ты угадал, но тут есть защита от таких мудаков как ты...'
     placed: 'Постройка установлена!'
     destroyed: 'Постройка убрана в инвентарь!'

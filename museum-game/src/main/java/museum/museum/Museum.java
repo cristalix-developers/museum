@@ -73,6 +73,9 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 	public void show(User user) {
 		if (!Objects.equals(user.getLastWarp(), warp))
 			warp.warp(user);
+		// При возвращение из шахты, сначала идет прогрузка музея, а потом удаление экспедиции
+		if (user.getExcavation() == null)
+			return;
 
 		cachedInfo.views++;
 

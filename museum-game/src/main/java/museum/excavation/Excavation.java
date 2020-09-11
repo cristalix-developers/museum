@@ -37,8 +37,6 @@ public class Excavation {
 					MessageUtil.find("visitexcavation")
 							.set("title", title)
 							.send(usr);
-
-					B.postpone(20, () -> prototype.getPackets().forEach(usr::sendPacket));
 				}).build().warp(user);
 	}
 
