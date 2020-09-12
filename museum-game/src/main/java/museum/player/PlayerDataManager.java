@@ -8,21 +8,21 @@ import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.data.BoosterInfo;
 import museum.data.UserInfo;
-import museum.museum.Museum;
 import museum.packages.*;
 import museum.player.prepare.*;
 import museum.prototype.Managers;
-import museum.util.warp.Warp;
 import museum.utils.MultiTimeBar;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
@@ -104,7 +104,8 @@ public class PlayerDataManager implements Listener {
 
 			try {
 				e.setSpawnLocation(getSpawnPosition(user));
-			} catch (NoSuchMethodError ignored) {}
+			} catch (NoSuchMethodError ignored) {
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -120,7 +121,7 @@ public class PlayerDataManager implements Listener {
 		e.setSpawnLocation(getSpawnPosition(app.getUser(e.getPlayer())));
 	}
 
-	private Location getSpawnPosition(User user){
+	private Location getSpawnPosition(User user) {
 		val museum = user.getMuseums().get(Managers.museum.getPrototype("main"));
 		val warp = museum.getWarp();
 		return warp.getFinish();
@@ -135,7 +136,7 @@ public class PlayerDataManager implements Listener {
 		user.setConnection(player.getHandle().playerConnection);
 		user.setPlayer(player);
 
-		B.postpone(5, () -> Arrays.asList(
+		B.postpone(2, () -> Arrays.asList(
 				BeforePacketHandler.INSTANCE,
 				new PrepareInventory(),
 				new PrepareJSAnime(),
@@ -153,8 +154,9 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLogin(PlayerLoginEvent e) {
+		val player = e.getPlayer();
 		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
-			userMap.remove(e.getPlayer().getUniqueId());
+			userMap.remove(player.getUniqueId());
 	}
 
 	@EventHandler

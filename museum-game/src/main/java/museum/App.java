@@ -4,9 +4,9 @@ import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
 import clepto.bukkit.gui.Guis;
-import clepto.cristalix.Cristalix;
 import clepto.cristalix.mapservice.WorldMeta;
 import lombok.Getter;
+import lombok.Setter;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommand;
@@ -22,7 +22,7 @@ import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.ticker.detail.FountainHandler;
-import museum.visitor.VisitorHandler;
+import museum.util.MapLoader;
 import museum.util.MuseumChatService;
 import museum.worker.WorkerClickListener;
 import museum.worker.WorkerHandler;
@@ -38,8 +38,6 @@ import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
-import ru.cristalix.core.map.BukkitWorldLoader;
-import ru.cristalix.core.map.MapListDataItem;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.scoreboard.IScoreboardService;
@@ -49,37 +47,27 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Getter
 public final class App extends JavaPlugin {
-
 	@Getter
 	private static App app;
 
 	private PlayerDataManager playerDataManager;
 	private ClientSocket clientSocket;
+	@Setter
 	private WorldMeta map;
-
 	private YamlConfiguration configuration;
 
 	@Override
 	public void onEnable() {
 		B.plugin = App.app = this;
 
-		// Загрузка карты с сервера BUIL-1
-		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("Museum", "release")
-				.orElseThrow(() -> new RuntimeException("Map Museum/release wasn't found in the MapService"));
+		// Загрузка мира
+		MapLoader.load(this);
 
 		// Добавление админ-команд
 		AdminCommand.init(this);
-
-		try {
-			this.map = new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get());
-		} catch (InterruptedException | ExecutionException e) {
-			throw new RuntimeException(e);
-		}
-		this.map.getWorld().setGameRuleValue("mobGriefing", "false");
 
 		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
 		SubjectType.init();

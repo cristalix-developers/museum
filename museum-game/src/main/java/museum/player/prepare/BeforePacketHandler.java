@@ -22,6 +22,7 @@ import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.player.pickaxe.Pickaxe;
 import museum.player.pickaxe.PickaxeType;
+import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
 import net.minecraft.server.v1_12_R1.*;
@@ -30,6 +31,7 @@ import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static museum.excavation.Excavation.isAir;
 import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.*;
@@ -42,19 +44,19 @@ public class BeforePacketHandler implements Prepare {
 
 	public static final BeforePacketHandler INSTANCE = new BeforePacketHandler();
 	public static final ItemStack EMERGENCY_STOP = Lemonade.get("go-back-item").render();
+	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
 	private static final BlockPosition dummy = new BlockPosition(0, 0, 0);
 
 	@Override
 	public void execute(User user, App app) {
-		PlayerConnection connection = user.getConnection();
-		connection.networkManager.channel.pipeline().addBefore("packet_handler", user.getName(),
+		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(),
 				new ChannelDuplexHandler() {
 					@Override
 					public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
 						try {
 							// Обработка отправки чанков
 							if (msg instanceof PacketPlayOutMapChunk) {
-								val mapChunk = (PacketPlayOutMapChunk) msg;
+								PacketPlayOutMapChunk mapChunk = (PacketPlayOutMapChunk) msg;
 								if (user.getExcavation() != null) {
 									// Если загружается чанк шахты, то новой
 									val prototype = user.getExcavation().getPrototype();
@@ -64,29 +66,9 @@ public class BeforePacketHandler implements Prepare {
 											return;
 										}
 									}
-								} else {
-									for (Subject subject : user.getCurrentMuseum().getSubjects()) {
-										val allocation = subject.getAllocation();
-										if (allocation == null) continue;
-										B.postpone(10, () -> {
-											allocation.getShowPackets().forEach(packet -> {
-												if (packet.a.x == mapChunk.a && packet.a.z / 16 == mapChunk.b)
-													user.sendPacket(packet);
-											});
-											if (subject instanceof CollectorSubject) {
-												val loc = ((CollectorSubject) subject).getCollectorLocation();
-												if (loc.getBlockX() / 16 == mapChunk.a && loc.getBlockZ() / 16 == mapChunk.b) {
-													val piece = ((CollectorSubject) subject).getPiece();
-													piece.hide(user.getPlayer());
-													piece.show(user.getPlayer(), loc);
-												}
-											}
-										});
-									}
 								}
 							}
-						} catch (Exception ignored) {
-						}
+						} catch (Exception ignored) { }
 						if (msg != null) {
 							super.write(ctx, msg, promise);
 						}
@@ -144,7 +126,7 @@ public class BeforePacketHandler implements Prepare {
 		);
 	}
 
-	public void acceptSubjectPlace(User user, BlockPosition a) {
+	private void acceptSubjectPlace(User user, BlockPosition a) {
 		Museum museum = user.getCurrentMuseum();
 		if (museum == null || museum.getOwner() != user) return;
 
@@ -256,12 +238,10 @@ public class BeforePacketHandler implements Prepare {
 		}
 	}
 
-	public static final V4 offset = new V4(0, 0.03, 0, 4);
-
 	private void animateFragments(User user, Fragment fragment, V4 location) {
 		Cycle.run(1, 60, tick -> {
 			if (tick == 59) fragment.hide(user.getPlayer());
-			else fragment.update(user.getPlayer(), location.add(offset));
+			else fragment.update(user.getPlayer(), location.add(OFFSET));
 		});
 	}
 

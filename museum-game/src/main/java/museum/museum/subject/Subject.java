@@ -41,14 +41,9 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 	}
 
 	public void show(User user) {
-		if (isAllocated())
-			allocation.getShowPackets().forEach(user::sendPacket);
 	}
 
 	public void hide(User user) {
-		if (!isAllocated())
-			return;
-		allocation.getHidePackets().forEach(user::sendPacket);
 	}
 
 	public double getIncome() {

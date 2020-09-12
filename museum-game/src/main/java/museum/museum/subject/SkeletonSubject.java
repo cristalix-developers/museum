@@ -67,7 +67,7 @@ public class SkeletonSubject extends Subject {
 	public void updateInfo() {
 		super.updateInfo();
 		if (skeleton == null) cachedInfo.metadata = null;
-		else cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + skeletonLocation.rot;
+		else cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot);
 	}
 
 	@Override

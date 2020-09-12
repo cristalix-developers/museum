@@ -1,8 +1,11 @@
 package museum.museum.subject;
 
 import clepto.cristalix.mapservice.Box;
+import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.val;
 import museum.App;
 import museum.data.SubjectInfo;
 import museum.museum.map.SubjectPrototype;
@@ -21,9 +24,8 @@ import static clepto.bukkit.B.nms;
 public class Allocation {
 
 	private final Location origin;
-	private final Collection<PacketPlayOutMultiBlockChange> showPackets;
+	private final Map<BlockPosition, IBlockData> blocks;
 	private final Collection<PacketPlayOutWorldEvent> destroyPackets;
-	private final Collection<PacketPlayOutMultiBlockChange> hidePackets;
 	private final List<Location> allocatedBlocks;
 	private final String clientData;
 
@@ -31,9 +33,8 @@ public class Allocation {
 		if (origin == null) return null;
 
 		Box box = prototype.getBox();
-		List<PacketPlayOutMultiBlockChange> showPackets = new ArrayList<>();
+		Map<BlockPosition, IBlockData> blocks = Maps.newHashMap();
 		List<PacketPlayOutWorldEvent> destroyPackets = new ArrayList<>();
-		List<PacketPlayOutMultiBlockChange> hidePackets = new ArrayList<>();
 		List<Location> allocated = new ArrayList<>();
 
 		V3 absoluteOrigin = UtilV3.fromVector(origin.toVector());
@@ -61,12 +62,9 @@ public class Allocation {
 		for (int x = (int) box.getMin().getX(); x <= box.getMax().getX(); x++) {
 			for (int y = (int) box.getMin().getY(); y <= box.getMax().getY(); y++) {
 				for (int z = (int) box.getMin().getZ(); z <= box.getMax().getZ(); z++) {
-					Location dst = box.transpose(absoluteOrigin, info.getRotation(), relativeOrigin, x, y, z);
+					val dst = box.transpose(absoluteOrigin, info.getRotation(), relativeOrigin, x, y, z);
+					val src = new Location(App.getApp().getWorld(), x, y, z);
 
-					if (dst.getBlock().getType() != Material.AIR) {
-						return null; // Невозможно разместить субъект - место занято или не доступно.
-					}
-					Location src = new Location(App.getApp().getWorld(), x, y, z);
 					if (src.getBlock().getType() == Material.AIR) continue;
 
 					if (minX > dst.getBlockX()) minX = dst.getBlockX();
@@ -94,29 +92,15 @@ public class Allocation {
 					int tileId = Block.getCombinedId(data);
 					destroyPackets.add(new PacketPlayOutWorldEvent(2001, blockPos, tileId, false));
 					allocated.add(dst);
+
+					blocks.put(blockPos, blockData.blockData);
 				}
 			}
 		}
 
-		for (Map.Entry<ChunkCoordIntPair, List<BlockData>> entry : chunkMap.entrySet()) {
-			PacketPlayOutMultiBlockChange showPacket = new PacketPlayOutMultiBlockChange();
-			PacketPlayOutMultiBlockChange hidePacket = new PacketPlayOutMultiBlockChange();
-			showPacket.a = hidePacket.a = entry.getKey();
-			List<BlockData> list = entry.getValue();
-			showPacket.b = new PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[list.size()];
-			hidePacket.b = new PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[list.size()];
-			for (int i = 0; i < list.size(); i++) {
-				BlockData blockData = list.get(i);
-				showPacket.b[i] = showPacket.new MultiBlockChangeInfo(blockData.offset, blockData.blockData);
-				hidePacket.b[i] = hidePacket.new MultiBlockChangeInfo(blockData.offset, Pickaxe.AIR_DATA);
-			}
-			showPackets.add(showPacket);
-			hidePackets.add(hidePacket);
-		}
-
 		String clientData = minX + "_" + minY + "_" + minZ + "_" + maxX + "_" + maxY + "_" + maxZ;
 
-		return new Allocation(origin, showPackets, destroyPackets, hidePackets, allocated, clientData);
+		return new Allocation(origin, blocks, destroyPackets, allocated, clientData);
 	}
 
 	@Override
