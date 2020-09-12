@@ -55,21 +55,28 @@ public class Managers {
 			val iconLabel = box.getLabel("icon");
 			DynamicItem icon = null;
 			if (iconLabel != null) {
-//				String tag = iconLabel.getTag();
-//				if (tag != null && !tag.isEmpty()) {
-//					icon = Lemonade.get(tag).dynamic();
-//				}
 				Block iconBlock = iconLabel.subtract(0, 1, 0).getBlock();
 				iconBlock.getChunk().load();
-				if (iconBlock.getType() == Material.CHEST) try {
-					icon = new DynamicItem(((Chest) iconBlock.getState()).getBlockInventory().getItem(0));
-				} catch (Exception ignored) {}
-
-				if (icon == null) icon = new DynamicItem(iconBlock.getDrops().iterator().next());
+				if (iconBlock.getType() == Material.CHEST) {
+					try {
+						icon = new DynamicItem(((Chest) iconBlock.getState()).getBlockInventory().getItem(0));
+					} catch (Exception ignored) {
+					}
+				}
+				if (icon == null)
+					icon = new DynamicItem(iconBlock.getDrops().iterator().next());
 				iconBlock.setType(Material.AIR);
-			} else icon = new DynamicItem(new ItemStack(Material.PACKED_ICE));
+			} else
+				icon = new DynamicItem(new ItemStack(Material.PACKED_ICE));
 
 			builder.icon(icon);
+
+			// Добавляю блок, на который можно ставить данный Subject
+			val ableLabel = box.getLabel("able");
+			Block ableBlock = ableLabel.subtract(0, 1, 0).getBlock();
+			ableBlock.getChunk().load();
+
+			builder.able(ableBlock.getDrops().iterator().next().getType());
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
 					.relativeManipulators(box.getLabels("manipulator").stream()
