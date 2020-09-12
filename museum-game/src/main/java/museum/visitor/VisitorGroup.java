@@ -1,4 +1,4 @@
-package museum.entities;
+package museum.visitor;
 
 import clepto.ListUtils;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class VisitorGroup {
 	private List<Node> currentRoute;
 	private Node currentNode;
 
-	public VisitorGroup(List<Location> allNodes, List<Location> mainNodes) {
+	public VisitorGroup(List<? extends Location> allNodes, List<? extends Location> mainNodes) {
 		int amount = allNodes.size();
 		this.nodes = new Node[amount];
 		int id = 0;
@@ -92,10 +92,11 @@ public class VisitorGroup {
 
 	}
 
-	public void spawn(Node node) {
-		currentNode = node;
-		mainToVisit.remove(node);
-		Location loc = node.getLocation();
+	public void spawn() {
+		nodes[0].getLocation().getChunk().load();
+		currentNode = nodes[0];
+		mainToVisit.remove(nodes[0]);
+		Location loc = nodes[0].getLocation();
 		this.guide = new EntityVisitor(loc.getWorld(), this);
 		PatchedEntity.VISITOR.spawn(this.guide, loc);
 		int peopleAmount = 5 + ((int) (Math.random() * 6));

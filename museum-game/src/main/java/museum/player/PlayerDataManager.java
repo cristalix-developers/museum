@@ -18,13 +18,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
@@ -104,11 +102,8 @@ public class PlayerDataManager implements Listener {
 			User user = new User(userInfo);
 			userMap.put(e.getUniqueId(), user);
 
-			Museum currentMuseum = user.getCurrentMuseum();
-			Warp warp = currentMuseum.getWarp();
-			Location finish = warp.getFinish();
 			try {
-				e.setSpawnLocation(finish);
+				e.setSpawnLocation(getSpawnPosition(user));
 			} catch (NoSuchMethodError ignored) {}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -117,28 +112,19 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler
 	public void onSpawn(PlayerSpawnLocationEvent e) {
-		UUID uniqueId = e.getPlayer().getUniqueId();
-		User user = app.getUser(uniqueId);
-		Museum currentMuseum = user.getCurrentMuseum();
-		Warp warp = currentMuseum.getWarp();
-		Location finish = warp.getFinish();
-		e.setSpawnLocation(finish);
+		e.setSpawnLocation(getSpawnPosition(app.getUser(e.getPlayer())));
 	}
 
 	@EventHandler
 	public void onSpawn(PlayerInitialSpawnEvent e) {
-		UUID uniqueId = e.getPlayer().getUniqueId();
-		User user = app.getUser(uniqueId);
-		Museum currentMuseum = user.getCurrentMuseum();
-		Warp warp = currentMuseum.getWarp();
-		Location finish = warp.getFinish();
-		e.setSpawnLocation(finish);
+		e.setSpawnLocation(getSpawnPosition(app.getUser(e.getPlayer())));
 	}
 
-//	@EventHandler
-//	public void onSpawn(PlayerLoginEvent e) {
-//		e.setSpawnLocation(app.getUser(e.getPlayer().getUniqueId()).getCurrentMuseum().getWarp().getFinish());
-//	}
+	private Location getSpawnPosition(User user){
+		val museum = user.getMuseums().get(Managers.museum.getPrototype("main"));
+		val warp = museum.getWarp();
+		return warp.getFinish();
+	}
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {

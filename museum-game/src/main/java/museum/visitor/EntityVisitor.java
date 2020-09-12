@@ -1,4 +1,4 @@
-package museum.entities;
+package museum.visitor;
 
 import lombok.Getter;
 import net.minecraft.server.v1_12_R1.*;
@@ -27,7 +27,7 @@ public class EntityVisitor extends EntityVillager {
 	}
 
 	@Override
-	protected void r() {
+	public void r() {
 		this.goalSelector.a(1, new PathfinderGoalLookAtPlayer(this, EntityVillager.class, 3.0F));
 		if (this.visitorGroup != null) {
 			if (this.visitorGroup.getGuide() == this) {

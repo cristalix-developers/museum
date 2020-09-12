@@ -22,7 +22,7 @@ import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.ticker.detail.FountainHandler;
-import museum.ticker.visitor.VisitorHandler;
+import museum.visitor.VisitorHandler;
 import museum.util.MuseumChatService;
 import museum.worker.WorkerClickListener;
 import museum.worker.WorkerHandler;
@@ -143,8 +143,7 @@ public final class App extends JavaPlugin {
 		);
 
 		// Обработка каждого тика
-		new TickTimerHandler(this, Arrays.asList(
-				new VisitorHandler(),
+		new TickTimerHandler(this, Collections.singletonList(
 				new FountainHandler(this)
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 	}

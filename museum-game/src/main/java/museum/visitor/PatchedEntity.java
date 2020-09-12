@@ -1,4 +1,4 @@
-package museum.entities;
+package museum.visitor;
 
 import net.minecraft.server.v1_12_R1.Entity;
 import net.minecraft.server.v1_12_R1.EntityTypes;

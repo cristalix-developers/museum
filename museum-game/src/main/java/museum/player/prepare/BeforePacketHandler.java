@@ -154,8 +154,7 @@ public class BeforePacketHandler implements Prepare {
 		if (subject == null)
 			return;
 
-		val underBlock = a.down();
-		val location = new Location(App.getApp().getWorld(), underBlock.getX(), underBlock.getY(), underBlock.getZ());
+		val location = new Location(App.getApp().getWorld(), a.getX(), a.getY(), a.getZ());
 
 		if (subject.getPrototype().getAble() != location.getBlock().getType()) {
 			MessageUtil.find("cannot-place").send(user);
