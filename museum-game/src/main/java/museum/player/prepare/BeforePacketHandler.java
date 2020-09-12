@@ -154,6 +154,14 @@ public class BeforePacketHandler implements Prepare {
 		if (subject == null)
 			return;
 
+		val underBlock = a.down();
+		val location = new Location(App.getApp().getWorld(), underBlock.getX(), underBlock.getY(), underBlock.getZ());
+
+		if (subject.getPrototype().getAble() != location.getBlock().getType()) {
+			MessageUtil.find("cannot-place").send(user);
+			return;
+		}
+
 		user.getInventory().setItemInMainHand(MuseumGuis.AIR_ITEM);
 		Location origin = new Location(user.getWorld(), a.getX(), a.getY() + 1, a.getZ());
 		subject.allocate(origin);
