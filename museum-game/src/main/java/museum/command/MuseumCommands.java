@@ -3,6 +3,7 @@ package museum.command;
 import clepto.bukkit.B;
 import clepto.bukkit.gui.Gui;
 import clepto.bukkit.gui.Guis;
+import clepto.bukkit.item.ItemClosure;
 import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
@@ -17,6 +18,7 @@ import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
+import museum.player.pickaxe.Pickaxe;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
@@ -25,8 +27,11 @@ import museum.util.warp.Warp;
 import museum.util.warp.WarpUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.Blocks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.formatting.Color;
 
@@ -54,6 +59,19 @@ public class MuseumCommands {
 		B.regCommand(this::cmdExcavation, "excavation", "exc");
 		B.regCommand(this::cmdPickaxe, "pickaxe");
 		B.regCommand(this::cmdSubject, "subject");
+		B.regCommand((sender, args) -> {
+			ItemClosure closure = new ItemClosure(this, this) {
+				@Override
+				public Object call(Object... args) {
+					item(Material.BRICK);
+					text("§6Кирпич судьбы");
+					text("§8Магически определяет погоду");
+					return null;
+				}
+			};
+			sender.getInventory().addItem(closure.build(this).asBukkitMirror());
+			return "§aOK";
+		}, "ti");
 	}
 
 	private String cmdHome(Player sender, String[] args) {
@@ -199,9 +217,9 @@ public class MuseumCommands {
 		if (subject == null)
 			return null;
 
+		val allocation = subject.getAllocation();
+
 		if ("color".equals(args[0]) && args.length == 3) {
-			if (!subject.isAllocated())
-				return null;
 
 			Color color;
 			try {
@@ -211,8 +229,17 @@ public class MuseumCommands {
 			}
 
 			subject.getCachedInfo().setColor(color);
-			subject.allocate(subject.getAllocation().getOrigin());
-			subject.show(user);
+
+			if (allocation != null) {
+				allocation.prepareUpdate(data -> {
+					Block block = data.getBlock();
+					// concrete и concrete_powder меняют цвет
+					return block == Blocks.dR || block == Blocks.dS ? block.fromLegacyData(color.getWoolData()) : data;
+				});
+
+				allocation.sendUpdate(museum.getUsers());
+			}
+
 			return MessageUtil.get("color-changed");
 		} else if ("special".equals(args[0])) {
 			if (subject instanceof SkeletonSubject)
@@ -220,10 +247,11 @@ public class MuseumCommands {
 			else if (subject instanceof CollectorSubject)
 				player.performCommand("gui collector-manipulator " + subjectUuid.toString());
 		} else if ("destroy".equals(args[0])) {
-			if (!subject.isAllocated())
+			if (allocation == null)
 				return null;
-			subject.getAllocation().getDestroyPackets().forEach(user::sendPacket);
-			subject.hide(user);
+			allocation.sendDestroyEffects(museum.getUsers());
+			allocation.prepareUpdate(data -> Pickaxe.AIR_DATA);
+			allocation.sendUpdate(museum.getUsers());
 			subject.allocate(null);
 
 			player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
@@ -273,7 +301,7 @@ public class MuseumCommands {
 			}
 
 			player.closeInventory();
-			return MessageUtil.find(newSkeletonType == null ? "freestand" : "standplaced").getText();
+			return MessageUtil.get(newSkeletonType == null ? "freestand" : "standplaced");
 		}
 		return null;
 	}

@@ -4,12 +4,11 @@ import clepto.cristalix.mapservice.Box;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.val;
 import museum.App;
 import museum.data.SubjectInfo;
 import museum.museum.map.SubjectPrototype;
-import museum.player.pickaxe.Pickaxe;
+import museum.player.User;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,6 +16,7 @@ import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static clepto.bukkit.B.nms;
 
@@ -25,7 +25,7 @@ public class Allocation {
 
 	private final Location origin;
 	private final Map<BlockPosition, IBlockData> blocks;
-	private final Collection<PacketPlayOutWorldEvent> destroyPackets;
+	private final Collection<PacketPlayOutMultiBlockChange> updatePackets;
 	private final List<Location> allocatedBlocks;
 	private final String clientData;
 
@@ -34,7 +34,6 @@ public class Allocation {
 
 		Box box = prototype.getBox();
 		Map<BlockPosition, IBlockData> blocks = Maps.newHashMap();
-		List<PacketPlayOutWorldEvent> destroyPackets = new ArrayList<>();
 		List<Location> allocated = new ArrayList<>();
 
 		V3 absoluteOrigin = UtilV3.fromVector(origin.toVector());
@@ -90,7 +89,6 @@ public class Allocation {
 					chunkMap.computeIfAbsent(chunkPos, c -> new ArrayList<>()).add(blockData);
 
 					int tileId = Block.getCombinedId(data);
-					destroyPackets.add(new PacketPlayOutWorldEvent(2001, blockPos, tileId, false));
 					allocated.add(dst);
 
 					blocks.put(blockPos, blockData.blockData);
@@ -98,9 +96,61 @@ public class Allocation {
 			}
 		}
 
+		Collection<PacketPlayOutMultiBlockChange> updatePackets = new ArrayList<>();
+
+		for (Map.Entry<ChunkCoordIntPair, List<BlockData>> entry : chunkMap.entrySet()) {
+			PacketPlayOutMultiBlockChange updatePacket = new PacketPlayOutMultiBlockChange();
+			updatePacket.a = entry.getKey();
+			List<BlockData> list = entry.getValue();
+			updatePacket.b = new PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[list.size()];
+			for (int i = 0; i < list.size(); i++) {
+				BlockData blockData = list.get(i);
+				updatePacket.b[i] = updatePacket.new MultiBlockChangeInfo(blockData.offset, blockData.blockData);
+			}
+			updatePackets.add(updatePacket);
+		}
+
 		String clientData = minX + "_" + minY + "_" + minZ + "_" + maxX + "_" + maxY + "_" + maxZ;
 
-		return new Allocation(origin, blocks, destroyPackets, allocated, clientData);
+		return new Allocation(origin, blocks, updatePackets, allocated, clientData);
+	}
+
+	public void prepareUpdate(Function<IBlockData, IBlockData> converter) {
+		for (PacketPlayOutMultiBlockChange packet : updatePackets) {
+			for (int i = 0; i < packet.b.length; i++) {
+				packet.b[i] = packet.new MultiBlockChangeInfo(packet.b[i].b, converter.apply(packet.b[i].c));
+			}
+		}
+	}
+
+	/**
+	 * Частицы и звуки ломания блоков в этой аллокации
+	 */
+	public void sendDestroyEffects(Collection<User> users) {
+		// ToDo: партиклов слишком много, лагает!!!
+		List<PacketPlayOutWorldEvent> packets = new ArrayList<>();
+		for (PacketPlayOutMultiBlockChange packet : this.updatePackets) {
+			for (PacketPlayOutMultiBlockChange.MultiBlockChangeInfo info : packet.b) {
+				if (info == null) continue;
+				// 2001 - id события разрушения блока
+				packets.add(new PacketPlayOutWorldEvent(2001, info.a(), Block.getCombinedId(info.c), false));
+			}
+		}
+		sendPackets(packets, users);
+	}
+
+	public void sendUpdate(Collection<User> users) {
+		sendPackets(this.updatePackets, users);
+	}
+
+	public static void sendPackets(Collection<? extends Packet<?>> packets, User... users) {
+		sendPackets(packets, Arrays.asList(users));
+	}
+	public static void sendPackets(Collection<? extends Packet<?>> packets, Collection<User> users) {
+		for (User user : users) {
+			for (Packet<?> packet : packets)
+				user.sendPacket(packet);
+		}
 	}
 
 	@Override

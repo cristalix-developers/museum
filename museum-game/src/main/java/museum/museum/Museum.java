@@ -1,5 +1,6 @@
 package museum.museum;
 
+import clepto.ListUtils;
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
@@ -52,7 +53,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
 		this.getSubjects(SubjectType.COLLECTOR).forEach(collector -> {
 			List<MarkerSubject> markers = allMarkers.stream()
-					.filter(marker -> marker.getCollectorId() == collector.getId())
+					.filter(marker -> marker.getCollectorId() == collector.getId() && marker.getLocation() != null)
 					.collect(Collectors.toList());
 			List<MarkerSubject> route = LocationTree.order(markers, MarkerSubject::getLocation);
 			collector.setNavigator(new CollectorNavigator(prototype, world,
@@ -179,6 +180,10 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
 	public void incrementViews() {
 		cachedInfo.views++;
+	}
+
+	public Collection<User> getUsers() {
+		return ListUtils.filter(App.getApp().getUsers(), user -> user.getCurrentMuseum() == this);
 	}
 
 }

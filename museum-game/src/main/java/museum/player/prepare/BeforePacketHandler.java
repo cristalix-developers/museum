@@ -13,7 +13,7 @@ import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.gui.MuseumGuis;
 import museum.museum.Museum;
-import museum.museum.subject.CollectorSubject;
+import museum.museum.subject.Allocation;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
@@ -22,7 +22,6 @@ import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.player.pickaxe.Pickaxe;
 import museum.player.pickaxe.PickaxeType;
-import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
 import net.minecraft.server.v1_12_R1.*;
@@ -30,8 +29,8 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static museum.excavation.Excavation.isAir;
 import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.*;
@@ -143,14 +142,20 @@ public class BeforePacketHandler implements Prepare {
 			return;
 		}
 
-		user.getInventory().setItemInMainHand(MuseumGuis.AIR_ITEM);
 		Location origin = new Location(user.getWorld(), a.getX(), a.getY() + 1, a.getZ());
-		subject.allocate(origin);
-		for (User viewer : App.getApp().getUsers()) {
-			if (viewer.getCurrentMuseum() != museum) continue;
-			subject.show(user);
-			user.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
+		Collection<User> viewers = museum.getUsers();
+		Allocation allocation = subject.allocate(origin);
+		if (allocation == null) {
+			MessageUtil.find("cannot-place").send(user);
+			return;
 		}
+
+		user.getInventory().setItemInMainHand(MuseumGuis.AIR_ITEM);
+		allocation.sendUpdate(viewers);
+		for (User viewer : viewers) {
+			viewer.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
+		}
+
 		MessageUtil.find("placed").send(user);
 	}
 

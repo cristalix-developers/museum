@@ -25,8 +25,6 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 	}
 
 	public Allocation allocate(Location origin) {
-		if (origin == null)
-			System.out.println("Clearing allocation for " + prototype.getAddress());
 		return this.allocation = Allocation.allocate(cachedInfo, prototype, origin);
 	}
 

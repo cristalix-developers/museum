@@ -1,6 +1,5 @@
 rootProject.name = 'museum'
 include 'museum-game'
-include 'museum-game-entities'
 include 'museum-service'
 include 'museum-commons'
 

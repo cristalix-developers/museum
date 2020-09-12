@@ -69,7 +69,7 @@ public class MapLoader {
 				continue;
 
 			allocation.getBlocks().forEach((position, data) -> {
-				if (position.getX() / 16 == chunk.locX && position.getZ() / 16 == chunk.locZ)
+				if (position.getX() >> 4 == chunk.locX && position.getZ() >> 4 == chunk.locZ)
 					chunk.a(position, goBack ? Pickaxe.AIR_DATA : data);
 			});
 

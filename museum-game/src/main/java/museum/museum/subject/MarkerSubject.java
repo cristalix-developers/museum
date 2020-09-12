@@ -21,7 +21,8 @@ public class MarkerSubject extends Subject {
 
 	public MarkerSubject(SubjectPrototype prototype, SubjectInfo info, User user) {
 		super(prototype, info, user);
-		this.location = UtilV3.toLocation(info.getLocation().clone().add(0.5, 0, 0.5), App.getApp().getWorld());
+		// ToDo: Fix markers
+		this.location = info.getLocation() == null ? null : UtilV3.toLocation(info.getLocation().clone().add(0.5, 0, 0.5), App.getApp().getWorld());
 		this.collectorId = info.getMetadata() == null ? 0 : Integer.parseInt(info.getMetadata());
 	}
 
@@ -31,6 +32,7 @@ public class MarkerSubject extends Subject {
 
 	@Override
 	public void show(User user) {
+		if (location == null) return;
 		val packet = new PacketPlayOutBlockChange(App.getApp().getNMSWorld(), new BlockPosition(location.x, location.y, location.z));
 		packet.block = Blocks.REDSTONE_TORCH.blockData;
 		user.sendPacket(packet);
@@ -38,6 +40,7 @@ public class MarkerSubject extends Subject {
 
 	@Override
 	public void hide(User user) {
+		if (location == null) return;
 		val packet = new PacketPlayOutBlockChange(App.getApp().getNMSWorld(), new BlockPosition(location.x, location.y, location.z));
 		packet.block = Blocks.AIR.blockData;
 		user.sendPacket(packet);
