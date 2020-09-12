@@ -58,10 +58,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 			collector.setNavigator(new CollectorNavigator(prototype, world,
 					route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 		});
-
-		// ToDo: Это костыль, музей должен устанавливаться по-нормальному
-		owner.setCurrentMuseum(this);
-
 		warp = new WarpUtil.WarpBuilder(prototype.getAddress()).build();
 	}
 
@@ -73,8 +69,11 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 	public void show(User user) {
 		if (!Objects.equals(user.getLastWarp(), warp))
 			warp.warp(user);
-		// При возвращение из шахты, сначала идет прогрузка музея, а потом удаление экспедиции
-		if (user.getExcavation() == null)
+
+		// Если игрок после раскопок, то убрать ее, иначе если он не зашел впервые, то зачем прогружать?
+		if (user.getExcavation() != null) {
+			user.setExcavation(null);
+		} else if (user.getCurrentMuseum() != null)
 			return;
 
 		cachedInfo.views++;
@@ -118,7 +117,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 	}
 
 	public void hide(User user) {
-
 		iterateSubjects(s -> s.hide(user));
 
 		Set<Coin> coins = user.getCoins();

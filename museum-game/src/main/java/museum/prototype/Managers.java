@@ -73,10 +73,9 @@ public class Managers {
 
 			// Добавляю блок, на который можно ставить данный Subject
 			val ableLabel = box.getLabel("able");
-			Block ableBlock = ableLabel.subtract(0, 1, 0).getBlock();
-			ableBlock.getChunk().load();
-
+			val ableBlock = ableLabel.subtract(0, 1, 0).getBlock();
 			builder.able(ableBlock.getDrops().iterator().next().getType());
+			ableBlock.setType(Material.AIR);
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
 					.relativeManipulators(box.getLabels("manipulator").stream()

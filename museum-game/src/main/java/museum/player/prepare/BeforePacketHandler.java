@@ -178,7 +178,6 @@ public class BeforePacketHandler implements Prepare {
 			excavation.setHitsLeft(-1);
 			B.postpone(200, () -> {
 				user.getCurrentMuseum().show(user);
-				user.setExcavation(null);
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			});
 			return true;
