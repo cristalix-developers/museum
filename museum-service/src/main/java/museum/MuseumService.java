@@ -143,6 +143,10 @@ public class MuseumService {
 			museumPackage.setBoostersCount(boosters);
 			answer(channel, museumPackage);
 		}));
+		registerHandler(RequestConfigurationsPackage.class, ((channel, serverName, museumPackage) -> {
+			CONFIGURATION_MANAGER.fillRequest(museumPackage);
+			answer(channel, museumPackage);
+		}));
 
 		Thread consoleThread = new Thread(MuseumService::handleConsole);
 		consoleThread.setDaemon(true);
