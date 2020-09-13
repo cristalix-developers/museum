@@ -29,7 +29,7 @@ dependencies {
     compileOnly 'org.codehaus.groovy:groovy:3.0.5'
     compileOnly 'cristalix:bukkit-core:20.08.28'
     implementation project(':museum-commons')
-    implementation 'clepto:clepto-bukkit:3.0.3'
+    implementation 'clepto:clepto-bukkit:3.0.4-SNAPSHOT'
     implementation 'clepto:clepto-cristalix:2.4.5'
 }
 

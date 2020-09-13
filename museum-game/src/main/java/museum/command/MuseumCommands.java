@@ -17,6 +17,7 @@ import museum.museum.subject.Allocation;
 import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
+import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.State;
 import museum.player.User;
@@ -54,6 +55,7 @@ public class MuseumCommands {
 		B.regCommand(this::cmdExcavation, "excavation", "exc");
 		B.regCommand(this::cmdPickaxe, "pickaxe");
 		B.regCommand(this::cmdSubject, "subject");
+		B.regCommand(this::cmdSkeleton, "skeleton");
 		B.regCommand(this::cmdVisit, "visit", "museum");
 		B.regCommand((sender, args) -> {
 			ItemClosure closure = new ItemClosure(this, this) {
@@ -103,6 +105,13 @@ public class MuseumCommands {
 			return MessageUtil.get("already-at-home");
 		user.setState(user.getLastMuseum());
 		return MessageUtil.get("welcome-home");
+	}
+
+	private String cmdSkeleton(Player sender, String[] args) {
+		Collection<Skeleton> skeletons = this.app.getUser(sender).getSkeletons();
+		skeletons.forEach(skeleton ->
+				sender.sendMessage("§e" + skeleton.getPrototype().getAddress() + "§f: " + skeleton.getUnlockedFragments().size()));
+		return "§e" + skeletons.size() + " in total.";
 	}
 
 	private String cmdSubjects(Player sender, String[] args) {
@@ -287,8 +296,11 @@ public class MuseumCommands {
 				newSkeletonType = Managers.skeleton.getByIndex(Integer.parseInt(args[2]));
 			} catch (Exception ignored) {}
 
-			if (newSkeletonType == null) skeletonSubject.setSkeleton(null);
-			else {
+			// Заменять на && не надо, ибо другая логика
+			if (newSkeletonType == null) {
+				if (previousSkeleton != null)
+					skeletonSubject.setSkeleton(null);
+			} else {
 				// Если этот скелет уже выставлен на другой витрине, потребовать сперва убрать его оттуда
 				for (val anotherSubject : museum.getSubjects(SubjectType.SKELETON_CASE)) {
 					if (anotherSubject == subject)
@@ -306,7 +318,7 @@ public class MuseumCommands {
 
 				val newSkeleton = user.getSkeletons().get(newSkeletonType);
 
-				if (newSkeleton == null || newSkeleton == previousSkeleton)
+				if (newSkeleton == null || newSkeleton == previousSkeleton || newSkeleton.getUnlockedFragments().isEmpty())
 					return null;
 
 				skeletonSubject.setSkeleton(newSkeleton);
@@ -320,8 +332,20 @@ public class MuseumCommands {
 				skeletonSubject.updateSkeleton(true);
 			}
 
-			player.closeInventory();
-			return MessageUtil.get(newSkeletonType == null ? "freestand" : "standplaced");
+			// Если до изменения был динозавр и он удален, то написать об этом
+			if (previousSkeleton != null) {
+				if (newSkeletonType == null) {
+					player.closeInventory();
+					return MessageUtil.get("freestand");
+				}
+				return null;
+			}
+			// Если динозавр не удален и поставлен новый динозавр, то написать об этом
+			if (newSkeletonType != null) {
+				player.closeInventory();
+				return MessageUtil.get("standplaced");
+			}
+			return null;
 		}
 		return null;
 	}

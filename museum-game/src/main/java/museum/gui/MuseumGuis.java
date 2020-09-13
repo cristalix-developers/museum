@@ -70,7 +70,7 @@ public class MuseumGuis {
 				if (skeleton.getPrototype().getAddress().equals(skeletonType.getAddress()))
 					playerSkeleton = skeleton;
 
-			if (playerSkeleton == null)
+			if (playerSkeleton == null || playerSkeleton.getUnlockedFragments().isEmpty())
 				return lockItem;
 
 			return Items.builder()
