@@ -1,3 +1,5 @@
+apply plugin: 'groovy'
+
 repositories {
     maven {
         def args = nmsMavenUri.split ' '
@@ -29,11 +31,17 @@ dependencies {
     compileOnly 'org.codehaus.groovy:groovy:3.0.5'
     compileOnly 'cristalix:bukkit-core:20.08.28'
     implementation project(':museum-commons')
-    implementation 'clepto:clepto-bukkit:3.0.3'
+    implementation 'clepto:clepto-bukkit:3.0.5'
     implementation 'clepto:clepto-cristalix:2.4.5'
 }
 
 ext.genOutputDir = file("$buildDir/generated/resources")
+
+configurations.all {
+    // check for updates every build
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 
 classes {
     File outputFile = file("$genOutputDir/plugin.yml")

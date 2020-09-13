@@ -118,6 +118,14 @@ public final class App extends JavaPlugin {
 			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 		});
 
+		// Прогрузка предметов из Groovy-скриптов
+		try {
+			Class<?> museumItems = Class.forName("MuseumItems");
+			museumItems.getMethod("run").invoke(museumItems.newInstance());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 		// Инициализация команд
 		new MuseumCommands(this);
 		this.shop = new Shop(this);

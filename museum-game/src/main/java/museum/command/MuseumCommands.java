@@ -3,7 +3,7 @@ package museum.command;
 import clepto.bukkit.B;
 import clepto.bukkit.gui.Gui;
 import clepto.bukkit.gui.Guis;
-import clepto.bukkit.item.ItemClosure;
+import clepto.bukkit.item.Items;
 import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
@@ -28,10 +28,11 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.formatting.Color;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -56,17 +57,14 @@ public class MuseumCommands {
 		B.regCommand(this::cmdSubject, "subject");
 		B.regCommand(this::cmdVisit, "visit", "museum");
 		B.regCommand((sender, args) -> {
-			ItemClosure closure = new ItemClosure(this, this) {
-				@Override
-				public Object call(Object... args) {
-					item(Material.BRICK);
-					text("§6Кирпич судьбы");
-					text("§8Магически определяет погоду");
-					return null;
-				}
-			};
-			sender.getInventory().addItem(closure.build(this).asBukkitMirror());
-			return "§aOK";
+			try {
+				sender.getInventory().addItem(Items.render("navigator", this).asBukkitMirror());
+				return "§aOK!";
+			} catch (Exception ex) {
+				StringWriter wr = new StringWriter();
+				ex.printStackTrace(new PrintWriter(wr));
+				return wr.toString();
+			}
 		}, "ti");
 	}
 
@@ -91,6 +89,8 @@ public class MuseumCommands {
 
 		if (user.getState() == museum)
 			return MessageUtil.get("already-here");
+
+		user.setState(museum);
 
 		return MessageUtil.find("museum-teleported")
 				.set("visitor", user.getName())
