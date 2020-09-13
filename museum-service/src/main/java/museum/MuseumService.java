@@ -52,7 +52,7 @@ public class MuseumService {
 	}};
 	public static ConfigurationManager CONFIGURATION_MANAGER;
 
-	public static MongoAdapter<UserInfo> userData;
+	public static UserDataMongoAdapter userData;
 	public static MongoAdapter<BoosterInfo> globalBoosters;
 
 	public static List<Subservice> subservices = new ArrayList<>();
@@ -69,7 +69,7 @@ public class MuseumService {
 		String dbUrl = System.getenv("db_url");
 		String dbName = System.getenv("db_data");
 		MongoClient client = MongoClients.create(dbUrl);
-		userData = new MongoAdapter<>(client, dbName, "userData", UserInfo.class);
+		userData = new UserDataMongoAdapter(client, dbName);
 		globalBoosters = new MongoAdapter<>(client, dbName, "globalBoosters", BoosterInfo.class);
 
 		boosterManager = new BoosterManager();
