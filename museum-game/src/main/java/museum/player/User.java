@@ -55,9 +55,9 @@ public class User implements PlayerWrapper {
 	public User(UserInfo info) {
 		this.info = info;
 
+		this.skeletons.importInfos(info.getSkeletonInfos());
 		this.subjects.importInfos(info.getSubjectInfos());
 		this.museums.importInfos(info.getMuseumInfos());
-		this.skeletons.importInfos(info.getSkeletonInfos());
 
 		if (info.getLastPosition() != null)
 			this.lastLocation = UtilV3.toLocation(info.getLastPosition(), App.getApp().getWorld());
