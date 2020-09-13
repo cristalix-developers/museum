@@ -54,7 +54,7 @@ public class CollectorSubject extends Subject {
 	@Override
 	public void setAllocation(Allocation allocation) {
 		super.setAllocation(allocation);
-		allocation.allocatePiece(piece, V4.fromLocation(this.getCollectorLocation()), false);
+		if (allocation != null) allocation.allocatePiece(piece, V4.fromLocation(this.getCollectorLocation()), false);
 	}
 
 	public void move(long iteration) {
