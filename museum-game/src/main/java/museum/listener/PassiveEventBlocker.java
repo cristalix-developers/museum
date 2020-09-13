@@ -45,11 +45,6 @@ public class PassiveEventBlocker implements Listener {
 	}
 
 	@EventHandler
-	public void onBlockPlace(BlockPlaceEvent event) {
-		event.setCancelled(true);
-	}
-
-	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 		event.setCancelled(true);
 	}

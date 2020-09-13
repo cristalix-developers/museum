@@ -2,14 +2,10 @@ package museum.player.prepare;
 
 import clepto.cristalix.mapservice.Label;
 import com.destroystokyo.paper.Title;
-import io.netty.buffer.Unpooled;
 import museum.App;
 import museum.player.User;
-import net.minecraft.server.v1_12_R1.PacketDataSerializer;
-import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -30,7 +26,7 @@ public class PreparePlayerBrain implements Prepare {
 			new Title("Кастомизируй"),
 			new Title("Играй с друзьями"),
 			new Title("Удачи!")
-	);
+													);
 
 	public PreparePlayerBrain(App app) {
 		dots = app.getMap().getLabels("guide");
@@ -47,14 +43,12 @@ public class PreparePlayerBrain implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		if (user.getPlayer().hasPlayedBefore())
+		if (user.getPlayer().hasPlayedBefore() || user.getExperience() > 10)
 			return;
-
-		user.getConnection().sendPacket(new PacketPlayOutCustomPayload("ilyafx:radio", new PacketDataSerializer(
-				Unpooled.wrappedBuffer("{\"enabled\": false, \"link\": \"https://bw.vime.red/music.mp3\"}".getBytes(StandardCharsets.UTF_8)))));
 
 		new BukkitRunnable() {
 			int counter = 0;
+
 			@Override
 			public void run() {
 				if (!user.getPlayer().isOnline()) {
@@ -69,15 +63,16 @@ public class PreparePlayerBrain implements Prepare {
 					user.getPlayer().sendMessage("§fон может устроить §6раскопки!");
 					user.getPlayer().sendMessage("§6Внутри музея, Сатоши §fможет показать вам");
 					user.getPlayer().sendMessage("§6постройки §fдля кастомизации помещения.");
+					user.giveExperience(10);
 
 					this.cancel();
 					return;
 				}
-				System.out.println(counter);
 				user.getPlayer().sendTitle(titles.get(counter));
 				user.getPlayer().teleport(dots.get(counter).toCenterLocation());
 				counter++;
 			}
-		}.runTaskTimer(app, 3 * 20L, 7 * 20L);
+		}.runTaskTimer(app, 3 * 20L, 6 * 20L);
 	}
+
 }

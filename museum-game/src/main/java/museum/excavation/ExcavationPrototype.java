@@ -1,10 +1,10 @@
 package museum.excavation;
 
 import lombok.Data;
-import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
-import org.bukkit.Location;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.prototype.Prototype;
+import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
+import org.bukkit.Material;
 
 import java.util.List;
 
@@ -18,5 +18,6 @@ public class ExcavationPrototype implements Prototype {
 	private final double price;
 	private final String title;
 	private final List<PacketPlayOutMapChunk> packets;
+	private final Material icon;
 
 }

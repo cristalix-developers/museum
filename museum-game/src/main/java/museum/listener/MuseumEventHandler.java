@@ -2,15 +2,15 @@ package museum.listener;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
+import museum.App;
+import museum.util.MessageUtil;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import museum.App;
 
 /**
  * @author func 08.06.2020
@@ -25,10 +25,30 @@ public class MuseumEventHandler implements Listener {
 	public void onInteract(PlayerInteractEvent e) {
 		if (e.getHand() == EquipmentSlot.OFF_HAND || (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK))
 			return;
-		Player player = e.getPlayer();
-		Material type = player.getInventory().getItemInMainHand().getType();
+		val player = e.getPlayer();
+		val itemStack = player.getInventory().getItemInMainHand();
+
+		if (itemStack == null || itemStack.getItemMeta() == null)
+			return;
+
+		val type = itemStack.getType();
 		if (type == Material.PAPER)
 			player.performCommand("gui main");
+		else if (type == Material.SADDLE)
+			player.performCommand("home");
+		else {
+			player.getInventory().forEach(item -> {
+				if (item == null || item.getItemMeta() == null)
+					return;
+
+				if (item.getType() == Material.EMERALD) {
+					val user = app.getUser(player);
+					user.setMoney(user.getMoney() + 200);
+					MessageUtil.find("emerald").send(user);
+					item.setAmount(item.getAmount() - 1);
+				}
+			});
+		}
 	}
 
 	@EventHandler

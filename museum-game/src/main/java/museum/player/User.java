@@ -27,6 +27,7 @@ import museum.util.LevelSystem;
 import museum.util.MessageUtil;
 import museum.util.warp.Warp;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -46,14 +47,14 @@ public class User implements PlayerWrapper {
 	private Warp lastWarp;
 	private Museum currentMuseum;
 	private Excavation excavation;
-	private Set<Coin> coins;
+	private Set<Coin> coins = new HashSet<>();
 
 	public User(UserInfo info) {
 		this.info = info;
 
-		this.subjects.addAll(info.getSubjectInfos());
-		this.museums.addAll(info.getMuseumInfos());
-		this.skeletons.addAll(info.getSkeletonInfos());
+		this.subjects.importInfos(info.getSubjectInfos());
+		this.museums.importInfos(info.getMuseumInfos());
+		this.skeletons.importInfos(info.getSkeletonInfos());
 	}
 
 	public void sendAnime() {
@@ -105,6 +106,11 @@ public class User implements PlayerWrapper {
 		UtilNetty.writeString(buffer, payload);
 		PacketPlayOutCustomPayload packet = new PacketPlayOutCustomPayload(channel, new PacketDataSerializer(buffer));
 		player.getHandle().playerConnection.sendPacket(packet);
+	}
+
+	@Override
+	public String toString() {
+		return this.getDisplayName();
 	}
 
 }

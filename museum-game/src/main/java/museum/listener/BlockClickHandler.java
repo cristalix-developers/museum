@@ -11,9 +11,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import museum.App;
-import museum.museum.map.SubjectPrototype;
-import museum.prototype.Managers;
-import museum.ticker.detail.PresentHandler;
 import museum.util.MessageUtil;
 
 /**
@@ -25,8 +22,6 @@ public class BlockClickHandler implements Listener {
 
 	private static final PotionEffect INVISIBLE =
 			new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false);
-	private final App app;
-	private final PresentHandler presentHandler;
 
 	@EventHandler
 	public void onBlockClick(PlayerInteractEvent event) {
@@ -35,24 +30,13 @@ public class BlockClickHandler implements Listener {
 			return;
 		val location = block.getLocation();
 		val player = event.getPlayer();
-		val user = app.getUser(player);
+		val blockType = block.getType();
 
-		if (block.getType() == Material.PISTON_EXTENSION) {
+		if (blockType == Material.PISTON_EXTENSION) {
 			Bat bat = (Bat) location.getWorld().spawnEntity(location.clone().add(.5, .2, .5), EntityType.BAT);
 			bat.setAI(false);
 			bat.addPotionEffect(INVISIBLE);
 			bat.addPassenger(player);
-		} else if (block.getType() == Material.SKULL) {
-			val reward = presentHandler.getPresentByLocation(location);
-			if (reward == null)
-				return;
-			reward.remove();
-			val type = reward.getType();
-			MessageUtil.find("reward")
-					.set("reward", MessageUtil.toMoneyFormat(type.getPrice()))
-					.send(user);
-			user.setMoney(user.getMoney() + type.getPrice());
-			type.getOnFind().onFind(user, location);
 		}
 	}
 }

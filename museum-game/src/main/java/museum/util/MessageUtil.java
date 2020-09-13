@@ -15,21 +15,21 @@ import java.text.DecimalFormat;
 @UtilityClass
 public class MessageUtil {
 
-	private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###,###.##$");
-	private static String PREFIX;
+	private final DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###,###.##$");
+	private String PREFIX;
 
-	public static String toMoneyFormat(double money) {
+	public String toMoneyFormat(double money) {
 		return MONEY_FORMAT.format(money);
 	}
 
-	public static Message find(String locator) {
+	public Message find(String locator) {
 		if (PREFIX == null)
 			PREFIX = App.getApp().getConfig().getString("chat.prefix");
 
 		return new Message(locator);
 	}
 
-	public static String get(String locator) {
+	public String get(String locator) {
 		return find(locator).getText();
 	}
 
@@ -40,7 +40,7 @@ public class MessageUtil {
 		private String text;
 
 		public Message(String locator) {
-			text = PREFIX + App.getApp().getConfig().getString("chat.messages." + locator);
+			text = PREFIX + App.getApp().getConfig().getString("chat.messages." + locator, locator);
 		}
 
 		public Message set(String key, String value) {

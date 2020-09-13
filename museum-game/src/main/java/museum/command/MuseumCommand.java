@@ -4,8 +4,10 @@ import clepto.bukkit.B;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import museum.App;
+import museum.museum.Museum;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.museum.subject.skeleton.V4;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import org.bukkit.Bukkit;
@@ -34,21 +36,26 @@ public class MuseumCommand implements B.Executor {
 		if (args[0].equals("accept")) {
 			if (args.length < 2)
 				return "§cИспользование: §f/museum accept Игрок";
-			val visitorPlayer = Bukkit.getPlayer(args[1]);
+			val ownerPlayer = Bukkit.getPlayer(args[1]);
 
-			if (visitorPlayer == null || !visitorPlayer.isOnline())
-				return MessageUtil.find("playeroffline").getText();
+			if (ownerPlayer == null || !ownerPlayer.isOnline())
+				return MessageUtil.get("playeroffline");
 
-			val visitorUser = app.getUser(visitorPlayer);
+			val ownerUser = app.getUser(ownerPlayer);
 
-			if (user.getCurrentMuseum().getOwner().equals(user))
-				return MessageUtil.find("inviteyourself").getText();
+			Museum museum = ownerUser.getCurrentMuseum();
+			if (museum.getOwner() != ownerUser)
+				return MessageUtil.get("playerbusy");
 
-			visitorUser.getCurrentMuseum().hide(visitorUser);
-			user.getCurrentMuseum().show(visitorUser);
+			if (ownerUser.equals(user))
+				return MessageUtil.get("inviteyourself");
+
+			user.getCurrentMuseum().hide(user);
+			museum.show(user);
 
 			return MessageUtil.find("visitaccept")
-					.set("visitor", user.getName()).getText();
+					.set("visitor", user.getName())
+					.getText();
 		}
 
 		if (args[0].equals("dino")) {
@@ -68,19 +75,15 @@ public class MuseumCommand implements B.Executor {
 				Optional<Fragment> opt = proto.getFragments().stream().filter(a -> a.getAddress().equalsIgnoreCase(fragmentAddress)).findAny();
 				if (!opt.isPresent()) return "§cКость §e" + fragmentAddress + "§c не найдена в скелете §e" + proto.getAddress();
 				Fragment fragment = opt.get();
-				fragment.hide(sender);
-				fragment.show(sender, location);
+				fragment.hide(user);
+				fragment.show(user, V4.fromLocation(location));
 				return "§aФрагмент §e" + proto.getTitle() + "/" + fragment.getAddress() + "§a отображён рядом с вами.";
 			} else {
-				proto.hide(sender);
-				proto.show(sender, location);
+				proto.hide(user);
+				proto.show(user, V4.fromLocation(location));
 				return "§aДинозавр §e" + proto.getTitle() + "§a отображён рядом с вами.";
 			}
-
 		}
-
 		return "§cНеизвестная подкоманда.";
-
 	}
-
 }

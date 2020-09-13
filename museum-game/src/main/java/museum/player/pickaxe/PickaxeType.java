@@ -10,9 +10,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum PickaxeType {
-	DEFAULT(new DefaultPickaxe(), 5),
-	PROFESSIONAL(new ProfessionalPickaxe(), 20),
-	PRESTIGE(new PrestigePickaxe(), 50);
+
+	DEFAULT(new DefaultPickaxe(), 1),
+	PROFESSIONAL(new ProfessionalPickaxe(), 3),
+	PRESTIGE(new PrestigePickaxe(), 5);
 
 	private final Pickaxe pickaxe;
 	private final int experience;

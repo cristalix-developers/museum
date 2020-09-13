@@ -1,15 +1,15 @@
 package museum.museum;
 
+import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.val;
-import net.minecraft.server.v1_12_R1.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import museum.App;
 import museum.player.User;
 import museum.player.pickaxe.Pickaxe;
+import net.minecraft.server.v1_12_R1.*;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 
 /**
  * @author func 08.06.2020
@@ -65,10 +65,10 @@ public class Coin {
 			user.setPickedCoinsCount(user.getPickedCoinsCount() + 1);
 			user.setMoney(user.getMoney() + money);
 
-			Bukkit.getScheduler().runTaskLaterAsynchronously(app, () -> {
+			B.postpone(30, () -> {
 				remove(connection);
 				connection.sendPacket(new PacketPlayOutEntityDestroy(message.getId()));
-			}, 30);
+			});
 		}
 		return close;
 	}

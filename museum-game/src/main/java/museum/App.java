@@ -4,28 +4,25 @@ import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
 import clepto.bukkit.gui.Guis;
-import clepto.cristalix.Cristalix;
-import clepto.cristalix.mapservice.Label;
 import clepto.cristalix.mapservice.WorldMeta;
 import lombok.Getter;
-import lombok.val;
+import lombok.Setter;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommand;
+import museum.command.MuseumCommands;
 import museum.donate.DonateType;
 import museum.gui.MuseumGuis;
 import museum.listener.BlockClickHandler;
 import museum.listener.MuseumEventHandler;
 import museum.listener.PassiveEventBlocker;
 import museum.museum.map.SubjectType;
-import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.packages.*;
 import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.ticker.detail.FountainHandler;
-import museum.ticker.detail.PresentHandler;
-import museum.ticker.visitor.VisitorHandler;
+import museum.util.MapLoader;
 import museum.util.MuseumChatService;
 import museum.worker.WorkerClickListener;
 import museum.worker.WorkerHandler;
@@ -38,12 +35,9 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.cristalix.core.CoreApi;
-import ru.cristalix.core.build.models.Point;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
-import ru.cristalix.core.map.BukkitWorldLoader;
-import ru.cristalix.core.map.MapListDataItem;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.scoreboard.IScoreboardService;
@@ -53,49 +47,27 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Getter
 public final class App extends JavaPlugin {
-
 	@Getter
 	private static App app;
 
 	private PlayerDataManager playerDataManager;
 	private ClientSocket clientSocket;
+	@Setter
 	private WorldMeta map;
-
 	private YamlConfiguration configuration;
 
 	@Override
 	public void onEnable() {
 		B.plugin = App.app = this;
 
-		// Загрузка карты с сервера BUIL-1
-		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("Museum", "release")
-				.orElseThrow(() -> new RuntimeException("Map Museum/release wasn't found in the MapService"));
+		// Загрузка мира
+		MapLoader.load(this);
 
 		// Добавление админ-команд
 		AdminCommand.init(this);
-
-		try {
-			this.map = new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get());
-			int total = 0;
-			for (Map.Entry<String, List<Point>> e : this.map.getCristalixMap().getBuildWorldState().getPoints().entrySet()) {
-				System.out.println("cristalix point " + e.getKey() + ": ");
-				for (Point point : e.getValue()) {
-					total++;
-					System.out.println(point.getTag() + " " + point.getV3());
-				}
-			}
-			System.out.println(total + " cristalix points in total.");
-			for (Label label : this.map.getLabels())
-				System.out.println(label);
-			System.out.println(this.map.getLabels().size() + " labels in total.");
-		} catch (InterruptedException | ExecutionException e) {
-			throw new RuntimeException(e);
-		}
-		this.map.getWorld().setGameRuleValue("mobGriefing", "false");
 
 		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
 		SubjectType.init();
@@ -134,18 +106,19 @@ public final class App extends JavaPlugin {
 			YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
 			itemsConfig.getKeys(false)
 					.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
+
+			// Инициализация "умных" иконок в гуишках
+			MuseumGuis.registerItemizers(this);
+
 			// Загрузка всех инвентарей
 			Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));
 
 			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 		});
 
-		// Инициализация промежуточных команд / Инвентарей
-		new MuseumGuis(this);
+		// Инициализация команд
+		new MuseumCommands(this);
 		B.regCommand(new MuseumCommand(this), "museum");
-
-		// Создание обработчика голов-подарков
-		val presentHandler = new PresentHandler(this);
 
 		// Регистрация обработчиков событий
 		B.events(
@@ -153,15 +126,13 @@ public final class App extends JavaPlugin {
 				new PassiveEventBlocker(),
 				new MuseumEventHandler(this),
 				new GuiEvents(),
-				new BlockClickHandler(this, presentHandler),
+				new BlockClickHandler(),
 				new WorkerClickListener(this, new WorkerHandler(this))
 		);
 
 		// Обработка каждого тика
-		new TickTimerHandler(this, Arrays.asList(
-				new VisitorHandler(),
-				new FountainHandler(this),
-				presentHandler
+		new TickTimerHandler(this, Collections.singletonList(
+				new FountainHandler(this)
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 	}
 
@@ -202,6 +173,10 @@ public final class App extends JavaPlugin {
 
 	public CraftWorld getWorld() {
 		return map.getWorld();
+	}
+
+	public Collection<User> getUsers() {
+		return playerDataManager.getUsers();
 	}
 
 }

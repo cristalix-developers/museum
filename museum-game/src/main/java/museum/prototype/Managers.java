@@ -1,24 +1,27 @@
 package museum.prototype;
 
 import clepto.ListUtils;
+import clepto.bukkit.DynamicItem;
 import clepto.bukkit.InvalidConfigException;
 import clepto.cristalix.mapservice.Label;
 import clepto.cristalix.mapservice.MapServiceException;
 import lombok.val;
-import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
-import org.bukkit.entity.ArmorStand;
-import ru.cristalix.core.formatting.Color;
-import ru.cristalix.core.math.D2;
 import museum.data.SubjectInfo;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.map.*;
 import museum.museum.subject.skeleton.Rarity;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.inventory.ItemStack;
+import ru.cristalix.core.formatting.Color;
+import ru.cristalix.core.math.D2;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,6 +51,31 @@ public class Managers {
 						.size(box.requireLabel("size").getTagInt());
 
 			else builder = SubjectPrototype.builder();
+
+			val iconLabel = box.getLabel("icon");
+			DynamicItem icon = null;
+			if (iconLabel != null) {
+				Block iconBlock = iconLabel.subtract(0, 1, 0).getBlock();
+				iconBlock.getChunk().load();
+				if (iconBlock.getType() == Material.CHEST) {
+					try {
+						icon = new DynamicItem(((Chest) iconBlock.getState()).getBlockInventory().getItem(0));
+					} catch (Exception ignored) {
+					}
+				}
+				if (icon == null)
+					icon = new DynamicItem(iconBlock.getDrops().iterator().next());
+				iconBlock.setType(Material.AIR);
+			} else
+				icon = new DynamicItem(new ItemStack(Material.PACKED_ICE));
+
+			builder.icon(icon);
+
+			// Добавляю блок, на который можно ставить данный Subject
+			val ableLabel = box.getLabel("able");
+			val ableBlock = ableLabel.subtract(0, 1, 0).getBlock();
+			builder.able(ableBlock.getDrops().iterator().next().getType());
+			ableBlock.setType(Material.AIR);
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
 					.relativeManipulators(box.getLabels("manipulator").stream()
@@ -160,7 +188,8 @@ public class Managers {
 					box.requireLabel("required-level").getTagInt(),
 					box.requireLabel("price").getTagDouble(),
 					box.requireLabel("title").getTag(),
-					packets
+					packets,
+					Material.getMaterial(box.requireLabel("icon").getTag().toUpperCase())
 			);
 		});
 	}

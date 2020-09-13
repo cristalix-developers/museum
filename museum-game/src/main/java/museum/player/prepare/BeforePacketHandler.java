@@ -1,35 +1,39 @@
 package museum.player.prepare;
 
 import clepto.ListUtils;
+import clepto.bukkit.B;
+import clepto.bukkit.Cycle;
 import clepto.bukkit.Lemonade;
-import com.destroystokyo.paper.antixray.PacketPlayOutMapChunkInfo;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import lombok.val;
-import museum.museum.subject.skeleton.V4;
-import net.minecraft.server.v1_12_R1.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import museum.App;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
+import museum.gui.MuseumGuis;
+import museum.museum.Museum;
+import museum.museum.subject.Allocation;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.player.pickaxe.Pickaxe;
 import museum.player.pickaxe.PickaxeType;
 import museum.util.MessageUtil;
+import museum.util.SubjectLogoUtil;
+import net.minecraft.server.v1_12_R1.*;
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.*;
 import static museum.excavation.Excavation.isAir;
+import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.*;
 
 /**
  * @author func 31.05.2020
@@ -37,20 +41,21 @@ import static museum.excavation.Excavation.isAir;
  */
 public class BeforePacketHandler implements Prepare {
 
-	private final BlockPosition dummy = new BlockPosition(0, 0, 0);
-	private final ItemStack menu = Lemonade.get("menu").render();
+	public static final BeforePacketHandler INSTANCE = new BeforePacketHandler();
+	public static final ItemStack EMERGENCY_STOP = Lemonade.get("go-back-item").render();
+	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
+	private static final BlockPosition dummy = new BlockPosition(0, 0, 0);
 
 	@Override
 	public void execute(User user, App app) {
-		PlayerConnection connection = user.getConnection();
-		connection.networkManager.channel.pipeline().addBefore("packet_handler", user.getName(),
+		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(),
 				new ChannelDuplexHandler() {
 					@Override
 					public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
 						try {
 							// Обработка отправки чанков
 							if (msg instanceof PacketPlayOutMapChunk) {
-								val mapChunk = (PacketPlayOutMapChunk) msg;
+								PacketPlayOutMapChunk mapChunk = (PacketPlayOutMapChunk) msg;
 								if (user.getExcavation() != null) {
 									// Если загружается чанк шахты, то новой
 									val prototype = user.getExcavation().getPrototype();
@@ -62,18 +67,21 @@ public class BeforePacketHandler implements Prepare {
 									}
 								}
 							}
-						} catch (Exception ignored) {
-						}
+						} catch (Exception ignored) { }
 						if (msg != null) {
 							super.write(ctx, msg, promise);
 						}
 					}
+
+					@SuppressWarnings("deprecation")
 					@Override
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 						if (packetObj instanceof PacketPlayInUseItem) {
 							PacketPlayInUseItem packet = (PacketPlayInUseItem) packetObj;
 							if (packet.c == EnumHand.MAIN_HAND) {
 								if (isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
+									val itemInMainHand = user.getPlayer().getInventory().getItemInMainHand();
+
 									if (user.getExcavation() == null) {
 										for (Subject subject : user.getCurrentMuseum().getSubjects()) {
 											if (subject.getAllocation() == null)
@@ -86,10 +94,13 @@ public class BeforePacketHandler implements Prepare {
 															user.getCurrentMuseum().processClick(user, subject));
 													break;
 												}
-
 											}
 										}
-									}
+										BlockPosition blockPos = new BlockPosition(packet.a);
+										B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, blockPos));
+									} else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP))
+										tryReturnPlayer(user, true);
+									packet.a = dummy;
 								}
 							} else if (packet.c == EnumHand.OFF_HAND)
 								packet.a = dummy;
@@ -100,7 +111,8 @@ public class BeforePacketHandler implements Prepare {
 
 							if (packet.c == STOP_DESTROY_BLOCK && valid) {
 								user.sendAnime();
-								if (tryReturnPlayer(user, app)) return;
+								if (tryReturnPlayer(user, false))
+									return;
 								acceptedBreak(user, packet);
 							} else if (packet.c == START_DESTROY_BLOCK) {
 								packet.c = ABORT_DESTROY_BLOCK;
@@ -113,25 +125,56 @@ public class BeforePacketHandler implements Prepare {
 		);
 	}
 
-	private boolean tryReturnPlayer(User user, App app) {
+	private void acceptSubjectPlace(User user, BlockPosition a) {
+		Museum museum = user.getCurrentMuseum();
+		if (museum == null || museum.getOwner() != user) return;
+
+		val item = user.getInventory().getItemInMainHand();
+		val subject = SubjectLogoUtil.decodeItemStackToSubject(user, item);
+
+		if (subject == null)
+			return;
+
+		val location = new Location(App.getApp().getWorld(), a.getX(), a.getY(), a.getZ());
+
+		if (subject.getPrototype().getAble() != location.getBlock().getType()) {
+			MessageUtil.find("cannot-place").send(user);
+			return;
+		}
+
+		Location origin = new Location(user.getWorld(), a.getX(), a.getY() + 1, a.getZ());
+		Collection<User> viewers = museum.getUsers();
+		Allocation allocation = subject.allocate(origin);
+		if (allocation == null) {
+			MessageUtil.find("cannot-place").send(user);
+			return;
+		}
+
+		user.getInventory().setItemInMainHand(MuseumGuis.AIR_ITEM);
+		allocation.sendUpdate(viewers);
+		for (User viewer : viewers) {
+			viewer.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
+			subject.show(viewer);
+		}
+
+		MessageUtil.find("placed").send(user);
+	}
+
+	private boolean tryReturnPlayer(User user, boolean force) {
 		Excavation excavation = user.getExcavation();
 
 		if (excavation.getHitsLeft() == -1)
 			return true;
 
 		excavation.setHitsLeft(excavation.getHitsLeft() - 1);
-		if (excavation.getHitsLeft() == 0) {
+		if (excavation.getHitsLeft() == 0 || force) {
 			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
 			MessageUtil.find("excavationend").send(user);
 			excavation.setHitsLeft(-1);
-			Bukkit.getScheduler().runTaskLater(app, () -> {
-				user.setExcavation(null);
-				val inventory = user.getPlayer().getInventory();
-				inventory.clear();
-				inventory.setItem(0, menu);
+			B.postpone(200, () -> {
 				user.getCurrentMuseum().show(user);
 				user.setExcavationCount(user.getExcavationCount() + 1);
-			}, 10 * 20L);
+			});
 			return true;
 		}
 		return excavation.getHitsLeft() < 0;
@@ -140,6 +183,10 @@ public class BeforePacketHandler implements Prepare {
 	@SuppressWarnings("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
+			// С некоторым шансом может выпасть эмеральд
+			if (Pickaxe.RANDOM.nextFloat() > .9)
+				user.getPlayer().getInventory().addItem(Lemonade.get("emerald-item").render());
+			// Перебрать все кирки и эффекты на них
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
 					List<BlockPosition> positions = pickaxeType.getPickaxe().dig(user, packet.a);
@@ -155,20 +202,21 @@ public class BeforePacketHandler implements Prepare {
 		ExcavationPrototype prototype = user.getExcavation().getPrototype();
 		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 
-		double luckyBuffer = user.getLocation().getY() / 100;
+		val luckyBuffer = user.getLocation().getY() / 100;
+		val bingo = luckyBuffer / proto.getRarity().getRareScale() / 10;
 
-		double bingo = luckyBuffer / proto.getRarity().getRareScale() / 10;
 		if (bingo > Pickaxe.RANDOM.nextDouble()) {
 			// Если повезло, то будет проиграна анимация и тд
-			user.giveExperience(25);
-			Fragment fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
+			user.giveExperience(1);
+			val fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
 
-			fragment.show(user.getPlayer(), new V4(position.getX(), position.getY(), position.getZ(), (float) (Math.random() * 360 - 180)));
+			V4 location = new V4(position.getX(), position.getY() + 0.5, position.getZ(), (float) (Math.random() * 360 - 180));
 
-			animateFragments(user, fragment);
+			fragment.show(user, location);
+			animateFragments(user, fragment, location);
 
 			// Проверка на дубликат
-			Skeleton skeleton = user.getSkeletons().get(proto);
+			Skeleton skeleton = user.getSkeletons().supply(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
 				double cost = proto.getPrice();
@@ -196,29 +244,11 @@ public class BeforePacketHandler implements Prepare {
 		}
 	}
 
-	private void animateFragments(User user, Fragment fragment) {
-		AtomicInteger integer = new AtomicInteger(0);
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				PlayerConnection connection = user.getConnection();
-
-				int[] ids = fragment.getPieceOffsetMap().keySet().stream()
-						.mapToInt(piece -> piece.getStand().id)
-						.toArray();
-
-				if (integer.getAndIncrement() < 22) {
-					for (int id : ids) {
-						connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMove(id, 0, 3, 0, false));
-						byte angle = (byte) (5 * integer.get() % 128);
-						// ToDo: Разве оно не сломает структуру фрагмента из нескольких стендов?
-						connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(id, angle, (byte) 0, false));
-					}
-				} else {
-					connection.sendPacket(new PacketPlayOutEntityDestroy(ids));
-					cancel();
-				}
-			}
-		}.runTaskTimerAsynchronously(App.getApp(), 5L, 3L);
+	private void animateFragments(User user, Fragment fragment, V4 location) {
+		Cycle.run(1, 60, tick -> {
+			if (tick == 59) fragment.hide(user);
+			else fragment.update(user, location.add(OFFSET));
+		});
 	}
+
 }

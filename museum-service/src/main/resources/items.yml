@@ -7,7 +7,7 @@ back:
 
 museum:
   icon: clay-ball
-  nbt: {other: guild_bank}
+  nbt: { other: guild_bank }
   text: |
     &bМузей
 
@@ -31,24 +31,24 @@ gallery:
 
 unavailable:
   icon: clay-ball
-  nbt: {other: point}
+  nbt: { other: point }
   text: '&7???'
 
 collector-free:
   icon: clay-ball
-  nbt: {museum: car}
+  nbt: { museum: car }
 
 collector-amateur:
   icon: clay-ball
-  nbt: {museum: car1}
+  nbt: { museum: car1 }
 
 collector-professional:
   icon: clay-ball
-  nbt: {museum: car1}
+  nbt: { museum: car2 }
 
 collector-prestige:
   icon: clay-ball
-  nbt: {museum: parovoz}
+  nbt: { museum: parovoz }
 
 menu:
   icon: paper
@@ -63,15 +63,13 @@ menu:
 coin:
   icon: double-plant
 
-buy_collector:
-  icon: dispenser
+buy-floor:
+  icon: stone-slab2
   text: |
-    §bКупить коллектор
+    §bКупить пол | §eСкоро...
 
-    Хороший коллектор способен
-    собрать больше монет!
-
-    [§bдля этого залла§f]
+    Приобретите полы, которые
+    подходят вашему музею.
 
 invite:
   icon: book-and-quill
@@ -106,14 +104,12 @@ collectors:
 
 go:
   text: |
-    §bВ путь!
+    §b<excavation> §6<cost>$
 
-    Экспедиция: <excavation>
-    Цена: <cost>$
     Минимальный уровень: <lvl>
     Кол-во ударов: <breaks>
 
-goto_excavations_item:
+goto-excavations-item:
   icon: compass
   text: |
     §bЭкспедиции
@@ -121,7 +117,7 @@ goto_excavations_item:
     Отправтесь на раскопки
     и найдите следы прошлого.
 
-goto_pickaxes_item:
+goto-pickaxes-item:
   icon: diamond-pickaxe
   text: |
     §bКирки
@@ -129,7 +125,7 @@ goto_pickaxes_item:
     Приобретите новую кирку,
     и разгодайте тайны песка...
 
-already_have:
+already-have:
   icon: emerald
   text: |
     §bПусто
@@ -143,7 +139,7 @@ goback:
   text: |
     §cВернуться
 
-museum_change_title:
+museum-change-title:
   icon: sign
   text: |
     §bПереименовать музей
@@ -152,8 +148,72 @@ museum_change_title:
     название вашего музея
     вы можете его изменить.
 
+emerald-item:
+  icon: emerald
+  text: |
+    §aДрагоценный камень §6+200$
+
+    Иногда его можно найти
+    на раскопках, стоит не много.
+
+subject-color:
+  icon: concrete
+  text: |
+    &bВыбрать <color-name>&b цвет!
+
+subject-info:
+  icon: paper
+  text: |
+    §b<title>
+
+    <lore>
+
+subject-change-color:
+  icon: milk-bucket
+  text: |
+    §bИзменить цвет
+
+    Кастомизируйте цвета построек,
+    так, как вам нравится!
+
+subject-special:
+  icon: clay-ball
+  nbt: { other: settings }
+  text: |
+    §bНастроить
+
+    Настройки для постройки!
+
+subject-destroy:
+  icon: clay-ball
+  nbt: { other: guild_shop }
+  text: |
+    §bВ инвентарь!
+
+    Переместит выбранную постройку,
+    вам в инвентарь.
+
+go-back-item:
+  icon: barrier
+  text: |
+    §cПрекратить раскопки §7[§eПКМ-БЛОК§7]
+
+    Вас экстренно вернут в ваш музей...
+    Все, что вы открыли за это
+    время - сохранится.
+
+pickaxe:
+  nbt:
+    CanDestroy:
+      - 'minecraft:dirt'
+      - 'minecraft:sand'
+      - 'minecraft:soul_sand'
+      - 'minecraft:grass'
+      - 'minecraft:concrete_powder'
+      - 'minecraft:snow'
+
 pickaxe-default:
-  icon: iron-pickaxe
+  icon: iron-pickaxe pickaxe
   unbreakable: true
   text: |
     §bКирка
@@ -162,7 +222,7 @@ pickaxe-default:
     для начинающего, ничего лишнего.
 
 pickaxe-professional:
-  icon: diamond-pickaxe
+  icon: diamond-pickaxe pickaxe
   unbreakable: true
   text: |
     §bПрофессиональная кирка
@@ -173,9 +233,9 @@ pickaxe-professional:
     Цена: 10'000$
 
 pickaxe-prestige:
-  icon: gold-pickaxe
+  icon: gold-pickaxe pickaxe
   unbreakable: true
-  enchant: ['32:1']
+  enchant: [ '32:1' ]
   text: |
     §bПрестижная кирка
 
@@ -185,6 +245,21 @@ pickaxe-prestige:
 
     Цена: 100'000$
 
+lock:
+  icon: clay-ball
+  nbt: { other: lock }
+  text: |
+    §cНедоступно
+
+    Вы еще не открыли этого динозавра!
+
+too-huge:
+  icon: barrier
+  text: |
+    <dino> не помещается на эту витрину
+
+    Вы можете поместить данного
+    динозавра на более крупную витрину.
 
 subject:
   text: |

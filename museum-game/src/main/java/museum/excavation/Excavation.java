@@ -1,16 +1,16 @@
 package museum.excavation;
 
-import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import museum.player.User;
+import museum.player.prepare.BeforePacketHandler;
+import museum.util.MessageUtil;
+import museum.util.warp.WarpUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.IScoreboardService;
-import museum.player.User;
-import museum.util.MessageUtil;
-import museum.util.warp.WarpUtil;
 
 @Data
 @AllArgsConstructor
@@ -23,26 +23,21 @@ public class Excavation {
 		return user.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ()).getType() == Material.AIR;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void load(User user) {
-
 		Player player = user.getPlayer();
 		player.getInventory().clear();
 		player.getInventory().addItem(Lemonade.get("pickaxe-" + user.getPickaxeType().name().toLowerCase()).render());
+		player.getInventory().setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 		new WarpUtil.WarpBuilder(prototype.getAddress())
 				.addAfter(usr -> {
-					IScoreboardService.get().setCurrentObjective(user.getUuid(), "excavation");
+					IScoreboardService.get().setCurrentObjective(usr.getUuid(), "excavation");
 
 					String title = prototype.getTitle();
-					player.sendTitle("§6Прибытие!", title);
+					usr.getPlayer().sendTitle("§6Прибытие!", title);
 
 					MessageUtil.find("visitexcavation")
 							.set("title", title)
-							.send(user);
-
-					B.postpone(20, () -> {
-						prototype.getPackets().forEach(user::sendPacket);
-					});
+							.send(usr);
 				}).build().warp(user);
 	}
 

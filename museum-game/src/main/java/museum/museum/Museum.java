@@ -1,12 +1,11 @@
 package museum.museum;
 
+import clepto.ListUtils;
+import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import ru.cristalix.core.scoreboard.IScoreboardService;
+import lombok.val;
 import museum.App;
 import museum.data.MuseumInfo;
 import museum.museum.collector.CollectorNavigator;
@@ -18,7 +17,13 @@ import museum.museum.subject.Subject;
 import museum.player.User;
 import museum.prototype.Storable;
 import museum.util.LocationTree;
+import museum.util.MessageUtil;
+import museum.util.SubjectLogoUtil;
+import museum.util.warp.Warp;
 import museum.util.warp.WarpUtil;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.inventory.ItemStack;
+import ru.cristalix.core.scoreboard.IScoreboardService;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,11 +37,14 @@ import java.util.stream.Collectors;
 @Getter
 public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
+	private final ItemStack menu = Lemonade.get("menu").render();
+
+	private Warp warp;
 	private final CraftWorld world;
 	private double income;
-    private String title;
+	private String title;
 
-    public Museum(MuseumPrototype prototype, MuseumInfo info, User owner) {
+	public Museum(MuseumPrototype prototype, MuseumInfo info, User owner) {
 		super(prototype, info, owner);
 		this.world = App.getApp().getWorld();
 		this.title = info.title;
@@ -45,21 +53,31 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
 		this.getSubjects(SubjectType.COLLECTOR).forEach(collector -> {
 			List<MarkerSubject> markers = allMarkers.stream()
-					.filter(marker -> marker.getCollectorId() == collector.getId())
+					.filter(marker -> marker.getCollectorId() == collector.getId() && marker.getLocation() != null)
 					.collect(Collectors.toList());
 			List<MarkerSubject> route = LocationTree.order(markers, MarkerSubject::getLocation);
 			collector.setNavigator(new CollectorNavigator(prototype, world,
 					route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 		});
+		warp = new WarpUtil.WarpBuilder(prototype.getAddress()).build();
+
+		owner.setCurrentMuseum(this);
 	}
 
-    @Override
-    public void updateInfo() {
-        cachedInfo.title = title;
-    }
+	@Override
+	public void updateInfo() {
+		cachedInfo.title = title;
+	}
 
-    public void show(User user) {
-		new WarpUtil.WarpBuilder(prototype.getAddress()).build().warp(user);
+	public void show(User user) {
+		if (!Objects.equals(user.getLastWarp(), warp))
+			warp.warp(user);
+
+		// Если игрок после раскопок, то убрать ее, иначе если он не зашел впервые, то зачем прогружать?
+		if (user.getExcavation() != null) {
+			user.setExcavation(null);
+		} else if (user.getCurrentMuseum() != null)
+			return;
 
 		cachedInfo.views++;
 
@@ -72,30 +90,37 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 					.append('_').append(subject.getPrototype().getPrice());
 		}
 		String payload = builder.toString();
-		System.out.println("Sent " + payload + " to " + user.getName());
 		user.sendPayload("museumsubjects", payload);
 
 		user.sendAnime();
 
 		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
 
-		user.setCoins(Collections.newSetFromMap(new ConcurrentHashMap<>()));
+		user.setCoins(ConcurrentHashMap.newKeySet());
 		user.setCurrentMuseum(this);
 
-		user.getPlayer().getInventory().remove(Material.SADDLE);
+		val player = user.getPlayer();
+		val inventory = player.getInventory();
+		inventory.clear();
+		inventory.setItem(0, menu);
 
 		if (this.owner != user) {
-			user.getPlayer().getInventory().setItem(8, Lemonade.get("back").render());
+			player.getInventory().setItem(8, Lemonade.get("back").render());
 		}
-		Bukkit.getScheduler().runTaskLaterAsynchronously(App.getApp(), () ->
-				iterateSubjects(s -> s.show(user)), 20L);
+		B.postpone(20, () -> iterateSubjects(subject -> {
+			subject.show(user);
+			if (user == owner) {
+				val allocation = subject.getAllocation();
+				if (allocation == null)
+					player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
+			}
+		}));
 
 		updateIncrease();
 	}
 
 	public void hide(User user) {
-
-		iterateSubjects(s -> s.hide(user, false));
+		iterateSubjects(s -> s.hide(user));
 
 		Set<Coin> coins = user.getCoins();
 		coins.forEach(coin -> coin.remove(user.getConnection()));
@@ -113,16 +138,24 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 
 	public void updateIncrease() {
 		double[] i = {.1};
-		iterateSubjects(s -> i[0] += s.getIncome()); // Completely safe and professional code.
+		iterateSubjects(s -> i[0] += s.getIncome());
 		income = i[0];
 	}
+
 	public List<Subject> getSubjects() {
 		List<Subject> list = new ArrayList<>();
 		iterateSubjects(list::add);
 		return list;
 	}
 
-	@SuppressWarnings ("unchecked")
+	public Subject getSubjectByUuid(UUID uuid) {
+		for (val subject : getSubjects())
+			if (subject.getCachedInfo().getUuid().equals(uuid))
+				return subject;
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
 	public <T extends Subject> List<T> getSubjects(SubjectType<T> type) {
 		List<T> list = new ArrayList<>();
 		iterateSubjects(s -> {
@@ -132,19 +165,27 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 	}
 
 	public void processClick(User user, Subject subject) {
-		user.performCommand("gui manipulator");
+		if (user.getMuseums().stream().noneMatch(museum -> user.getCurrentMuseum().equals(museum))) {
+			MessageUtil.find("non-root").send(user);
+			return;
+		}
+		user.performCommand("gui manipulator " + subject.getCachedInfo().getUuid().toString());
 	}
 
 	public long getViews() {
-        return cachedInfo.getViews();
-    }
+		return cachedInfo.getViews();
+	}
 
-    public Date getCreationDate() {
-        return cachedInfo.getCreationDate();
-    }
+	public Date getCreationDate() {
+		return cachedInfo.getCreationDate();
+	}
 
-    public void incrementViews() {
-        cachedInfo.views++;
-    }
+	public void incrementViews() {
+		cachedInfo.views++;
+	}
+
+	public Collection<User> getUsers() {
+		return ListUtils.filter(App.getApp().getUsers(), user -> user.getCurrentMuseum() == this);
+	}
 
 }

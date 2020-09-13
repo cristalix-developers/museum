@@ -35,7 +35,7 @@ public class PrepareScoreBoard implements Prepare {
 				.record("Баланс", () -> "§a" + MessageUtil.toMoneyFormat(user.getMoney()));
 		val museum = user.getCurrentMuseum();
 		main.startGroup("Музей")
-				.record("Заработок", () -> "§b" + MessageUtil.toMoneyFormat(user.getCurrentMuseum().getIncome()))
+				.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(user.getCurrentMuseum().getIncome()))
 				.record("Посещений", () -> "§b" + museum.getViews());
 		template(main);
 

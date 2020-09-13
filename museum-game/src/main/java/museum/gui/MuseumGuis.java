@@ -1,132 +1,83 @@
 package museum.gui;
 
-import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
-import clepto.bukkit.gui.Gui;
 import clepto.bukkit.gui.Guis;
 import clepto.humanize.TimeFormatter;
+import lombok.experimental.UtilityClass;
+import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
-import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
+import museum.museum.map.SkeletonSubjectPrototype;
+import museum.museum.map.SubjectType;
+import museum.museum.subject.SkeletonSubject;
+import museum.museum.subject.skeleton.Skeleton;
+import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
-import museum.util.VirtualSign;
-import museum.util.warp.Warp;
-import museum.util.warp.WarpUtil;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Statistic;
-import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import ru.cristalix.core.formatting.Color;
+import ru.cristalix.core.item.Items;
 
 import java.time.Duration;
+import java.util.UUID;
 
+import static java.util.Objects.requireNonNull;
+
+@UtilityClass
 public class MuseumGuis {
 
-	public MuseumGuis(App app) {
-		Warp warp = new WarpUtil.WarpBuilder("gallery")
-				.onForward(user -> user.getCurrentMuseum().hide(user))
-				.build();
+	public final ItemStack AIR_ITEM = new ItemStack(Material.AIR);
 
-		B.regCommand((sender, args) -> {
-			if (args.length == 0) return "§cИспользование: §e/gui [адрес]";
-			Gui gui = Guis.registry.get(args[0]);
-			if (gui == null) return "§cМеню с адресом §e" + args[0] + "§c не найдено.";
+	public void registerItemizers(App app) {
+		ItemStack lockItem = Lemonade.get("lock").render();
 
-			gui.open(sender, args.length > 1 ? args[1] : null);
-			return null;
-		}, "gui");
+		Guis.registerItemizer("subjects-select-dino", (base, player, context, slotId) -> {
+			val user = app.getUser(player);
+			SkeletonPrototype skeletonType;
+			SkeletonSubject subject;
 
-		B.regCommand((sender, args) -> {
-			warp.warp(app.getUser(sender));
-			return null;
-		}, "gallery");
+			int index = context.getOpenedGui().getIndex(slotId);
 
-		B.regCommand((sender, args) -> {
-			new VirtualSign().openSign(sender, lines -> {
-				for (String line : lines) {
-					if (line != null && !line.isEmpty()) {
-						User user = app.getUser(sender);
-						user.getCurrentMuseum().setTitle(line);
-						MessageUtil.find("museumtitlechange")
-								.set("title", line)
-								.send(user);
-					}
-				}
-			});
-			return null;
-		}, "changetitle");
+			try {
+				skeletonType = requireNonNull(Managers.skeleton.getByIndex(index));
+				subject = requireNonNull((SkeletonSubject) user.getCurrentMuseum().getSubjectByUuid(UUID.fromString(context.getPayload())));
+				requireNonNull(user.getSkeletons().supply(skeletonType));
+			} catch (Exception e) {
+				return lockItem;
+			}
 
-		B.regCommand((sender, args) -> {
-			new VirtualSign().openSign(sender, lines -> {
-				for (String line : lines) {
-					if (line != null && !line.isEmpty()) {
-						Player invited = Bukkit.getPlayer(line);
-						User user = app.getUser(sender);
-						if (invited == null) {
-							MessageUtil.find("playeroffline").send(user);
-							return;
-						} else if (invited.equals(sender)) {
-							MessageUtil.find("inviteyourself").send(user);
-							return;
-						}
-						MessageUtil.find("invited").send(user);
-						TextComponent invite = new TextComponent(
-								MessageUtil.find("invitefrom")
-										.set("player", sender.getName())
-										.getText()
-						);
-						invite.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/museum accept " + sender.getName()));
-						invited.sendMessage(invite);
-					}
-				}
-			});
-			return null;
-		}, "invite");
+			if (skeletonType.getSize() > ((SkeletonSubjectPrototype) subject.getPrototype()).getSize())
+				return Lemonade.get("too-huge").dynamic().fill("dino", skeletonType.getTitle()).render();
 
-		B.regCommand((player, args) -> {
-			User user = app.getUser(player);
-			if (args.length == 0)
-				return null;
-			ExcavationPrototype proto = Managers.excavation.getPrototype(args[0]);
-			if (proto == null)
-				return null;
+			// Если любая витрина уже использует этот прототип, то поставить lock предмет
+			for (SkeletonSubject skeletonSubject : user.getCurrentMuseum().getSubjects(SubjectType.SKELETON_CASE)) {
+				Skeleton skeleton = skeletonSubject.getSkeleton();
+				if (skeleton == null) continue;
+				if (skeleton.getCachedInfo().getPrototypeAddress().equals(skeletonType.getAddress()))
+					return lockItem;
+			}
 
-			player.closeInventory();
+			Skeleton playerSkeleton = null;
 
-			if (proto.getPrice() > user.getMoney())
-				return MessageUtil.get("nomoney");
+			for (Skeleton skeleton : user.getSkeletons())
+				if (skeleton.getPrototype().getAddress().equals(skeletonType.getAddress()))
+					playerSkeleton = skeleton;
 
-			user.setMoney(user.getMoney() - proto.getPrice());
+			if (playerSkeleton == null)
+				return lockItem;
 
-			Excavation excavation = new Excavation(proto, proto.getHitCount());
-			user.setExcavation(excavation);
-
-			user.getCurrentMuseum().hide(user);
-			excavation.load(user);
-			return null;
-		}, "excavation", "exc");
-
-		B.regCommand((player, args) -> {
-			User user = app.getUser(player);
-			PickaxeType pickaxe = user.getPickaxeType().getNext();
-			if (pickaxe == user.getPickaxeType())
-				return null;
-			player.closeInventory();
-
-			if (user.getMoney() < pickaxe.getPrice())
-				return MessageUtil.get("nomoney");
-
-			user.setPickaxeType(pickaxe);
-			user.setMoney(user.getMoney() - pickaxe.getPrice());
-			player.performCommand("gui pickaxes");
-			return MessageUtil.get("newpickaxe");
-
-		}, "pickaxe");
+			return Items.builder()
+					.displayName(skeletonType.getTitle() + " / " + skeletonType.getRarity().getWord().toUpperCase())
+					.type(Material.BONE_BLOCK)
+					.lore("Собрано " + playerSkeleton.getUnlockedFragments().size() + "/" + skeletonType.getFragments().size())
+					.build();
+		});
 
 		Guis.registerItemizer("upgrade-pickaxe", (base, player, context, slotId) -> {
 			User user = app.getUser(player);
@@ -134,18 +85,28 @@ public class MuseumGuis {
 			return Lemonade.get("pickaxe-" + pickaxe.name()).render();
 		});
 
+		Guis.registerItemizer("subject-color", (base, player, context, slotId) -> {
+			String info = context.getOpenedGui().getSlotData(slotId).getInfo();
+			Color color = Color.valueOf(info.toUpperCase());
+			ItemStack item = base.dynamic().fill("color-name", color.getTeamName()).render();
+			item.setDurability((short) color.getWoolData());
+			return item;
+		});
+
 		Guis.registerItemizer("excavation", (base, player, context, slotId) -> {
 			ExcavationPrototype excavation = Managers.excavation.getPrototype(
 					context.getOpenedGui().getSlotData(slotId).getInfo()
 			);
-			if (excavation == null)// || excavation.getRequiredLevel() > app.getUser(player).getLevel())
+			if (excavation == null || excavation.getRequiredLevel() > app.getUser(player).getLevel())
 				return Lemonade.get("unavailable").render();
-			return base.dynamic()
+			val item = base.dynamic()
 					.fill("excavation", excavation.getTitle())
 					.fill("cost", String.format("%.2f", excavation.getPrice()))
 					.fill("lvl", String.valueOf(excavation.getRequiredLevel()))
 					.fill("breaks", String.valueOf(excavation.getHitCount()))
 					.render();
+			item.setType(excavation.getIcon());
+			return item;
 		});
 
 		Guis.registerItemizer("profile", (base, player, context, slotId) -> {
