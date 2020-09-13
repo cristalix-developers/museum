@@ -20,6 +20,7 @@ import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
 import museum.player.pickaxe.Pickaxe;
 import museum.prototype.Managers;
+import museum.util.Colorizer;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
 import museum.util.VirtualSign;
@@ -37,6 +38,8 @@ import ru.cristalix.core.formatting.Color;
 
 import java.util.List;
 import java.util.UUID;
+
+import static museum.util.Colorizer.applyColor;
 
 public class MuseumCommands {
 
@@ -93,7 +96,7 @@ public class MuseumCommands {
 			Allocation allocation = subject.getAllocation();
 			if (allocation != null) {
 				Location origin = allocation.getOrigin();
-				allocationInfo = allocation.getAllocatedBlocks().size() + " blocks, §f" + origin.getX() + " " + origin.getY() + " " + origin.getZ();
+				allocationInfo = allocation.getUpdatePackets().size() + " packets, §f" + origin.getX() + " " + origin.getY() + " " + origin.getZ();
 			}
 			sender.sendMessage("§e" + subject.getPrototype().getAddress() + "§f: " + subject.getOwner().getName() + ", " + allocationInfo);
 		}
@@ -231,11 +234,7 @@ public class MuseumCommands {
 			subject.getCachedInfo().setColor(color);
 
 			if (allocation != null) {
-				allocation.prepareUpdate(data -> {
-					Block block = data.getBlock();
-					// concrete и concrete_powder меняют цвет
-					return block == Blocks.dR || block == Blocks.dS ? block.fromLegacyData(color.getWoolData()) : data;
-				});
+				allocation.prepareUpdate(data -> applyColor(data, color));
 
 				allocation.sendUpdate(museum.getUsers());
 			}
@@ -253,6 +252,7 @@ public class MuseumCommands {
 			allocation.prepareUpdate(data -> Pickaxe.AIR_DATA);
 			allocation.sendUpdate(museum.getUsers());
 			subject.allocate(null);
+			for (User viewer : museum.getUsers()) subject.hide(viewer);
 
 			player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 			player.closeInventory();
@@ -296,7 +296,7 @@ public class MuseumCommands {
 			for (User watcher : app.getUsers()) {
 				if (watcher.getCurrentMuseum() != museum) continue;
 				if (previousSkeleton != null)
-					previousSkeleton.getPrototype().hide(watcher.getPlayer());
+					previousSkeleton.getPrototype().hide(watcher);
 				skeletonSubject.show(watcher);
 			}
 

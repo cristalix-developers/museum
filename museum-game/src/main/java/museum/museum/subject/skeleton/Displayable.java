@@ -5,16 +5,20 @@ import org.bukkit.entity.Player;
 
 public interface Displayable {
 
-	void show(Player player, V4 position);
+	void getShowPackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position);
 
-	default void show(Player player, Location location) {
-		this.show(player, V4.fromLocation(location));
+	default void show(User user, V4 position) {
+		Collection<Packet<PacketListenerPlayOut>> packets = new ArrayList<>();
+		this.getShowPackets(packets, position);
+		packets.forEach(user::sendPacket);
 	}
 
-	void update(Player player, V4 position);
+	void getUpdatePackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position);
 
-	default void update(Player player, Location location) {
-		this.update(player, V4.fromLocation(location));
+	default void update(User user, V4 position) {
+		Collection<Packet<PacketListenerPlayOut>> packets = new ArrayList<>();
+		this.getUpdatePackets(packets, position);
+		packets.forEach(user::sendPacket);
 	}
 
 	void hide(Player player);

@@ -60,6 +60,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 					route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 		});
 		warp = new WarpUtil.WarpBuilder(prototype.getAddress()).build();
+
+		owner.setCurrentMuseum(this);
 	}
 
 	@Override

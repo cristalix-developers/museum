@@ -9,6 +9,7 @@ import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.CollectorSubjectPrototype;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.Piece;
+import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
@@ -53,7 +54,7 @@ public class CollectorSubject extends Subject {
 	@Override
 	public void show(User user) {
 		super.show(user);
-		piece.show(user.getPlayer(), this.getCollectorLocation());
+		piece.show(user, V4.fromLocation(this.getCollectorLocation()));
 	}
 
 	public void move(User user, long iteration) {
@@ -61,13 +62,13 @@ public class CollectorSubject extends Subject {
 			return;
 		Location location = getLocation(iteration);
 		user.getCoins().removeIf(coin -> coin.pickUp(user, location, radius, piece.getStand().id));
-		piece.update(user.getPlayer(), location);
+		piece.update(user, V4.fromLocation(location));
 	}
 
 	@Override
 	public void hide(User user) {
 		super.hide(user);
-		piece.hide(user.getPlayer());
+		piece.hide(user);
 	}
 
 	public Location getCollectorLocation() {

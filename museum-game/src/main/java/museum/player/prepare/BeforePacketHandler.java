@@ -154,6 +154,7 @@ public class BeforePacketHandler implements Prepare {
 		allocation.sendUpdate(viewers);
 		for (User viewer : viewers) {
 			viewer.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
+			subject.show(viewer);
 		}
 
 		MessageUtil.find("placed").send(user);
@@ -211,7 +212,7 @@ public class BeforePacketHandler implements Prepare {
 
 			V4 location = new V4(position.getX(), position.getY() + 0.5, position.getZ(), (float) (Math.random() * 360 - 180));
 
-			fragment.show(user.getPlayer(), location);
+			fragment.show(user, location);
 			animateFragments(user, fragment, location);
 
 			// Проверка на дубликат
@@ -245,8 +246,8 @@ public class BeforePacketHandler implements Prepare {
 
 	private void animateFragments(User user, Fragment fragment, V4 location) {
 		Cycle.run(1, 60, tick -> {
-			if (tick == 59) fragment.hide(user.getPlayer());
-			else fragment.update(user.getPlayer(), location.add(OFFSET));
+			if (tick == 59) fragment.hide(user);
+			else fragment.update(user, location.add(OFFSET));
 		});
 	}
 

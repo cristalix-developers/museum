@@ -1,6 +1,5 @@
 package museum.museum.subject;
 
-import clepto.bukkit.B;
 import clepto.cristalix.mapservice.Box;
 import lombok.Getter;
 import museum.data.SubjectInfo;
@@ -76,18 +75,15 @@ public class SkeletonSubject extends Subject {
 		if (skeleton == null) return;
 		if (!isAllocated()) return;
 		V4 absoluteLocation = V4.fromLocation(this.getAllocation().getOrigin()).add(this.skeletonLocation);
-		B.bc("§eskeletonLocation: §f" + absoluteLocation);
-		skeleton.getPrototype().show(user.getPlayer(), absoluteLocation);
 		skeleton.getUnlockedFragments().forEach(fragment ->
-				fragment.show(user.getPlayer(), orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment))));
+				fragment.show(user, orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment))));
 	}
 
 	@Override
 	public void hide(User user) {
 		super.hide(user);
-		if (skeleton == null)
-			return;
-		skeleton.getPrototype().hide(user.getPlayer());
+		if (skeleton != null)
+			skeleton.getPrototype().hide(user);
 	}
 
 	public double getIncome() {

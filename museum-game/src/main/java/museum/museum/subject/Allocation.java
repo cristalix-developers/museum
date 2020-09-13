@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static clepto.bukkit.B.nms;
+import static museum.util.Colorizer.applyColor;
 
 @Data
 public class Allocation {
@@ -76,10 +77,8 @@ public class Allocation {
 					BlockPosition blockPos = nms(dst);
 					ChunkCoordIntPair chunkPos = new ChunkCoordIntPair(blockPos);
 
-					IBlockData data = world.getType(nms(src));
-					if (data.getBlock() == Blocks.dR) {
-						data = Blocks.dR.getBlockData().set(BlockCloth.COLOR, EnumColor.fromColorIndex(info.getColor().getWoolData()));
-					}
+					IBlockData data = applyColor(world.getType(nms(src)), info.getColor());
+
 					int xOffset = blockPos.getX() - (blockPos.getX() >> 4) * 16;
 					int yOffset = blockPos.getY();
 					int zOffset = blockPos.getZ() - (blockPos.getZ() >> 4) * 16;

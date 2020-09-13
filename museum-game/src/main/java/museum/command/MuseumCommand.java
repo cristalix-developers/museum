@@ -7,6 +7,7 @@ import museum.App;
 import museum.museum.Museum;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.museum.subject.skeleton.V4;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import org.bukkit.Bukkit;
@@ -27,7 +28,7 @@ public class MuseumCommand implements B.Executor {
 	@Override
 	public String execute(Player sender, String[] args) {
 		if (sender == null) return "Only for players.";
-		val visitorUser = app.getUser(sender);
+		val user = app.getUser(sender);
 
 		if (args.length == 0)
 			return "§cИспользование: §f/museum [accept]";
@@ -46,14 +47,14 @@ public class MuseumCommand implements B.Executor {
 			if (museum.getOwner() != ownerUser)
 				return MessageUtil.get("playerbusy");
 
-			if (ownerUser.equals(visitorUser))
+			if (ownerUser.equals(user))
 				return MessageUtil.get("inviteyourself");
 
-			visitorUser.getCurrentMuseum().hide(visitorUser);
-			museum.show(visitorUser);
+			user.getCurrentMuseum().hide(user);
+			museum.show(user);
 
 			return MessageUtil.find("visitaccept")
-					.set("visitor", visitorUser.getName())
+					.set("visitor", user.getName())
 					.getText();
 		}
 
@@ -74,12 +75,12 @@ public class MuseumCommand implements B.Executor {
 				Optional<Fragment> opt = proto.getFragments().stream().filter(a -> a.getAddress().equalsIgnoreCase(fragmentAddress)).findAny();
 				if (!opt.isPresent()) return "§cКость §e" + fragmentAddress + "§c не найдена в скелете §e" + proto.getAddress();
 				Fragment fragment = opt.get();
-				fragment.hide(sender);
-				fragment.show(sender, location);
+				fragment.hide(user);
+				fragment.show(user, V4.fromLocation(location));
 				return "§aФрагмент §e" + proto.getTitle() + "/" + fragment.getAddress() + "§a отображён рядом с вами.";
 			} else {
-				proto.hide(sender);
-				proto.show(sender, location);
+				proto.hide(user);
+				proto.show(user, V4.fromLocation(location));
 				return "§aДинозавр §e" + proto.getTitle() + "§a отображён рядом с вами.";
 			}
 		}
