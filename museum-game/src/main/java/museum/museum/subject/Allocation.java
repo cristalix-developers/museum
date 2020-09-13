@@ -26,7 +26,7 @@ public class Allocation {
 
 	private final Location origin;
 	private final Map<BlockPosition, IBlockData> blocks;
-	private final Collection<PacketPlayOutMultiBlockChange> updatePackets;
+	private final Collection<Packet<PacketListenerPlayOut>> updatePackets;
 	private final List<Location> allocatedBlocks;
 	private final String clientData;
 
@@ -87,7 +87,6 @@ public class Allocation {
 					BlockData blockData = new BlockData(offset, data);
 					chunkMap.computeIfAbsent(chunkPos, c -> new ArrayList<>()).add(blockData);
 
-					int tileId = Block.getCombinedId(data);
 					allocated.add(dst);
 
 					blocks.put(blockPos, blockData.blockData);
@@ -95,9 +94,9 @@ public class Allocation {
 			}
 		}
 
-		Collection<PacketPlayOutMultiBlockChange> updatePackets = new ArrayList<>();
+		Collection<Packet<PacketListenerPlayOut>> updatePackets = new ArrayList<>();
 
-		for (Map.Entry<ChunkCoordIntPair, List<BlockData>> entry : chunkMap.entrySet()) {
+		for (val entry : chunkMap.entrySet()) {
 			PacketPlayOutMultiBlockChange updatePacket = new PacketPlayOutMultiBlockChange();
 			updatePacket.a = entry.getKey();
 			List<BlockData> list = entry.getValue();
@@ -115,7 +114,10 @@ public class Allocation {
 	}
 
 	public void prepareUpdate(Function<IBlockData, IBlockData> converter) {
-		for (PacketPlayOutMultiBlockChange packet : updatePackets) {
+		for (val rawPacket : updatePackets) {
+			if (rawPacket.getClass() != PacketPlayOutMultiBlockChange.class)
+				continue;
+			PacketPlayOutMultiBlockChange packet = (PacketPlayOutMultiBlockChange) rawPacket;
 			for (int i = 0; i < packet.b.length; i++) {
 				packet.b[i] = packet.new MultiBlockChangeInfo(packet.b[i].b, converter.apply(packet.b[i].c));
 			}
@@ -128,7 +130,10 @@ public class Allocation {
 	public void sendDestroyEffects(Collection<User> users) {
 		// ToDo: партиклов слишком много, лагает!!!
 		List<PacketPlayOutWorldEvent> packets = new ArrayList<>();
-		for (PacketPlayOutMultiBlockChange packet : this.updatePackets) {
+		for (val rawPacket : this.updatePackets) {
+			if (rawPacket.getClass() != PacketPlayOutMultiBlockChange.class)
+				continue;
+			PacketPlayOutMultiBlockChange packet = (PacketPlayOutMultiBlockChange) rawPacket;
 			for (PacketPlayOutMultiBlockChange.MultiBlockChangeInfo info : packet.b) {
 				if (info == null) continue;
 				// 2001 - id события разрушения блока

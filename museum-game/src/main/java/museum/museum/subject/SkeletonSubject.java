@@ -43,6 +43,7 @@ public class SkeletonSubject extends Subject {
 
 	@Override
 	public Allocation allocate(Location origin) {
+		Allocation allocation = super.allocate(origin);
 		if (origin == null) skeletonLocation = null;
 		else {
 			float rot = this.skeletonLocation == null ? 0 : this.skeletonLocation.rot;
@@ -57,9 +58,10 @@ public class SkeletonSubject extends Subject {
 					(int) o.getZ()
 			));
 			this.skeletonLocation.setRot(rot);
+
 		}
 
-		return super.allocate(origin);
+		return allocation;
 	}
 
 	@Override

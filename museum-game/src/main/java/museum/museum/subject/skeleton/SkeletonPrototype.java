@@ -2,15 +2,13 @@ package museum.museum.subject.skeleton;
 
 import lombok.Getter;
 import museum.prototype.Prototype;
+import net.minecraft.server.v1_12_R1.Packet;
+import net.minecraft.server.v1_12_R1.PacketListenerPlayOut;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Player;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.groupingBy;
 import static museum.museum.subject.skeleton.Displayable.orientedOffset;
@@ -64,19 +62,18 @@ public class SkeletonPrototype implements Prototype, Displayable {
 	}
 
 	@Override
-	public void show(Player player, V4 position) {
-		fragmentOffsetMap.forEach((fragment, offset) -> fragment.show(player, orientedOffset(position, offset)));
+	public void getShowPackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
+		fragmentOffsetMap.forEach((piece, offset) -> piece.getShowPackets(buffer, orientedOffset(position, offset)));
 	}
 
 	@Override
-	public void update(Player player, V4 position) {
-		fragmentOffsetMap.forEach((fragment, offset) -> fragment.show(player, orientedOffset(position, offset)));
+	public void getUpdatePackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
+		fragmentOffsetMap.forEach((piece, offset) -> piece.getUpdatePackets(buffer, orientedOffset(position, offset)));
 	}
 
 	@Override
-	public void hide(Player player) {
-		for (Fragment fragment : this.getFragments())
-			fragment.hide(player);
+	public void getHidePackets(Collection<Packet<PacketListenerPlayOut>> buffer) {
+		fragmentOffsetMap.keySet().forEach(piece -> piece.getHidePackets(buffer));
 	}
 
 	public V4 getOffset(Fragment fragment) {

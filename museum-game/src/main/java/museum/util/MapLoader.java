@@ -38,9 +38,8 @@ public class MapLoader {
 			throw new RuntimeException(e);
 		}
 		app.getMap().getWorld().setGameRuleValue("mobGriefing", "false");
-		// todo: отсылать мобов тоже через перепись чанка
 		// Инжектим блоки в чанки (patched paper)
-		app.getNMSWorld().chunkInterceptor = (Chunk chunk, int flags, EntityPlayer receiver) -> {
+		app.getNMSWorld().chunkInterceptor = (chunk, flags, receiver) -> {
 			val user = app.getUser(receiver.getUniqueID());
 
 			if (user.getExcavation() != null)
@@ -49,7 +48,7 @@ public class MapLoader {
 			rewriteChunk(user, worldChunk, false, (subject -> B.postpone(1, () -> {
 				if (subject instanceof CollectorSubject) {
 					val loc = ((CollectorSubject) subject).getCollectorLocation();
-					if (loc.getX() / 16 == worldChunk.locX && loc.getZ() / 16 == worldChunk.locZ) {
+					if (loc.getBlockX() >> 4 == worldChunk.locX && loc.getBlockZ() >> 4 == worldChunk.locZ) {
 						val piece = ((CollectorSubject) subject).getPiece();
 						piece.hide(user);
 						piece.show(user, V4.fromLocation(loc));
@@ -59,6 +58,7 @@ public class MapLoader {
 					if (subjectChunk.getX() == chunk.locX && subjectChunk.getZ() == chunk.locZ) subject.show(user);
 				}
 			})));
+
 			val packet = new PacketPlayOutMapChunk(worldChunk, flags);
 			rewriteChunk(user, worldChunk, true, null);
 			return packet;

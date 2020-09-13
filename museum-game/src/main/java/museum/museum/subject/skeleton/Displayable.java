@@ -1,7 +1,11 @@
 package museum.museum.subject.skeleton;
 
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import museum.player.User;
+import net.minecraft.server.v1_12_R1.Packet;
+import net.minecraft.server.v1_12_R1.PacketListenerPlayOut;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public interface Displayable {
 
@@ -21,7 +25,13 @@ public interface Displayable {
 		packets.forEach(user::sendPacket);
 	}
 
-	void hide(Player player);
+	void getHidePackets(Collection<Packet<PacketListenerPlayOut>> buffer);
+
+	default void hide(User user) {
+		Collection<Packet<PacketListenerPlayOut>> packets = new ArrayList<>();
+		this.getHidePackets(packets);
+		packets.forEach(user::sendPacket);
+	}
 
 	static V4 orientedOffset(V4 positionRotation, V4 offset) {
 		V4 orientedOffset = offset.clone().rotate(V4.Y, positionRotation.rot);

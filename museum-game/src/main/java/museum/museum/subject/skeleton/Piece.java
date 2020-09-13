@@ -2,11 +2,8 @@ package museum.museum.subject.skeleton;
 
 import lombok.Getter;
 import net.minecraft.server.v1_12_R1.*;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Piece implements Displayable {
 
@@ -37,32 +34,31 @@ public class Piece implements Displayable {
 		this.packetsEquipment = list.toArray(new PacketPlayOutEntityEquipment[0]);
 	}
 
-	public void show(Player player, V4 pos) {
-		PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
-		packetSpawn.c = pos.x;
-		packetSpawn.d = pos.y;
-		packetSpawn.e = pos.z;
-		packetSpawn.j = MathHelper.d((pos.rot) * 256.0F / 360.0F);
-		connection.sendPacket(packetSpawn);
-		connection.sendPacket(packetMetadata);
-		for (PacketPlayOutEntityEquipment packet : packetsEquipment)
-			connection.sendPacket(packet);
+	@Override
+	public void getShowPackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
+		packetSpawn.c = position.x;
+		packetSpawn.d = position.y;
+		packetSpawn.e = position.z;
+		packetSpawn.j = MathHelper.d((position.rot) * 256.0F / 360.0F);
+		buffer.add(packetSpawn);
+		buffer.add(packetMetadata);
+		buffer.addAll(Arrays.asList(packetsEquipment));
 	}
 
-	public void hide(Player player) {
-		((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetDestroy);
-	}
-
-	public void update(Player player, V4 pos) {
-		PlayerConnection con = ((CraftPlayer) player).getHandle().playerConnection;
+	@Override
+	public void getUpdatePackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
 		PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport();
 		packet.a = this.stand.id;
-		packet.b = pos.x;
-		packet.c = pos.y;
-		packet.d = pos.z;
-		packet.e = (byte) ((int) ((pos.rot + stand.yaw) * 256.0F / 360.0F));
-		con.sendPacket(packet);
+		packet.b = position.x;
+		packet.c = position.y;
+		packet.d = position.z;
+		packet.e = (byte) ((int) ((position.rot + stand.yaw) * 256.0F / 360.0F));
+		buffer.add(packet);
 	}
 
+	@Override
+	public void getHidePackets(Collection<Packet<PacketListenerPlayOut>> buffer) {
+		buffer.add(packetDestroy);
+	}
 
 }

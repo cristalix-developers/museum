@@ -2,8 +2,10 @@ package museum.museum.subject.skeleton;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import lombok.Data;
-import org.bukkit.entity.Player;
+import net.minecraft.server.v1_12_R1.Packet;
+import net.minecraft.server.v1_12_R1.PacketListenerPlayOut;
 
+import java.util.Collection;
 import java.util.Map;
 
 import static museum.museum.subject.skeleton.Displayable.orientedOffset;
@@ -15,19 +17,19 @@ public class Fragment implements Displayable {
 	private final Map<Piece, V4> pieceOffsetMap = new Reference2ObjectArrayMap<>();
 
 	@Override
-	public void show(Player player, V4 position) {
-		pieceOffsetMap.forEach((piece, offset) -> piece.show(player, orientedOffset(position, offset)));
+	public void getShowPackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
+		pieceOffsetMap.forEach((piece, offset) -> piece.getShowPackets(buffer, orientedOffset(position, offset)));
 	}
 
 	@Override
-	public void update(Player player, V4 position) {
-		pieceOffsetMap.forEach((piece, offset) -> piece.update(player, orientedOffset(position, offset)));
+	public void getUpdatePackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
+		pieceOffsetMap.forEach((piece, offset) -> piece.getUpdatePackets(buffer, orientedOffset(position, offset)));
 	}
 
 	@Override
-	public void hide(Player player) {
-		for (Piece piece : pieceOffsetMap.keySet())
-			piece.hide(player);
+	public void getHidePackets(Collection<Packet<PacketListenerPlayOut>> buffer) {
+		pieceOffsetMap.keySet().forEach(piece -> piece.getHidePackets(buffer));
 	}
+
 
 }
