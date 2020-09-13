@@ -12,6 +12,7 @@ public class LocationTree {
 
 	public <T> List<T> order(List<T> points, Function<T, Location> converter) {
 		List<T> result = new ArrayList<>();
+		if (points.isEmpty()) return null;
 		T currentNode = points.iterator().next();
 		points.remove(currentNode);
 		result.add(currentNode);

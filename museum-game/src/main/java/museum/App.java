@@ -9,13 +9,13 @@ import lombok.Getter;
 import lombok.Setter;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
-import museum.command.MuseumCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
 import museum.gui.MuseumGuis;
 import museum.listener.BlockClickHandler;
 import museum.listener.MuseumEventHandler;
 import museum.listener.PassiveEventBlocker;
+import museum.museum.Shop;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
 import museum.player.PlayerDataManager;
@@ -58,6 +58,8 @@ public final class App extends JavaPlugin {
 	@Setter
 	private WorldMeta map;
 	private YamlConfiguration configuration;
+
+	private Shop shop;
 
 	@Override
 	public void onEnable() {
@@ -118,7 +120,7 @@ public final class App extends JavaPlugin {
 
 		// Инициализация команд
 		new MuseumCommands(this);
-		B.regCommand(new MuseumCommand(this), "museum");
+		this.shop = new Shop(this);
 
 		// Регистрация обработчиков событий
 		B.events(

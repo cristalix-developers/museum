@@ -5,15 +5,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.Data;
 import lombok.experimental.Delegate;
-import net.minecraft.server.v1_12_R1.Packet;
-import net.minecraft.server.v1_12_R1.PacketDataSerializer;
-import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
-import net.minecraft.server.v1_12_R1.PlayerConnection;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import ru.cristalix.core.util.UtilNetty;
+import museum.App;
 import museum.boosters.BoosterType;
 import museum.data.*;
-import museum.excavation.Excavation;
 import museum.museum.Coin;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
@@ -21,14 +15,24 @@ import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.player.prepare.PrepareScoreBoard;
 import museum.prototype.Managers;
 import museum.prototype.Registry;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
-import museum.util.warp.Warp;
+import net.minecraft.server.v1_12_R1.Packet;
+import net.minecraft.server.v1_12_R1.PacketDataSerializer;
+import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.spigotmc.AsyncCatcher;
+import ru.cristalix.core.util.UtilNetty;
+import ru.cristalix.core.util.UtilV3;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
 public class User implements PlayerWrapper {
@@ -44,9 +48,8 @@ public class User implements PlayerWrapper {
 
 	private CraftPlayer player;
 	private PlayerConnection connection;
-	private Warp lastWarp;
-	private Museum currentMuseum;
-	private Excavation excavation;
+	private Location lastLocation;
+	private State state;
 	private Set<Coin> coins = new HashSet<>();
 
 	public User(UserInfo info) {
@@ -55,11 +58,33 @@ public class User implements PlayerWrapper {
 		this.subjects.importInfos(info.getSubjectInfos());
 		this.museums.importInfos(info.getMuseumInfos());
 		this.skeletons.importInfos(info.getSkeletonInfos());
+
+		if (info.getLastPosition() != null)
+			this.lastLocation = UtilV3.toLocation(info.getLastPosition(), App.getApp().getWorld());
+		else
+			this.lastLocation = Managers.museum.getPrototype("main").getSpawn();
+
+		this.state = this.museums.get(Managers.museum.getPrototype("main"));
+	}
+
+	public void setState(State state) {
+		AsyncCatcher.catchOp("user state change");
+		if (this.state != null && this.state != state) this.state.leaveState(this);
+		(this.state = state).enterState(this);
+		PrepareScoreBoard.setupScoreboard(this);
+	}
+
+	public Subject getSubject(UUID uuid) {
+		for (Subject subject : this.subjects) {
+			if (subject.getCachedInfo().getUuid().equals(uuid)) return subject;
+		}
+		return null;
 	}
 
 	public void sendAnime() {
 		ByteBuf buffer = Unpooled.buffer();
-		UtilNetty.writeVarInt(buffer, excavation == null ? -2 : excavation.getHitsLeft() > 0 ? excavation.getHitsLeft() : -1);
+		// ToDo: Вернуть счётчик на раскопках!
+//		UtilNetty.writeVarInt(buffer, excavation == null ? -2 : excavation.getHitsLeft() > 0 ? excavation.getHitsLeft() : -1);
 		connection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
 	}
 
@@ -111,6 +136,14 @@ public class User implements PlayerWrapper {
 	@Override
 	public String toString() {
 		return this.getDisplayName();
+	}
+
+	public Museum getLastMuseum() {
+		for (Museum museum : museums) {
+			if (museum.getPrototype().getBox().contains(lastLocation))
+				return museum;
+		}
+		return null;
 	}
 
 }

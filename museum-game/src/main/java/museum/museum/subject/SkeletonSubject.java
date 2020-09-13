@@ -9,11 +9,10 @@ import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.prototype.Managers;
-import org.bukkit.Location;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
 
-import static museum.museum.subject.skeleton.Displayable.orientedOffset;
+import static museum.museum.subject.skeleton.Piece.orientedOffset;
 
 /**
  * @author func 22.05.2020
@@ -42,9 +41,9 @@ public class SkeletonSubject extends Subject {
 	}
 
 	@Override
-	public Allocation allocate(Location origin) {
-		Allocation allocation = super.allocate(origin);
-		if (origin == null) skeletonLocation = null;
+	public void setAllocation(Allocation allocation) {
+		super.setAllocation(allocation);
+		if (allocation == null) skeletonLocation = null;
 		else {
 			float rot = this.skeletonLocation == null ? 0 : this.skeletonLocation.rot;
 			Box box = prototype.getBox();
@@ -56,12 +55,22 @@ public class SkeletonSubject extends Subject {
 					(int) o.getX(),
 					(int) o.getY(),
 					(int) o.getZ()
-			));
+																 ));
 			this.skeletonLocation.setRot(rot);
 
-		}
+			this.updateSkeleton(false);
 
-		return allocation;
+		}
+	}
+
+	public void updateSkeleton(boolean sendUpdates) {
+		Allocation allocation = this.getAllocation();
+		if (allocation == null || this.skeleton == null) return;
+		this.updateInfo();
+		V4 absoluteLocation = V4.fromLocation(allocation.getOrigin()).add(this.skeletonLocation);
+//		skeleton.getUnlockedFragments().forEach(fragment ->
+		skeleton.getPrototype().getFragments().forEach(fragment ->
+				allocation.allocatePiece(fragment, orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment)), sendUpdates));
 	}
 
 	@Override
@@ -69,23 +78,6 @@ public class SkeletonSubject extends Subject {
 		super.updateInfo();
 		if (skeleton == null) cachedInfo.metadata = null;
 		else cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot);
-	}
-
-	@Override
-	public void show(User user) {
-		super.show(user);
-		if (skeleton == null) return;
-		if (!isAllocated()) return;
-		V4 absoluteLocation = V4.fromLocation(this.getAllocation().getOrigin()).add(this.skeletonLocation);
-		skeleton.getUnlockedFragments().forEach(fragment ->
-				fragment.show(user, orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment))));
-	}
-
-	@Override
-	public void hide(User user) {
-		super.hide(user);
-		if (skeleton != null)
-			skeleton.getPrototype().hide(user);
 	}
 
 	public double getIncome() {

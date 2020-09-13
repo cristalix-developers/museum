@@ -10,8 +10,8 @@ import museum.data.PickaxeType;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
 import museum.museum.map.SkeletonSubjectPrototype;
-import museum.museum.map.SubjectType;
 import museum.museum.subject.SkeletonSubject;
+import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
@@ -46,7 +46,7 @@ public class MuseumGuis {
 
 			try {
 				skeletonType = requireNonNull(Managers.skeleton.getByIndex(index));
-				subject = requireNonNull((SkeletonSubject) user.getCurrentMuseum().getSubjectByUuid(UUID.fromString(context.getPayload())));
+				subject = requireNonNull((SkeletonSubject) user.getSubject(UUID.fromString(context.getPayload())));
 				requireNonNull(user.getSkeletons().supply(skeletonType));
 			} catch (Exception e) {
 				return lockItem;
@@ -55,12 +55,13 @@ public class MuseumGuis {
 			if (skeletonType.getSize() > ((SkeletonSubjectPrototype) subject.getPrototype()).getSize())
 				return Lemonade.get("too-huge").dynamic().fill("dino", skeletonType.getTitle()).render();
 
-			// Если любая витрина уже использует этот прототип, то поставить lock предмет
-			for (SkeletonSubject skeletonSubject : user.getCurrentMuseum().getSubjects(SubjectType.SKELETON_CASE)) {
-				Skeleton skeleton = skeletonSubject.getSkeleton();
+			// Если любая витрина уже использует этот прототип, то поставить уголь
+			for (Subject other : user.getSubjects()) {
+				if (!(other instanceof SkeletonSubject)) continue;
+				Skeleton skeleton = ((SkeletonSubject) other).getSkeleton();
 				if (skeleton == null) continue;
 				if (skeleton.getCachedInfo().getPrototypeAddress().equals(skeletonType.getAddress()))
-					return lockItem;
+					return new ItemStack(Material.COAL);
 			}
 
 			Skeleton playerSkeleton = null;
@@ -128,7 +129,7 @@ public class MuseumGuis {
 
 		Guis.registerItemizer("museum", (base, player, context, slotId) -> {
 			User user = app.getUser(player);
-			Museum museum = user.getCurrentMuseum();
+			Museum museum = user.getLastMuseum();
 			return base.dynamic()
 					.fill("owner", museum.getOwner().getName())
 					.fill("title", museum.getTitle())

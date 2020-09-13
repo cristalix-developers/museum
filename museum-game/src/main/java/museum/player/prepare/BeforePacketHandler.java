@@ -6,7 +6,6 @@ import clepto.bukkit.Cycle;
 import clepto.bukkit.Lemonade;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import lombok.val;
 import museum.App;
 import museum.excavation.Excavation;
@@ -20,7 +19,6 @@ import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
-import museum.player.pickaxe.Pickaxe;
 import museum.player.pickaxe.PickaxeType;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
@@ -28,6 +26,7 @@ import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.List;
@@ -50,30 +49,7 @@ public class BeforePacketHandler implements Prepare {
 	public void execute(User user, App app) {
 		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(),
 				new ChannelDuplexHandler() {
-					@Override
-					public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-						try {
-							// Обработка отправки чанков
-							if (msg instanceof PacketPlayOutMapChunk) {
-								PacketPlayOutMapChunk mapChunk = (PacketPlayOutMapChunk) msg;
-								if (user.getExcavation() != null) {
-									// Если загружается чанк шахты, то новой
-									val prototype = user.getExcavation().getPrototype();
-									for (PacketPlayOutMapChunk packet : prototype.getPackets()) {
-										if (packet.a == mapChunk.a && packet.b == mapChunk.b) {
-											super.write(ctx, packet, promise);
-											return;
-										}
-									}
-								}
-							}
-						} catch (Exception ignored) { }
-						if (msg != null) {
-							super.write(ctx, msg, promise);
-						}
-					}
-
-					@SuppressWarnings("deprecation")
+					@SuppressWarnings ("deprecation")
 					@Override
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 						if (packetObj instanceof PacketPlayInUseItem) {
@@ -82,22 +58,23 @@ public class BeforePacketHandler implements Prepare {
 								if (isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
 									val itemInMainHand = user.getPlayer().getInventory().getItemInMainHand();
 
-									if (user.getExcavation() == null) {
-										for (Subject subject : user.getCurrentMuseum().getSubjects()) {
-											if (subject.getAllocation() == null)
-												continue;
+									if (user.getState() instanceof Museum) {
+										Museum museum = (Museum) user.getState();
+										for (Subject subject : museum.getSubjects()) {
 											for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
 												BlockPosition pos = packet.a;
 												if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
 													packet.a = dummy; // Genius
-													MinecraftServer.getServer().postToMainThread(() ->
-															user.getCurrentMuseum().processClick(user, subject));
+													MinecraftServer.getServer().postToMainThread(() -> {
+														if (user != museum.getOwner()) MessageUtil.find("non-root").send(user);
+														else user.performCommand("gui manipulator " + subject.getCachedInfo().getUuid());
+													});
 													break;
 												}
 											}
 										}
 										BlockPosition blockPos = new BlockPosition(packet.a);
-										B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, blockPos));
+										B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, museum, blockPos));
 									} else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP))
 										tryReturnPlayer(user, true);
 									packet.a = dummy;
@@ -106,9 +83,7 @@ public class BeforePacketHandler implements Prepare {
 								packet.a = dummy;
 						} else if (packetObj instanceof PacketPlayInBlockDig) {
 							PacketPlayInBlockDig packet = (PacketPlayInBlockDig) packetObj;
-							Excavation excavation = user.getExcavation();
-							boolean valid = excavation != null && isAir(user, packet.a);
-
+							boolean valid = user.getState() instanceof Excavation && isAir(user, packet.a);
 							if (packet.c == STOP_DESTROY_BLOCK && valid) {
 								user.sendAnime();
 								if (tryReturnPlayer(user, false))
@@ -122,11 +97,10 @@ public class BeforePacketHandler implements Prepare {
 						super.channelRead(channelHandlerContext, packetObj);
 					}
 				}
-		);
+																		);
 	}
 
-	private void acceptSubjectPlace(User user, BlockPosition a) {
-		Museum museum = user.getCurrentMuseum();
+	private void acceptSubjectPlace(User user, Museum museum, BlockPosition a) {
 		if (museum == null || museum.getOwner() != user) return;
 
 		val item = user.getInventory().getItemInMainHand();
@@ -144,24 +118,22 @@ public class BeforePacketHandler implements Prepare {
 
 		Location origin = new Location(user.getWorld(), a.getX(), a.getY() + 1, a.getZ());
 		Collection<User> viewers = museum.getUsers();
-		Allocation allocation = subject.allocate(origin);
-		if (allocation == null) {
+		if (!museum.addSubject(subject, origin)) {
 			MessageUtil.find("cannot-place").send(user);
 			return;
 		}
 
 		user.getInventory().setItemInMainHand(MuseumGuis.AIR_ITEM);
-		allocation.sendUpdate(viewers);
+		subject.getAllocation().perform(Allocation.Action.UPDATE_BLOCKS, Allocation.Action.SPAWN_PIECES);
 		for (User viewer : viewers) {
 			viewer.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
-			subject.show(viewer);
 		}
 
 		MessageUtil.find("placed").send(user);
 	}
 
 	private boolean tryReturnPlayer(User user, boolean force) {
-		Excavation excavation = user.getExcavation();
+		Excavation excavation = ((Excavation) user.getState());
 
 		if (excavation.getHitsLeft() == -1)
 			return true;
@@ -172,7 +144,7 @@ public class BeforePacketHandler implements Prepare {
 			MessageUtil.find("excavationend").send(user);
 			excavation.setHitsLeft(-1);
 			B.postpone(200, () -> {
-				user.getCurrentMuseum().show(user);
+				user.setState(user.getLastMuseum());
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			});
 			return true;
@@ -180,11 +152,11 @@ public class BeforePacketHandler implements Prepare {
 		return excavation.getHitsLeft() < 0;
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings ("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
 			// С некоторым шансом может выпасть эмеральд
-			if (Pickaxe.RANDOM.nextFloat() > .9)
+			if (Vector.random.nextFloat() > .9)
 				user.getPlayer().getInventory().addItem(Lemonade.get("emerald-item").render());
 			// Перебрать все кирки и эффекты на них
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
@@ -199,20 +171,20 @@ public class BeforePacketHandler implements Prepare {
 	}
 
 	private void generateFragments(User user, BlockPosition position) {
-		ExcavationPrototype prototype = user.getExcavation().getPrototype();
+		ExcavationPrototype prototype = ((Excavation) user.getState()).getPrototype();
 		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 
 		val luckyBuffer = user.getLocation().getY() / 100;
 		val bingo = luckyBuffer / proto.getRarity().getRareScale() / 10;
 
-		if (bingo > Pickaxe.RANDOM.nextDouble()) {
+		if (bingo > Vector.random.nextDouble()) {
 			// Если повезло, то будет проиграна анимация и тд
 			user.giveExperience(1);
 			val fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
 
 			V4 location = new V4(position.getX(), position.getY() + 0.5, position.getZ(), (float) (Math.random() * 360 - 180));
 
-			fragment.show(user, location);
+			fragment.transpose(location).forEach((atom, origin) -> atom.show(user, origin));
 			animateFragments(user, fragment, location);
 
 			// Проверка на дубликат
@@ -246,8 +218,8 @@ public class BeforePacketHandler implements Prepare {
 
 	private void animateFragments(User user, Fragment fragment, V4 location) {
 		Cycle.run(1, 60, tick -> {
-			if (tick == 59) fragment.hide(user);
-			else fragment.update(user, location.add(OFFSET));
+			if (tick == 59) fragment.transpose(OFFSET).keySet().forEach(piece -> piece.hide(user));
+			else fragment.transpose(location.add(OFFSET)).forEach((atom, origin) -> atom.update(user, origin));
 		});
 	}
 

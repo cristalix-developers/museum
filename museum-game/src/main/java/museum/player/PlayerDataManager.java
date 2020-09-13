@@ -8,13 +8,12 @@ import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.data.BoosterInfo;
 import museum.data.UserInfo;
+import museum.museum.Museum;
 import museum.packages.*;
 import museum.player.prepare.*;
-import museum.prototype.Managers;
 import museum.utils.MultiTimeBar;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -80,7 +79,7 @@ public class PlayerDataManager implements Listener {
 				if (pckg.getSum() != null)
 					user.setMoney(user.getMoney() + pckg.getSum());
 				if (pckg.getSeconds() != null) {
-					double result = pckg.getSeconds() * user.getCurrentMuseum().getIncome(); // Типа того
+					double result = pckg.getSeconds() * user.getMuseums().stream().mapToDouble(Museum::getIncome).sum(); // Типа того
 					user.setMoney(user.getMoney() + result);
 				}
 			}
@@ -103,7 +102,7 @@ public class PlayerDataManager implements Listener {
 			userMap.put(e.getUniqueId(), user);
 
 			try {
-				e.setSpawnLocation(getSpawnPosition(user));
+				e.setSpawnLocation(user.getLastLocation());
 			} catch (NoSuchMethodError ignored) {
 			}
 		} catch (Exception ex) {
@@ -113,18 +112,12 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler
 	public void onSpawn(PlayerSpawnLocationEvent e) {
-		e.setSpawnLocation(getSpawnPosition(app.getUser(e.getPlayer())));
+		e.setSpawnLocation(app.getUser(e.getPlayer()).getLastLocation());
 	}
 
 	@EventHandler
 	public void onSpawn(PlayerInitialSpawnEvent e) {
-		e.setSpawnLocation(getSpawnPosition(app.getUser(e.getPlayer())));
-	}
-
-	private Location getSpawnPosition(User user) {
-		val museum = user.getMuseums().get(Managers.museum.getPrototype("main"));
-		val warp = museum.getWarp();
-		return warp.getFinish();
+		e.setSpawnLocation(app.getUser(e.getPlayer()).getLastLocation());
 	}
 
 	@EventHandler
@@ -141,7 +134,7 @@ public class PlayerDataManager implements Listener {
 				new PrepareInventory(),
 				new PrepareJSAnime(),
 				(usr, app) -> usr.getPlayer().setWalkSpeed(.33F),
-				(usr, app) -> user.getMuseums().supply(Managers.museum.getPrototype("main")).show(user), // Музей
+				(usr, app) -> user.setState(user.getState()), // Музей
 				new PrepareScoreBoard(),
 				(usr, app) -> user.getPlayer().addPotionEffect(NIGHT_VISION),
 				(usr, app) -> Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current)), // Скрытие игроков

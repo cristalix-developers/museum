@@ -10,6 +10,7 @@ import museum.data.PickaxeType;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
+import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SkeletonSubjectPrototype;
 import museum.museum.map.SubjectType;
 import museum.museum.subject.Allocation;
@@ -17,51 +18,43 @@ import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.player.State;
 import museum.player.User;
-import museum.player.pickaxe.Pickaxe;
 import museum.prototype.Managers;
-import museum.util.Colorizer;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
 import museum.util.VirtualSign;
-import museum.util.warp.Warp;
-import museum.util.warp.WarpUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.v1_12_R1.Block;
-import net.minecraft.server.v1_12_R1.Blocks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.formatting.Color;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 
+import static museum.museum.subject.Allocation.Action.*;
 import static museum.util.Colorizer.applyColor;
 
 public class MuseumCommands {
 
 	private final App app;
-	private final Warp galleryWarp;
 
 	public MuseumCommands(App app) {
 		this.app = app;
 
-		this.galleryWarp = new WarpUtil.WarpBuilder("gallery")
-				.onForward(user -> user.getCurrentMuseum().hide(user))
-				.build();
-
 		B.regCommand(this::cmdHome, "home", "leave", "spawn");
 		B.regCommand(this::cmdSubjects, "subjects", "sj");
 		B.regCommand(this::cmdGui, "gui");
-		B.regCommand(this::cmdGallery, "gallery");
+		B.regCommand(this::cmdShop, "shop", "gallery");
 		B.regCommand(this::cmdChangeTitle, "changetitle");
 		B.regCommand(this::cmdInvite, "invite");
 		B.regCommand(this::cmdExcavation, "excavation", "exc");
 		B.regCommand(this::cmdPickaxe, "pickaxe");
 		B.regCommand(this::cmdSubject, "subject");
+		B.regCommand(this::cmdVisit, "visit", "museum");
 		B.regCommand((sender, args) -> {
 			ItemClosure closure = new ItemClosure(this, this) {
 				@Override
@@ -77,20 +70,43 @@ public class MuseumCommands {
 		}, "ti");
 	}
 
+	private String cmdVisit(Player sender, String[] args) {
+		val user = app.getUser(sender);
+
+		if (args.length == 0)
+			return "§cИспользование: §f/museum [Игрок] (Музей)";
+
+		val ownerPlayer = Bukkit.getPlayer(args[0]);
+
+		if (ownerPlayer == null || !ownerPlayer.isOnline())
+			return MessageUtil.get("playeroffline");
+
+		val ownerUser = app.getUser(ownerPlayer);
+		String address = args.length > 1 ? args[1] : "main";
+
+		MuseumPrototype prototype = Managers.museum.getPrototype(address);
+		Museum museum = prototype == null ? null : ownerUser.getMuseums().get(prototype);
+		if (museum == null)
+			return MessageUtil.find("museum-not-found").set("type", address).getText();
+
+		if (user.getState() == museum)
+			return MessageUtil.get("already-here");
+
+		return MessageUtil.find("museum-teleported")
+				.set("visitor", user.getName())
+				.getText();
+	}
+
 	private String cmdHome(Player sender, String[] args) {
 		User user = this.app.getUser(sender);
-		if (user.getExcavation() != null)
-			user.setExcavation(null);
-		else if (user.getCurrentMuseum().getOwner() != user)
-			user.getCurrentMuseum().hide(user);
-		else
+		if (user.getState() instanceof Museum)
 			return MessageUtil.get("already-at-home");
-		user.getMuseums().supply(Managers.museum.getPrototype("main")).show(user);
+		user.setState(user.getLastMuseum());
 		return MessageUtil.get("welcome-home");
 	}
 
 	private String cmdSubjects(Player sender, String[] args) {
-		List<Subject> subjects = this.app.getUser(sender).getCurrentMuseum().getSubjects();
+		Collection<Subject> subjects = this.app.getUser(sender).getSubjects();
 		for (Subject subject : subjects) {
 			String allocationInfo = "§cno allocation";
 			Allocation allocation = subject.getAllocation();
@@ -113,17 +129,23 @@ public class MuseumCommands {
 		return null;
 	}
 
-	private String cmdGallery(Player sender, String[] args) {
-		this.galleryWarp.warp(this.app.getUser(sender));
-		return null;
+	private String cmdShop(Player sender, String[] args) {
+		User user = app.getUser(sender);
+		if (user.getState() instanceof Excavation)
+			// ToDo: Автоматический триггер возвращения домой с возможностью отмены
+			return "§cВы на раскопках, сперва вернитесь домой";
+		user.setState(app.getShop());
+		return "§aДобро пожаловать в магазин!";
 	}
 
 	private String cmdChangeTitle(Player sender, String[] args) {
+		User user = app.getUser(sender);
+		if (!(user.getState() instanceof Museum))
+			return MessageUtil.get("not-in-museum");
 		new VirtualSign().openSign(sender, lines -> {
 			for (String line : lines) {
 				if (line != null && !line.isEmpty()) {
-					User user = this.app.getUser(sender);
-					user.getCurrentMuseum().setTitle(line);
+					((Museum) user.getState()).setTitle(line);
 					MessageUtil.find("museumtitlechange")
 							.set("title", line)
 							.send(user);
@@ -176,10 +198,8 @@ public class MuseumCommands {
 		user.setMoney(user.getMoney() - proto.getPrice());
 
 		Excavation excavation = new Excavation(proto, proto.getHitCount());
-		user.setExcavation(excavation);
+		user.setState(excavation);
 
-		user.getCurrentMuseum().hide(user);
-		excavation.load(user);
 		return null;
 	}
 
@@ -212,7 +232,10 @@ public class MuseumCommands {
 		}
 
 		val user = app.getUser(player);
-		Museum museum = user.getCurrentMuseum();
+		State state = user.getState();
+		if (!(state instanceof Museum))
+			return MessageUtil.get("not-in-museum");
+		Museum museum = (Museum) state;
 		val subject = museum.getSubjectByUuid(subjectUuid);
 		if (museum.getOwner() != user)
 			return MessageUtil.get("owner-crash");
@@ -235,8 +258,7 @@ public class MuseumCommands {
 
 			if (allocation != null) {
 				allocation.prepareUpdate(data -> applyColor(data, color));
-
-				allocation.sendUpdate(museum.getUsers());
+				allocation.perform(Allocation.Action.UPDATE_BLOCKS);
 			}
 
 			return MessageUtil.get("color-changed");
@@ -248,11 +270,8 @@ public class MuseumCommands {
 		} else if ("destroy".equals(args[0])) {
 			if (allocation == null)
 				return null;
-			allocation.sendDestroyEffects(museum.getUsers());
-			allocation.prepareUpdate(data -> Pickaxe.AIR_DATA);
-			allocation.sendUpdate(museum.getUsers());
-			subject.allocate(null);
-			for (User viewer : museum.getUsers()) subject.hide(viewer);
+			allocation.perform(PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES);
+			subject.setAllocation(null);
 
 			player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 			player.closeInventory();
@@ -293,11 +312,12 @@ public class MuseumCommands {
 				skeletonSubject.setSkeleton(newSkeleton);
 			}
 
-			for (User watcher : app.getUsers()) {
-				if (watcher.getCurrentMuseum() != museum) continue;
-				if (previousSkeleton != null)
-					previousSkeleton.getPrototype().hide(watcher);
-				skeletonSubject.show(watcher);
+			if (allocation != null) {
+				if (previousSkeleton != null) {
+					allocation.perform(HIDE_PIECES);
+					allocation.removePiece(previousSkeleton.getPrototype());
+				}
+				skeletonSubject.updateSkeleton(true);
 			}
 
 			player.closeInventory();

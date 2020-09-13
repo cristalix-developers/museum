@@ -1,17 +1,14 @@
 package museum.worker;
 
-import clepto.bukkit.gui.Guis;
-import lombok.AllArgsConstructor;
 import lombok.val;
+import museum.App;
+import museum.player.User;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftVillager;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import museum.App;
-import museum.player.User;
-import museum.util.warp.WarpUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,17 +24,18 @@ public class WorkerHandler {
 			new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 10000, false, false);
 
 	public WorkerHandler(App app) {
-		// Формат таблички: .p worker <Название> <mover/shower> <meta>
-		workers = app.getMap().getLabels("worker").stream()
+		// Формат таблички: .p simplenpc <Имя жителя> </команда>
+		workers = app.getMap().getLabels("simplenpc").stream()
 				.map(label -> {
-					String[] ss = label.getTag().split("\\s+");
+					String[] ss = label.getTag().split("\\s+", 2);
 					val villager = (Villager) app.getWorld().spawnEntity(label, EntityType.VILLAGER);
 					villager.setCustomName(ss[0]);
 					villager.setAI(false);
 					villager.setCustomNameVisible(true);
 					villager.addPotionEffect(SLOWNESS);
-					villager.setMetadata("type", new FixedMetadataValue(app, ss[1].toUpperCase()));
-					villager.setMetadata("meta", new FixedMetadataValue(app, ss[2]));
+					String command = ss[1];
+					if (command.startsWith("/")) command = command.substring(1);
+					villager.setMetadata("command", new FixedMetadataValue(app, command));
 					((CraftVillager) villager).getHandle().persistent = true;
 					return villager;
 				}).collect(Collectors.toList());
@@ -46,29 +44,10 @@ public class WorkerHandler {
 	public void acceptClick(User user, Villager villager) {
 		for (Villager worker : workers) {
 			if (worker.equals(villager)) {
-				WorkerType.valueOf(villager.getMetadata("type").get(0).asString())
-						.onClick(user, villager.getMetadata("meta").get(0).asString());
+				user.performCommand(villager.getMetadata("command").get(0).asString());
 				return;
 			}
 		}
 	}
 
-	@AllArgsConstructor
-	enum WorkerType {
-		MOVER() {
-			@Override
-			void onClick(User user, String meta) {
-				WarpUtil.get(meta).warp(user);
-			}
-		},
-		SHOWER() {
-			@Override
-			void onClick(User user, String meta) {
-				Guis.registry.get(meta).open(user.getPlayer(), null);
-			}
-		},
-		;
-
-		abstract void onClick(User user, String meta);
-	}
 }

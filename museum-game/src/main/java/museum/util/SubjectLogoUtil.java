@@ -34,6 +34,6 @@ public class SubjectLogoUtil {
 		if (tag == null || !tag.hasKey("subject-uuid"))
 			return null;
 
-		return user.getCurrentMuseum().getSubjectByUuid(UUID.fromString(tag.getString("subject-uuid")));
+		return user.getSubject(UUID.fromString(tag.getString("subject-uuid")));
 	}
 }

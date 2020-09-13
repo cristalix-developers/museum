@@ -1,26 +1,23 @@
 package museum.player.pickaxe;
 
 import lombok.val;
+import museum.util.ChunkWriter;
 import net.minecraft.server.v1_12_R1.*;
 import museum.App;
 import museum.excavation.Excavation;
 import museum.player.User;
+import org.bukkit.util.Vector;
 
 import java.util.List;
-import java.util.Random;
 
 public interface Pickaxe {
-
-	Random RANDOM = new Random();
-
-	IBlockData AIR_DATA = Block.getById(0).getBlockData();
 
 	List<BlockPosition> dig(User user, BlockPosition position);
 
 	default boolean breakBlock(User user, BlockPosition position) {
 		if (Excavation.isAir(user, position)) {
 			val blockChange = new PacketPlayOutBlockChange(App.getApp().getNMSWorld(), position);
-			blockChange.block = AIR_DATA;
+			blockChange.block = ChunkWriter.AIR_DATA;
 			user.sendPacket(blockChange);
 			return true;
 		}
@@ -29,9 +26,9 @@ public interface Pickaxe {
 
 	default void animate(PlayerConnection connection, BlockPosition position) {
 		connection.sendPacket(new PacketPlayOutBlockBreakAnimation(
-				RANDOM.nextInt(1000),
+				Vector.random.nextInt(1000),
 				position,
-				6 + RANDOM.nextInt(3)
+				6 + Vector.random.nextInt(3)
 		));
 	}
 

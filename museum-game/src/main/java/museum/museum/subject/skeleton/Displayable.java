@@ -33,9 +33,4 @@ public interface Displayable {
 		packets.forEach(user::sendPacket);
 	}
 
-	static V4 orientedOffset(V4 positionRotation, V4 offset) {
-		V4 orientedOffset = offset.clone().rotate(V4.Y, positionRotation.rot);
-		return V4.sum(positionRotation, orientedOffset).setRot(orientedOffset.rot);
-	}
-
 }

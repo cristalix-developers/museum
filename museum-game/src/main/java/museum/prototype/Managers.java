@@ -108,7 +108,7 @@ public class Managers {
 							address + " on " + label.getCoords());
 				defaultInfos.add(new SubjectInfo(new UUID(0, 0), prototype.getAddress(), label.toV3(), D2.PX, tag.length > 1 ? tag[1] : null, -1, Color.LIME));
 			}
-			return new MuseumPrototype(address, box, defaultInfos);
+			return new MuseumPrototype(address, box, box.requireLabel("spawn"), defaultInfos);
 		});
 
 		skeleton = new PrototypeManager<>("skeleton", (address, box) -> {
@@ -184,6 +184,7 @@ public class Managers {
 
 			return new ExcavationPrototype(
 					address, skeletonPrototypes,
+					box.requireLabel("spawn"),
 					box.requireLabel("hit-count").getTagInt(),
 					box.requireLabel("required-level").getTagInt(),
 					box.requireLabel("price").getTagDouble(),
