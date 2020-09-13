@@ -47,6 +47,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public final class App extends JavaPlugin {
@@ -104,19 +105,9 @@ public final class App extends JavaPlugin {
 		CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
 		// Регистрация обработчика пакета конфига
-		clientSocket.registerHandler(ConfigurationsPackage.class, pckg -> {
-			YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
-			itemsConfig.getKeys(false)
-					.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
+		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
 
-			// Инициализация "умных" иконок в гуишках
-			MuseumGuis.registerItemizers(this);
-
-			// Загрузка всех инвентарей
-			Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));
-
-			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
-		});
+		requestConfigurations();
 
 		// Прогрузка предметов из Groovy-скриптов
 		try {
@@ -187,6 +178,34 @@ public final class App extends JavaPlugin {
 
 	public Collection<User> getUsers() {
 		return playerDataManager.getUsers();
+	}
+
+	private void requestConfigurations() {
+		try {
+			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage()).get(3L, TimeUnit.SECONDS);
+			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getGuisData(), pckg.getItemsData()));
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			System.out.println("We can't receive museum configurations! Retry in 3sec");
+			try {
+				Thread.sleep(3000L);
+			} catch(Exception ignored) {}
+			requestConfigurations();
+		}
+	}
+
+	private void fillConfigurations(ConfigurationsPackage pckg) {
+		YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
+		itemsConfig.getKeys(false)
+				.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
+
+		// Инициализация "умных" иконок в гуишках
+		MuseumGuis.registerItemizers(this);
+
+		// Загрузка всех инвентарей
+		Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));
+
+		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 	}
 
 }
