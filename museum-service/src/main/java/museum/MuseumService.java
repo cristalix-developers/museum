@@ -147,6 +147,12 @@ public class MuseumService {
 			CONFIGURATION_MANAGER.fillRequest(museumPackage);
 			answer(channel, museumPackage);
 		}));
+		registerHandler(TopPackage.class, ((channel, serverName, museumPackage) -> {
+			userData.getTop(museumPackage.getTopType(), museumPackage.getLimit()).thenAccept(res -> {
+				museumPackage.setEntries(res);
+				answer(channel, museumPackage);
+			});
+		}));
 
 		Thread consoleThread = new Thread(MuseumService::handleConsole);
 		consoleThread.setDaemon(true);
