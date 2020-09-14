@@ -140,6 +140,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		}
 
 		updateIncrease();
+
+		player.setAllowFlight(true);
 	}
 
 	@Override

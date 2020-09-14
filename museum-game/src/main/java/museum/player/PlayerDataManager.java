@@ -138,8 +138,7 @@ public class PlayerDataManager implements Listener {
 				(usr, app) -> user.getPlayer().addPotionEffect(NIGHT_VISION),
 				(usr, app) -> Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current)), // Скрытие игроков
 				(usr, app) -> user.getPlayer().setGameMode(GameMode.ADVENTURE), // Режим игры
-				new PreparePlayerBrain(app),
-				(usr, app) -> user.getPlayer().setAllowFlight(true) // Режим полёта
+				new PreparePlayerBrain(app)
 		).forEach(prepare -> prepare.execute(user, app)));
 
 		e.setJoinMessage(null);

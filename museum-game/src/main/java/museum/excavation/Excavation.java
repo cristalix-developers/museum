@@ -28,6 +28,7 @@ public class Excavation implements State {
 	@Override
 	public void enterState(User user) {
 		Player player = user.getPlayer();
+		player.setAllowFlight(false);
 		player.getInventory().clear();
 		player.getInventory().addItem(Lemonade.get("pickaxe-" + user.getPickaxeType().name().toLowerCase()).render());
 		player.getInventory().setItem(8, BeforePacketHandler.EMERGENCY_STOP);
