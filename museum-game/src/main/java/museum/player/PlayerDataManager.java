@@ -131,7 +131,6 @@ public class PlayerDataManager implements Listener {
 
 		B.postpone(2, () -> Arrays.asList(
 				BeforePacketHandler.INSTANCE,
-				new PrepareInventory(),
 				new PrepareJSAnime(),
 				(usr, app) -> usr.getPlayer().setWalkSpeed(.33F),
 				(usr, app) -> user.setState(user.getState()), // Музей

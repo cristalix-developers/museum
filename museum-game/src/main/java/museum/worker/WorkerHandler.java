@@ -1,5 +1,6 @@
 package museum.worker;
 
+import lombok.Getter;
 import lombok.val;
 import museum.App;
 import museum.player.User;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  */
 public class WorkerHandler {
 
+	@Getter
 	private final List<Villager> workers;
 	private static final PotionEffect SLOWNESS =
 			new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 10000, false, false);

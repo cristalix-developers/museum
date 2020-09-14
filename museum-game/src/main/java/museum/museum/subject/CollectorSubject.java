@@ -1,6 +1,6 @@
 package museum.museum.subject;
 
-import clepto.bukkit.Lemonade;
+import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.Setter;
 import museum.App;
@@ -14,9 +14,6 @@ import museum.player.User;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.inventory.ItemStack;
 
 public class CollectorSubject extends Subject {
 
@@ -33,9 +30,8 @@ public class CollectorSubject extends Subject {
 	public CollectorSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
 		EntityArmorStand armorStand = new EntityArmorStand(App.getApp().getNMSWorld());
-		Lemonade lemonade = Lemonade.get(this.prototype.getAddress());
-		ItemStack item = lemonade == null ? new ItemStack(Material.WORKBENCH) : lemonade.render();
-		armorStand.setSlot(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(item));
+		// todo: добавить кеширование предметов, а то они одни и теже
+		armorStand.setSlot(EnumItemSlot.HEAD, Items.render(this.prototype.getAddress()));
 		armorStand.setCustomName(prototype.getTitle());
 		armorStand.setCustomNameVisible(true);
 		this.navigator = null;

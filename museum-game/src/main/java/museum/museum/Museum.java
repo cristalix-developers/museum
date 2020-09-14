@@ -2,6 +2,7 @@ package museum.museum;
 
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
+import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
@@ -45,7 +46,9 @@ import static museum.museum.subject.Allocation.Action.*;
 @Getter
 public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements State {
 
-	private final ItemStack menu = Lemonade.get("menu").render();
+	// todo: Надо их кешировать, а то музеев много
+	private final ItemStack menu = Items.render("menu").asBukkitMirror();
+	private final ItemStack backItem = Items.render("back").asBukkitMirror();
 
 	private final CraftWorld world;
 	private double income;
@@ -80,7 +83,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 					if (route != null) collector.setNavigator(new CollectorNavigator(prototype, world,
 							route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 				});
-
 	}
 
 	@Override
@@ -90,19 +92,16 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 	@Override
 	public void setupScoreboard(User user, SimpleBoardObjective objective) {
-
 		objective.setDisplayName(this.title);
 
 		objective.startGroup("Музей");
 		if (owner != user) objective.record("Владелец", user.getName());
 		objective.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(getIncome()))
 				.record("Посещений", () -> "§b" + this.getViews());
-
 	}
 
 	@Override
 	public void enterState(User user) {
-
 		user.teleport(prototype.getBox().contains(user.getLastLocation()) && owner == user ? user.getLastLocation() : prototype.getSpawn());
 		for (Subject subject : this.getSubjects()) {
 			subject.getAllocation().perform(user, UPDATE_BLOCKS);
@@ -132,7 +131,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		inventory.setItem(0, menu);
 
 		if (this.owner != user) {
-			inventory.setItem(8, Lemonade.get("back").render());
+			inventory.setItem(8, backItem);
 		} else {
 			for (Subject subject : user.getSubjects()) {
 				if (!subject.isAllocated())

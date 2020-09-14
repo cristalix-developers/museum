@@ -99,7 +99,7 @@ public class MuseumGuis {
 					context.getOpenedGui().getSlotData(slotId).getInfo()
 			);
 			if (excavation == null || excavation.getRequiredLevel() > app.getUser(player).getLevel())
-				return Lemonade.get("unavailable").render();
+				return clepto.bukkit.item.Items.render("unavailable").asBukkitMirror();
 			val item = base.dynamic()
 					.fill("excavation", excavation.getTitle())
 					.fill("cost", String.format("%.2f", excavation.getPrice()))

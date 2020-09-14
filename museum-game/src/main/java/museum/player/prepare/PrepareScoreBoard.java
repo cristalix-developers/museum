@@ -24,7 +24,6 @@ public class PrepareScoreBoard implements Prepare {
 	}
 
 	public static void addServerInfo(SimpleBoardObjective objective) {
-
 		long megabyte = 1024 * 1024;
 		Runtime runtime = Runtime.getRuntime();
 
@@ -49,7 +48,6 @@ public class PrepareScoreBoard implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-
 		SimpleBoardObjective excavation = IScoreboardService.get().getPlayerObjective(user.getUuid(), "excavation");
 
 		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");

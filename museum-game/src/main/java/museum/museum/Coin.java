@@ -17,12 +17,12 @@ import org.bukkit.util.Vector;
  */
 public class Coin {
 
-	public static final ItemStack COIN = CraftItemStack.asNMSCopy(Lemonade.get("coin").render());
+	public static final ItemStack COIN = clepto.bukkit.item.Items.render("coin");
 	public static final int SECONDS_LIVE = 20;
-	private EntityItem entityItem;
-	private Location location;
+	private final EntityItem entityItem;
+	private final Location location;
 	@Getter
-	private long timestamp;
+	private final long timestamp;
 
 	public Coin(Location location) {
 		this.location = location;

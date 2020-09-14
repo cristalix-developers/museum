@@ -4,6 +4,7 @@ import clepto.ListUtils;
 import clepto.bukkit.B;
 import clepto.bukkit.Cycle;
 import clepto.bukkit.Lemonade;
+import clepto.bukkit.item.Items;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.val;
@@ -41,8 +42,10 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
 public class BeforePacketHandler implements Prepare {
 
 	public static final BeforePacketHandler INSTANCE = new BeforePacketHandler();
-	public static final ItemStack EMERGENCY_STOP = Lemonade.get("go-back-item").render();
+
+	public static final ItemStack EMERGENCY_STOP = Items.render("go-back-item").asBukkitMirror();
 	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
+	private static final ItemStack emeraldItem = Items.render("emerald-item").asBukkitCopy();
 	private static final BlockPosition dummy = new BlockPosition(0, 0, 0);
 
 	@Override
@@ -157,7 +160,7 @@ public class BeforePacketHandler implements Prepare {
 		MinecraftServer.getServer().postToMainThread(() -> {
 			// С некоторым шансом может выпасть эмеральд
 			if (Vector.random.nextFloat() > .9)
-				user.getPlayer().getInventory().addItem(Lemonade.get("emerald-item").render());
+				user.getPlayer().getInventory().addItem(emeraldItem);
 			// Перебрать все кирки и эффекты на них
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
