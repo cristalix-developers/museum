@@ -3,6 +3,7 @@ package museum.museum.subject;
 import clepto.cristalix.mapservice.Box;
 import lombok.Getter;
 import museum.data.SubjectInfo;
+import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
@@ -55,7 +56,7 @@ public class SkeletonSubject extends Subject {
 					(int) o.getX(),
 					(int) o.getY(),
 					(int) o.getZ()
-																 ));
+			));
 			this.skeletonLocation.setRot(rot);
 
 			this.updateSkeleton(false);
@@ -70,13 +71,15 @@ public class SkeletonSubject extends Subject {
 		V4 absoluteLocation = V4.fromLocation(allocation.getOrigin()).add(this.skeletonLocation);
 		skeleton.getUnlockedFragments().forEach(fragment ->
 				allocation.allocatePiece(fragment, orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment)), sendUpdates));
+		((Museum) owner.getState()).updateIncrease();
 	}
 
 	@Override
 	public void updateInfo() {
 		super.updateInfo();
 		if (skeleton == null) cachedInfo.metadata = null;
-		else cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot);
+		else
+			cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot);
 	}
 
 	public double getIncome() {

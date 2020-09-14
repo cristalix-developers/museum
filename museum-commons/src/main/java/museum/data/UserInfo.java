@@ -25,5 +25,6 @@ public class UserInfo implements Unique {
 	private V3 lastPosition;
 	private List<DonateType> donates;
     private List<BoosterInfo> localBoosters;
+    private double income;
 
 }
