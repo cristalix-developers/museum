@@ -11,6 +11,7 @@ import museum.excavation.ExcavationPrototype;
 import museum.museum.map.*;
 import museum.museum.subject.skeleton.Rarity;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.util.LocationUtil;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -184,7 +185,7 @@ public class Managers {
 
 			return new ExcavationPrototype(
 					address, skeletonPrototypes,
-					box.requireLabel("spawn"),
+					LocationUtil.resetLabelRotation(box.requireLabel("spawn"), 0),
 					box.requireLabel("hit-count").getTagInt(),
 					box.requireLabel("required-level").getTagInt(),
 					box.requireLabel("price").getTagDouble(),

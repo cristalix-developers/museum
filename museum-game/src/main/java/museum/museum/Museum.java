@@ -1,7 +1,6 @@
 package museum.museum;
 
 import clepto.bukkit.B;
-import clepto.bukkit.Lemonade;
 import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,9 +16,10 @@ import museum.museum.subject.MarkerSubject;
 import museum.museum.subject.Subject;
 import museum.player.State;
 import museum.player.User;
+import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Storable;
 import museum.util.ChunkWriter;
-import museum.util.LocationTree;
+import museum.util.LocationUtil;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -79,7 +79,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 					List<MarkerSubject> markers = allMarkers.stream()
 							.filter(marker -> marker.getCollectorId() == collector.getId() && marker.getLocation() != null)
 							.collect(Collectors.toList());
-					List<MarkerSubject> route = LocationTree.order(markers, MarkerSubject::getLocation);
+					List<MarkerSubject> route = LocationUtil.orderTree(markers, MarkerSubject::getLocation);
 					if (route != null) collector.setNavigator(new CollectorNavigator(prototype, world,
 							route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 				});
@@ -127,8 +127,9 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 		val player = user.getPlayer();
 		val inventory = player.getInventory();
-		inventory.clear();
-		inventory.setItem(0, menu);
+
+		if (owner.getExperience() > PreparePlayerBrain.EXPERIENCE)
+			giveMenu();
 
 		if (this.owner != user) {
 			inventory.setItem(8, backItem);
@@ -142,6 +143,12 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		updateIncrease();
 
 		player.setAllowFlight(true);
+	}
+
+	public void giveMenu() {
+		val inventory = owner.getInventory();
+		inventory.clear();
+		inventory.setItem(0, menu);
 	}
 
 	@Override

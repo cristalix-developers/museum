@@ -3,17 +3,16 @@ package museum.museum;
 import museum.App;
 import museum.player.State;
 import museum.player.User;
+import museum.util.LocationUtil;
 import org.bukkit.Location;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
 public class Shop implements State {
 
-	private final App app;
 	private final Location spawnLocation;
 
 	public Shop(App app) {
-		this.app = app;
-		this.spawnLocation = this.app.getMap().requireLabel("shop-spawn");
+		this.spawnLocation = LocationUtil.resetLabelRotation(app.getMap().requireLabel("shop-spawn"), 0);
 	}
 
 	@Override

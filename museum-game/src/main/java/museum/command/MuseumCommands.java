@@ -21,6 +21,7 @@ import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.State;
 import museum.player.User;
+import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
@@ -200,6 +201,9 @@ public class MuseumCommands {
 		if (proto == null)
 			return null;
 
+		if (user.getExperience() <= PreparePlayerBrain.EXPERIENCE)
+			return null;
+
 		player.closeInventory();
 
 		if (proto.getPrice() > user.getMoney())
@@ -295,7 +299,8 @@ public class MuseumCommands {
 			SkeletonPrototype newSkeletonType = null;
 			try {
 				newSkeletonType = Managers.skeleton.getByIndex(Integer.parseInt(args[2]));
-			} catch (Exception ignored) {}
+			} catch (Exception ignored) {
+			}
 
 			// Заменять на && не надо, ибо другая логика
 			if (newSkeletonType == null) {

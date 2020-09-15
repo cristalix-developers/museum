@@ -20,7 +20,7 @@ public class DefaultElements {
 				proto.getAddress(),
 				"Музей археологии",
 				new Date(),
-				3
+				0
 		);
 
 		UserInfo userInfo = new UserInfo(

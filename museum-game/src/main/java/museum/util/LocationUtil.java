@@ -1,5 +1,6 @@
 package museum.util;
 
+import clepto.cristalix.mapservice.Label;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 
@@ -8,9 +9,9 @@ import java.util.List;
 import java.util.function.Function;
 
 @UtilityClass
-public class LocationTree {
+public class LocationUtil {
 
-	public <T> List<T> order(List<T> points, Function<T, Location> converter) {
+	public <T> List<T> orderTree(List<T> points, Function<T, Location> converter) {
 		List<T> result = new ArrayList<>();
 		if (points.isEmpty()) return null;
 		T currentNode = points.iterator().next();
@@ -32,6 +33,15 @@ public class LocationTree {
 			points.remove(currentNode = closest);
 			result.add(currentNode);
 		}
+	}
+
+	public <L extends Label> L resetLabelRotation(L input, int characterOffset) {
+		String[] ss = input.getTag().split("\\s++");
+
+		input.setYaw(Integer.parseInt(ss[characterOffset]));
+		input.setPitch(Integer.parseInt(ss[++characterOffset]));
+
+		return input;
 	}
 
 }

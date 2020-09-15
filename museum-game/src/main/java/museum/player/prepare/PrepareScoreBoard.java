@@ -33,8 +33,7 @@ public class PrepareScoreBoard implements Prepare {
 						runtime.totalMemory() / megabyte + " " +
 								runtime.maxMemory() / megabyte + " " +
 								runtime.freeMemory() / megabyte
-				)
-				.record("TPS", () -> String.format("%.2f", Bukkit.getTPS()[0]));
+				).record("TPS", () -> String.format("%.2f", Bukkit.getTPS()[0]));
 	}
 
 	public static void setupScoreboard(User user) {
@@ -52,5 +51,4 @@ public class PrepareScoreBoard implements Prepare {
 
 		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
 	}
-
 }

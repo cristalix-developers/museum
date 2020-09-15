@@ -1,14 +1,21 @@
 package museum.player.prepare;
 
+import clepto.bukkit.Cycle;
 import clepto.cristalix.mapservice.Label;
 import com.destroystokyo.paper.Title;
 import museum.App;
+import museum.museum.Museum;
 import museum.player.User;
+import museum.util.LocationUtil;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
+
+import static clepto.bukkit.Cycle.exit;
 
 /**
  * @author func 26.08.2020
@@ -16,63 +23,60 @@ import java.util.List;
  */
 public class PreparePlayerBrain implements Prepare {
 
+	public static final PreparePlayerBrain INSTANCE = new PreparePlayerBrain();
+	public static final int EXPERIENCE = 10;
+
 	private final List<Label> dots;
-	private final List<Title> titles = Arrays.asList(
-			new Title("Привет!"),
-			new Title("Это.", "Твой. Музей."),
-			new Title("Заполняй витрины"),
-			new Title("Находи динозавров"),
-			new Title("Собирай монеты"),
-			new Title("Кастомизируй"),
-			new Title("Играй с друзьями"),
-			new Title("Удачи!")
-													);
+	private final List<Title> titles = new ArrayList<>();
+	private final String endMessage = "§f[§aВНИМАНИЕ§f]\n" +
+			"§6У входа §fв музей вас ждет §6Рафаэль,\n" +
+			"§fон может устроить §6раскопки!\n" +
+			"§6Внутри музея, Сатоши §fможет показать вам\n" +
+			"§6постройки §fдля кастомизации помещения.\n";
 
-	public PreparePlayerBrain(App app) {
-		dots = app.getMap().getLabels("guide");
+	public PreparePlayerBrain() {
+		dots = App.getApp().getMap().getLabels("guide");
 
-		for (Label label : dots) {
-			String[] ss = label.getTag().split("\\s++");
+		// При &&& след. текст становится на второе место
+		Stream.of(
+				"Привет! 䀈", "Это.nextТвой. Музей. 㸾", "Заполняйnextвитрины 㜤",
+				"Раскапывайnextдинозавров 㿿", "Собирай монеты 㜰", "Кастомизируй 㟡",
+				"Играй сnextдрузьями 㭿", "Удачи! 㬂"
+		).map(line -> {
+			if (line.contains("next")) {
+				String[] separated = line.split("next");
+				return new Title(separated[0], separated[1]);
+			}
+			return new Title(line);
+		}).forEach(titles::add);
 
-			label.setYaw(Integer.parseInt(ss[1]));
-			label.setPitch(Integer.parseInt(ss[2]));
-		}
+		for (Label label : dots)
+			LocationUtil.resetLabelRotation(label, 1);
 
 		dots.sort(Comparator.comparing(dot -> Integer.parseInt(dot.getTag().split("\\s++")[0])));
 	}
 
 	@Override
 	public void execute(User user, App app) {
-		if (user.getPlayer().hasPlayedBefore() || user.getExperience() > 10)
+		final CraftPlayer player = user.getPlayer();
+
+		if (player.hasPlayedBefore() || user.getExperience() > EXPERIENCE)
 			return;
 
-		new BukkitRunnable() {
-			int counter = 0;
-
-			@Override
-			public void run() {
-				if (!user.getPlayer().isOnline()) {
-					this.cancel();
+		Cycle.run(5 * 20, titles.size(), iteration -> {
+				if (!player.isOnline()) {
+					exit();
 					return;
 				}
-
-				if (counter >= titles.size()) {
-
-					user.getPlayer().sendMessage("§f[§aВНИМАНИЕ§f]");
-					user.getPlayer().sendMessage("§6У входа §fв музей вас ждет §6Рафаэль,");
-					user.getPlayer().sendMessage("§fон может устроить §6раскопки!");
-					user.getPlayer().sendMessage("§6Внутри музея, Сатоши §fможет показать вам");
-					user.getPlayer().sendMessage("§6постройки §fдля кастомизации помещения.");
-					user.giveExperience(10);
-
-					this.cancel();
+				if (iteration >= titles.size()) {
+					player.sendMessage(endMessage);
+					user.giveExperience(EXPERIENCE);
+					((Museum) user.getState()).giveMenu();
+					exit();
 					return;
 				}
-				user.getPlayer().sendTitle(titles.get(counter));
-				user.getPlayer().teleport(dots.get(counter).toCenterLocation());
-				counter++;
-			}
-		}.runTaskTimer(app, 3 * 20L, 6 * 20L);
+				player.sendTitle(titles.get(iteration));
+				player.teleport(dots.get(iteration).toCenterLocation());
+		});
 	}
-
 }

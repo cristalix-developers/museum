@@ -96,7 +96,6 @@ public final class App extends JavaPlugin {
 					.filter(Objects::nonNull)
 					.forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage())));
 		});
-		this.playerDataManager = new PlayerDataManager(this);
 
 		// Регистрация Core сервисов
 		CoreApi.get().unregisterService(IChatService.class);
@@ -116,6 +115,9 @@ public final class App extends JavaPlugin {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+
+		// Класс управляющий игроками
+		this.playerDataManager = new PlayerDataManager(this);
 
 		// Инициализация команд
 		new MuseumCommands(this);

@@ -2,6 +2,7 @@ package museum.player;
 
 import clepto.bukkit.B;
 import com.destroystokyo.paper.event.player.PlayerInitialSpawnEvent;
+import com.google.common.collect.Maps;
 import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
@@ -36,15 +37,26 @@ import java.util.stream.Collectors;
 
 public class PlayerDataManager implements Listener {
 
+	public static final PotionEffect NIGHT_VISION = new PotionEffect(
+			PotionEffectType.NIGHT_VISION,
+			65536, 10, false, false
+	);
 	private final App app;
-	private final Map<UUID, User> userMap = new HashMap<>();
+	private final Map<UUID, User> userMap = Maps.newHashMap();
 	private final MultiTimeBar timeBar;
 	private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
-	public static final PotionEffect NIGHT_VISION = new PotionEffect(PotionEffectType.NIGHT_VISION, 65536, 10, false, false);
+	private final List<Prepare> prepares;
 
 	@SuppressWarnings("deprecation")
 	public PlayerDataManager(App app) {
 		this.app = app;
+
+		prepares = Arrays.asList(
+				BeforePacketHandler.INSTANCE,
+				new PrepareJSAnime(),
+				new PrepareScoreBoard(),
+				PreparePlayerBrain.INSTANCE
+		);
 
 		ClientSocket client = app.getClientSocket();
 		CoreApi api = CoreApi.get();
@@ -129,17 +141,13 @@ public class PlayerDataManager implements Listener {
 		user.setConnection(player.getHandle().playerConnection);
 		user.setPlayer(player);
 
-		B.postpone(2, () -> Arrays.asList(
-				BeforePacketHandler.INSTANCE,
-				new PrepareJSAnime(),
-				(usr, app) -> usr.getPlayer().setWalkSpeed(.33F),
-				(usr, app) -> user.setState(user.getState()), // Музей
-				new PrepareScoreBoard(),
-				(usr, app) -> user.getPlayer().addPotionEffect(NIGHT_VISION),
-				(usr, app) -> Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current)), // Скрытие игроков
-				(usr, app) -> user.getPlayer().setGameMode(GameMode.ADVENTURE), // Режим игры
-				new PreparePlayerBrain(app)
-		).forEach(prepare -> prepare.execute(user, app)));
+		player.addPotionEffect(NIGHT_VISION);
+		player.setWalkSpeed(.33F);
+		Bukkit.getOnlinePlayers().forEach(current -> player.hidePlayer(app, current)); // Скрытие игроков
+		player.setGameMode(GameMode.ADVENTURE);
+		user.setState(user.getState()); // Загрузка музея
+
+		B.postpone(2, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
 
 		e.setJoinMessage(null);
 	}
