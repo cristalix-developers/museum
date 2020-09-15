@@ -85,7 +85,7 @@ register 'invite', {
     """
 }
 
-register 'paper', {
+register 'menu', {
     item PAPER
     text """
         §f>> §6§lМеню §f<<
