@@ -142,6 +142,10 @@ public class MuseumCommands {
 
 	private String cmdShop(Player sender, String[] args) {
 		User user = app.getUser(sender);
+
+		if (user.getExperience() <= PreparePlayerBrain.EXPERIENCE)
+			return null;
+
 		if (user.getState() instanceof Excavation)
 			// ToDo: Автоматический триггер возвращения домой с возможностью отмены
 			return "§cВы на раскопках, сперва вернитесь домой";
