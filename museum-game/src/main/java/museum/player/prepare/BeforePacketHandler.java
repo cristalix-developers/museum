@@ -3,7 +3,6 @@ package museum.player.prepare;
 import clepto.ListUtils;
 import clepto.bukkit.B;
 import clepto.bukkit.Cycle;
-import clepto.bukkit.Lemonade;
 import clepto.bukkit.item.Items;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -23,6 +22,7 @@ import museum.player.User;
 import museum.player.pickaxe.PickaxeType;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
+import museum.worker.WorkerHandler;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -52,10 +52,15 @@ public class BeforePacketHandler implements Prepare {
 	public void execute(User user, App app) {
 		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(),
 				new ChannelDuplexHandler() {
-					@SuppressWarnings ("deprecation")
+					@SuppressWarnings("deprecation")
 					@Override
 					public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
-						if (packetObj instanceof PacketPlayInUseItem) {
+						if (packetObj instanceof PacketPlayInUseEntity) {
+							PacketPlayInUseEntity pc = (PacketPlayInUseEntity) packetObj;
+							if (!pc.d.equals(EnumHand.MAIN_HAND) || !pc.action.equals(PacketPlayInUseEntity.EnumEntityUseAction.INTERACT_AT))
+								return;
+							WorkerHandler.acceptClick(user, pc.getEntityId());
+						} else if (packetObj instanceof PacketPlayInUseItem) {
 							PacketPlayInUseItem packet = (PacketPlayInUseItem) packetObj;
 							if (packet.c == EnumHand.MAIN_HAND) {
 								if (isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
@@ -69,8 +74,10 @@ public class BeforePacketHandler implements Prepare {
 												if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
 													packet.a = dummy; // Genius
 													MinecraftServer.getServer().postToMainThread(() -> {
-														if (user != museum.getOwner()) MessageUtil.find("non-root").send(user);
-														else user.performCommand("gui manipulator " + subject.getCachedInfo().getUuid());
+														if (user != museum.getOwner())
+															MessageUtil.find("non-root").send(user);
+														else
+															user.performCommand("gui manipulator " + subject.getCachedInfo().getUuid());
 													});
 													break;
 												}
@@ -100,7 +107,7 @@ public class BeforePacketHandler implements Prepare {
 						super.channelRead(channelHandlerContext, packetObj);
 					}
 				}
-																		);
+		);
 	}
 
 	private void acceptSubjectPlace(User user, Museum museum, BlockPosition a) {
@@ -155,7 +162,7 @@ public class BeforePacketHandler implements Prepare {
 		return excavation.getHitsLeft() < 0;
 	}
 
-	@SuppressWarnings ("deprecation")
+	@SuppressWarnings("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
 			// С некоторым шансом может выпасть эмеральд

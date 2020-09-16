@@ -4,6 +4,7 @@ import museum.App;
 import museum.player.State;
 import museum.player.User;
 import museum.util.LocationUtil;
+import museum.worker.WorkerHandler;
 import org.bukkit.Location;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
@@ -23,6 +24,7 @@ public class Shop implements State {
 	@Override
 	public void enterState(User user) {
 		user.teleport(this.spawnLocation);
+		WorkerHandler.load(user);
 	}
 
 	@Override

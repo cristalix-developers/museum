@@ -24,7 +24,6 @@ import museum.prototype.Managers;
 import museum.ticker.detail.FountainHandler;
 import museum.util.MapLoader;
 import museum.util.MuseumChatService;
-import museum.worker.WorkerClickListener;
 import museum.worker.WorkerHandler;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
@@ -129,9 +128,10 @@ public final class App extends JavaPlugin {
 				new PassiveEventBlocker(),
 				new MuseumEventHandler(this),
 				new GuiEvents(),
-				new BlockClickHandler(),
-				new WorkerClickListener(this, new WorkerHandler(this))
+				new BlockClickHandler()
 		);
+
+		new WorkerHandler(this);
 
 		// Обработка каждого тика
 		new TickTimerHandler(this, Collections.singletonList(

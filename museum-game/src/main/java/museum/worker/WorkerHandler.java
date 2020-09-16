@@ -1,17 +1,12 @@
 package museum.worker;
 
-import lombok.Getter;
-import lombok.val;
+import com.mojang.authlib.GameProfile;
 import museum.App;
 import museum.player.User;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftVillager;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Villager;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -20,36 +15,35 @@ import java.util.stream.Collectors;
  */
 public class WorkerHandler {
 
-	@Getter
-	private final List<Villager> workers;
-	private static final PotionEffect SLOWNESS =
-			new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 10000, false, false);
+	private static final List<NpcWorker> workers = new ArrayList<>();
+	private final String test =
+			"http://textures.minecraft.net/texture/8694879ed454829f43b5117f8770b3436feaa92865a45809ccb3cdecae24e28";
 
 	public WorkerHandler(App app) {
 		// Формат таблички: .p simplenpc <Имя жителя> </команда>
-		workers = app.getMap().getLabels("simplenpc").stream()
+		workers.addAll(app.getMap().getLabels("simplenpc")
+				.stream()
 				.map(label -> {
 					String[] ss = label.getTag().split("\\s+", 2);
-					val villager = (Villager) app.getWorld().spawnEntity(label, EntityType.VILLAGER);
-					villager.setCustomName(ss[0]);
-					villager.setAI(false);
-					villager.setCustomNameVisible(true);
-					villager.addPotionEffect(SLOWNESS);
-					String command = ss[1];
-					if (command.startsWith("/")) command = command.substring(1);
-					villager.setMetadata("command", new FixedMetadataValue(app, command));
-					((CraftVillager) villager).getHandle().persistent = true;
-					return villager;
-				}).collect(Collectors.toList());
+					return new NpcWorker(label, test, ss[0], user -> {
+						if (ss[1].startsWith("/"))
+							user.performCommand(label.getTag().substring(1));
+					});
+				}).collect(Collectors.toList()));
 	}
 
-	public void acceptClick(User user, Villager villager) {
-		for (Villager worker : workers) {
-			if (worker.equals(villager)) {
-				user.performCommand(villager.getMetadata("command").get(0).asString());
+	public static void acceptClick(User user, int id) {
+		for (NpcWorker worker : workers) {
+			if (worker.getMeta("id").equals(id)) {
+				worker.getOnInteract().accept(user);
 				return;
 			}
 		}
 	}
 
+	public static void load(User user) {
+		for (NpcWorker worker : workers)
+			if (worker.getLocation().distanceSquared(user.getLocation()) < 100_000)
+				worker.show(user);
+	}
 }
