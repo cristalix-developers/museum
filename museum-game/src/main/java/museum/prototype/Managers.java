@@ -136,8 +136,7 @@ public class Managers {
 						int[] data = {block.getType().getId(), block.getData()};
 						block.setType(Material.AIR);
 						return data;
-					})
-					.collect(Collectors.toList());
+					}).collect(Collectors.toList());
 
 			if (pallette.isEmpty())
 				throw new MapServiceException("No pallette markers found for excavation " + address);
@@ -183,6 +182,8 @@ public class Managers {
 
 			space.forEach(block -> block.getBlock().setType(Material.AIR));
 
+			val palletteName = "§eНужная руда";
+
 			return new ExcavationPrototype(
 					address, skeletonPrototypes,
 					LocationUtil.resetLabelRotation(box.requireLabel("spawn"), 0),
@@ -191,7 +192,15 @@ public class Managers {
 					box.requireLabel("price").getTagDouble(),
 					box.requireLabel("title").getTag(),
 					packets,
-					Material.getMaterial(box.requireLabel("icon").getTag().toUpperCase())
+					Material.getMaterial(box.requireLabel("icon").getTag().toUpperCase()),
+					pallette.stream()
+						.map(pal -> {
+							val item = new ItemStack(pal[0], 1, (short) 0, (byte) pal[1]);
+							val meta = item.getItemMeta();
+							meta.setDisplayName(palletteName);
+							item.setItemMeta(meta);
+							return item;
+						}).toArray(ItemStack[]::new)
 			);
 		});
 	}

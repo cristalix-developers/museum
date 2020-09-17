@@ -3,6 +3,7 @@ package museum.excavation;
 import clepto.bukkit.Lemonade;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.val;
 import museum.player.State;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
@@ -12,6 +13,7 @@ import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
 @Data
@@ -25,13 +27,21 @@ public class Excavation implements State {
 		return user.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ()).getType() == Material.AIR;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void enterState(User user) {
 		Player player = user.getPlayer();
 		player.setAllowFlight(false);
-		player.getInventory().clear();
-		player.getInventory().addItem(Lemonade.get("pickaxe-" + user.getPickaxeType().name().toLowerCase()).render());
-		player.getInventory().setItem(8, BeforePacketHandler.EMERGENCY_STOP);
+
+		val inventory = player.getInventory();
+
+		inventory.clear();
+		inventory.addItem(Lemonade.get("pickaxe-" + user.getPickaxeType().name().toLowerCase()).render());
+		inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
+
+		for (val item : prototype.getPallette())
+			inventory.addItem(item);
+
 		user.teleport(prototype.getSpawn());
 		user.getPlayer().sendTitle("§6Прибытие!", prototype.getTitle());
 
