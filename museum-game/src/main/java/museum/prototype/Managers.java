@@ -33,6 +33,7 @@ public class Managers {
 	public static PrototypeManager<MuseumPrototype> museum;
 	public static PrototypeManager<SkeletonPrototype> skeleton;
 	public static PrototypeManager<ExcavationPrototype> excavation;
+	public static PrototypeManager<FountainPrototype> fountains;
 
 	@SuppressWarnings("deprecation")
 	public static void init() {
@@ -126,6 +127,11 @@ public class Managers {
 
 			return new SkeletonPrototype(address, title, origin, size, rarity, stands, box.requireLabel("price").getTagInt());
 		});
+
+		fountains = new PrototypeManager<>("sfountain", ((address, box) -> FountainPrototype.builder()
+				.source(box.getLabel("source"))
+				.build()
+		));
 
 		excavation = new PrototypeManager<>("excavation", (address, box) -> {
 			box.expandVert();
