@@ -24,6 +24,7 @@ import museum.prototype.Managers;
 import museum.ticker.detail.FountainHandler;
 import museum.util.MapLoader;
 import museum.util.MuseumChatService;
+import museum.visitor.VisitorHandler;
 import museum.worker.WorkerHandler;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
@@ -137,6 +138,8 @@ public final class App extends JavaPlugin {
 		new TickTimerHandler(this, Collections.singletonList(
 				new FountainHandler(this)
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
+
+		VisitorHandler.init(this, 1);
 	}
 
 	@Override

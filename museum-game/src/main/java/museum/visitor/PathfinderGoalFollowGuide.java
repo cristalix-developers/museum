@@ -1,9 +1,13 @@
 package museum.visitor;
 
+import lombok.val;
+import museum.App;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.event.entity.EntityTeleportEvent;
+
+import java.util.UUID;
 
 public class PathfinderGoalFollowGuide extends PathfinderGoal {
 
@@ -32,7 +36,12 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 	// shouldExecute()
 	@Override
 	public boolean a() {
-		VisitorGroup visitorGroup = this.visitor.getVisitorGroup();
+		val uuids = VisitorHandler.getVisitorUuids();
+
+		if (!uuids.containsKey(UUID.fromString(visitor.getCustomName()))) {
+			return false;
+		}
+		val visitorGroup = uuids.get(UUID.fromString(visitor.getCustomName()));
 		if (visitorGroup == null) return false;
 		EntityVisitor guide = visitorGroup.getGuide();
 		if (guide == null) return false;
@@ -48,16 +57,19 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 	}
 
 	// startExecuting()
+	@Override
 	public void c() {
 		this.h = 0;
 	}
 
 	// resetTask()
+	@Override
 	public void d() {
 		this.guide = null;
 	}
 
 	// updateTask()
+	@Override
 	public void e() {
 		this.visitor.getControllerLook().a(this.guide, 10.0F, (float) this.visitor.N());
 		if (--this.h > 0) return;

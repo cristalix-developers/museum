@@ -1,11 +1,17 @@
 package museum.visitor;
 
 import clepto.cristalix.mapservice.MapServiceException;
+import com.google.common.collect.Maps;
+import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
+import museum.ticker.Ticked;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -14,18 +20,20 @@ import java.util.stream.Collectors;
  */
 public class VisitorHandler {
 
-	public VisitorHandler() {
-		val labels = App.getApp().getMap().getLabels("node");
+	@Getter
+	private static final Map<UUID, VisitorGroup> visitorUuids = Maps.newHashMap();
+
+	public static void init(App app, int groupAmount) {
+		val labels = app.getMap().getLabels("node");
 		val nodes = labels.stream()
 				.filter(label -> label.getTag() != null)
 				.collect(Collectors.toList());
 
-		val group = new VisitorGroup(labels, nodes);
-
-		group.newMainRoute();
-		group.spawn();
+		for (int i = 0; i < groupAmount; i++)
+			new VisitorGroup(labels, nodes).spawn();
 
 		if (labels.isEmpty())
 			throw new MapServiceException("Not visitors nodes found.");
 	}
+
 }

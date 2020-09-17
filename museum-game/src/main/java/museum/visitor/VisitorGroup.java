@@ -3,6 +3,8 @@ package museum.visitor;
 import clepto.ListUtils;
 import lombok.Data;
 import lombok.Getter;
+import lombok.val;
+import museum.App;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -24,7 +26,7 @@ public class VisitorGroup {
 		int amount = allNodes.size();
 		this.nodes = new Node[amount];
 		int id = 0;
-		for (Location loc : allNodes) {
+		for (val loc : allNodes) {
 			nodes[id] = new Node(id, new boolean[amount], loc);
 			id++;
 		}
@@ -56,14 +58,13 @@ public class VisitorGroup {
 				neighbours[offset] = adj;
 			}
 
-			for (Node neighbour : neighbours) {
+			for (val neighbour : neighbours) {
 				if (neighbour == null) continue;
 				neighbour.connections[node.id] = true;
 				node.connections[neighbour.id] = true;
 			}
-
 		}
-
+		this.currentRoute = new ArrayList<>(mainToVisit);
 	}
 
 	public void newMainRoute() {
@@ -87,9 +88,7 @@ public class VisitorGroup {
 				}
 			}
 		}
-
 		this.currentRoute = new ArrayList<>(visited);
-
 	}
 
 	public void spawn() {
@@ -102,9 +101,9 @@ public class VisitorGroup {
 		int peopleAmount = 5 + ((int) (Math.random() * 6));
 		this.crowd = new ArrayList<>();
 		for (int i = 0; i < peopleAmount; i++) {
-			EntityVisitor visitor = new EntityVisitor(loc.getWorld(), this);
-			PatchedEntity.VISITOR.spawn(visitor, loc);
+			val visitor = new EntityVisitor(loc.getWorld(), this);
 			this.crowd.add(visitor);
+			PatchedEntity.VISITOR.spawn(visitor, loc);
 		}
 	}
 

@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutionException;
 @UtilityClass
 public class MapLoader {
 
-	public static void load(App app) {
+	public void load(App app) {
 		// Загрузка карты с сервера BUIL-1
 		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("Museum", "release")
 				.orElseThrow(() -> new RuntimeException("Map Museum/release wasn't found in the MapService"));
