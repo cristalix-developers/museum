@@ -38,10 +38,10 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 	public boolean a() {
 		val uuids = VisitorHandler.getVisitorUuids();
 
-		if (!uuids.containsKey(UUID.fromString(visitor.getCustomName()))) {
+		if (!uuids.containsKey(visitor.getUniqueID())) {
 			return false;
 		}
-		val visitorGroup = uuids.get(UUID.fromString(visitor.getCustomName()));
+		val visitorGroup = uuids.get(visitor.getUniqueID());
 		if (visitorGroup == null) return false;
 		EntityVisitor guide = visitorGroup.getGuide();
 		if (guide == null) return false;

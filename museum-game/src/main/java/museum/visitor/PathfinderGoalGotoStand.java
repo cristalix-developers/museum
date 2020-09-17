@@ -19,9 +19,15 @@ public class PathfinderGoalGotoStand extends PathfinderGoal {
 
 	@Override
 	public void c() {
-		val dotVisit = group.getCurrentRoute().get((int) (System.currentTimeMillis() / 100000) % group.getCurrentRoute().size()).getLocation();
+		// Заставляет идти ведущего по пути
+		val route = group.getCurrentRoute();
+		val dotVisit = route.get((int) (System.currentTimeMillis() / 100000) % route.size()).getLocation();
 		val guider = group.getGuide();
-		navigation.a(guider.locX + (dotVisit.getX() - guider.locX) / 40, dotVisit.getY(), guider.locZ + (dotVisit.getZ() - guider.locZ) / 40, .65);
+		navigation.a(
+				guider.locX + (dotVisit.getX() - guider.locX) / 40,
+				dotVisit.getY(),
+				guider.locZ + (dotVisit.getZ() - guider.locZ) / 40, .65
+		);
 	}
 
 	@Override

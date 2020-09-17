@@ -14,22 +14,18 @@ public class EntityVisitor extends EntityVillager {
 
 	public EntityVisitor(org.bukkit.World world, VisitorGroup group) {
 		super(((CraftWorld) world).getHandle());
-
-		setCustomName(uniqueID.toString());
 		VisitorHandler.getVisitorUuids().put(uniqueID, group);
-		System.out.println("putting " + uniqueID.toString() + " " + group.getCrowd());
 	}
 
 	@Override
 	public void r() {
 		val uuid = VisitorHandler.getVisitorUuids();
-		if (uuid.isEmpty() || getCustomName().isEmpty()) {
+		if (uuid.isEmpty() || getUniqueID() == null)
 			return;
-		}
-		if (!uuid.containsKey(UUID.fromString(getCustomName()))) {
+		if (!uuid.containsKey(getUniqueID()))
 			return;
-		}
-		val visitorGroup = uuid.get(UUID.fromString(getCustomName()));
+
+		val visitorGroup = uuid.get(getUniqueID());
 		if (visitorGroup.getGuide().equals(this)) {
 			this.goalSelector.a(1, new PathfinderGoalGotoStand(visitorGroup));
 			return;
