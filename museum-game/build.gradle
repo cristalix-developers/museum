@@ -1,29 +1,7 @@
 apply plugin: 'groovy'
 
-repositories {
-    maven {
-        def args = nmsMavenUri.split ' '
-        url args[0]
-        credentials {
-            username = args[1]
-            password = args[2]
-        }
-        authentication {
-            basic(BasicAuthentication)
-        }
-    }
-    maven {
-        def args = cristalixMavenUri.split ' '
-        url args[0]
-        credentials {
-            username = args[1]
-            password = args[2]
-        }
-        authentication {
-            basic(BasicAuthentication)
-        }
-    }
-}
+project.ext.mavenUri = "$nmsMavenUri $cristalixMavenUri"
+apply from: 'mavenAuth.gradle'
 
 dependencies {
     compileOnly 'bottle:bottle-minecraft:1.0.1'
@@ -35,45 +13,11 @@ dependencies {
     implementation 'clepto:clepto-cristalix:2.4.5'
 }
 
-ext.genOutputDir = file("$buildDir/generated/resources")
-
+// Скачивать *-SNAPHOT заново при каждом билде
 configurations.all {
-    // check for updates every build
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-
-classes {
-    File outputFile = file("$genOutputDir/plugin.yml")
-    outputs.file(outputFile)
-    doLast {
-        outputFile.text = new BukkitPlugin(
-                name: 'Museum',
-                mainClass: 'museum.App',
-                dependencies: ['CoreAPI']
-        ).generatePluginYML()
-    }
-}
-
-jar.from genOutputDir
-
-import java.text.SimpleDateFormat
-
-class BukkitPlugin {
-    String name
-    String mainClass
-    String[] dependencies
-
-    String generatePluginYML() {
-        String version = new SimpleDateFormat('HH:mm:ss dd.MM.yyyy').format(new Date())
-        return [
-                "name: '$name'",
-                "version: '$version'",
-                "main: $mainClass",
-                "depend: [${dependencies.join(", ")}]"
-        ].join("\n")
-    }
-
-}
-
-
+ext.bukkitPlugin = [mainClass: 'museum.App', dependencies: 'CoreAPI']
+apply from: 'bukkitPlugin.gradle'
+apply from: 'groovyCollector.gradle'

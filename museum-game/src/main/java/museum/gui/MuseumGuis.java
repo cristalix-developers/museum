@@ -74,7 +74,7 @@ public class MuseumGuis {
 				return lockItem;
 
 			return Items.builder()
-					.displayName(skeletonType.getTitle() + " / " + skeletonType.getRarity().getWord().toUpperCase())
+					.displayName(skeletonType.getTitle() + " / " + skeletonType.getRarity().getPeriod().toUpperCase())
 					.type(Material.BONE_BLOCK)
 					.lore("Собрано " + playerSkeleton.getUnlockedFragments().size() + "/" + skeletonType.getFragments().size())
 					.build();

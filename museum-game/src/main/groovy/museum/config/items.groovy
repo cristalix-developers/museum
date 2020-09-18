@@ -1,7 +1,10 @@
+package museum.config
+
 import clepto.humanize.TimeFormatter
 import museum.excavation.Excavation
 import museum.museum.Museum
 import museum.museum.subject.Subject
+import museum.museum.subject.skeleton.Skeleton
 import museum.player.User
 import museum.util.LevelSystem
 import org.bukkit.Statistic
@@ -15,29 +18,40 @@ import static org.bukkit.Material.*
 def formatter = TimeFormatter.builder() accuracy 500 build()
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
 
+register 'skeleton', {
+
+    item BONE
+    def skeleton = (Skeleton) context
+    text "§f» Скелет §b$skeleton.prototype.title §f«"
+    text '§eФрагменты: §f' + skeleton.unlockedFragments.size() + '§f/§e' + skeleton.prototype.fragments.size()
+    text '§eОткуда: §f' + skeleton.prototype.rarity.period
+    text '§eРазмер: §f' + skeleton.prototype.size + 'x' + skeleton.prototype.size
+
+}
+
 register 'unavailable', {
     item CLAY_BALL
-    nbt([museum: 'point'])
+    nbt.museum = 'point'
 }
 
 register 'collector-free', {
     item CLAY_BALL
-    nbt([museum: 'car'])
+    nbt.museum = 'car'
 }
 
 register 'collector-amateur', {
     item CLAY_BALL
-    nbt([museum: 'car1'])
+    nbt.museum = 'car1'
 }
 
 register 'collector-professional', {
     item CLAY_BALL
-    nbt([museum: 'car2'])
+    nbt.museum = 'car2'
 }
 
 register 'collector-prestige', {
     item CLAY_BALL
-    nbt([museum: 'parovoz'])
+    nbt.museum = 'parovoz'
     text '&7???'
 }
 

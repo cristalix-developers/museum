@@ -1,0 +1,17 @@
+String mavenUri = project.ext.mavenUri
+if (mavenUri == null)
+    throw new IllegalStateException("No project.ext.mavenUri provided!")
+
+repositories {
+    String[] args = mavenUri.split ' '
+    def repos = args.length / 3
+    for (int i in 0..<repos) maven {
+        url args[i * 3]
+        credentials {
+            username = args[i * 3 + 1]
+            password = args[i * 3 + 2]
+        }
+        authentication { basic(BasicAuthentication) }
+    }
+
+}

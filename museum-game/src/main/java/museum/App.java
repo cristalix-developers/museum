@@ -5,6 +5,7 @@ import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
 import clepto.bukkit.gui.Guis;
 import clepto.cristalix.mapservice.WorldMeta;
+import groovy.lang.Script;
 import lombok.Getter;
 import lombok.Setter;
 import museum.client.ClientSocket;
@@ -43,11 +44,13 @@ import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 @Getter
 public final class App extends JavaPlugin {
@@ -75,6 +78,7 @@ public final class App extends JavaPlugin {
 		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
 		SubjectType.init();
 		Managers.init();
+		clepto.bukkit.menu.Guis.init();
 
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 		this.clientSocket = new ClientSocket(
@@ -110,7 +114,20 @@ public final class App extends JavaPlugin {
 
 		// Прогрузка предметов из Groovy-скриптов
 		try {
-			Class<?> museumItems = Class.forName("MuseumItems");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")));
+			while (true) {
+				String line = reader.readLine();
+				if (line == null || line.isEmpty()) break;
+				Class<?> scriptClass = Class.forName(line);
+				if (!Script.class.isAssignableFrom(scriptClass)) continue;
+				Script script = (Script) scriptClass.newInstance();
+				try {
+					script.run();
+				} catch (Throwable throwable) {
+					Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", throwable);
+				}
+			}
+			Class<?> museumItems = Class.forName("museum.config.items");
 			museumItems.getMethod("run").invoke(museumItems.newInstance());
 		} catch (Exception e) {
 			throw new RuntimeException(e);

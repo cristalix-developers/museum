@@ -1,0 +1,43 @@
+import java.text.SimpleDateFormat
+
+def generatePluginYML() {
+    def config = project.ext.bukkitPlugin ? project.ext.bukkitPlugin : rootProject.ext.bukkitPlugin
+    if (config == null)
+        throw new IllegalStateException("No project.ext.bukkitPlugin provided!")
+
+    def name = config.name ? config.name : project.name
+
+    def version = new SimpleDateFormat('HH:mm:ss dd.MM.yyyy').format(new Date())
+
+    def mainClass = config.mainClass ? config.mainClass : project.ext.mainClass ?
+            project.ext.bukkitMainClass : rootProject.ext.bukkitMainClass
+    if (config == null)
+        throw new IllegalStateException("No project.ext.bukkitPlugin.mainClass nor project.ext.bukkitMainClass provided!")
+
+    def dependencies = config.dependencies ?
+            config.dependencies instanceof CharSequence ?
+                    [config.dependencies]
+                    : config.dependencies
+            : []
+
+    return [
+            "name: '$name'",
+            "version: \"\\u00a7a$version\"",
+            "main: $mainClass",
+            "depend: [${dependencies.join(", ")}]"
+    ].join("\n")
+}
+
+def genOutputDir = file("$buildDir/generated/resources")
+
+
+
+jar {
+    File pluginYml = file("$genOutputDir/plugin.yml")
+    pluginYml
+    outputs.file(pluginYml)
+    doFirst {
+        pluginYml.text = generatePluginYML()
+    }
+    from genOutputDir
+}

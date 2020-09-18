@@ -1,8 +1,6 @@
 package museum.command;
 
 import clepto.bukkit.B;
-import clepto.bukkit.gui.Gui;
-import clepto.bukkit.gui.Guis;
 import clepto.bukkit.item.Items;
 import lombok.val;
 import museum.App;
@@ -36,6 +34,7 @@ import ru.cristalix.core.formatting.Color;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static museum.museum.subject.Allocation.Action.*;
@@ -133,10 +132,11 @@ public class MuseumCommands {
 	private String cmdGui(Player sender, String[] args) {
 		this.app.getUser(sender);
 		if (args.length == 0) return "§cИспользование: §e/gui [адрес]";
-		Gui gui = Guis.registry.get(args[0]);
-		if (gui == null) return "§cГуи с адресом §e" + args[0] + "§c не найден.";
-
-		gui.open(sender, args.length > 1 ? args[1] : null);
+		try {
+			clepto.bukkit.menu.Guis.open(sender, args[0], args.length > 1 ? args[1] : null);
+		} catch (NoSuchElementException ex) {
+			return "§cГуи с адресом §e" + args[0] + "§c не найден.";
+		}
 		return null;
 	}
 
@@ -200,13 +200,13 @@ public class MuseumCommands {
 	private String cmdExcavation(Player player, String[] args) {
 		User user = this.app.getUser(player);
 		if (args.length == 0)
-			return null;
+			return "/excavation <место>";
 		ExcavationPrototype proto = Managers.excavation.getPrototype(args[0]);
 		if (proto == null)
-			return null;
+			return "Такого места для раскопок нет";
 
 		if (user.getExperience() <= PreparePlayerBrain.EXPERIENCE)
-			return null;
+			return "Опыта мало";
 
 		player.closeInventory();
 

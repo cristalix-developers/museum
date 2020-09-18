@@ -8,7 +8,6 @@ import museum.museum.Museum;
 import museum.player.User;
 import museum.util.LocationUtil;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -60,7 +59,7 @@ public class PreparePlayerBrain implements Prepare {
 	public void execute(User user, App app) {
 		final CraftPlayer player = user.getPlayer();
 
-		if (player.hasPlayedBefore() || user.getExperience() > EXPERIENCE)
+		if (player.hasPlayedBefore() || user.getExperience() >= EXPERIENCE)
 			return;
 
 		Cycle.run(5 * 20, titles.size(), iteration -> {

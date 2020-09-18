@@ -1,0 +1,24 @@
+def genOutputDir = file("$buildDir/generated/resources")
+
+SourceDirectorySet set = sourceSets.main.groovy
+def groovyScriptsStr = set.asPath
+
+set.srcDirs.each { groovyScriptsStr = groovyScriptsStr.replace(it.path, "") }
+
+def groovyScripts = ""
+for (script in groovyScriptsStr.split(';')) {
+    if (script.startsWith('/') || script.startsWith('\\')) script = script.substring(1)
+    groovyScripts += script
+            .replace('/', '.')
+            .replace('\\', '.')
+            .replace('.groovy', '') + '\n'
+}
+jar {
+    File groovyScriptsFile = file("$genOutputDir/groovyScripts")
+    outputs.file(groovyScriptsFile)
+    doFirst {
+        project.sourceSets.main.resources
+        groovyScriptsFile.text = groovyScripts
+    }
+    from genOutputDir
+}

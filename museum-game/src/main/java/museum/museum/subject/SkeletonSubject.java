@@ -66,8 +66,8 @@ public class SkeletonSubject extends Subject {
 
 	public void updateSkeleton(boolean sendUpdates) {
 		Allocation allocation = this.getAllocation();
-		if (allocation == null || this.skeleton == null) return;
 		this.updateInfo();
+		if (allocation == null || this.skeleton == null) return;
 		V4 absoluteLocation = V4.fromLocation(allocation.getOrigin()).add(this.skeletonLocation);
 		skeleton.getUnlockedFragments().forEach(fragment ->
 				allocation.allocatePiece(fragment, orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment)), sendUpdates));

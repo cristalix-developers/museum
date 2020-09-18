@@ -4,6 +4,7 @@ import clepto.ListUtils;
 import clepto.bukkit.B;
 import clepto.bukkit.Cycle;
 import clepto.bukkit.item.Items;
+import clepto.bukkit.menu.Guis;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.val;
@@ -77,7 +78,7 @@ public class BeforePacketHandler implements Prepare {
 														if (user != museum.getOwner())
 															MessageUtil.find("non-root").send(user);
 														else
-															user.performCommand("gui manipulator " + subject.getCachedInfo().getUuid());
+															Guis.open(user.getPlayer(), "manipulator", subject);
 													});
 													break;
 												}
@@ -219,7 +220,7 @@ public class BeforePacketHandler implements Prepare {
 				MessageUtil.find("findfragment")
 						.set("name", fragment.getAddress())
 						.send(user);
-				user.getPlayer().sendTitle("§l§6Находка!", "§eобнаружен " + proto.getRarity().getWord() + " фрагмент");
+				user.getPlayer().sendTitle("§l§6Находка!", "§eобнаружен новый фрагмент");
 
 				skeleton.getUnlockedFragments().add(fragment);
 			}
