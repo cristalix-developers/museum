@@ -2,9 +2,11 @@ package museum;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.mongodb.async.SingleResultCallback;
 import com.mongodb.async.client.MongoClient;
 import com.mongodb.async.client.MongoClients;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import museum.data.PickaxeType;
 import museum.data.UserInfo;
 import museum.packages.TopPackage;
@@ -17,6 +19,7 @@ import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.math.V3;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -64,42 +67,47 @@ public class MongoServiceTest {
     }
 
     void testTop(TopPackage.TopType topType, Comparator<UserInfo> comparator, int generate, int limit) throws Exception {
-        Thread.sleep(500L);
+        Thread.sleep(100L);
         UserDataMongoAdapter adapter = userData;
-        adapter.getData().drop(adapter.getSession(), (v, err) -> {
-            if (err != null)
-                err.printStackTrace();
-        });
-        Thread.sleep(2000L);
+        CompletableFuture<Void> dropFuture = new CompletableFuture<>();
+        adapter.getData().drop(adapter.getSession(), wrap(dropFuture));
+        dropFuture.join();
         List<UserInfo> generated = generateUserInfos(generate);
-        pushAll(adapter, generated.stream().map(info -> Document.parse(GlobalSerializers.toJson(info))).collect(Collectors.toList()));
-        Thread.sleep(500L);
+        pushAll(adapter, generated.stream().map(info -> Document.parse(GlobalSerializers.toJson(info))).collect(Collectors.toList())).join();
         List<TopEntry<UserInfo, Object>> list = adapter.getTop(topType, limit).join();
         List<UUID> expected = generated.stream().sorted(comparator).map(UserInfo::getUuid).collect(Collectors.toList());
-        deleteAll(adapter, expected);
-        Thread.sleep(300L);
+        deleteAll(adapter, expected).join();
         assertIterableEquals(
                 expected.stream().limit(limit).collect(Collectors.toList()),
                 list.stream().map(TopEntry::getKey).map(UserInfo::getUuid).collect(Collectors.toList())
         );
     }
 
-    void pushAll(MongoAdapter adapter, List<Document> documents) {
-        adapter.getData().insertMany(documents, (v, err) -> {
-            if (err != null)
-                err.printStackTrace();
-        });
+    CompletableFuture<Void> pushAll(MongoAdapter adapter, List<Document> documents) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        adapter.getData().insertMany(documents, wrap(future));
+        return future;
     }
 
-    void deleteAll(MongoAdapter adapter, List<UUID> uuids) {
+    CompletableFuture<DeleteResult> deleteAll(MongoAdapter adapter, List<UUID> uuids) {
+        CompletableFuture<DeleteResult> future = new CompletableFuture<>();
         adapter.getData().deleteMany(
                 Filters.or(
                     uuids.stream().map(uid -> Filters.eq("uuid", uid.toString())).collect(Collectors.toList())
-                ), (v, err) -> {
-                    if (err != null)
-                        err.printStackTrace();
-                }
+                ), wrap(future)
         );
+        return future;
+    }
+
+    <T> SingleResultCallback<T> wrap(CompletableFuture<T> future) {
+        return (obj, err) -> {
+            if (err != null) {
+                future.completeExceptionally(err);
+                err.printStackTrace();
+                return;
+            }
+            future.complete(obj);
+        };
     }
 
     List<UserInfo> generateUserInfos(int count) {
