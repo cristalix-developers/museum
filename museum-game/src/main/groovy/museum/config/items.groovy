@@ -44,17 +44,6 @@ register 'collector-prestige', {
     text '&7???'
 }
 
-register 'gallery', {
-    item STORAGE_MINECART
-    text """
-        &bПостройки
-
-        Посетите галлерею построек
-        и выбирите, что ходите приобрести
-        для вашего музея!
-    """
-}
-
 register 'back', {
     item SADDLE
     text """
@@ -78,16 +67,6 @@ register 'buy-floor', {
     """
 }
 
-register 'invite', {
-    item BOOK_AND_QUILL
-    text """
-        §bПригласить друга
-
-        Нажмите и введите
-        никнейм приглашенного!
-    """
-}
-
 register 'menu', {
     item PAPER
     text """
@@ -103,17 +82,6 @@ register 'menu', {
 register 'goback', {
     item BARRIER
     text '§cВернуться'
-}
-
-register 'museum-change-title', {
-    item SIGN
-    text """
-        §bПереименовать музей
-
-        Если вам не нравтся
-        название вашего музея
-        вы можете его изменить.
-    """
 }
 
 register 'emerald-item', {

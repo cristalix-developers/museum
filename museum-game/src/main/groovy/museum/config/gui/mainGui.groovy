@@ -42,9 +42,16 @@ Guis.register 'main', { player ->
     }
 
     button 'H' icon {
-        item PAPER
-    } rightClick {
-        performCommand('gallery')
+        item SIGN
+        text """
+        §bПереименовать музей
+
+        Если вам не нравтся
+        название вашего музея
+        вы можете его изменить.
+        """
+    } leftClick {
+        performCommand('changetitle')
     }
 
     button 'S' icon {
@@ -90,11 +97,28 @@ Guis.register 'main', { player ->
     }
 
     button 'J' icon {
-        item PAPER
+        item BOOK_AND_QUILL
+        text """
+        §bПригласить друга
+
+        Нажмите и введите
+        никнейм приглашенного!
+        """
+    } leftClick {
+        performCommand 'invite'
     }
 
     button 'S' icon {
-        item PAPER
+        item STORAGE_MINECART
+        text """
+        &bПостройки
+
+        Посетите галлерею построек
+        и выбирите, что ходите приобрести
+        для вашего музея!
+        """
+    } leftClick {
+        performCommand 'gallery'
     }
 
 }

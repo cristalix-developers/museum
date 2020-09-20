@@ -1,7 +1,6 @@
 package museum.command;
 
 import clepto.bukkit.B;
-import clepto.bukkit.item.Items;
 import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
@@ -31,8 +30,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.formatting.Color;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -64,15 +61,15 @@ public class MuseumCommands {
 		val user = app.getUser(sender);
 
 		if (args.length == 0)
-			return "§cИспользование: §f/museum [Игрок] (Музей)";
+			return "§cИспользование: §f/museum visit [Игрок] [Музей]";
 
-		val ownerPlayer = Bukkit.getPlayer(args[0]);
+		val ownerPlayer = Bukkit.getPlayer(args[1]);
 
 		if (ownerPlayer == null || !ownerPlayer.isOnline())
 			return MessageUtil.get("playeroffline");
 
 		val ownerUser = app.getUser(ownerPlayer);
-		String address = args.length > 1 ? args[1] : "main";
+		String address = args.length > 2 ? args[2] : "main";
 
 		MuseumPrototype prototype = Managers.museum.getPrototype(address);
 		Museum museum = prototype == null ? null : ownerUser.getMuseums().get(prototype);
@@ -91,7 +88,7 @@ public class MuseumCommands {
 
 	private String cmdHome(Player sender, String[] args) {
 		User user = this.app.getUser(sender);
-		if (user.getState() instanceof Museum)
+		if (user.getState() instanceof Museum && ((Museum) user.getState()).getOwner().equals(user))
 			return MessageUtil.get("already-at-home");
 		user.setState(user.getLastMuseum());
 		return MessageUtil.get("welcome-home");
@@ -146,6 +143,8 @@ public class MuseumCommands {
 		User user = app.getUser(sender);
 		if (!(user.getState() instanceof Museum))
 			return MessageUtil.get("not-in-museum");
+		if (!((Museum) user.getState()).getOwner().equals(user))
+			return MessageUtil.get("root-refuse");
 		new VirtualSign().openSign(sender, lines -> {
 			for (String line : lines) {
 				if (line != null && !line.isEmpty()) {
@@ -162,25 +161,25 @@ public class MuseumCommands {
 	private String cmdInvite(Player sender, String[] args) {
 		new VirtualSign().openSign(sender, lines -> {
 			for (String line : lines) {
-				if (line != null && !line.isEmpty()) {
-					Player invited = Bukkit.getPlayer(line);
-					User user = this.app.getUser(sender);
-					if (invited == null) {
-						MessageUtil.find("playeroffline").send(user);
-						return;
-					} else if (invited.equals(sender)) {
-						MessageUtil.find("inviteyourself").send(user);
-						return;
-					}
-					MessageUtil.find("invited").send(user);
-					TextComponent invite = new TextComponent(
-							MessageUtil.find("invitefrom")
-									.set("player", sender.getName())
-									.getText()
-					);
-					invite.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/museum accept " + sender.getName()));
-					invited.sendMessage(invite);
+				if (line == null || line.isEmpty())
+					return;
+				Player invited = Bukkit.getPlayer(line);
+				User user = this.app.getUser(sender);
+				if (invited == null) {
+					MessageUtil.find("playeroffline").send(user);
+					return;
+				} else if (invited.equals(sender)) {
+					MessageUtil.find("inviteyourself").send(user);
+					return;
 				}
+				MessageUtil.find("invited").send(user);
+				TextComponent invite = new TextComponent(
+						MessageUtil.find("invitefrom")
+								.set("player", sender.getName())
+								.getText()
+				);
+				invite.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/museum accept " + sender.getName()));
+				invited.sendMessage(invite);
 			}
 		});
 		return null;
