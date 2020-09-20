@@ -26,8 +26,6 @@ Items.register 'professional', {
 
     Кирка для настоящего профи.
     Ломает от 1 до 5 блоков.
-
-    Цена: 1'000\$
     """
 }
 
@@ -40,8 +38,6 @@ Items.register 'prestige', {
     Самая престижная и элегантная
     кирка для истинного коллекционера.
     Ломает 5 блоков. С вероятностью 50%.
-
-    Цена: 100'000\$
     """
 }
 
@@ -60,6 +56,8 @@ Guis.register 'pickaxe', { player ->
         } else {
             apply items[user.pickaxeType.next.name().toLowerCase()]
         }
+        text ''
+        text "Цена: $user.pickaxeType.next.price"
     } leftClick {
         performCommand'pickaxe'
     }
