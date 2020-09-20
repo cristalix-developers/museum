@@ -58,17 +58,6 @@ public class MuseumCommands {
 		B.regCommand(this::cmdSubject, "subject");
 		B.regCommand(this::cmdSkeleton, "skeleton");
 		B.regCommand(this::cmdVisit, "visit", "museum");
-		B.regCommand((sender, args) -> {
-			try {
-				sender.getInventory().addItem(Items.render("museum", app.getUser(sender).getState()).asBukkitMirror());
-				return "§aOK!";
-			} catch (Exception ex) {
-				StringWriter wr = new StringWriter();
-				ex.printStackTrace(new PrintWriter(wr));
-				ex.printStackTrace();
-				return wr.toString();
-			}
-		}, "ti");
 	}
 
 	private String cmdVisit(Player sender, String[] args) {
