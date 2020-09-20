@@ -3,6 +3,7 @@ package museum.configuration;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import museum.packages.RequestConfigurationsPackage;
 import ru.cristalix.core.CoreApi;
 import museum.packages.ConfigurationsPackage;
 import museum.socket.ServerSocketHandler;
@@ -59,6 +60,12 @@ public class ConfigurationManager {
 
 	public ConfigurationsPackage pckg() {
 		return new ConfigurationsPackage(configData, guiData, itemsData);
+	}
+
+	public void fillRequest(RequestConfigurationsPackage pckg) {
+		pckg.setConfigData(configData);
+		pckg.setGuisData(guiData);
+		pckg.setItemsData(itemsData);
 	}
 
 	@Getter

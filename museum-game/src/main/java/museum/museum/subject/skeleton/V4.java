@@ -79,7 +79,7 @@ public class V4 implements Cloneable {
 	public V4 rotate(V4 axis, float degrees) {
 		if (axis.y == 0 || axis.x != 0 || axis.z != 0)
 			// ToDo: Implement quaternion rotation
-			throw new UnsupportedOperationException("Non-Y axis rotation is yet to be implemented.");
+			throw new UnsupportedOperationException("Non-Y axis rotations are yet to be implemented.");
 
 		double prevX = this.x;
 		double prevZ = this.z;

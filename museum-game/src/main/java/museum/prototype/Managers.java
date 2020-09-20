@@ -11,6 +11,7 @@ import museum.excavation.ExcavationPrototype;
 import museum.museum.map.*;
 import museum.museum.subject.skeleton.Rarity;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.util.LocationUtil;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -32,6 +33,7 @@ public class Managers {
 	public static PrototypeManager<MuseumPrototype> museum;
 	public static PrototypeManager<SkeletonPrototype> skeleton;
 	public static PrototypeManager<ExcavationPrototype> excavation;
+	public static PrototypeManager<FountainPrototype> fountains;
 
 	@SuppressWarnings("deprecation")
 	public static void init() {
@@ -108,7 +110,7 @@ public class Managers {
 							address + " on " + label.getCoords());
 				defaultInfos.add(new SubjectInfo(new UUID(0, 0), prototype.getAddress(), label.toV3(), D2.PX, tag.length > 1 ? tag[1] : null, -1, Color.LIME));
 			}
-			return new MuseumPrototype(address, box, defaultInfos);
+			return new MuseumPrototype(address, box, box.requireLabel("spawn"), defaultInfos);
 		});
 
 		skeleton = new PrototypeManager<>("skeleton", (address, box) -> {
@@ -126,6 +128,11 @@ public class Managers {
 			return new SkeletonPrototype(address, title, origin, size, rarity, stands, box.requireLabel("price").getTagInt());
 		});
 
+		fountains = new PrototypeManager<>("sfountain", ((address, box) -> FountainPrototype.builder()
+				.source(box.getLabel("source"))
+				.build()
+		));
+
 		excavation = new PrototypeManager<>("excavation", (address, box) -> {
 			box.expandVert();
 
@@ -135,8 +142,7 @@ public class Managers {
 						int[] data = {block.getType().getId(), block.getData()};
 						block.setType(Material.AIR);
 						return data;
-					})
-					.collect(Collectors.toList());
+					}).collect(Collectors.toList());
 
 			if (pallette.isEmpty())
 				throw new MapServiceException("No pallette markers found for excavation " + address);
@@ -182,14 +188,25 @@ public class Managers {
 
 			space.forEach(block -> block.getBlock().setType(Material.AIR));
 
+			val palletteName = "§eНужная руда";
+
 			return new ExcavationPrototype(
 					address, skeletonPrototypes,
+					LocationUtil.resetLabelRotation(box.requireLabel("spawn"), 0),
 					box.requireLabel("hit-count").getTagInt(),
 					box.requireLabel("required-level").getTagInt(),
 					box.requireLabel("price").getTagDouble(),
 					box.requireLabel("title").getTag(),
 					packets,
-					Material.getMaterial(box.requireLabel("icon").getTag().toUpperCase())
+					Material.getMaterial(box.requireLabel("icon").getTag().toUpperCase()),
+					pallette.stream()
+						.map(pal -> {
+							val item = new ItemStack(pal[0], 1, (short) 0, (byte) pal[1]);
+							val meta = item.getItemMeta();
+							meta.setDisplayName(palletteName);
+							item.setItemMeta(meta);
+							return item;
+						}).toArray(ItemStack[]::new)
 			);
 		});
 	}

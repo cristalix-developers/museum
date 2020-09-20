@@ -1,10 +1,10 @@
 package museum.prototype;
 
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
-import ru.cristalix.core.account.IAccountService;
 import museum.data.Info;
 import museum.player.User;
+import org.bukkit.Bukkit;
+import ru.cristalix.core.account.IAccountService;
 
 import java.util.*;
 import java.util.function.Function;

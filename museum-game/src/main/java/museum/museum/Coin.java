@@ -6,10 +6,10 @@ import lombok.Getter;
 import lombok.val;
 import museum.App;
 import museum.player.User;
-import museum.player.pickaxe.Pickaxe;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.util.Vector;
 
 /**
  * @author func 08.06.2020
@@ -17,12 +17,12 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
  */
 public class Coin {
 
-	public static final ItemStack COIN = CraftItemStack.asNMSCopy(Lemonade.get("coin").render());
+	public static final ItemStack COIN = clepto.bukkit.item.Items.render("coin");
 	public static final int SECONDS_LIVE = 20;
-	private EntityItem entityItem;
-	private Location location;
+	private final EntityItem entityItem;
+	private final Location location;
 	@Getter
-	private long timestamp;
+	private final long timestamp;
 
 	public Coin(Location location) {
 		this.location = location;
@@ -44,8 +44,8 @@ public class Coin {
 
 		if (close) {
 			// Расчет стоимости монеты
-			val money = (user.getCurrentMuseum().getIncome() / user.getMuseums().size()) * (.5 + Pickaxe.RANDOM.nextDouble());
-			val format = Math.floor(money * 100) / 100;
+			double money = (user.getLastMuseum().getIncome() / user.getMuseums().size()) * (.5 + Vector.random.nextDouble());
+			double format = Math.floor(money * 100) / 100;
 
 			val connection = user.getConnection();
 

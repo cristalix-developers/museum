@@ -30,3 +30,4 @@ chat:
     leavedfrommuseum: '§7%NAME% покинул ваш музей.'
     visitexcavation: 'Вы прибыли на §l§b%TITLE%.'
     visitaccepted: '%VISITOR% принял приглашение.'
+    root-refuse: 'Вы не можете изменить название чужого музея!'

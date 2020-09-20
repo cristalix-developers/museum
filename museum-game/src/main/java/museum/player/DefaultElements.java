@@ -20,7 +20,7 @@ public class DefaultElements {
 				proto.getAddress(),
 				"Музей археологии",
 				new Date(),
-				3
+				0
 		);
 
 		UserInfo userInfo = new UserInfo(
@@ -33,8 +33,10 @@ public class DefaultElements {
 				new ArrayList<>(),
 				0,
 				0,
+				null,
 				new ArrayList<>(),
-				new ArrayList<>()
+				new ArrayList<>(),
+				0
 		);
 
 		for (SubjectInfo subject : proto.getDefaultSubjects())

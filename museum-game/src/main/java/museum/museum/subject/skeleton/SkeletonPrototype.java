@@ -5,7 +5,6 @@ import museum.prototype.Prototype;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,17 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
-import static museum.museum.subject.skeleton.Displayable.orientedOffset;
 
 @Getter
-public class SkeletonPrototype implements Prototype, Displayable {
+public class SkeletonPrototype implements Prototype, Piece {
 
 	private final String title;
 	private final int size;
 	private final String address;
 	private final Rarity rarity;
 	private final int price;
-	private final Map<Fragment, V4> fragmentOffsetMap = new HashMap<>();
+	private final Map<Fragment, V4> childrenMap = new HashMap<>();
 
 	public SkeletonPrototype(String address, String title, Location worldOrigin, int size, Rarity rarity, List<ArmorStand> stands, int price) {
 		this.title = title;
@@ -47,40 +45,24 @@ public class SkeletonPrototype implements Prototype, Displayable {
 					Fragment fragment = new Fragment(fragmentAddress);
 
 					for (ArmorStand stand : fragmentStands) {
-						Piece piece = new Piece(((CraftArmorStand) stand).getHandle());
+						AtomPiece piece = new AtomPiece(((CraftArmorStand) stand).getHandle());
 						V4 pieceOffset = V4.fromLocation(stand.getLocation().subtract(fragmentOffset.toVector()));
 						pieceOffset.setRot(stand.getLocation().getYaw());
-						fragment.getPieceOffsetMap().put(piece, pieceOffset);
+						fragment.getChildrenMap().put(piece, pieceOffset);
 					}
 
-					this.fragmentOffsetMap.put(fragment, V4.fromVector(fragmentOffset.toVector().subtract(worldOrigin.toVector())));
+					this.childrenMap.put(fragment, V4.fromVector(fragmentOffset.toVector().subtract(worldOrigin.toVector())));
 
 				});
 
 	}
 
 	public Collection<Fragment> getFragments() {
-		return fragmentOffsetMap.keySet();
-	}
-
-	@Override
-	public void show(Player player, V4 position) {
-		fragmentOffsetMap.forEach((fragment, offset) -> fragment.show(player, orientedOffset(position, offset)));
-	}
-
-	@Override
-	public void update(Player player, V4 position) {
-		fragmentOffsetMap.forEach((fragment, offset) -> fragment.show(player, orientedOffset(position, offset)));
-	}
-
-	@Override
-	public void hide(Player player) {
-		for (Fragment fragment : this.getFragments())
-			fragment.hide(player);
+		return childrenMap.keySet();
 	}
 
 	public V4 getOffset(Fragment fragment) {
-		return this.fragmentOffsetMap.get(fragment);
+		return this.childrenMap.get(fragment);
 	}
 
 }

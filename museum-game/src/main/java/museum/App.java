@@ -5,26 +5,27 @@ import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
 import clepto.bukkit.gui.Guis;
 import clepto.cristalix.mapservice.WorldMeta;
+import groovy.lang.Script;
 import lombok.Getter;
 import lombok.Setter;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
-import museum.command.MuseumCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
-import museum.gui.MuseumGuis;
 import museum.listener.BlockClickHandler;
 import museum.listener.MuseumEventHandler;
 import museum.listener.PassiveEventBlocker;
+import museum.museum.Shop;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
 import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.ticker.detail.FountainHandler;
+import museum.ticker.detail.WayParticleHandler;
 import museum.util.MapLoader;
 import museum.util.MuseumChatService;
-import museum.worker.WorkerClickListener;
+import museum.visitor.VisitorHandler;
 import museum.worker.WorkerHandler;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
@@ -43,10 +44,13 @@ import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 @Getter
 public final class App extends JavaPlugin {
@@ -58,6 +62,8 @@ public final class App extends JavaPlugin {
 	@Setter
 	private WorldMeta map;
 	private YamlConfiguration configuration;
+
+	private Shop shop;
 
 	@Override
 	public void onEnable() {
@@ -72,6 +78,7 @@ public final class App extends JavaPlugin {
 		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
 		SubjectType.init();
 		Managers.init();
+		clepto.bukkit.menu.Guis.init();
 
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 		this.clientSocket = new ClientSocket(
@@ -93,7 +100,6 @@ public final class App extends JavaPlugin {
 					.filter(Objects::nonNull)
 					.forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage())));
 		});
-		this.playerDataManager = new PlayerDataManager(this);
 
 		// Регистрация Core сервисов
 		CoreApi.get().unregisterService(IChatService.class);
@@ -102,23 +108,37 @@ public final class App extends JavaPlugin {
 		CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
 		// Регистрация обработчика пакета конфига
-		clientSocket.registerHandler(ConfigurationsPackage.class, pckg -> {
-			YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
-			itemsConfig.getKeys(false)
-					.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
+		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
 
-			// Инициализация "умных" иконок в гуишках
-			MuseumGuis.registerItemizers(this);
+		requestConfigurations();
 
-			// Загрузка всех инвентарей
-			Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));
+		// Прогрузка предметов из Groovy-скриптов
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")));
+			while (true) {
+				String line = reader.readLine();
+				if (line == null || line.isEmpty()) break;
+				Class<?> scriptClass = Class.forName(line);
+				if (!Script.class.isAssignableFrom(scriptClass)) continue;
+				Script script = (Script) scriptClass.newInstance();
+				try {
+					script.run();
+				} catch (Throwable throwable) {
+					Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", throwable);
+				}
+			}
+			Class<?> museumItems = Class.forName("museum.config.items");
+			museumItems.getMethod("run").invoke(museumItems.newInstance());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
-			this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
-		});
+		// Класс управляющий игроками
+		this.playerDataManager = new PlayerDataManager(this);
 
 		// Инициализация команд
 		new MuseumCommands(this);
-		B.regCommand(new MuseumCommand(this), "museum");
+		this.shop = new Shop(this);
 
 		// Регистрация обработчиков событий
 		B.events(
@@ -126,14 +146,18 @@ public final class App extends JavaPlugin {
 				new PassiveEventBlocker(),
 				new MuseumEventHandler(this),
 				new GuiEvents(),
-				new BlockClickHandler(),
-				new WorkerClickListener(this, new WorkerHandler(this))
+				new BlockClickHandler()
 		);
 
+		new WorkerHandler(this);
+
 		// Обработка каждого тика
-		new TickTimerHandler(this, Collections.singletonList(
-				new FountainHandler(this)
+		new TickTimerHandler(this, Arrays.asList(
+				new FountainHandler(this),
+				new WayParticleHandler(this)
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
+
+		VisitorHandler.init(this, 1);
 	}
 
 	@Override
@@ -177,6 +201,32 @@ public final class App extends JavaPlugin {
 
 	public Collection<User> getUsers() {
 		return playerDataManager.getUsers();
+	}
+
+	private void requestConfigurations() {
+		try {
+			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage()).get(3L, TimeUnit.SECONDS);
+			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getGuisData(), pckg.getItemsData()));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.out.println("We can't receive museum configurations! Retry in 3sec");
+			try {
+				Thread.sleep(3000L);
+			} catch (Exception ignored) {
+			}
+			requestConfigurations();
+		}
+	}
+
+	private void fillConfigurations(ConfigurationsPackage pckg) {
+		YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
+		itemsConfig.getKeys(false)
+				.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
+
+		// Загрузка всех инвентарей
+		Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));
+
+		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 	}
 
 }

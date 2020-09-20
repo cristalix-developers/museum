@@ -1,43 +1,3 @@
-main:
-  $back: &back
-    char: B
-    icon: goback
-    left-click: /gui main
-  title: Главное меню
-  layout: |
-    F--SMT--A
-    --H---J--
-  buttons:
-
-    - char: F
-      icon: profile
-      native: profile
-
-    - char: S
-      icon: buy-floor
-      left-click: /gui floor
-
-    - char: M
-      icon: museum
-      native: museum
-
-    - char: T
-      icon: museum-change-title
-      left-click: /changetitle
-
-    - char: A
-      icon: invite
-      left-click: /invite
-
-    - char: H
-      icon: gallery
-      left-click: /gallery
-
-    - char: J
-      icon: goto-excavations-item
-      left-click: /gui excavations
-
-
 pickaxes:
   title: Инструменты
   layout: ----S---B
@@ -45,8 +5,6 @@ pickaxes:
     - char: S
       native: upgrade-pickaxe
       left-click: /pickaxe
-
-    - <<: *back
 
 skeleton-manipulator:
   title: Настройка витрины
@@ -119,24 +77,4 @@ subject-color:
     - { <<: *color-button, info: GREEN }
     - { <<: *color-button, info: RED }
     - { <<: *color-button, info: BLACK }
-
-excavations:
-  title: Экспедиции
-  layout: OOOOOOOOB
-  $exc: &exc
-    char: O
-    icon: go
-    left-click: /excavation <info>
-    native: excavation
-
-  buttons:
-    - { <<: *exc, info: 'desert' }
-    - { <<: *exc, info: 'island' }
-    - { <<: *exc, info: 'jungle' }
-    - { <<: *exc, info: 4 }
-    - { <<: *exc, info: 5 }
-    - { <<: *exc, info: 6 }
-    - { <<: *exc, info: 7 }
-    - { <<: *exc, info: 8 }
-    - <<: *back
 

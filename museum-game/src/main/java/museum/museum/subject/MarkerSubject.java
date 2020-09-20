@@ -1,16 +1,12 @@
 package museum.museum.subject;
 
 import lombok.Getter;
-import lombok.val;
-import net.minecraft.server.v1_12_R1.BlockPosition;
-import net.minecraft.server.v1_12_R1.Blocks;
-import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange;
-import org.bukkit.Location;
-import ru.cristalix.core.util.UtilV3;
 import museum.App;
 import museum.data.SubjectInfo;
 import museum.museum.map.SubjectPrototype;
 import museum.player.User;
+import org.bukkit.Location;
+import ru.cristalix.core.util.UtilV3;
 
 public class MarkerSubject extends Subject {
 
@@ -28,22 +24,6 @@ public class MarkerSubject extends Subject {
 
 	public Location getLocation() {
 		return location;
-	}
-
-	@Override
-	public void show(User user) {
-		if (location == null) return;
-		val packet = new PacketPlayOutBlockChange(App.getApp().getNMSWorld(), new BlockPosition(location.x, location.y, location.z));
-		packet.block = Blocks.REDSTONE_TORCH.blockData;
-		user.sendPacket(packet);
-	}
-
-	@Override
-	public void hide(User user) {
-		if (location == null) return;
-		val packet = new PacketPlayOutBlockChange(App.getApp().getNMSWorld(), new BlockPosition(location.x, location.y, location.z));
-		packet.block = Blocks.AIR.blockData;
-		user.sendPacket(packet);
 	}
 
 	@Override

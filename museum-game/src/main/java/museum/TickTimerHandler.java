@@ -2,6 +2,8 @@ package museum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import museum.museum.Museum;
+import museum.museum.subject.Subject;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -46,11 +48,11 @@ public class TickTimerHandler extends BukkitRunnable {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			val user = app.getUser(player.getUniqueId());
 
-			if (user.getExcavation() != null || user.getCurrentMuseum() == null)
-				continue;
-
-			for (CollectorSubject collector : user.getCurrentMuseum().getSubjects(SubjectType.COLLECTOR))
-				collector.move(user, time);
+			for (Museum museum : user.getMuseums()) {
+				for (Subject subject : museum.getSubjects()) {
+					if (subject instanceof CollectorSubject) ((CollectorSubject) subject).move(time);
+				}
+			}
 
 			// Если монеты устарели, что бы не копились на клиенте, удаляю
 			user.getCoins().removeIf(coin -> {

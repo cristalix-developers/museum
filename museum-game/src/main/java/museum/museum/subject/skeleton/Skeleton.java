@@ -1,10 +1,9 @@
 package museum.museum.subject.skeleton;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import museum.prototype.Storable;
 import museum.data.SkeletonInfo;
 import museum.player.User;
+import museum.prototype.Storable;
 
 import java.util.Set;
 import java.util.stream.Collectors;

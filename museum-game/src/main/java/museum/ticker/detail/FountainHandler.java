@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 public class FountainHandler implements Ticked {
 
-	private final Random random = new Random();
+
 	private final List<Fountain> fountains;
 
 	public FountainHandler(App app) {
@@ -31,12 +31,9 @@ public class FountainHandler implements Ticked {
 					Chunk chunk = label.getChunk();
 					Chunk[] chunks = new Chunk[9];
 					int i = 0;
-					for (int x = chunk.getX() - 1; x <= chunk.getX() + 1; x++) {
-						for (int z = chunk.getZ() - 1; z <= chunk.getZ() + 1; z++) {
+					for (int x = chunk.getX() - 1; x <= chunk.getX() + 1; x++)
+						for (int z = chunk.getZ() - 1; z <= chunk.getZ() + 1; z++)
 							chunks[i++] = chunk.getWorld().getChunkAt(x, z);
-						}
-
-					}
 					return new Fountain(
 							label.toCenterLocation(),
 							chunks,
@@ -67,9 +64,9 @@ public class FountainHandler implements Ticked {
 			FallingBlock particle = location.getWorld().spawnFallingBlock(location, Material.STAINED_GLASS, (byte) 3);
 			particle.setDropItem(false);
 			particle.setVelocity(vector.clone().add(new Vector(
-					(random.nextDouble() - .5) * noise.getX(),
-					(random.nextDouble()) * noise.getY(),
-					(random.nextDouble() - .5) * noise.getZ()
+					(RANDOM.nextDouble() - .5) * noise.getX(),
+					(RANDOM.nextDouble()) * noise.getY(),
+					(RANDOM.nextDouble() - .5) * noise.getZ()
 			)));
 			B.postpone(30, particle::remove);
 		}

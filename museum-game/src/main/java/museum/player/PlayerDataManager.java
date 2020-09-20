@@ -2,19 +2,19 @@ package museum.player;
 
 import clepto.bukkit.B;
 import com.destroystokyo.paper.event.player.PlayerInitialSpawnEvent;
+import com.google.common.collect.Maps;
 import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.data.BoosterInfo;
 import museum.data.UserInfo;
+import museum.museum.Museum;
 import museum.packages.*;
 import museum.player.prepare.*;
-import museum.prototype.Managers;
 import museum.utils.MultiTimeBar;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,15 +37,26 @@ import java.util.stream.Collectors;
 
 public class PlayerDataManager implements Listener {
 
+	public static final PotionEffect NIGHT_VISION = new PotionEffect(
+			PotionEffectType.NIGHT_VISION,
+			65536, 10, false, false
+	);
 	private final App app;
-	private final Map<UUID, User> userMap = new HashMap<>();
+	private final Map<UUID, User> userMap = Maps.newHashMap();
 	private final MultiTimeBar timeBar;
 	private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
-	public static final PotionEffect NIGHT_VISION = new PotionEffect(PotionEffectType.NIGHT_VISION, 65536, 10, false, false);
+	private final List<Prepare> prepares;
 
 	@SuppressWarnings("deprecation")
 	public PlayerDataManager(App app) {
 		this.app = app;
+
+		prepares = Arrays.asList(
+				BeforePacketHandler.INSTANCE,
+				new PrepareJSAnime(),
+				new PrepareScoreBoard(),
+				PreparePlayerBrain.INSTANCE
+		);
 
 		ClientSocket client = app.getClientSocket();
 		CoreApi api = CoreApi.get();
@@ -80,7 +91,7 @@ public class PlayerDataManager implements Listener {
 				if (pckg.getSum() != null)
 					user.setMoney(user.getMoney() + pckg.getSum());
 				if (pckg.getSeconds() != null) {
-					double result = pckg.getSeconds() * user.getCurrentMuseum().getIncome(); // Типа того
+					double result = pckg.getSeconds() * user.getMuseums().stream().mapToDouble(Museum::getIncome).sum(); // Типа того
 					user.setMoney(user.getMoney() + result);
 				}
 			}
@@ -103,7 +114,7 @@ public class PlayerDataManager implements Listener {
 			userMap.put(e.getUniqueId(), user);
 
 			try {
-				e.setSpawnLocation(getSpawnPosition(user));
+				e.setSpawnLocation(user.getLastLocation());
 			} catch (NoSuchMethodError ignored) {
 			}
 		} catch (Exception ex) {
@@ -113,18 +124,12 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler
 	public void onSpawn(PlayerSpawnLocationEvent e) {
-		e.setSpawnLocation(getSpawnPosition(app.getUser(e.getPlayer())));
+		e.setSpawnLocation(app.getUser(e.getPlayer()).getLastLocation());
 	}
 
 	@EventHandler
 	public void onSpawn(PlayerInitialSpawnEvent e) {
-		e.setSpawnLocation(getSpawnPosition(app.getUser(e.getPlayer())));
-	}
-
-	private Location getSpawnPosition(User user) {
-		val museum = user.getMuseums().get(Managers.museum.getPrototype("main"));
-		val warp = museum.getWarp();
-		return warp.getFinish();
+		e.setSpawnLocation(app.getUser(e.getPlayer()).getLastLocation());
 	}
 
 	@EventHandler
@@ -136,19 +141,13 @@ public class PlayerDataManager implements Listener {
 		user.setConnection(player.getHandle().playerConnection);
 		user.setPlayer(player);
 
-		B.postpone(2, () -> Arrays.asList(
-				BeforePacketHandler.INSTANCE,
-				new PrepareInventory(),
-				new PrepareJSAnime(),
-				(usr, app) -> usr.getPlayer().setWalkSpeed(.33F),
-				(usr, app) -> user.getMuseums().supply(Managers.museum.getPrototype("main")).show(user), // Музей
-				new PrepareScoreBoard(),
-				(usr, app) -> user.getPlayer().addPotionEffect(NIGHT_VISION),
-				(usr, app) -> Bukkit.getOnlinePlayers().forEach(current -> user.getPlayer().hidePlayer(app, current)), // Скрытие игроков
-				(usr, app) -> user.getPlayer().setGameMode(GameMode.ADVENTURE), // Режим игры
-				new PreparePlayerBrain(app),
-				(usr, app) -> user.getPlayer().setAllowFlight(true) // Режим полёта
-		).forEach(prepare -> prepare.execute(user, app)));
+		player.addPotionEffect(NIGHT_VISION);
+		player.setWalkSpeed(.33F);
+		Bukkit.getOnlinePlayers().forEach(current -> player.hidePlayer(app, current)); // Скрытие игроков
+		player.setGameMode(GameMode.ADVENTURE);
+		user.setState(user.getState()); // Загрузка музея
+
+		B.postpone(2, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
 
 		e.setJoinMessage(null);
 	}

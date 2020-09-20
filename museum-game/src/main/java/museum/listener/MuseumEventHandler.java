@@ -3,6 +3,7 @@ package museum.listener;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import museum.App;
+import museum.museum.Museum;
 import museum.util.MessageUtil;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -62,7 +63,7 @@ public class MuseumEventHandler implements Listener {
 		val player = e.getPlayer();
 		val user = app.getUser(player.getUniqueId());
 
-		if (user.getExcavation() != null || user.getCoins() == null)
+		if (!(user.getState() instanceof Museum) || user.getCoins() == null)
 			return;
 
 		// Попытка скушать монетки

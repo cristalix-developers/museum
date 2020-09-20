@@ -1,8 +1,7 @@
 package museum.museum;
 
-import clepto.ListUtils;
 import clepto.bukkit.B;
-import clepto.bukkit.Lemonade;
+import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
@@ -12,34 +11,46 @@ import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectType;
 import museum.museum.subject.Allocation;
+import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.MarkerSubject;
 import museum.museum.subject.Subject;
+import museum.player.State;
 import museum.player.User;
+import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Storable;
-import museum.util.LocationTree;
+import museum.util.ChunkWriter;
+import museum.util.LocationUtil;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
-import museum.util.warp.Warp;
-import museum.util.warp.WarpUtil;
+import museum.worker.WorkerHandler;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.Chunk;
+import net.minecraft.server.v1_12_R1.IBlockData;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.inventory.ItemStack;
-import ru.cristalix.core.scoreboard.IScoreboardService;
+import ru.cristalix.core.math.V3;
+import ru.cristalix.core.scoreboard.SimpleBoardObjective;
+import ru.cristalix.core.util.UtilV3;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static museum.museum.subject.Allocation.Action.*;
+
 /**
  * @author func 22.05.2020
  */
 @Setter
 @Getter
-public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
+public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements State {
 
-	private final ItemStack menu = Lemonade.get("menu").render();
+	// todo: Надо их кешировать, а то музеев много
+	private final ItemStack menu = Items.render("menu").asBukkitMirror();
+	private final ItemStack backItem = Items.render("back").asBukkitMirror();
 
-	private Warp warp;
 	private final CraftWorld world;
 	private double income;
 	private String title;
@@ -49,19 +60,30 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		this.world = App.getApp().getWorld();
 		this.title = info.title;
 
-		List<MarkerSubject> allMarkers = getSubjects(SubjectType.MARKER);
+		for (Subject subject : owner.getSubjects()) {
+			V3 position = subject.getCachedInfo().getLocation();
+			if (position == null) continue;
+			Location location = UtilV3.toLocation(position, App.getApp().getWorld());
+			if (!this.getPrototype().getBox().contains(location)) continue;
+			B.run(() -> this.addSubject(subject, location));
+		}
 
-		this.getSubjects(SubjectType.COLLECTOR).forEach(collector -> {
-			List<MarkerSubject> markers = allMarkers.stream()
-					.filter(marker -> marker.getCollectorId() == collector.getId() && marker.getLocation() != null)
-					.collect(Collectors.toList());
-			List<MarkerSubject> route = LocationTree.order(markers, MarkerSubject::getLocation);
-			collector.setNavigator(new CollectorNavigator(prototype, world,
-					route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
-		});
-		warp = new WarpUtil.WarpBuilder(prototype.getAddress()).build();
+		List<MarkerSubject> allMarkers = owner.getSubjects().stream()
+				.filter(subject -> subject.getPrototype().getType() == SubjectType.MARKER)
+				.map(MarkerSubject.class::cast)
+				.collect(Collectors.toList());
 
-		owner.setCurrentMuseum(this);
+		owner.getSubjects().stream()
+				.filter(subject -> subject.getPrototype().getType() == SubjectType.COLLECTOR)
+				.map(CollectorSubject.class::cast)
+				.forEach(collector -> {
+					List<MarkerSubject> markers = allMarkers.stream()
+							.filter(marker -> marker.getCollectorId() == collector.getId() && marker.getLocation() != null)
+							.collect(Collectors.toList());
+					List<MarkerSubject> route = LocationUtil.orderTree(markers, MarkerSubject::getLocation);
+					if (route != null) collector.setNavigator(new CollectorNavigator(prototype, world,
+							route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
+				});
 	}
 
 	@Override
@@ -69,15 +91,19 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		cachedInfo.title = title;
 	}
 
-	public void show(User user) {
-		if (!Objects.equals(user.getLastWarp(), warp))
-			warp.warp(user);
+	@Override
+	public void setupScoreboard(User user, SimpleBoardObjective objective) {
+		objective.setDisplayName(this.title);
 
-		// Если игрок после раскопок, то убрать ее, иначе если он не зашел впервые, то зачем прогружать?
-		if (user.getExcavation() != null) {
-			user.setExcavation(null);
-		} else if (user.getCurrentMuseum() != null)
-			return;
+		objective.startGroup("Музей");
+		if (owner != user) objective.record("Владелец", user.getName());
+		objective.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(getIncome()))
+				.record("Посещений", () -> "§b" + this.getViews());
+	}
+
+	@Override
+	public void enterState(User user) {
+		user.teleport(prototype.getBox().contains(user.getLastLocation()) && owner == user ? user.getLastLocation() : prototype.getSpawn());
 
 		cachedInfo.views++;
 
@@ -90,38 +116,51 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 					.append('_').append(subject.getPrototype().getPrice());
 		}
 		String payload = builder.toString();
+
 		user.sendPayload("museumsubjects", payload);
-
 		user.sendAnime();
-
-		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
-
 		user.setCoins(ConcurrentHashMap.newKeySet());
-		user.setCurrentMuseum(this);
 
 		val player = user.getPlayer();
 		val inventory = player.getInventory();
-		inventory.clear();
-		inventory.setItem(0, menu);
 
-		if (this.owner != user) {
-			player.getInventory().setItem(8, Lemonade.get("back").render());
-		}
-		B.postpone(20, () -> iterateSubjects(subject -> {
-			subject.show(user);
-			if (user == owner) {
-				val allocation = subject.getAllocation();
-				if (allocation == null)
-					player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
-			}
-		}));
+		if (owner.getExperience() >= PreparePlayerBrain.EXPERIENCE)
+			giveMenu();
+
+		if (this.owner != user)
+			inventory.setItem(8, backItem);
+		else
+			for (Subject subject : user.getSubjects())
+				if (!subject.isAllocated())
+					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 
 		updateIncrease();
+
+		player.setAllowFlight(true);
+
+		WorkerHandler.load(user);
+
+		B.postpone(20, () -> {
+			for (Subject subject : this.getSubjects()) {
+				subject.getAllocation().perform(user, UPDATE_BLOCKS);
+				subject.getAllocation().perform(user, SPAWN_PIECES);
+			}
+		});
 	}
 
-	public void hide(User user) {
-		iterateSubjects(s -> s.hide(user));
+	public void giveMenu() {
+		val inventory = owner.getInventory();
+		inventory.clear();
+		inventory.setItem(0, menu);
+	}
 
+	@Override
+	public void leaveState(User user) {
+		this.iterateSubjects(subject -> subject.getAllocation().perform(user, HIDE_BLOCKS, HIDE_PIECES));
+		user.setLastLocation(user.getLocation());
+		user.setLastPosition(UtilV3.fromVector(user.getLocation().toVector()));
+
+		// ToDo: Разве коины не должны быть частью музея, а не юзера?
 		Set<Coin> coins = user.getCoins();
 		coins.forEach(coin -> coin.remove(user.getConnection()));
 		coins.clear();
@@ -130,8 +169,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 	private void iterateSubjects(Consumer<Subject> action) {
 		for (Subject subject : owner.getSubjects()) {
 			Allocation allocation = subject.getAllocation();
-//			if (allocation == null) continue;
-//			if (!prototype.getBox().contains(allocation.getOrigin())) continue;
+			if (allocation == null) continue;
+			if (!prototype.getBox().contains(allocation.getOrigin())) continue;
 			action.accept(subject);
 		}
 	}
@@ -164,14 +203,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		return list;
 	}
 
-	public void processClick(User user, Subject subject) {
-		if (user.getMuseums().stream().noneMatch(museum -> user.getCurrentMuseum().equals(museum))) {
-			MessageUtil.find("non-root").send(user);
-			return;
-		}
-		user.performCommand("gui manipulator " + subject.getCachedInfo().getUuid().toString());
-	}
-
 	public long getViews() {
 		return cachedInfo.getViews();
 	}
@@ -184,8 +215,25 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> {
 		cachedInfo.views++;
 	}
 
-	public Collection<User> getUsers() {
-		return ListUtils.filter(App.getApp().getUsers(), user -> user.getCurrentMuseum() == this);
+	@Override
+	public void rewriteChunk(User user, ChunkWriter chunkWriter) {
+		Chunk chunk = chunkWriter.getChunk();
+		iterateSubjects(subject -> {
+			Allocation allocation = subject.getAllocation();
+			for (Map.Entry<BlockPosition, IBlockData> entry : allocation.getBlocks().entrySet()) {
+				BlockPosition position = entry.getKey();
+				if (position.getX() >> 4 == chunk.locX && position.getZ() >> 4 == chunk.locZ)
+					chunkWriter.write(position, entry.getValue());
+			}
+
+			allocation.perform(Collections.singleton(user), chunk, Allocation.Action.SPAWN_PIECES);
+		});
+	}
+
+	public boolean addSubject(Subject subject, Location location) {
+		Allocation allocation = Allocation.allocate(this, subject.getCachedInfo(), subject.getPrototype(), location);
+		subject.setAllocation(allocation);
+		return allocation != null;
 	}
 
 }

@@ -4,11 +4,17 @@ import clepto.cristalix.mapservice.Box;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import museum.App;
 import museum.data.SubjectInfo;
 import museum.museum.map.SubjectPrototype;
+import museum.museum.subject.skeleton.AtomPiece;
+import museum.museum.subject.skeleton.Piece;
+import museum.museum.subject.skeleton.V4;
+import museum.player.State;
 import museum.player.User;
+import museum.util.ChunkWriter;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,11 +32,14 @@ public class Allocation {
 
 	private final Location origin;
 	private final Map<BlockPosition, IBlockData> blocks;
-	private final Collection<PacketPlayOutMultiBlockChange> updatePackets;
+	private final Collection<Packet<PacketListenerPlayOut>> updatePackets;
+	private final Collection<Packet<PacketListenerPlayOut>> removePackets;
+	private final Map<AtomPiece, V4> pieces = new HashMap<>();
+	private final State owner;
 	private final List<Location> allocatedBlocks;
 	private final String clientData;
 
-	public static Allocation allocate(SubjectInfo info, SubjectPrototype prototype, Location origin) {
+	public static Allocation allocate(State owner, SubjectInfo info, SubjectPrototype prototype, Location origin) {
 		if (origin == null) return null;
 
 		Box box = prototype.getBox();
@@ -87,7 +96,6 @@ public class Allocation {
 					BlockData blockData = new BlockData(offset, data);
 					chunkMap.computeIfAbsent(chunkPos, c -> new ArrayList<>()).add(blockData);
 
-					int tileId = Block.getCombinedId(data);
 					allocated.add(dst);
 
 					blocks.put(blockPos, blockData.blockData);
@@ -95,61 +103,96 @@ public class Allocation {
 			}
 		}
 
-		Collection<PacketPlayOutMultiBlockChange> updatePackets = new ArrayList<>();
+		Collection<Packet<PacketListenerPlayOut>> updatePackets = new ArrayList<>();
+		Collection<Packet<PacketListenerPlayOut>> removePackets = new ArrayList<>();
 
-		for (Map.Entry<ChunkCoordIntPair, List<BlockData>> entry : chunkMap.entrySet()) {
+		for (val entry : chunkMap.entrySet()) {
 			PacketPlayOutMultiBlockChange updatePacket = new PacketPlayOutMultiBlockChange();
-			updatePacket.a = entry.getKey();
+			PacketPlayOutMultiBlockChange removePacket = new PacketPlayOutMultiBlockChange();
+			updatePacket.a = removePacket.a = entry.getKey();
 			List<BlockData> list = entry.getValue();
 			updatePacket.b = new PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[list.size()];
+			removePacket.b = new PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[list.size()];
 			for (int i = 0; i < list.size(); i++) {
 				BlockData blockData = list.get(i);
 				updatePacket.b[i] = updatePacket.new MultiBlockChangeInfo(blockData.offset, blockData.blockData);
+				removePacket.b[i] = removePacket.new MultiBlockChangeInfo(blockData.offset, ChunkWriter.AIR_DATA);
 			}
 			updatePackets.add(updatePacket);
+			removePackets.add(removePacket);
 		}
 
 		String clientData = minX + "_" + minY + "_" + minZ + "_" + maxX + "_" + maxY + "_" + maxZ;
 
-		return new Allocation(origin, blocks, updatePackets, allocated, clientData);
+		return new Allocation(origin, blocks, updatePackets, removePackets, owner, allocated, clientData);
 	}
 
 	public void prepareUpdate(Function<IBlockData, IBlockData> converter) {
-		for (PacketPlayOutMultiBlockChange packet : updatePackets) {
+		for (val rawPacket : updatePackets) {
+			if (rawPacket.getClass() != PacketPlayOutMultiBlockChange.class)
+				continue;
+			PacketPlayOutMultiBlockChange packet = (PacketPlayOutMultiBlockChange) rawPacket;
 			for (int i = 0; i < packet.b.length; i++) {
-				packet.b[i] = packet.new MultiBlockChangeInfo(packet.b[i].b, converter.apply(packet.b[i].c));
+				IBlockData newData = converter.apply(packet.b[i].c);
+				blocks.put(packet.b[i].a(), newData);
+				packet.b[i] = packet.new MultiBlockChangeInfo(packet.b[i].b, newData);
 			}
 		}
 	}
 
-	/**
-	 * Частицы и звуки ломания блоков в этой аллокации
-	 */
-	public void sendDestroyEffects(Collection<User> users) {
-		// ToDo: партиклов слишком много, лагает!!!
-		List<PacketPlayOutWorldEvent> packets = new ArrayList<>();
-		for (PacketPlayOutMultiBlockChange packet : this.updatePackets) {
-			for (PacketPlayOutMultiBlockChange.MultiBlockChangeInfo info : packet.b) {
-				if (info == null) continue;
-				// 2001 - id события разрушения блока
-				packets.add(new PacketPlayOutWorldEvent(2001, info.a(), Block.getCombinedId(info.c), false));
+	public void allocatePiece(Piece piece, V4 origin, boolean update) {
+		Map<AtomPiece, V4> freshPieces = new HashMap<>();
+		piece.recursiveTraverse(freshPieces, origin);
+		if (update) {
+			List<Packet<PacketListenerPlayOut>> packets = new ArrayList<>();
+			freshPieces.forEach((atom, position) -> {
+				V4 existing = this.pieces.get(atom);
+				if (existing != null) atom.getUpdatePackets(packets, position);
+				else atom.getShowPackets(packets, position);
+			});
+			for (User user : owner.getUsers()) {
+				packets.forEach(user::sendPacket);
 			}
 		}
-		sendPackets(packets, users);
+		this.pieces.putAll(freshPieces);
 	}
 
-	public void sendUpdate(Collection<User> users) {
-		sendPackets(this.updatePackets, users);
+	public void removePiece(Piece piece) {
+		Map<AtomPiece, V4> pieces = new HashMap<>();
+		piece.recursiveTraverse(pieces, new V4(0, 0, 0, 0));
+		int[] ids = new int[pieces.size()];
+		int i = 0;
+		for (AtomPiece atomPiece : pieces.keySet()) {
+			this.pieces.remove(atomPiece);
+			ids[i++] = atomPiece.getStand().id;
+		}
+		PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(ids);
+		for (User user : owner.getUsers()) user.sendPacket(packet);
 	}
 
-	public static void sendPackets(Collection<? extends Packet<?>> packets, User... users) {
-		sendPackets(packets, Arrays.asList(users));
+	public void perform(User user, Action... actions) {
+		this.perform(Collections.singleton(user), null, actions);
 	}
-	public static void sendPackets(Collection<? extends Packet<?>> packets, Collection<User> users) {
-		for (User user : users) {
-			for (Packet<?> packet : packets)
+
+	public void perform(User users, Chunk chunk, Action... actions) {
+		this.perform(Collections.singleton(users), chunk, actions);
+	}
+
+	public void perform(Action... actions) {
+		this.perform(owner.getUsers(), null, actions);
+	}
+
+	public void perform(Collection<User> users, Action... actions) {
+		this.perform(users, null, actions);
+	}
+
+	public void perform(Collection<User> users, Chunk chunk, Action... actions) {
+		List<Packet<PacketListenerPlayOut>> packets = new ArrayList<>();
+		for (Action action : actions)
+			action.perform(this, packets, chunk);
+		for (User user : users)
+			for (val packet : packets)
 				user.sendPacket(packet);
-		}
 	}
 
 	@Override
@@ -157,4 +200,50 @@ public class Allocation {
 		return origin + " " + clientData;
 	}
 
+	@RequiredArgsConstructor
+	public enum Action {
+		SPAWN_PIECES((allocation, buffer, chunk) -> {
+			allocation.pieces.forEach((piece, position) -> {
+				if (chunk == null || chunk.locX == (int) position.x >> 4 && chunk.locZ == (int) position.z >> 4)
+					piece.getShowPackets(buffer, position);
+			});
+		}),
+		HIDE_BLOCKS((allocation, buffer, chunk) -> buffer.addAll(allocation.removePackets)),
+		HIDE_PIECES((allocation, buffer, chunk) -> {
+			int[] ids = new int[allocation.pieces.size()];
+			int i = 0;
+			for (AtomPiece piece : allocation.pieces.keySet()) ids[i++] = piece.getStand().id;
+			buffer.add(new PacketPlayOutEntityDestroy(ids));
+		}),
+		UPDATE_BLOCKS((allocation, buffer, chunk) -> buffer.addAll(allocation.updatePackets)),
+		UPDATE_PIECES((allocation, buffer, chunk) -> {
+			allocation.pieces.forEach((piece, position) -> piece.getUpdatePackets(buffer, position));
+		}),
+		PLAY_EFFECTS((allocation, buffer, chunk) -> {
+			// ToDo: партиклов слишком много, лагает
+			for (val rawPacket : allocation.updatePackets) {
+				if (rawPacket.getClass() != PacketPlayOutMultiBlockChange.class)
+					continue;
+				PacketPlayOutMultiBlockChange packet = (PacketPlayOutMultiBlockChange) rawPacket;
+				for (PacketPlayOutMultiBlockChange.MultiBlockChangeInfo info : packet.b) {
+					if (info == null) continue;
+					// 2001 - id события разрушения блока
+					buffer.add(new PacketPlayOutWorldEvent(2001, info.a(), Block.getCombinedId(info.c), false));
+				}
+			}
+		});
+
+		private final Executor executor;
+
+		public void perform(Allocation allocation, List<Packet<PacketListenerPlayOut>> resultBuffer, Chunk chunk) {
+			this.executor.execute(allocation, resultBuffer, chunk);
+		}
+
+		@FunctionalInterface
+		public interface Executor {
+
+			void execute(Allocation allocation, List<Packet<PacketListenerPlayOut>> resultBuffer, Chunk chunk);
+
+		}
+	}
 }

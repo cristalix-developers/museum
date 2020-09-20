@@ -1,6 +1,6 @@
 package museum.museum.subject;
 
-import clepto.bukkit.Lemonade;
+import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.Setter;
 import museum.App;
@@ -8,22 +8,19 @@ import museum.data.SubjectInfo;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.CollectorSubjectPrototype;
 import museum.museum.map.SubjectPrototype;
-import museum.museum.subject.skeleton.Piece;
+import museum.museum.subject.skeleton.AtomPiece;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.inventory.ItemStack;
 
 public class CollectorSubject extends Subject {
 
 	@Getter
 	private final int id;
 	@Getter
-	private final Piece piece;
+	private final AtomPiece piece;
 	@Setter
 	private CollectorNavigator navigator;
 
@@ -33,13 +30,12 @@ public class CollectorSubject extends Subject {
 	public CollectorSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
 		EntityArmorStand armorStand = new EntityArmorStand(App.getApp().getNMSWorld());
-		Lemonade lemonade = Lemonade.get(this.prototype.getAddress());
-		ItemStack item = lemonade == null ? new ItemStack(Material.WORKBENCH) : lemonade.render();
-		armorStand.setSlot(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(item));
+		// todo: добавить кеширование предметов, а то они одни и теже
+		armorStand.setSlot(EnumItemSlot.HEAD, Items.render(this.prototype.getAddress()));
 		armorStand.setCustomName(prototype.getTitle());
 		armorStand.setCustomNameVisible(true);
 		this.navigator = null;
-		this.piece = new Piece(armorStand);
+		this.piece = new AtomPiece(armorStand);
 		this.id = info.getMetadata() == null ? 0 : Integer.parseInt(info.getMetadata());
 		this.speed = (int) ((CollectorSubjectPrototype) prototype).getSpeed();
 		this.radius = ((CollectorSubjectPrototype) prototype).getRadius();
@@ -52,23 +48,18 @@ public class CollectorSubject extends Subject {
 	}
 
 	@Override
-	public void show(User user) {
-		super.show(user);
-		piece.show(user, V4.fromLocation(this.getCollectorLocation()));
+	public void setAllocation(Allocation allocation) {
+		super.setAllocation(allocation);
+		if (allocation != null) allocation.allocatePiece(piece, V4.fromLocation(this.getCollectorLocation()), false);
 	}
 
-	public void move(User user, long iteration) {
+	public void move(long iteration) {
 		if (navigator == null)
 			return;
 		Location location = getLocation(iteration);
-		user.getCoins().removeIf(coin -> coin.pickUp(user, location, radius, piece.getStand().id));
-		piece.update(user, V4.fromLocation(location));
-	}
-
-	@Override
-	public void hide(User user) {
-		super.hide(user);
-		piece.hide(user);
+		// ToDo: Пофиксить монетки
+//		user.getCoins().removeIf(coin -> coin.pickUp(user, location, radius, piece.getStand().id));
+		if (isAllocated()) getAllocation().allocatePiece(piece, V4.fromLocation(location), true);
 	}
 
 	public Location getCollectorLocation() {
@@ -77,6 +68,6 @@ public class CollectorSubject extends Subject {
 
 	private Location getLocation(long time) {
 		int secondsPerLap = 200000 / speed;
-		return navigator.getLocation(time % secondsPerLap / (double) secondsPerLap);
+		return navigator == null ? getAllocation().getOrigin().toCenterLocation() : navigator.getLocation(time % secondsPerLap / (double) secondsPerLap);
 	}
 }

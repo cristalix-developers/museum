@@ -6,13 +6,18 @@ import com.mongodb.async.client.MongoClient;
 import com.mongodb.async.client.MongoCollection;
 import com.mongodb.client.model.*;
 import com.mongodb.session.ClientSession;
+import lombok.Getter;
+import lombok.val;
+import museum.tops.TopEntry;
 import org.bson.Document;
 import ru.cristalix.core.GlobalSerializers;
 import museum.data.Unique;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+@Getter
 public class MongoAdapter<T extends Unique> {
 
 	private static final UpdateOptions UPSERT = new UpdateOptions().upsert(true);
@@ -20,6 +25,8 @@ public class MongoAdapter<T extends Unique> {
 	private final MongoCollection<Document> data;
 	private final Class<T> type;
 	private final ClientSession session;
+
+	private final AtomicBoolean connected = new AtomicBoolean(false);
 
 	public MongoAdapter(MongoClient client, String database, String collection, Class<T> type) {
 		this.data = client.getDatabase(database).getCollection(collection);
@@ -31,9 +38,19 @@ public class MongoAdapter<T extends Unique> {
 		});
 		try {
 			this.session = future.get(10, TimeUnit.SECONDS);
+			new Thread(() -> {
+				try {
+					Thread.sleep(2000L);
+					connected.set(true);
+				} catch(Exception ignored) {}
+			}).start();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public boolean isConnected() {
+		return connected.get();
 	}
 
 	public CompletableFuture<T> find(UUID uuid) {
@@ -75,6 +92,27 @@ public class MongoAdapter<T extends Unique> {
 		}
 
 		data.bulkWrite(session, models, this::handle);
+	}
+
+	public <V> CompletableFuture<List<TopEntry<T, V>>> makeRatingByField(String fieldName, int limit) {
+		val operations = Arrays.asList(
+				Aggregates.project(Projections.fields(Projections.include("uuid", fieldName), Projections.exclude("_id"))),
+				Aggregates.sort(Sorts.descending(fieldName)),
+				Aggregates.limit(limit)
+		);
+		List<TopEntry<T, V>> entries = new ArrayList<>();
+		CompletableFuture<List<TopEntry<T, V>>> future = new CompletableFuture<>();
+		data.aggregate(operations).forEach(document -> {
+			T key = readDocument(document);
+			entries.add(new TopEntry<>(key, (V) document.get(fieldName)));
+		}, (__, throwable) -> {
+			if (throwable != null) {
+				future.completeExceptionally(throwable);
+				return;
+			}
+			future.complete(entries);
+		});
+		return future;
 	}
 
 	private void handle(Object result, Throwable throwable) {

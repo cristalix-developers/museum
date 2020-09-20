@@ -4,6 +4,7 @@ import clepto.cristalix.mapservice.Box;
 import lombok.Data;
 import museum.data.SubjectInfo;
 import museum.prototype.Prototype;
+import org.bukkit.Location;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class MuseumPrototype implements Prototype {
 
 	private final String address;
 	private final Box box;
+	private final Location spawn;
 	private final List<SubjectInfo> defaultSubjects;
 
 }
