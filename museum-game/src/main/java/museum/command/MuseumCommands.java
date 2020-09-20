@@ -205,7 +205,7 @@ public class MuseumCommands {
 		if (proto == null)
 			return "Такого места для раскопок нет";
 
-		if (user.getExperience() <= PreparePlayerBrain.EXPERIENCE)
+		if (user.getExperience() < PreparePlayerBrain.EXPERIENCE)
 			return "Опыта мало";
 
 		player.closeInventory();
@@ -233,7 +233,7 @@ public class MuseumCommands {
 
 		user.setPickaxeType(pickaxe);
 		user.setMoney(user.getMoney() - pickaxe.getPrice());
-		player.performCommand("gui pickaxes");
+		player.performCommand("gui pickaxe");
 		return MessageUtil.get("newpickaxe");
 	}
 

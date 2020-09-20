@@ -1,22 +1,11 @@
 package museum.config
 
-import clepto.humanize.TimeFormatter
-import museum.excavation.Excavation
-import museum.museum.Museum
+
 import museum.museum.subject.Subject
 import museum.museum.subject.skeleton.Skeleton
-import museum.player.User
-import museum.util.LevelSystem
-import org.bukkit.Statistic
-
-import java.text.DecimalFormat
-import java.time.Duration
 
 import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
-
-def formatter = TimeFormatter.builder() accuracy 500 build()
-def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
 
 register 'skeleton', {
 
@@ -111,26 +100,6 @@ register 'menu', {
     """
 }
 
-register 'goto-excavations-item', {
-    item COMPASS
-    text """
-        §bЭкспедиции
-
-        Отправтесь на раскопки
-        и найдите следы прошлого.
-    """
-}
-
-register 'goto-pickaxes-item', {
-    item GOLD_PICKAXE
-    text """
-        §bКирки
-
-        Приобретите новую кирку,
-        и разгодайте тайны песка...
-    """
-}
-
 register 'goback', {
     item BARRIER
     text '§cВернуться'
@@ -212,52 +181,5 @@ register 'subject-info', {
         §b$subject.prototype.title
 
         Стоимость: $subject.prototype.price
-    """
-}
-
-register 'go', {
-    def excavation = context as Excavation
-    item excavation.prototype.icon
-    text """
-        §b$excavation.prototype.title §6${moneyFormatter.format(excavation.prototype.price)}
-
-        Минимальный уровень: $excavation.prototype.requiredLevel
-        Кол-во ударов: $excavation.prototype.hitCount
-    """
-}
-
-register 'profile', {
-    item PAPER
-    def user = context as User
-    text """
-        §bПрофиль
-
-        Уровень: $user.level
-        Денег: ${moneyFormatter.format(user.money)}
-        Опыт: $user.experience
-        Опыта осталось: ${LevelSystem.formatExperience(user.experience)}
-        Часов сыграно: ${user.player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000}
-        Монет собрано: $user.pickedCoinsCount
-        Кирка: $user.pickaxeType.name
-        Раскопок: $user.excavationCount
-        Фрагментов: ${user.skeletons.stream().mapToInt(s -> s.unlockedFragments.size()).sum()}
-    """
-}
-
-register 'museum', {
-    item CLAY_BALL
-    nbt([other: 'guild_bank'])
-    def museum = context as Museum
-    text """
-        &bМузей
-    
-        Хозяин: &e$museum.owner.name
-        Название: &e$museum.title
-        Посещений: &e$museum.views
-    
-        Доход: &e$museum.income
-        Витрин: &e${museum.subjects.size()}
-    
-        Создан &e${formatter.format(Duration.ofMillis(System.currentTimeMillis() - museum.creationDate.time))} назад
     """
 }

@@ -12,7 +12,6 @@ import lombok.val;
 import museum.App;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
-import museum.gui.MuseumGuis;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
 import museum.museum.subject.Subject;
@@ -22,11 +21,13 @@ import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.player.pickaxe.PickaxeType;
+import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
 import museum.worker.WorkerHandler;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -48,8 +49,11 @@ public class BeforePacketHandler implements Prepare {
 
 	public static final ItemStack EMERGENCY_STOP = Items.render("go-back-item").asBukkitMirror();
 	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
-	private static final ItemStack emeraldItem = Items.render("emerald-item").asBukkitCopy();
-	private static final BlockPosition dummy = new BlockPosition(0, 0, 0);
+	private static final ItemStack EMERALD_ITEM = Items.render("emerald-item").asBukkitCopy();
+	private static final ItemStack AIR_ITEM = ru.cristalix.core.item.Items.builder()
+			.type(Material.AIR)
+			.build();
+	private static final BlockPosition DUMMY = new BlockPosition(0, 0, 0);
 
 	@Override
 	public void execute(User user, App app) {
@@ -57,16 +61,16 @@ public class BeforePacketHandler implements Prepare {
 		pipeline.addAfter("decoder", UUID.randomUUID().toString(), new MessageToMessageDecoder<Packet>() {
 					@Override
 					protected void decode(ChannelHandlerContext channelHandlerContext, Packet packet, List<Object> list) {
-						if (!(packet instanceof PacketPlayInUseEntity))
-							return;
-						MinecraftServer.SERVER.postToMainThread(() -> {
-							PacketPlayInUseEntity pc = (PacketPlayInUseEntity) packet;
-							if (pc.d == null || !pc.d.equals(EnumHand.MAIN_HAND))
-								return;
-							if (!pc.action.equals(PacketPlayInUseEntity.EnumEntityUseAction.INTERACT_AT))
-								return;
-							WorkerHandler.acceptClick(user, pc.getEntityId());
-						});
+						if (packet instanceof PacketPlayInUseEntity) {
+							MinecraftServer.SERVER.postToMainThread(() -> {
+								PacketPlayInUseEntity pc = (PacketPlayInUseEntity) packet;
+								if (pc.d == null || !pc.d.equals(EnumHand.MAIN_HAND))
+									return;
+								if (!pc.action.equals(PacketPlayInUseEntity.EnumEntityUseAction.INTERACT_AT))
+									return;
+								WorkerHandler.acceptClick(user, pc.getEntityId());
+							});
+						}
 						list.add(packet);
 					}
 				}
@@ -87,7 +91,7 @@ public class BeforePacketHandler implements Prepare {
 									for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
 										BlockPosition pos = packet.a;
 										if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
-											packet.a = dummy; // Genius
+											packet.a = DUMMY; // Genius
 											MinecraftServer.SERVER.postToMainThread(() -> {
 												if (user != museum.getOwner())
 													MessageUtil.find("non-root").send(user);
@@ -102,10 +106,10 @@ public class BeforePacketHandler implements Prepare {
 								B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, museum, blockPos));
 							} else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP))
 								tryReturnPlayer(user, true);
-							packet.a = dummy;
+							packet.a = DUMMY;
 						}
 					} else if (packet.c == EnumHand.OFF_HAND)
-						packet.a = dummy;
+						packet.a = DUMMY;
 				} else if (packetObj instanceof PacketPlayInBlockDig) {
 					PacketPlayInBlockDig packet = (PacketPlayInBlockDig) packetObj;
 					boolean valid = user.getState() instanceof Excavation && isAir(user, packet.a);
@@ -116,7 +120,7 @@ public class BeforePacketHandler implements Prepare {
 						acceptedBreak(user, packet);
 					} else if (packet.c == START_DESTROY_BLOCK) {
 						packet.c = ABORT_DESTROY_BLOCK;
-						packet.a = dummy;
+						packet.a = DUMMY;
 					}
 				}
 				super.channelRead(channelHandlerContext, packetObj);
@@ -147,7 +151,7 @@ public class BeforePacketHandler implements Prepare {
 			return;
 		}
 
-		user.getInventory().setItemInMainHand(MuseumGuis.AIR_ITEM);
+		user.getInventory().setItemInMainHand(AIR_ITEM);
 		subject.getAllocation().perform(Allocation.Action.UPDATE_BLOCKS, Allocation.Action.SPAWN_PIECES);
 		for (User viewer : viewers) {
 			viewer.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
@@ -168,7 +172,10 @@ public class BeforePacketHandler implements Prepare {
 			MessageUtil.find("excavationend").send(user);
 			excavation.setHitsLeft(-1);
 			B.postpone(200, () -> {
-				user.setState(user.getLastMuseum());
+				user.setState(user.getLastMuseum() == null ?
+						user.getMuseums().get(Managers.museum.getPrototype("main")) :
+						user.getLastMuseum()
+				);
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			});
 			return true;
@@ -181,7 +188,7 @@ public class BeforePacketHandler implements Prepare {
 		MinecraftServer.getServer().postToMainThread(() -> {
 			// С некоторым шансом может выпасть эмеральд
 			if (Vector.random.nextFloat() > .9)
-				user.getPlayer().getInventory().addItem(emeraldItem);
+				user.getPlayer().getInventory().addItem(EMERALD_ITEM);
 			// Перебрать все кирки и эффекты на них
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {

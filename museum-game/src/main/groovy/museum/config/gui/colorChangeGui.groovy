@@ -38,5 +38,4 @@ Guis.register 'colorChange', {
             }
         }
     }
-
 }

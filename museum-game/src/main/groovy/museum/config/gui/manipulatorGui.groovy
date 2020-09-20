@@ -151,9 +151,5 @@ Guis.register 'manipulator', { player ->
             rows.times {gui.layout += '-OOOOOOO-' }
             gui.layout += '---------'
         }
-
     }
-
-
 }
-

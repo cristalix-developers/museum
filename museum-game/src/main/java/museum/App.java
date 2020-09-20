@@ -12,7 +12,6 @@ import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
-import museum.gui.MuseumGuis;
 import museum.listener.BlockClickHandler;
 import museum.listener.MuseumEventHandler;
 import museum.listener.PassiveEventBlocker;
@@ -23,6 +22,7 @@ import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.prototype.Managers;
 import museum.ticker.detail.FountainHandler;
+import museum.ticker.detail.WayParticleHandler;
 import museum.util.MapLoader;
 import museum.util.MuseumChatService;
 import museum.visitor.VisitorHandler;
@@ -152,8 +152,9 @@ public final class App extends JavaPlugin {
 		new WorkerHandler(this);
 
 		// Обработка каждого тика
-		new TickTimerHandler(this, Collections.singletonList(
-				new FountainHandler(this)
+		new TickTimerHandler(this, Arrays.asList(
+				new FountainHandler(this),
+				new WayParticleHandler(this)
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
 		VisitorHandler.init(this, 1);
@@ -206,12 +207,13 @@ public final class App extends JavaPlugin {
 		try {
 			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage()).get(3L, TimeUnit.SECONDS);
 			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getGuisData(), pckg.getItemsData()));
-		} catch(Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.out.println("We can't receive museum configurations! Retry in 3sec");
 			try {
 				Thread.sleep(3000L);
-			} catch(Exception ignored) {}
+			} catch (Exception ignored) {
+			}
 			requestConfigurations();
 		}
 	}
@@ -220,9 +222,6 @@ public final class App extends JavaPlugin {
 		YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
 		itemsConfig.getKeys(false)
 				.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
-
-		// Инициализация "умных" иконок в гуишках
-		MuseumGuis.registerItemizers(this);
 
 		// Загрузка всех инвентарей
 		Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));

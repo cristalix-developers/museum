@@ -3,6 +3,7 @@ package museum.worker;
 import com.mojang.authlib.GameProfile;
 import museum.App;
 import museum.player.User;
+import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +25,10 @@ public class WorkerHandler {
 		workers.addAll(app.getMap().getLabels("simplenpc")
 				.stream()
 				.map(label -> {
-					String[] ss = label.getTag().split("\\s+", 2);
+					String[] ss = label.getTag().split("\\s+");
 					return new NpcWorker(label, test, ss[0], user -> {
 						if (ss[1].startsWith("/"))
-							user.performCommand(label.getTag().substring(1));
+							user.performCommand(label.getTag().substring(ss[0].length() + 2));
 					});
 				}).collect(Collectors.toList()));
 	}

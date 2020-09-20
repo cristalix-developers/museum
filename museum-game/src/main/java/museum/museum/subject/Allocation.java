@@ -188,8 +188,11 @@ public class Allocation {
 
 	public void perform(Collection<User> users, Chunk chunk, Action... actions) {
 		List<Packet<PacketListenerPlayOut>> packets = new ArrayList<>();
-		for (Action action : actions) action.perform(this, packets, chunk);
-		for (User user : users) for (val packet : packets) user.sendPacket(packet);
+		for (Action action : actions)
+			action.perform(this, packets, chunk);
+		for (User user : users)
+			for (val packet : packets)
+				user.sendPacket(packet);
 	}
 
 	@Override
@@ -242,7 +245,5 @@ public class Allocation {
 			void execute(Allocation allocation, List<Packet<PacketListenerPlayOut>> resultBuffer, Chunk chunk);
 
 		}
-
 	}
-
 }

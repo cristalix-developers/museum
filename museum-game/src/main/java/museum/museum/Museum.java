@@ -104,10 +104,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	@Override
 	public void enterState(User user) {
 		user.teleport(prototype.getBox().contains(user.getLastLocation()) && owner == user ? user.getLastLocation() : prototype.getSpawn());
-		for (Subject subject : this.getSubjects()) {
-			subject.getAllocation().perform(user, UPDATE_BLOCKS);
-			subject.getAllocation().perform(user, SPAWN_PIECES);
-		}
 
 		cachedInfo.views++;
 
@@ -120,32 +116,36 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 					.append('_').append(subject.getPrototype().getPrice());
 		}
 		String payload = builder.toString();
+
 		user.sendPayload("museumsubjects", payload);
-
 		user.sendAnime();
-
 		user.setCoins(ConcurrentHashMap.newKeySet());
 
 		val player = user.getPlayer();
 		val inventory = player.getInventory();
 
-		if (owner.getExperience() > PreparePlayerBrain.EXPERIENCE)
+		if (owner.getExperience() >= PreparePlayerBrain.EXPERIENCE)
 			giveMenu();
 
-		if (this.owner != user) {
+		if (this.owner != user)
 			inventory.setItem(8, backItem);
-		} else {
-			for (Subject subject : user.getSubjects()) {
+		else
+			for (Subject subject : user.getSubjects())
 				if (!subject.isAllocated())
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
-			}
-		}
 
 		updateIncrease();
 
 		player.setAllowFlight(true);
 
 		WorkerHandler.load(user);
+
+		B.postpone(20, () -> {
+			for (Subject subject : this.getSubjects()) {
+				subject.getAllocation().perform(user, UPDATE_BLOCKS);
+				subject.getAllocation().perform(user, SPAWN_PIECES);
+			}
+		});
 	}
 
 	public void giveMenu() {
@@ -194,7 +194,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		return null;
 	}
 
-	@SuppressWarnings ("unchecked")
+	@SuppressWarnings("unchecked")
 	public <T extends Subject> List<T> getSubjects(SubjectType<T> type) {
 		List<T> list = new ArrayList<>();
 		iterateSubjects(s -> {
