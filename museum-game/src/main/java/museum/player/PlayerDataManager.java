@@ -39,7 +39,7 @@ public class PlayerDataManager implements Listener {
 
 	public static final PotionEffect NIGHT_VISION = new PotionEffect(
 			PotionEffectType.NIGHT_VISION,
-			65536, 10, false, false
+			999999, 10, false, false
 	);
 	private final App app;
 	private final Map<UUID, User> userMap = Maps.newHashMap();

@@ -96,7 +96,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		objective.setDisplayName(this.title);
 
 		objective.startGroup("Музей");
-		if (owner != user) objective.record("Владелец", user.getName());
+		if (owner != user) objective.record("Владелец", owner.getName());
 		objective.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(getIncome()))
 				.record("Посещений", () -> "§b" + this.getViews());
 	}

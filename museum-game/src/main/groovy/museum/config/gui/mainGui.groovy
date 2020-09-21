@@ -3,6 +3,7 @@ package museum.config.gui
 import clepto.bukkit.menu.Guis
 import clepto.humanize.TimeFormatter
 import museum.App
+import museum.museum.Museum
 import museum.player.User
 import museum.util.LevelSystem
 import org.bukkit.Statistic
@@ -69,7 +70,7 @@ Guis.register 'main', { player ->
     button 'M' icon {
         item CLAY_BALL
         nbt([other: 'guild_bank'])
-        def museum = user.lastMuseum
+        def museum = (Museum) user.state
         text """
         &bМузей
     
