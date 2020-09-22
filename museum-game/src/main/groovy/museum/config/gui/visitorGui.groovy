@@ -32,7 +32,7 @@ Guis.register 'visitor', { player ->
         if (state == null || !(state instanceof Museum))
             return
         def museum = ((Museum) state)
-        if (visitor.state == museum)
+        if (visitor.state == museum || museum.getOwner() == visitor)
             return
         int fragments = user.skeletons.stream().mapToInt(s -> s.unlockedFragments.size()).sum().intValue()
         double price = fragments * 3.33f

@@ -3,6 +3,12 @@ serviceRealm: MUSS-1
 chat:
   prefix: '§7[§l§bi§7] '
   messages:
+    traveler: '%VISITOR% посетил(а) ваш музей, прибыль §6+%PRICE%'
+    museum-teleported: '%VISITOR% принял ваше предложение. И посетил ваш музей.'
+    not-in-museum: 'Вы не в музее...'
+    welcome-gallery: 'Добро пожаловать в магазин!'
+    welcome-home: 'Добро пожаловать в музей!'
+    already-at-home: 'Вы уже в музее.'
     cannot-place: 'Вы не можете разместить данную постройку на этом блоке.'
     color-changed: 'Цвет витрины изменен.'
     owner-crash: 'UUID ты угадал, но тут есть защита от таких мудаков как ты...'

@@ -30,7 +30,11 @@ Guis.register 'excavation', { player ->
 
                 Минимальный уровень: $excavation.requiredLevel
                 Кол-во ударов: $excavation.hitCount
+
+                Можно найти:
                 """
+                excavation.availableSkeletonPrototypes
+                        .forEach(prototype -> text " - §b$prototype.title")
             } leftClick {
                 closeInventory()
                 performCommand 'excavation ' + excavation.address

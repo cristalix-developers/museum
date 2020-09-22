@@ -78,7 +78,7 @@ public class MuseumCommands {
 			return MessageUtil.find("museum-not-found").set("type", address).getText();
 
 		if (user.getLastMuseum().equals(museum))
-			return MessageUtil.get("already-here");
+			return MessageUtil.get("already-at-home");
 
 		user.setState(museum);
 
@@ -116,16 +116,22 @@ public class MuseumCommands {
 			visitor.setMoney(visitor.getMoney() - price);
 			owner.setMoney(owner.getMoney() + price);
 			visitor.setState(museum);
-			owner.sendMessage("К вам зашли, вот вам деньги с посещения +" + MessageUtil.toMoneyFormat(price) + "$");
+			MessageUtil.find("traveler")
+					.set("visitor", visitor.getName())
+					.set("price", MessageUtil.toMoneyFormat(price))
+					.send(owner);
 		}
 		return null;
 	}
 
 	private String cmdHome(Player sender, String[] args) {
-		User user = this.app.getUser(sender);
+		val user = this.app.getUser(sender);
 		if (user.getState() instanceof Museum && ((Museum) user.getState()).getOwner().equals(user))
 			return MessageUtil.get("already-at-home");
-		user.setState(user.getLastMuseum());
+		user.setState(user.getLastMuseum() == null ?
+				user.getMuseums().get(Managers.museum.getPrototype("main")) :
+				user.getLastMuseum()
+		);
 		return MessageUtil.get("welcome-home");
 	}
 
@@ -171,7 +177,7 @@ public class MuseumCommands {
 			// ToDo: Автоматический триггер возвращения домой с возможностью отмены
 			return "§cВы на раскопках, сперва вернитесь домой";
 		user.setState(app.getShop());
-		return "§aДобро пожаловать в магазин!";
+		return MessageUtil.get("welcome-gallery");
 	}
 
 	private String cmdChangeTitle(Player sender, String[] args) {

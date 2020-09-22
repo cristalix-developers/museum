@@ -168,10 +168,10 @@ public class BeforePacketHandler implements Prepare {
 
 		excavation.setHitsLeft(excavation.getHitsLeft() - 1);
 		if (excavation.getHitsLeft() == 0 || force) {
-			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
+			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 5 сек.");
 			MessageUtil.find("excavationend").send(user);
 			excavation.setHitsLeft(-1);
-			B.postpone(200, () -> {
+			B.postpone(100, () -> {
 				user.setState(user.getLastMuseum() == null ?
 						user.getMuseums().get(Managers.museum.getPrototype("main")) :
 						user.getLastMuseum()
