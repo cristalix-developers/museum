@@ -50,6 +50,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	// todo: Надо их кешировать, а то музеев много
 	private final ItemStack menu = Items.render("menu").asBukkitMirror();
 	private final ItemStack backItem = Items.render("back").asBukkitMirror();
+	private final ItemStack visitorMenu = Items.render("visitorMenu").asBukkitMirror();
 
 	private final CraftWorld world;
 	private double income;
@@ -152,6 +153,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		val inventory = owner.getInventory();
 		inventory.clear();
 		inventory.setItem(0, menu);
+		inventory.setItem(4, visitorMenu);
 	}
 
 	@Override

@@ -148,7 +148,7 @@ Guis.register 'manipulator', { player ->
         def rows = (Managers.skeleton.size() - 1) / 7 + 1
 
         if (rows) {
-            rows.times {gui.layout += '-OOOOOOO-' }
+            rows.times { gui.layout += '-OOOOOOO-' }
             gui.layout += '---------'
         }
     }

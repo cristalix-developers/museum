@@ -54,6 +54,7 @@ public class MuseumCommands {
 		B.regCommand(this::cmdPickaxe, "pickaxe");
 		B.regCommand(this::cmdSubject, "subject");
 		B.regCommand(this::cmdSkeleton, "skeleton");
+		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
 	}
 
@@ -84,6 +85,40 @@ public class MuseumCommands {
 		return MessageUtil.find("museum-teleported")
 				.set("visitor", user.getName())
 				.getText();
+	}
+
+	private String cmdTravel(Player sender, String[] args) {
+		val visitor = app.getUser(sender);
+		val owner = app.getUser(Bukkit.getPlayer(args[0]));
+
+		if (args.length < 2)
+			return null;
+		if (owner == null || !owner.getPlayer().isOnline() || owner.getState() == null || owner.equals(visitor)) {
+			return MessageUtil.get("playeroffline");
+		}
+
+		double price;
+
+		try {
+			price = Double.parseDouble(args[1]);
+		} catch (Exception ignored) {
+			return null;
+		}
+
+		val state = owner.getState();
+
+		if (state instanceof Museum) {
+			val museum = (Museum) state;
+
+			if (visitor.getMoney() <= price)
+				return MessageUtil.get("nomoney");
+
+			visitor.setMoney(visitor.getMoney() - price);
+			owner.setMoney(owner.getMoney() + price);
+			visitor.setState(museum);
+			owner.sendMessage("К вам зашли, вот вам деньги с посещения +" + MessageUtil.toMoneyFormat(price) + "$");
+		}
+		return null;
 	}
 
 	private String cmdHome(Player sender, String[] args) {

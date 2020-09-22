@@ -4,7 +4,6 @@ import clepto.bukkit.menu.Guis
 import clepto.humanize.TimeFormatter
 import museum.App
 import museum.museum.Museum
-import museum.player.User
 import museum.util.LevelSystem
 import org.bukkit.Statistic
 import org.bukkit.entity.Player
@@ -19,7 +18,7 @@ def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
 
 Guis.register 'main', { player ->
 
-    User user = App.app.getUser((Player) player)
+    def user = App.app.getUser((Player) player)
 
     title 'Главное меню'
     layout 'FH-SMT-JS'

@@ -79,6 +79,11 @@ register 'menu', {
     """
 }
 
+register 'visitorMenu', {
+    item WOOD_DOOR
+    text '§6Посмотреть музеи'
+}
+
 register 'goback', {
     item BARRIER
     text '§cВернуться'

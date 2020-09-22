@@ -1,6 +1,6 @@
 package museum.config.gui
 
-import clepto.bukkit.item.Items
+
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.prototype.Managers
@@ -18,9 +18,7 @@ Guis.register 'excavation', { player ->
     def user = App.app.getUser((Player) player)
 
     title 'Раскопки'
-
     layout 'OOOOOOOOX'
-
     button MuseumGuis.background
 
     Managers.excavation.toSorted { a, b -> a.requiredLevel <=> b.requiredLevel }.each { excavation ->
