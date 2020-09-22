@@ -26,5 +26,6 @@ public class UserInfo implements Unique {
 	private List<DonateType> donates;
     private List<BoosterInfo> localBoosters;
     private double income;
+    private long timePlayed;
 
 }

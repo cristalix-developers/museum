@@ -54,7 +54,7 @@ public class MuseumEventHandler implements Listener {
 
 				if (item.getType() == Material.EMERALD) {
 					val user = app.getUser(player);
-					user.setMoney(user.getMoney() + 200);
+					user.setMoney(user.getMoney() + 36);
 					MessageUtil.find("emerald").send(user);
 					item.setAmount(item.getAmount() - 1);
 				}

@@ -5,7 +5,6 @@ import clepto.humanize.TimeFormatter
 import museum.App
 import museum.museum.Museum
 import museum.util.LevelSystem
-import org.bukkit.Statistic
 import org.bukkit.entity.Player
 
 import java.text.DecimalFormat
@@ -33,7 +32,7 @@ Guis.register 'main', { player ->
         Денег: ${moneyFormatter.format(user.money)}
         Опыт: $user.experience
         Опыта осталось: ${LevelSystem.formatExperience(user.experience)}
-        Часов сыграно: ${user.player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000}
+        Часов сыграно: ${user.timePlayed / 3_600_000}
         Монет собрано: $user.pickedCoinsCount
         Кирка: $user.pickaxeType.name
         Раскопок: $user.excavationCount

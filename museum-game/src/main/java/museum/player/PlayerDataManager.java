@@ -133,8 +133,11 @@ public class PlayerDataManager implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e) {
-		val player = (CraftPlayer) e.getPlayer();
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		val player = (CraftPlayer) event.getPlayer();
+
+		player.setWalkSpeed(.33F);
+
 		timeBar.onJoin(player.getUniqueId());
 		val user = userMap.get(player.getUniqueId());
 
@@ -142,27 +145,28 @@ public class PlayerDataManager implements Listener {
 		user.setPlayer(player);
 
 		player.addPotionEffect(NIGHT_VISION);
-		player.setWalkSpeed(.33F);
 		Bukkit.getOnlinePlayers().forEach(current -> player.hidePlayer(app, current)); // Скрытие игроков
 		player.setGameMode(GameMode.ADVENTURE);
 		user.setState(user.getState()); // Загрузка музея
 
 		B.postpone(2, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
 
-		e.setJoinMessage(null);
+		event.setJoinMessage(null);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerLogin(PlayerLoginEvent e) {
-		val player = e.getPlayer();
-		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
+	public void onPlayerLogin(PlayerLoginEvent event) {
+		val player = event.getPlayer();
+		if (event.getResult() != PlayerLoginEvent.Result.ALLOWED)
 			userMap.remove(player.getUniqueId());
 	}
 
 	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent e) {
-		timeBar.onQuit(e.getPlayer().getUniqueId());
-		e.setQuitMessage(null);
+	public void onPlayerQuit(PlayerQuitEvent event) {
+		val user = userMap.get(event.getPlayer().getUniqueId());
+		user.setTimePlayed(user.getTimePlayed() + user.getEnterTime());
+		timeBar.onQuit(event.getPlayer().getUniqueId());
+		event.setQuitMessage(null);
 	}
 
 	public double calcMultiplier(UUID user, BoosterType type) {

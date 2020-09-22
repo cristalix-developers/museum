@@ -12,10 +12,10 @@ import java.util.function.Supplier;
 
 public class MultiTimeBar {
 
-	private Supplier<List<MultiBarInstance>> supplier;
-	private Supplier<String> ifEmpty;
-	private CriTimeBar bar;
-	private AtomicInteger currentInt = new AtomicInteger(0);
+	private final Supplier<List<MultiBarInstance>> supplier;
+	private final Supplier<String> ifEmpty;
+	private final CriTimeBar bar;
+	private final AtomicInteger currentInt = new AtomicInteger(0);
 	private MultiBarInstance current;
 
 	public MultiTimeBar(Supplier<List<MultiBarInstance>> itemList, long reloadTime, TimeUnit reloadTimeUnit, Supplier<String> ifEmpty) {
@@ -69,7 +69,7 @@ public class MultiTimeBar {
 		this.current = list.get(j);
 	}
 
-	public static interface MultiBarInstance {
+	public interface MultiBarInstance {
 
 		double getPercentsOfFullTime();
 

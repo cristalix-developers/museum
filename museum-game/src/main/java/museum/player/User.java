@@ -51,8 +51,10 @@ public class User implements PlayerWrapper {
 	private Location lastLocation;
 	private State state;
 	private Set<Coin> coins = new HashSet<>();
+	private long enterTime;
 
 	public User(UserInfo info) {
+		this.enterTime = System.currentTimeMillis();
 		this.info = info;
 
 		this.skeletons.importInfos(info.getSkeletonInfos());
