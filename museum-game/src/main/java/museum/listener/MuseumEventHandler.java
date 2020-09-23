@@ -41,9 +41,7 @@ public class MuseumEventHandler implements Listener {
 			return;
 
 		val type = itemStack.getType();
-		if (type == Material.PAPER)
-			player.performCommand("gui main");
-		else if (type == Material.WOOD_DOOR)
+		if (type == Material.WOOD_DOOR)
 			player.performCommand("gui visitor");
 		else if (type == Material.SADDLE)
 			player.performCommand("home");

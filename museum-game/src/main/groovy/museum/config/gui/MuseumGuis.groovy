@@ -4,11 +4,14 @@ import clepto.bukkit.item.ItemBuilder
 import clepto.bukkit.menu.Gui
 import clepto.bukkit.menu.Guis
 
+import java.text.DecimalFormat
+
 import static org.bukkit.Material.BARRIER
-import static org.bukkit.Material.CLAY_BALL
 import static org.bukkit.Material.STAINED_GLASS_PANE
 
 class MuseumGuis {
+
+    static DecimalFormat moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
 
     static Closure backgroundIcon = {
         ItemBuilder builder = (ItemBuilder) delegate

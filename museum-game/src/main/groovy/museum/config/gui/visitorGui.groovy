@@ -1,40 +1,39 @@
 package museum.config.gui
 
 
-import clepto.bukkit.menu.Guis
-import museum.App
 import museum.museum.Museum
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
-import java.text.DecimalFormat
+import static clepto.bukkit.menu.Guis.register
 
-def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
+import static museum.App.getApp
+import static museum.config.gui.MuseumGuis.moneyFormatter
 
-Guis.register 'visitor', { player ->
-    def visitor = App.app.getUser((Player) player)
+register 'visitor', { player ->
+    def visitor = app.getUser((Player) player)
 
     title 'Посещение других музеев'
 
     layout """
-    -OOOOOOO-
-    -OOOOOOO-
-    -OOOOOOO-
-    -OOOOOOO-
-    -OOOOOOO-
+        -OOOOOOO-
+        -OOOOOOO-
+        -OOOOOOO-
+        -OOOOOOO-
+        -OOOOOOO-
     """
 
     button MuseumGuis.background
-    App.getApp().users.forEach(user -> {
-        if (user == visitor)
+    app.users.each {
+        if (it == visitor)
             return
-        def state = user.state
-        if (state == null || !(state instanceof Museum))
+        def state = it.state
+        if (!(state instanceof Museum))
             return
         def museum = ((Museum) state)
         if (visitor.state == museum || museum.getOwner() == visitor)
             return
-        int fragments = user.skeletons.stream().mapToInt(s -> s.unlockedFragments.size()).sum().intValue()
+        int fragments = it.skeletons.stream().mapToInt(s -> s.unlockedFragments.size()).sum().intValue()
         double price = fragments * 3.33f
         button 'O' icon {
             item Material.WOOD_DOOR
@@ -44,7 +43,7 @@ Guis.register 'visitor', { player ->
             Фрагментов:  §b$fragments
             """
         } leftClick {
-            performCommand("travel " + museum.owner.name + " " + price)
+            performCommand "travel $museum.owner.name $price"
         }
-    })
+    }
 }

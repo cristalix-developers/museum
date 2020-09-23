@@ -2,6 +2,7 @@ package museum;
 
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
+import clepto.bukkit.behaviour.BehaviourListener;
 import clepto.bukkit.gui.GuiEvents;
 import clepto.bukkit.gui.Guis;
 import clepto.cristalix.mapservice.WorldMeta;
@@ -146,7 +147,8 @@ public final class App extends JavaPlugin {
 				new PassiveEventBlocker(),
 				new MuseumEventHandler(this),
 				new GuiEvents(),
-				new BlockClickHandler()
+				new BlockClickHandler(),
+				new BehaviourListener()
 		);
 
 		new WorkerHandler(this);
