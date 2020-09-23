@@ -79,7 +79,7 @@ register 'menu', {
     """
 }
 
-register 'visitorMenu', {
+register 'visitor-menu', {
     item WOOD_DOOR
     text '§6Посмотреть музеи'
 }

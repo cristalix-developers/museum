@@ -67,7 +67,7 @@ Guis.register 'main', { player ->
 
     button 'M' icon {
         item CLAY_BALL
-        nbt([other: 'guild_bank'])
+        nbt.other = 'guild_bank'
         def museum = (Museum) user.state
         text """
         &bМузей
