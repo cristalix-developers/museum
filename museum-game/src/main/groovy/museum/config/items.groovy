@@ -89,16 +89,6 @@ register 'goback', {
     text '§cВернуться'
 }
 
-register 'emerald-item', {
-    item EMERALD
-    text """
-        §aДрагоценный камень §6+36\$
-
-        Иногда его можно найти
-        на раскопках, стоит не много.
-    """
-}
-
 register 'subject-change-color', {
     item MILK_BUCKET
     text """
@@ -111,7 +101,7 @@ register 'subject-change-color', {
 
 register 'subject-special', {
     item CLAY_BALL
-    nbt([other: 'settings'])
+    nbt.other = 'settings'
     text """
         §bНастроить
 
@@ -121,7 +111,7 @@ register 'subject-special', {
 
 register 'subject-destroy', {
     item CLAY_BALL
-    nbt([other: 'guild_shop'])
+    nbt.other = 'guild_shop'
     text """
         §bВ инвентарь!
 

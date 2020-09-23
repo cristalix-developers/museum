@@ -31,36 +31,6 @@ public class MuseumEventHandler implements Listener {
 	}
 
 	@EventHandler
-	public void onInteract(PlayerInteractEvent event) {
-		if (event.getHand() == EquipmentSlot.OFF_HAND || (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK))
-			return;
-		val player = event.getPlayer();
-		val itemStack = player.getInventory().getItemInMainHand();
-
-		if (itemStack == null || itemStack.getItemMeta() == null)
-			return;
-
-		val type = itemStack.getType();
-		if (type == Material.WOOD_DOOR)
-			player.performCommand("gui visitor");
-		else if (type == Material.SADDLE)
-			player.performCommand("home");
-		else {
-			player.getInventory().forEach(item -> {
-				if (item == null || item.getItemMeta() == null)
-					return;
-
-				if (item.getType() == Material.EMERALD) {
-					val user = app.getUser(player);
-					user.setMoney(user.getMoney() + 36);
-					MessageUtil.find("emerald").send(user);
-					item.setAmount(item.getAmount() - 1);
-				}
-			});
-		}
-	}
-
-	@EventHandler
 	public void onMove(PlayerMoveEvent event) {
 		val from = event.getFrom();
 		val to = event.getTo();

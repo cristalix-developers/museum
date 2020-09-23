@@ -1,6 +1,5 @@
 package museum.config.gui
 
-import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.museum.map.SkeletonSubjectPrototype
@@ -8,24 +7,23 @@ import museum.museum.subject.Allocation
 import museum.museum.subject.SkeletonSubject
 import museum.museum.subject.Subject
 import museum.museum.subject.skeleton.Skeleton
-import museum.player.User
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
 
-import static clepto.bukkit.item.Items.items
+import static clepto.bukkit.item.Items.*
 import static museum.museum.subject.Allocation.Action.*
 import static org.bukkit.Material.CLAY_BALL
 import static org.bukkit.Material.CONCRETE
 
-Items.register 'lockedSkeleton', {
+register 'lockedSkeleton', {
     item CLAY_BALL
     nbt.other = 'tochka'
     text.clear()
     text '§8???'
 }
 
-Items.register 'emptySkeleton', {
+register 'emptySkeleton', {
     item CLAY_BALL
     nbt.other = 'tochka'
     text """
@@ -34,23 +32,22 @@ Items.register 'emptySkeleton', {
     """
 }
 
-Items.register 'tooBigSkeleton', {
+register 'tooBigSkeleton', {
     nbt.color = 0x505050
     text '&7Этот скелет слишком большой для этой витрины'
 }
 
-Items.register 'alreadyPlacedSkeleton', {
+register 'alreadyPlacedSkeleton', {
     text '&eНажмите, чтобы убрать скелет со стенда'
 }
 
-Items.register 'availableSkeleton', {
+register 'availableSkeleton', {
     nbt.color = 0xAAAAAA
     text '&aНажмите, чтобы поставить скелет на стенд'
 }
 
 Guis.register 'manipulator', { player ->
-
-    User user = App.app.getUser((Player) player)
+    def user = App.app.getUser((Player) player)
     def abstractSubject = (Subject) context
 
     title abstractSubject.prototype.title

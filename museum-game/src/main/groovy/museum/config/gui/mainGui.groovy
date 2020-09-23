@@ -1,6 +1,5 @@
 package museum.config.gui
 
-
 import clepto.bukkit.menu.Guis
 import clepto.humanize.TimeFormatter
 import museum.App
@@ -11,18 +10,12 @@ import org.bukkit.entity.Player
 import java.text.DecimalFormat
 import java.time.Duration
 
-import static clepto.bukkit.behaviour.Behaviour.when
 import static org.bukkit.Material.*
 
 def formatter = TimeFormatter.builder() accuracy 500 build()
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
 
-when PAPER used {
-    Guis.open player, 'main', null
-}
-
 Guis.register 'main', { player ->
-
     def user = App.app.getUser((Player) player)
 
     title 'Главное меню'

@@ -14,7 +14,6 @@ import static org.bukkit.Material.CLAY_BALL
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
 
 Guis.register 'excavation', { player ->
-
     def user = App.app.getUser((Player) player)
 
     title 'Раскопки'
