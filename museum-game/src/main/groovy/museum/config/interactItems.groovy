@@ -57,7 +57,7 @@ on PlayerInteractEvent, {
         if (!item)
             continue
         def tag = CraftItemStack.asNMSCopy(item).getTag()
-        if (!tag || !tag.getInt('cost'))
+        if (!tag || !tag.hasKeyOfType('cost', 99))
             continue
         def cost = tag.getInt('cost')
         item.amount = item.amount - 1

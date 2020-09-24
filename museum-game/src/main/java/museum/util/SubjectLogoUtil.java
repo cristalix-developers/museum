@@ -31,7 +31,7 @@ public class SubjectLogoUtil {
 		val nmsCopy = CraftItemStack.asNMSCopy(itemStack);
 		val tag = nmsCopy.getTag();
 
-		if (tag == null || !tag.hasKey("subject-uuid"))
+		if (tag == null || !tag.hasKeyOfType("subject-uuid", 8))
 			return null;
 
 		return user.getSubject(UUID.fromString(tag.getString("subject-uuid")));
