@@ -18,6 +18,7 @@ Items.register 'pickaxe-template', {
             'minecraft:concrete_powder',
             'minecraft:snow'
     ]
+    nbt.HideFlags = 63
 }
 
 Items.register 'default', {

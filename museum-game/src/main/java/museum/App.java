@@ -128,8 +128,6 @@ public final class App extends JavaPlugin {
 					Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", throwable);
 				}
 			}
-			Class<?> museumItems = Class.forName("museum.config.items");
-			museumItems.getMethod("run").invoke(museumItems.newInstance());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

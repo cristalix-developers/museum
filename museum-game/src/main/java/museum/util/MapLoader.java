@@ -31,7 +31,10 @@ public class MapLoader {
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
-		app.getMap().getWorld().setGameRuleValue("mobGriefing", "false");
+		val world = app.getMap().getWorld();
+		world.setGameRuleValue("mobGriefing", "false");
+		world.setGameRuleValue("doTileDrops", "false");
+
 		// Инжектим блоки в чанки (patched paper)
 		app.getNMSWorld().chunkInterceptor = (chunk, flags, receiver) -> {
 			val user = app.getUser(receiver.getUniqueID());

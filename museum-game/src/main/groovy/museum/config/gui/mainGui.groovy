@@ -60,7 +60,7 @@ Guis.register 'main', { player ->
         Приобретите новую кирку,
         и разгодайте тайны песка...
         """
-        nbt.flags = 63
+        nbt.HideFlags = 63
     } leftClick {
         performCommand('gui pickaxe')
     }
