@@ -1,10 +1,10 @@
 package museum.player.prepare;
 
 import clepto.cristalix.Scripts;
-import ru.cristalix.core.display.IDisplayService;
-import ru.cristalix.core.display.messages.JavaScriptMessage;
 import museum.App;
 import museum.player.User;
+import ru.cristalix.core.display.IDisplayService;
+import ru.cristalix.core.display.messages.JavaScriptMessage;
 
 import java.io.File;
 

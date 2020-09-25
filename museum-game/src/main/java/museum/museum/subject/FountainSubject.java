@@ -8,8 +8,6 @@ import museum.museum.map.SubjectPrototype;
 import museum.player.User;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.entity.FallingBlock;
 import ru.cristalix.core.util.UtilV3;
 
 /**
@@ -51,7 +49,7 @@ public class FountainSubject extends Subject {
 			entity.id = (int) (10_000_000 * Math.random()) + 1_000;
 			entity.ticksLived = 1;
 			connection.sendPacket(new PacketPlayOutSpawnEntity(entity, 70));
-			connection.sendPacket(new PacketPlayOutEntityMetadata(entity.id, entity.getDataWatcher(), false));
+			connection.sendPacket(new PacketPlayOutEntityMetadata(entity.id, entity.getDataWatcher(), true));
 			connection.sendPacket(new PacketPlayOutEntityVelocity(entity.id, 0, .4, 0));
 		}
 	}

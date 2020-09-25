@@ -4,16 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import museum.App;
 import museum.museum.Museum;
-import museum.util.MessageUtil;
-import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.EquipmentSlot;
 
 /**
  * @author func 08.06.2020

@@ -1,11 +1,14 @@
 package museum.player.pickaxe;
 
 import lombok.val;
-import museum.util.ChunkWriter;
-import net.minecraft.server.v1_12_R1.*;
 import museum.App;
 import museum.excavation.Excavation;
 import museum.player.User;
+import museum.util.ChunkWriter;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.PacketPlayOutBlockBreakAnimation;
+import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.util.Vector;
 
 import java.util.List;

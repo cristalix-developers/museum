@@ -1,13 +1,10 @@
 package museum.visitor;
 
-import lombok.val;
-import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.EntityTypes;
+import net.minecraft.server.v1_12_R1.EntityVillager;
+import net.minecraft.server.v1_12_R1.MinecraftKey;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
-
-import java.util.function.Function;
 
 public class PatchedEntity<T extends EntityVillager> {
 

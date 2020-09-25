@@ -1,12 +1,10 @@
 package museum.config.gui
 
-
 import museum.museum.Museum
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
 import static clepto.bukkit.menu.Guis.register
-
 import static museum.App.getApp
 import static museum.config.gui.MuseumGuis.moneyFormatter
 

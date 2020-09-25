@@ -8,7 +8,6 @@ import lombok.experimental.Delegate;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.data.*;
-import museum.museum.Coin;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectPrototype;
@@ -30,8 +29,6 @@ import org.spigotmc.AsyncCatcher;
 import ru.cristalix.core.util.UtilNetty;
 import ru.cristalix.core.util.UtilV3;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Data

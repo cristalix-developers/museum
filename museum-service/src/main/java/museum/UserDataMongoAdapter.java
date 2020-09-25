@@ -5,7 +5,6 @@ import museum.data.UserInfo;
 import museum.packages.TopPackage;
 import museum.tops.TopEntry;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 

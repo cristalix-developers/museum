@@ -11,7 +11,8 @@ import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
 
-import static clepto.bukkit.item.Items.*
+import static clepto.bukkit.item.Items.items
+import static clepto.bukkit.item.Items.register
 import static museum.museum.subject.Allocation.Action.*
 import static org.bukkit.Material.CLAY_BALL
 import static org.bukkit.Material.CONCRETE
