@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 public class ConfigurationsPackage extends MuseumPackage {
 
 	// request
-	private final String configData, guisData, itemsData;
+	private final String configData, itemsData;
 
 	// no response
 

@@ -1,8 +1,6 @@
 package museum.packages;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import museum.data.UserInfo;
 import museum.tops.TopEntry;
 
@@ -20,10 +18,10 @@ public class TopPackage extends MuseumPackage {
     // response
     private List<TopEntry<UserInfo, Object>> entries;
 
-    public static enum TopType {
+    public enum TopType {
 
         MONEY,
-        SALARY,
+        INCOME,
         EXPERIENCE,;
 
     }

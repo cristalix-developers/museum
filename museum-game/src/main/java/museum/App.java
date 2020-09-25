@@ -50,6 +50,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -206,7 +207,7 @@ public final class App extends JavaPlugin {
 	private void requestConfigurations() {
 		try {
 			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage()).get(3L, TimeUnit.SECONDS);
-			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getGuisData(), pckg.getItemsData()));
+			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getItemsData()));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.out.println("We can't receive museum configurations! Retry in 3sec");
@@ -222,9 +223,6 @@ public final class App extends JavaPlugin {
 		YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
 		itemsConfig.getKeys(false)
 				.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
-
-		// Загрузка всех инвентарей
-		Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));
 
 		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 	}

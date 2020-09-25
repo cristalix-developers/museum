@@ -3,6 +3,8 @@ package museum;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import museum.museum.Museum;
+import museum.museum.map.FountainPrototype;
+import museum.museum.subject.FountainSubject;
 import museum.museum.subject.Subject;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -47,10 +49,12 @@ public class TickTimerHandler extends BukkitRunnable {
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			val user = app.getUser(player.getUniqueId());
-
 			for (Museum museum : user.getMuseums()) {
 				for (Subject subject : museum.getSubjects()) {
-					if (subject instanceof CollectorSubject) ((CollectorSubject) subject).move(time);
+					if (subject instanceof CollectorSubject)
+						((CollectorSubject) subject).move(time);
+					else if (subject instanceof FountainSubject)
+						((FountainSubject) subject).throwWater(user);
 				}
 			}
 

@@ -16,29 +16,7 @@ public class UserDataMongoAdapter extends MongoAdapter<UserInfo> {
     }
 
     public CompletableFuture<List<TopEntry<UserInfo, Object>>> getTop(TopPackage.TopType topType, int limit) {
-        switch (topType) {
-            case MONEY:
-                return getMoneyTop(limit);
-            case SALARY:
-                return getSalaryTop(limit);
-            case EXPERIENCE:
-                return getExperienceTop(limit);
-            default:
-                System.out.println("We don't know type of this top: " + topType);
-                return CompletableFuture.completedFuture(Collections.emptyList());
-        }
-    }
-
-    public CompletableFuture<List<TopEntry<UserInfo, Object>>> getSalaryTop(int limit) {
-        return makeRatingByField("income", limit);
-    }
-
-    public CompletableFuture<List<TopEntry<UserInfo, Object>>> getMoneyTop(int limit) {
-        return makeRatingByField("money", limit);
-    }
-    
-    public CompletableFuture<List<TopEntry<UserInfo, Object>>> getExperienceTop(int limit) {
-        return makeRatingByField("experience", limit);
+        return makeRatingByField(topType.name().toLowerCase(), limit);
     }
 
 }

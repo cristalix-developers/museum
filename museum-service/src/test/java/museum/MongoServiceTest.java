@@ -48,12 +48,12 @@ public class MongoServiceTest {
 
     @Test
     void testSalaryTop() throws Exception {
-        testTop(TopPackage.TopType.SALARY, Comparator.comparingDouble(UserInfo::getIncome).reversed(), 50, 50);
+        testTop(TopPackage.TopType.INCOME, Comparator.comparingDouble(UserInfo::getIncome).reversed(), 50, 50);
     }
 
     @Test
     void testSalaryTopLimit() throws Exception {
-        testTop(TopPackage.TopType.SALARY, Comparator.comparingDouble(UserInfo::getIncome).reversed(), 50, 15);
+        testTop(TopPackage.TopType.INCOME, Comparator.comparingDouble(UserInfo::getIncome).reversed(), 50, 15);
     }
 
     @Test

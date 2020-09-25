@@ -50,11 +50,8 @@ public class SkeletonPrototype implements Prototype, Piece {
 						pieceOffset.setRot(stand.getLocation().getYaw());
 						fragment.getChildrenMap().put(piece, pieceOffset);
 					}
-
 					this.childrenMap.put(fragment, V4.fromVector(fragmentOffset.toVector().subtract(worldOrigin.toVector())));
-
 				});
-
 	}
 
 	public Collection<Fragment> getFragments() {

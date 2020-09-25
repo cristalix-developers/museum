@@ -14,6 +14,6 @@ public class RequestConfigurationsPackage extends MuseumPackage {
     // no request
 
     // no response
-    private String configData, guisData, itemsData;
+    private String configData, itemsData;
 
 }
