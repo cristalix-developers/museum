@@ -53,7 +53,6 @@ public class FountainSubject extends Subject {
 			connection.sendPacket(new PacketPlayOutSpawnEntity(entity, 70));
 			connection.sendPacket(new PacketPlayOutEntityMetadata(entity.id, entity.getDataWatcher(), false));
 			connection.sendPacket(new PacketPlayOutEntityVelocity(entity.id, 0, .4, 0));
-			System.out.println(entity.id + " " + entity.locX + " " + entity.locY + " " + entity.locZ);
 		}
 	}
 }

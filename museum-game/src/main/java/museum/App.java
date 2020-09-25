@@ -24,6 +24,7 @@ import museum.player.User;
 import museum.prototype.Managers;
 import museum.ticker.detail.FountainHandler;
 import museum.ticker.detail.WayParticleHandler;
+import museum.ticker.top.TopManager;
 import museum.util.MapLoader;
 import museum.util.MuseumChatService;
 import museum.visitor.VisitorHandler;
@@ -50,21 +51,22 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-@Getter
 public final class App extends JavaPlugin {
 	@Getter
 	private static App app;
 
 	private PlayerDataManager playerDataManager;
+	@Getter
 	private ClientSocket clientSocket;
+	@Getter
 	@Setter
 	private WorldMeta map;
 	private YamlConfiguration configuration;
 
+	@Getter
 	private Shop shop;
 
 	@Override
@@ -155,7 +157,8 @@ public final class App extends JavaPlugin {
 		// Обработка каждого тика
 		new TickTimerHandler(this, Arrays.asList(
 				new FountainHandler(this),
-				new WayParticleHandler(this)
+				new WayParticleHandler(this),
+				new TopManager(this)
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
 		VisitorHandler.init(this, 1);
@@ -189,7 +192,7 @@ public final class App extends JavaPlugin {
 	}
 
 	public CompletableFuture<UserTransactionPackage.TransactionResponse> processDonate(UUID user, DonateType donate) {
-		return getClientSocket().writeAndAwaitResponse(new UserTransactionPackage(user, donate, null)).thenApply(UserTransactionPackage::getResponse);
+		return clientSocket.writeAndAwaitResponse(new UserTransactionPackage(user, donate, null)).thenApply(UserTransactionPackage::getResponse);
 	}
 
 	private InputStreamReader reader(String base64) {

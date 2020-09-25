@@ -1,6 +1,7 @@
 package museum.command;
 
 import clepto.bukkit.B;
+import lombok.SneakyThrows;
 import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
@@ -16,6 +17,7 @@ import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.packages.TopPackage;
 import museum.player.State;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;

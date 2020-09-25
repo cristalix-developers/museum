@@ -31,7 +31,7 @@ public class MapLoader {
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
-		val world = app.getMap().getWorld();
+		val world = app.getWorld();
 		world.setGameRuleValue("mobGriefing", "false");
 		world.setGameRuleValue("doTileDrops", "false");
 
