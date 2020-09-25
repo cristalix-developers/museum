@@ -41,11 +41,11 @@ public class MuseumEventHandler implements Listener {
 		val player = event.getPlayer();
 		val user = app.getUser(player.getUniqueId());
 
-		if (!(user.getState() instanceof Museum) || user.getCoins() == null)
+		if (!(user.getState() instanceof Museum))
 			return;
 
 		// Попытка скушать монетки
-		user.getCoins().removeIf(coin -> coin.pickUp(user, to, 1.7, player.getEntityId()));
+		((Museum) user.getState()).getCoins().removeIf(coin -> coin.pickUp(user, to, 1.7, player.getEntityId()));
 	}
 
 }

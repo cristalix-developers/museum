@@ -56,16 +56,15 @@ public class TickTimerHandler extends BukkitRunnable {
 					else if (subject instanceof FountainSubject)
 						((FountainSubject) subject).throwWater(user);
 				}
+				// Если монеты устарели, что бы не копились на клиенте, удаляю
+				museum.getCoins().removeIf(coin -> {
+					if (coin.getTimestamp() + Coin.SECONDS_LIVE * 1000 < time) {
+						coin.remove(user.getConnection());
+						return true;
+					}
+					return false;
+				});
 			}
-
-			// Если монеты устарели, что бы не копились на клиенте, удаляю
-			user.getCoins().removeIf(coin -> {
-				if (coin.getTimestamp() + Coin.SECONDS_LIVE * 1000 < time) {
-					coin.remove(user.getConnection());
-					return true;
-				}
-				return false;
-			});
 		}
 	}
 }

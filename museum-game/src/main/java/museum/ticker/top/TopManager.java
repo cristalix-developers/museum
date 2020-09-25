@@ -1,13 +1,18 @@
 package museum.ticker.top;
 
 import com.google.common.collect.Maps;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import lombok.RequiredArgsConstructor;
 import museum.App;
 import museum.data.UserInfo;
 import museum.packages.TopPackage;
 import museum.ticker.Ticked;
 import museum.tops.TopEntry;
+import net.minecraft.server.v1_12_R1.PacketDataSerializer;
+import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
 import org.bukkit.Bukkit;
+import ru.cristalix.core.util.UtilNetty;
 
 import java.util.List;
 import java.util.Map;
@@ -43,6 +48,8 @@ public class TopManager implements Ticked {
 	}
 
 	public void sendTops() {
-		// todo: реализовать отправку игрокам топов
+		//ByteBuf buffer = Unpooled.buffer();
+		//UtilNetty.writeVarInt(buffer, 475284);
+		//player.getHandle().playerConnection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
 	}
 }

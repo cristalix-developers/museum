@@ -55,6 +55,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	private final CraftWorld world;
 	private double income;
 	private String title;
+	private List<Coin> coins = new ArrayList<>();
 
 	public Museum(MuseumPrototype prototype, MuseumInfo info, User owner) {
 		super(prototype, info, owner);
@@ -120,7 +121,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 		user.sendPayload("museumsubjects", payload);
 		user.sendAnime();
-		user.setCoins(ConcurrentHashMap.newKeySet());
 
 		val player = user.getPlayer();
 		val inventory = player.getInventory();
@@ -162,8 +162,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		user.setLastLocation(user.getLocation());
 		user.setLastPosition(UtilV3.fromVector(user.getLocation().toVector()));
 
-		// ToDo: Разве коины не должны быть частью музея, а не юзера?
-		Set<Coin> coins = user.getCoins();
 		coins.forEach(coin -> coin.remove(user.getConnection()));
 		coins.clear();
 	}

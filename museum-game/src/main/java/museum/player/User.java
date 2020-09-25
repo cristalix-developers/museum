@@ -50,7 +50,6 @@ public class User implements PlayerWrapper {
 	private PlayerConnection connection;
 	private Location lastLocation;
 	private State state;
-	private Set<Coin> coins = new HashSet<>();
 	private long enterTime;
 
 	public User(UserInfo info) {
