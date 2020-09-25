@@ -3,13 +3,9 @@ package museum.visitor;
 import clepto.cristalix.mapservice.MapServiceException;
 import com.google.common.collect.Maps;
 import lombok.Getter;
-import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
-import museum.ticker.Ticked;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;

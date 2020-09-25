@@ -1,6 +1,8 @@
 package museum.util;
 
 import lombok.val;
+import museum.App;
+import museum.packages.UserChatPackage;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -19,8 +21,6 @@ import ru.cristalix.core.chat.ChatContext;
 import ru.cristalix.core.chat.ChatService;
 import ru.cristalix.core.formatting.Formatting;
 import ru.cristalix.core.permissions.IPermissionService;
-import museum.App;
-import museum.packages.UserChatPackage;
 
 import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;

@@ -1,7 +1,8 @@
 package museum.visitor;
 
 import lombok.val;
-import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.NavigationAbstract;
+import net.minecraft.server.v1_12_R1.PathfinderGoal;
 
 /**
  * @author func 16.09.2020

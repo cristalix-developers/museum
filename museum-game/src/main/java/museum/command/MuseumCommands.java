@@ -1,7 +1,6 @@
 package museum.command;
 
 import clepto.bukkit.B;
-import lombok.SneakyThrows;
 import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
@@ -17,7 +16,6 @@ import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
-import museum.packages.TopPackage;
 import museum.player.State;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;
@@ -30,7 +28,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.core.formatting.Color;
 
 import java.util.Collection;

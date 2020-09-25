@@ -1,6 +1,8 @@
 package museum.packages;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 import museum.data.UserInfo;
 import museum.tops.TopEntry;
 

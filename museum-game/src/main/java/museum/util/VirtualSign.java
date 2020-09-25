@@ -6,14 +6,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import museum.App;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.lib.Preconditions;
-import museum.App;
 
 import java.util.List;
 import java.util.Map;

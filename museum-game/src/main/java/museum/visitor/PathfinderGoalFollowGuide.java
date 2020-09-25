@@ -1,13 +1,10 @@
 package museum.visitor;
 
 import lombok.val;
-import museum.App;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.event.entity.EntityTeleportEvent;
-
-import java.util.UUID;
 
 public class PathfinderGoalFollowGuide extends PathfinderGoal {
 

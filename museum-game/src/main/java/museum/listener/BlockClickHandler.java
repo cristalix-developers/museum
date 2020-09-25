@@ -10,8 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import museum.App;
-import museum.util.MessageUtil;
 
 /**
  * @author func 14.07.2020

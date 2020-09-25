@@ -1,7 +1,5 @@
 package museum;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.mongodb.async.SingleResultCallback;
 import com.mongodb.async.client.MongoClient;
 import com.mongodb.async.client.MongoClients;
@@ -22,6 +20,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 public class MongoServiceTest {
 

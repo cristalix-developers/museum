@@ -1,8 +1,8 @@
 package museum.player.pickaxe;
 
+import museum.player.User;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.EnumDirection;
-import museum.player.User;
 
 import java.util.Arrays;
 import java.util.List;

@@ -2,19 +2,17 @@ package museum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import museum.client.ClientSocket;
+import museum.museum.Coin;
 import museum.museum.Museum;
-import museum.museum.map.FountainPrototype;
+import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.FountainSubject;
 import museum.museum.subject.Subject;
+import museum.player.PlayerDataManager;
+import museum.ticker.Ticked;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import museum.client.ClientSocket;
-import museum.museum.Coin;
-import museum.museum.map.SubjectType;
-import museum.museum.subject.CollectorSubject;
-import museum.player.PlayerDataManager;
-import museum.ticker.Ticked;
 
 import java.util.List;
 
