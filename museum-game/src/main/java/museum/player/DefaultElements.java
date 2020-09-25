@@ -27,6 +27,7 @@ public class DefaultElements {
 				userId,
 				0,
 				1000.0,
+				0L,
 				PickaxeType.DEFAULT,
 				Collections.singletonList(startMuseum),
 				new ArrayList<>(),
@@ -36,7 +37,6 @@ public class DefaultElements {
 				null,
 				new ArrayList<>(),
 				new ArrayList<>(),
-				0,
 				0
 		);
 

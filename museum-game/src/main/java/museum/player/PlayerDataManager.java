@@ -82,7 +82,9 @@ public class PlayerDataManager implements Listener {
 			val data = userMap.remove(event.getUuid());
 			if (data == null)
 				return;
-			client.write(new SaveUserPackage(event.getUuid(), data.generateUserInfo()));
+			val info = data.generateUserInfo();
+			info.setTimePlayed(info.getTimePlayed() + System.currentTimeMillis() - data.getEnterTime());
+			client.write(new SaveUserPackage(event.getUuid(), info));
 		}, 100);
 		client.registerHandler(GlobalBoostersPackage.class, pckg -> globalBoosters = pckg.getBoosters());
 		client.registerHandler(ExtraDepositUserPackage.class, pckg -> {
@@ -149,22 +151,19 @@ public class PlayerDataManager implements Listener {
 		player.setGameMode(GameMode.ADVENTURE);
 		user.setState(user.getState()); // Загрузка музея
 
-		B.postpone(2, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
+		B.postpone(1, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
 
 		event.setJoinMessage(null);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLogin(PlayerLoginEvent event) {
-		val player = event.getPlayer();
 		if (event.getResult() != PlayerLoginEvent.Result.ALLOWED)
-			userMap.remove(player.getUniqueId());
+			userMap.remove(event.getPlayer().getUniqueId());
 	}
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
-		val user = userMap.get(event.getPlayer().getUniqueId());
-		user.setTimePlayed(user.getTimePlayed() + user.getEnterTime());
 		timeBar.onQuit(event.getPlayer().getUniqueId());
 		event.setQuitMessage(null);
 	}

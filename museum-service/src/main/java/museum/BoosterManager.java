@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class BoosterManager implements Subservice {
 
 	private final Map<BoosterType, BoosterInfo> globalBoosters;
-	private Map<UUID, Set<UUID>> thanksMap = new ConcurrentHashMap<>();
+	private final Map<UUID, Set<UUID>> thanksMap = new ConcurrentHashMap<>();
 
 	public BoosterManager() {
 		try {

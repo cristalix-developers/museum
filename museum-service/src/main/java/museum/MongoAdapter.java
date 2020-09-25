@@ -44,7 +44,8 @@ public class MongoAdapter<T extends Unique> {
 				try {
 					Thread.sleep(2000L);
 					connected.set(true);
-				} catch(Exception ignored) {}
+				} catch (Exception ignored) {
+				}
 			}).start();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -57,9 +58,15 @@ public class MongoAdapter<T extends Unique> {
 
 	public CompletableFuture<T> find(UUID uuid) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-
 		data.find(session, Filters.eq("uuid", uuid.toString()))
-				.first((result, throwable) -> future.complete(readDocument(result)));
+				.first((result, throwable) -> {
+					try {
+						System.out.println(result);
+						future.complete(readDocument(result));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
 		return future;
 	}
 

@@ -120,6 +120,7 @@ public class MongoServiceTest {
         return new UserInfo(UUID.randomUUID(),
                 RANDOM.nextInt(1000000),
                 RANDOM.nextInt(1000000),
+                RANDOM.nextInt(1000000),
                 PickaxeType.DEFAULT,
                 Collections.emptyList(),
                 Collections.emptyList(),
@@ -129,8 +130,7 @@ public class MongoServiceTest {
                 new V3(0, 0, 0),
                 Collections.emptyList(),
                 Collections.emptyList(),
-                RANDOM.nextInt(1000000),
-                0
+                RANDOM.nextInt(1000000)
         );
     }
 }

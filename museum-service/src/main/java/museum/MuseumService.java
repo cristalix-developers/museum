@@ -82,8 +82,7 @@ public class MuseumService {
 		registerHandler(UserInfoPackage.class, (channel, source, pckg) -> {
 			System.out.println("Received UserInfoPackage from " + source + " for " + pckg.getUuid().toString());
 
-			userData.find(pckg.getUuid())
-					.thenAccept(info -> {
+			userData.find(pckg.getUuid()).thenAccept(info -> {
 						pckg.setUserInfo(info);
                         answer(channel, pckg);
 					});
