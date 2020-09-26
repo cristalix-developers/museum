@@ -51,7 +51,7 @@ public class TickTimerHandler extends BukkitRunnable {
 				for (Subject subject : museum.getSubjects()) {
 					if (subject instanceof CollectorSubject)
 						((CollectorSubject) subject).move(time);
-					else if (subject instanceof FountainSubject)
+					else if (counter % 5 == 0 && subject instanceof FountainSubject)
 						((FountainSubject) subject).throwWater(user);
 				}
 				// Если монеты устарели, что бы не копились на клиенте, удаляю

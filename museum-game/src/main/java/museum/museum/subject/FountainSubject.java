@@ -7,7 +7,10 @@ import museum.museum.map.FountainPrototype;
 import museum.museum.map.SubjectPrototype;
 import museum.player.User;
 import net.minecraft.server.v1_12_R1.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import ru.cristalix.core.util.UtilV3;
 
 /**
@@ -18,19 +21,27 @@ public class FountainSubject extends Subject {
 
 	private final Color colour;
 	private final EntityFallingBlock entity;
+	private final PacketPlayOutSpawnEntity spawn;
+	private final PacketPlayOutEntityMetadata metadata;
+	private final PacketPlayOutEntityDestroy destroy;
 
+	@SuppressWarnings("deprecation")
 	public FountainSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
 		val acceptedPrototype = ((FountainPrototype) prototype);
 		this.colour = Color.AQUA;
-		val acceptedSource = acceptedPrototype.getSource().clone().subtract(prototype.getBox().getMin()).add(UtilV3.toVector(info.location));
-		val location = acceptedPrototype.getSource().clone().subtract(0, 1, 0);
-		System.out.println(location.getBlock().getType());
+		val label = acceptedPrototype.getSource();
 		val world = prototype.getBox().getWorld().getHandle();
+		val acceptedSource = label.clone().subtract(prototype.getBox().getCenter()).add(UtilV3.toVector(info.location));
+		val icon = label.clone().subtract(0, 1, 0).getBlock();
 		this.entity = new EntityFallingBlock(
-				world, acceptedSource.getX(), acceptedSource.getY(), acceptedSource.getZ(),
-				world.c(new BlockPosition(location.getX(), location.getY(), location.getZ()))
+				world, acceptedSource.getX() + .5, acceptedSource.getY() + 1, acceptedSource.getZ() + .5,
+				CraftMagicNumbers.getBlock(icon.getType()).fromLegacyData(icon.getData())
 		);
+		this.entity.id = -100000;
+		spawn = new PacketPlayOutSpawnEntity(entity, 70, Block.getCombinedId(entity.block));
+		metadata = new PacketPlayOutEntityMetadata(entity.id, entity.getDataWatcher(), true);
+		destroy = new PacketPlayOutEntityDestroy(-100000);
 	}
 
 	@Override
@@ -46,11 +57,15 @@ public class FountainSubject extends Subject {
 	public void throwWater(User user) {
 		if (user.getState() instanceof Museum) {
 			val connection = user.getConnection();
-			entity.id = (int) (10_000_000 * Math.random()) + 1_000;
+			entity.id = entity.id < -1000 ? ++entity.id : -100000;
 			entity.ticksLived = 1;
-			connection.sendPacket(new PacketPlayOutSpawnEntity(entity, 70));
-			connection.sendPacket(new PacketPlayOutEntityMetadata(entity.id, entity.getDataWatcher(), true));
-			connection.sendPacket(new PacketPlayOutEntityVelocity(entity.id, 0, .4, 0));
+			spawn.a = entity.id;
+			metadata.a = entity.id;
+			destroy.a[0] = entity.id - 5;
+			connection.sendPacket(spawn);
+			connection.sendPacket(metadata);
+			connection.sendPacket(new PacketPlayOutEntityVelocity(entity.id, Math.random() / 10 - .05, .6, Math.random() / 10 - .05));
+			connection.sendPacket(destroy);
 		}
 	}
 }
