@@ -2,16 +2,15 @@ package museum.ticker.detail;
 
 import clepto.bukkit.B;
 import lombok.AllArgsConstructor;
+import museum.App;
+import museum.ticker.Ticked;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.util.Vector;
-import museum.App;
-import museum.ticker.Ticked;
 
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -52,7 +51,7 @@ public class FountainHandler implements Ticked {
 	}
 
 	@AllArgsConstructor
-	class Fountain {
+	static class Fountain {
 		private final Location location;
 		private final Chunk[] chunks;
 		private final Vector vector;
@@ -61,6 +60,7 @@ public class FountainHandler implements Ticked {
 		public void spawnParticle() {
 			for (Chunk chunk : chunks) if (!chunk.isLoaded()) return;
 
+			@SuppressWarnings("deprecation")
 			FallingBlock particle = location.getWorld().spawnFallingBlock(location, Material.STAINED_GLASS, (byte) 3);
 			particle.setDropItem(false);
 			particle.setVelocity(vector.clone().add(new Vector(

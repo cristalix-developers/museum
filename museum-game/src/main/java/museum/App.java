@@ -2,8 +2,8 @@ package museum;
 
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
+import clepto.bukkit.behaviour.BehaviourListener;
 import clepto.bukkit.gui.GuiEvents;
-import clepto.bukkit.gui.Guis;
 import clepto.cristalix.mapservice.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
@@ -23,6 +23,7 @@ import museum.player.User;
 import museum.prototype.Managers;
 import museum.ticker.detail.FountainHandler;
 import museum.ticker.detail.WayParticleHandler;
+import museum.ticker.top.TopManager;
 import museum.util.MapLoader;
 import museum.util.MuseumChatService;
 import museum.visitor.VisitorHandler;
@@ -52,17 +53,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-@Getter
 public final class App extends JavaPlugin {
 	@Getter
 	private static App app;
 
 	private PlayerDataManager playerDataManager;
+	@Getter
 	private ClientSocket clientSocket;
+	@Getter
 	@Setter
 	private WorldMeta map;
 	private YamlConfiguration configuration;
 
+	@Getter
 	private Shop shop;
 
 	@Override
@@ -127,8 +130,6 @@ public final class App extends JavaPlugin {
 					Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", throwable);
 				}
 			}
-			Class<?> museumItems = Class.forName("museum.config.items");
-			museumItems.getMethod("run").invoke(museumItems.newInstance());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -146,7 +147,8 @@ public final class App extends JavaPlugin {
 				new PassiveEventBlocker(),
 				new MuseumEventHandler(this),
 				new GuiEvents(),
-				new BlockClickHandler()
+				new BlockClickHandler(),
+				new BehaviourListener()
 		);
 
 		new WorkerHandler(this);
@@ -154,7 +156,8 @@ public final class App extends JavaPlugin {
 		// Обработка каждого тика
 		new TickTimerHandler(this, Arrays.asList(
 				new FountainHandler(this),
-				new WayParticleHandler(this)
+				new WayParticleHandler(this),
+				new TopManager(this)
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
 		VisitorHandler.init(this, 1);
@@ -188,7 +191,7 @@ public final class App extends JavaPlugin {
 	}
 
 	public CompletableFuture<UserTransactionPackage.TransactionResponse> processDonate(UUID user, DonateType donate) {
-		return getClientSocket().writeAndAwaitResponse(new UserTransactionPackage(user, donate, null)).thenApply(UserTransactionPackage::getResponse);
+		return clientSocket.writeAndAwaitResponse(new UserTransactionPackage(user, donate, null)).thenApply(UserTransactionPackage::getResponse);
 	}
 
 	private InputStreamReader reader(String base64) {
@@ -206,7 +209,7 @@ public final class App extends JavaPlugin {
 	private void requestConfigurations() {
 		try {
 			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage()).get(3L, TimeUnit.SECONDS);
-			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getGuisData(), pckg.getItemsData()));
+			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getItemsData()));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.out.println("We can't receive museum configurations! Retry in 3sec");
@@ -222,9 +225,6 @@ public final class App extends JavaPlugin {
 		YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
 		itemsConfig.getKeys(false)
 				.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
-
-		// Загрузка всех инвентарей
-		Guis.loadGuis(YamlConfiguration.loadConfiguration(reader(pckg.getGuisData())));
 
 		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 	}

@@ -4,10 +4,14 @@ import clepto.bukkit.item.ItemBuilder
 import clepto.bukkit.menu.Gui
 import clepto.bukkit.menu.Guis
 
+import java.text.DecimalFormat
+
 import static org.bukkit.Material.BARRIER
 import static org.bukkit.Material.STAINED_GLASS_PANE
 
 class MuseumGuis {
+
+    static DecimalFormat moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
 
     static Closure backgroundIcon = {
         ItemBuilder builder = (ItemBuilder) delegate
@@ -19,7 +23,7 @@ class MuseumGuis {
     static Gui.Button background = Guis.staticButton '-' fillAvailable() icon backgroundIcon
 
     static Gui.Button backToManipulator(subject) {
-        def button = Guis.staticButton('B').icon {
+        def button = Guis.staticButton('X').icon {
             item BARRIER
             text '§cНазад'
         } leftClick {

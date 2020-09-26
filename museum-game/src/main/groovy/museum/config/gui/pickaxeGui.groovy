@@ -9,8 +9,21 @@ import org.bukkit.entity.Player
 import static clepto.bukkit.item.Items.items
 import static org.bukkit.Material.*
 
+Items.register 'pickaxe-template', {
+    nbt.CanDestroy = [
+            'minecraft:dirt',
+            'minecraft:sand',
+            'minecraft:soul_sand',
+            'minecraft:grass',
+            'minecraft:concrete_powder',
+            'minecraft:snow'
+    ]
+    nbt.HideFlags = 63
+}
+
 Items.register 'default', {
     item IRON_PICKAXE
+    apply items['pickaxe-template']
     text """
     §bКирка
 
@@ -21,6 +34,7 @@ Items.register 'default', {
 
 Items.register 'professional', {
     item DIAMOND_PICKAXE
+    apply items['pickaxe-template']
     text """
     §bПрофессиональная кирка
 
@@ -31,6 +45,7 @@ Items.register 'professional', {
 
 Items.register 'prestige', {
     item GOLD_PICKAXE
+    apply items['pickaxe-template']
     enchant(Enchantment.DIG_SPEED, 2)
     text """
     §bПрестижная кирка

@@ -1,13 +1,10 @@
 package museum.worker;
 
-import com.mojang.authlib.GameProfile;
 import museum.App;
 import museum.player.User;
-import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**

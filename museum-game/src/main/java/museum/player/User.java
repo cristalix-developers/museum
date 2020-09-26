@@ -8,7 +8,6 @@ import lombok.experimental.Delegate;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.data.*;
-import museum.museum.Coin;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectPrototype;
@@ -30,8 +29,6 @@ import org.spigotmc.AsyncCatcher;
 import ru.cristalix.core.util.UtilNetty;
 import ru.cristalix.core.util.UtilV3;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -50,9 +47,10 @@ public class User implements PlayerWrapper {
 	private PlayerConnection connection;
 	private Location lastLocation;
 	private State state;
-	private Set<Coin> coins = new HashSet<>();
+	private long enterTime;
 
 	public User(UserInfo info) {
+		this.enterTime = System.currentTimeMillis();
 		this.info = info;
 
 		this.skeletons.importInfos(info.getSkeletonInfos());
@@ -65,6 +63,8 @@ public class User implements PlayerWrapper {
 			this.lastLocation = Managers.museum.getPrototype("main").getSpawn();
 
 		this.state = this.museums.get(Managers.museum.getPrototype("main"));
+
+		updateIncome();
 	}
 
 	public void setState(State state) {
@@ -84,7 +84,7 @@ public class User implements PlayerWrapper {
 	public void sendAnime() {
 		ByteBuf buffer = Unpooled.buffer();
 		// ToDo: Вернуть счётчик на раскопках!
-//		UtilNetty.writeVarInt(buffer, excavation == null ? -2 : excavation.getHitsLeft() > 0 ? excavation.getHitsLeft() : -1);
+//		UtilNetty.writeVarInt(buffer, interactItems == null ? -2 : interactItems.getHitsLeft() > 0 ? interactItems.getHitsLeft() : -1);
 		connection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
 	}
 
@@ -146,4 +146,10 @@ public class User implements PlayerWrapper {
 		return null;
 	}
 
+	public void updateIncome() {
+		setIncome(0.1);
+		for (Museum museum : getMuseums())
+			for (Subject subject : museum.getSubjects())
+				setIncome(getIncome() + subject.getIncome());
+	}
 }

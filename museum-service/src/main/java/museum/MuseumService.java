@@ -76,14 +76,13 @@ public class MuseumService {
 		subservices.add(boosterManager);
 
 
-		CONFIGURATION_MANAGER = new ConfigurationManager("config.yml", "guis.yml", "items.yml");
+		CONFIGURATION_MANAGER = new ConfigurationManager("config.yml", "items.yml");
 		CONFIGURATION_MANAGER.init();
 
 		registerHandler(UserInfoPackage.class, (channel, source, pckg) -> {
 			System.out.println("Received UserInfoPackage from " + source + " for " + pckg.getUuid().toString());
 
-			userData.find(pckg.getUuid())
-					.thenAccept(info -> {
+			userData.find(pckg.getUuid()).thenAccept(info -> {
 						pckg.setUserInfo(info);
                         answer(channel, pckg);
 					});
@@ -147,12 +146,11 @@ public class MuseumService {
 			CONFIGURATION_MANAGER.fillRequest(museumPackage);
 			answer(channel, museumPackage);
 		}));
-		registerHandler(TopPackage.class, ((channel, serverName, museumPackage) -> {
-			userData.getTop(museumPackage.getTopType(), museumPackage.getLimit()).thenAccept(res -> {
-				museumPackage.setEntries(res);
-				answer(channel, museumPackage);
-			});
-		}));
+		registerHandler(TopPackage.class, ((channel, serverName, museumPackage) ->
+				userData.getTop(museumPackage.getTopType(), museumPackage.getLimit()).thenAccept(res -> {
+			museumPackage.setEntries(res);
+			answer(channel, museumPackage);
+		})));
 
 		Thread consoleThread = new Thread(MuseumService::handleConsole);
 		consoleThread.setDaemon(true);

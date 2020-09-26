@@ -6,8 +6,6 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
 import museum.player.State;
-import museum.worker.NpcWorker;
-import museum.worker.WorkerHandler;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import ru.cristalix.core.map.BukkitWorldLoader;
 import ru.cristalix.core.map.MapListDataItem;
@@ -31,7 +29,10 @@ public class MapLoader {
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
-		app.getMap().getWorld().setGameRuleValue("mobGriefing", "false");
+		val world = app.getWorld();
+		world.setGameRuleValue("mobGriefing", "false");
+		world.setGameRuleValue("doTileDrops", "false");
+
 		// Инжектим блоки в чанки (patched paper)
 		app.getNMSWorld().chunkInterceptor = (chunk, flags, receiver) -> {
 			val user = app.getUser(receiver.getUniqueID());

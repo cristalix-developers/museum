@@ -2,12 +2,8 @@ package museum.visitor;
 
 import lombok.Getter;
 import lombok.val;
-import museum.App;
 import net.minecraft.server.v1_12_R1.EntityVillager;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-
-import java.util.UUID;
 
 @Getter
 public class EntityVisitor extends EntityVillager {

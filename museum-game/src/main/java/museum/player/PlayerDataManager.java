@@ -39,7 +39,7 @@ public class PlayerDataManager implements Listener {
 
 	public static final PotionEffect NIGHT_VISION = new PotionEffect(
 			PotionEffectType.NIGHT_VISION,
-			65536, 10, false, false
+			999999, 10, false, false
 	);
 	private final App app;
 	private final Map<UUID, User> userMap = Maps.newHashMap();
@@ -82,7 +82,9 @@ public class PlayerDataManager implements Listener {
 			val data = userMap.remove(event.getUuid());
 			if (data == null)
 				return;
-			client.write(new SaveUserPackage(event.getUuid(), data.generateUserInfo()));
+			val info = data.generateUserInfo();
+			info.setTimePlayed(info.getTimePlayed() + System.currentTimeMillis() - data.getEnterTime());
+			client.write(new SaveUserPackage(event.getUuid(), info));
 		}, 100);
 		client.registerHandler(GlobalBoostersPackage.class, pckg -> globalBoosters = pckg.getBoosters());
 		client.registerHandler(ExtraDepositUserPackage.class, pckg -> {
@@ -133,8 +135,11 @@ public class PlayerDataManager implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e) {
-		val player = (CraftPlayer) e.getPlayer();
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		val player = (CraftPlayer) event.getPlayer();
+
+		player.setWalkSpeed(.33F);
+
 		timeBar.onJoin(player.getUniqueId());
 		val user = userMap.get(player.getUniqueId());
 
@@ -142,27 +147,25 @@ public class PlayerDataManager implements Listener {
 		user.setPlayer(player);
 
 		player.addPotionEffect(NIGHT_VISION);
-		player.setWalkSpeed(.33F);
 		Bukkit.getOnlinePlayers().forEach(current -> player.hidePlayer(app, current)); // Скрытие игроков
 		player.setGameMode(GameMode.ADVENTURE);
 		user.setState(user.getState()); // Загрузка музея
 
-		B.postpone(2, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
+		B.postpone(1, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
 
-		e.setJoinMessage(null);
+		event.setJoinMessage(null);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerLogin(PlayerLoginEvent e) {
-		val player = e.getPlayer();
-		if (e.getResult() != PlayerLoginEvent.Result.ALLOWED)
-			userMap.remove(player.getUniqueId());
+	public void onPlayerLogin(PlayerLoginEvent event) {
+		if (event.getResult() != PlayerLoginEvent.Result.ALLOWED)
+			userMap.remove(event.getPlayer().getUniqueId());
 	}
 
 	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent e) {
-		timeBar.onQuit(e.getPlayer().getUniqueId());
-		e.setQuitMessage(null);
+	public void onPlayerQuit(PlayerQuitEvent event) {
+		timeBar.onQuit(event.getPlayer().getUniqueId());
+		event.setQuitMessage(null);
 	}
 
 	public double calcMultiplier(UUID user, BoosterType type) {

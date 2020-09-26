@@ -20,10 +20,10 @@ public class TopPackage extends MuseumPackage {
     // response
     private List<TopEntry<UserInfo, Object>> entries;
 
-    public static enum TopType {
+    public enum TopType {
 
         MONEY,
-        SALARY,
+        INCOME,
         EXPERIENCE,;
 
     }

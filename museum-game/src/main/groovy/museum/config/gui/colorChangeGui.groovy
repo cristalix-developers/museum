@@ -16,7 +16,7 @@ Guis.register 'colorChange', {
     title 'Изменение цвета'
 
     layout '''
-        ----B----
+        ----X----
         -CCCCCCC-
         -CCCCCCC-
         ---------

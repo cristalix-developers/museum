@@ -6,11 +6,11 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.util.AttributeKey;
-import ru.cristalix.core.CoreApi;
 import museum.MuseumService;
 import museum.packages.GreetingPackage;
 import museum.packages.MuseumPackage;
 import museum.utils.UtilNetty;
+import ru.cristalix.core.CoreApi;
 
 import java.net.InetSocketAddress;
 import java.util.Map;

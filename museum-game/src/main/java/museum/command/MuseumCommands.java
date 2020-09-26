@@ -54,6 +54,7 @@ public class MuseumCommands {
 		B.regCommand(this::cmdPickaxe, "pickaxe");
 		B.regCommand(this::cmdSubject, "subject");
 		B.regCommand(this::cmdSkeleton, "skeleton");
+		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
 	}
 
@@ -77,7 +78,7 @@ public class MuseumCommands {
 			return MessageUtil.find("museum-not-found").set("type", address).getText();
 
 		if (user.getLastMuseum().equals(museum))
-			return MessageUtil.get("already-here");
+			return MessageUtil.get("already-at-home");
 
 		user.setState(museum);
 
@@ -86,11 +87,51 @@ public class MuseumCommands {
 				.getText();
 	}
 
+	private String cmdTravel(Player sender, String[] args) {
+		val visitor = app.getUser(sender);
+		val owner = app.getUser(Bukkit.getPlayer(args[0]));
+
+		if (args.length < 2)
+			return null;
+		if (owner == null || !owner.getPlayer().isOnline() || owner.getState() == null || owner.equals(visitor)) {
+			return MessageUtil.get("playeroffline");
+		}
+
+		double price;
+
+		try {
+			price = Double.parseDouble(args[1]);
+		} catch (Exception ignored) {
+			return null;
+		}
+
+		val state = owner.getState();
+
+		if (state instanceof Museum) {
+			val museum = (Museum) state;
+
+			if (visitor.getMoney() <= price)
+				return MessageUtil.get("nomoney");
+
+			visitor.setMoney(visitor.getMoney() - price);
+			owner.setMoney(owner.getMoney() + price);
+			visitor.setState(museum);
+			MessageUtil.find("traveler")
+					.set("visitor", visitor.getName())
+					.set("price", MessageUtil.toMoneyFormat(price))
+					.send(owner);
+		}
+		return null;
+	}
+
 	private String cmdHome(Player sender, String[] args) {
-		User user = this.app.getUser(sender);
+		val user = this.app.getUser(sender);
 		if (user.getState() instanceof Museum && ((Museum) user.getState()).getOwner().equals(user))
 			return MessageUtil.get("already-at-home");
-		user.setState(user.getLastMuseum());
+		user.setState(user.getLastMuseum() == null ?
+				user.getMuseums().get(Managers.museum.getPrototype("main")) :
+				user.getLastMuseum()
+		);
 		return MessageUtil.get("welcome-home");
 	}
 
@@ -136,7 +177,7 @@ public class MuseumCommands {
 			// ToDo: Автоматический триггер возвращения домой с возможностью отмены
 			return "§cВы на раскопках, сперва вернитесь домой";
 		user.setState(app.getShop());
-		return "§aДобро пожаловать в магазин!";
+		return MessageUtil.get("welcome-gallery");
 	}
 
 	private String cmdChangeTitle(Player sender, String[] args) {

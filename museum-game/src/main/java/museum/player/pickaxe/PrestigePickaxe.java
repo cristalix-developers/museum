@@ -1,7 +1,7 @@
 package museum.player.pickaxe;
 
-import net.minecraft.server.v1_12_R1.BlockPosition;
 import museum.player.User;
+import net.minecraft.server.v1_12_R1.BlockPosition;
 
 import java.util.List;
 import java.util.stream.Collectors;

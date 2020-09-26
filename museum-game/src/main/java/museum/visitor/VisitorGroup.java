@@ -4,7 +4,6 @@ import clepto.ListUtils;
 import lombok.Data;
 import lombok.Getter;
 import lombok.val;
-import museum.App;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -97,6 +96,8 @@ public class VisitorGroup {
 		mainToVisit.remove(nodes[0]);
 		Location loc = nodes[0].getLocation();
 		this.guide = new EntityVisitor(loc.getWorld(), this);
+		this.guide.setCustomName("Гид");
+		this.guide.setCustomNameVisible(true);
 		PatchedEntity.VISITOR.spawn(this.guide, loc);
 		int peopleAmount = 5 + ((int) (Math.random() * 6));
 		this.crowd = new ArrayList<>();

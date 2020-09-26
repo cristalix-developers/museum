@@ -1,6 +1,6 @@
 package museum.excavation;
 
-import clepto.bukkit.Lemonade;
+import clepto.bukkit.item.Items;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.val;
@@ -13,7 +13,6 @@ import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
 @Data
@@ -36,7 +35,7 @@ public class Excavation implements State {
 		val inventory = player.getInventory();
 
 		inventory.clear();
-		inventory.addItem(Lemonade.get("pickaxe-" + user.getPickaxeType().name().toLowerCase()).render());
+		inventory.addItem(Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror());
 		inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
 		for (val item : prototype.getPallette())

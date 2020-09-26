@@ -50,10 +50,12 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	// todo: Надо их кешировать, а то музеев много
 	private final ItemStack menu = Items.render("menu").asBukkitMirror();
 	private final ItemStack backItem = Items.render("back").asBukkitMirror();
+	private final ItemStack visitorMenu = Items.render("visitor-menu").asBukkitMirror();
 
 	private final CraftWorld world;
 	private double income;
 	private String title;
+	private Set<Coin> coins = ConcurrentHashMap.newKeySet();
 
 	public Museum(MuseumPrototype prototype, MuseumInfo info, User owner) {
 		super(prototype, info, owner);
@@ -96,7 +98,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		objective.setDisplayName(this.title);
 
 		objective.startGroup("Музей");
-		if (owner != user) objective.record("Владелец", user.getName());
+		if (owner != user) objective.record("Владелец", owner.getName());
 		objective.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(getIncome()))
 				.record("Посещений", () -> "§b" + this.getViews());
 	}
@@ -119,7 +121,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 		user.sendPayload("museumsubjects", payload);
 		user.sendAnime();
-		user.setCoins(ConcurrentHashMap.newKeySet());
 
 		val player = user.getPlayer();
 		val inventory = player.getInventory();
@@ -152,6 +153,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		val inventory = owner.getInventory();
 		inventory.clear();
 		inventory.setItem(0, menu);
+		inventory.setItem(4, visitorMenu);
 	}
 
 	@Override
@@ -160,8 +162,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		user.setLastLocation(user.getLocation());
 		user.setLastPosition(UtilV3.fromVector(user.getLocation().toVector()));
 
-		// ToDo: Разве коины не должны быть частью музея, а не юзера?
-		Set<Coin> coins = user.getCoins();
 		coins.forEach(coin -> coin.remove(user.getConnection()));
 		coins.clear();
 	}

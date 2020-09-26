@@ -3,9 +3,9 @@ package museum.museum.collector;
 import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
+import museum.museum.map.MuseumPrototype;
 import org.bukkit.Location;
 import org.bukkit.World;
-import museum.museum.map.MuseumPrototype;
 
 import java.util.List;
 import java.util.stream.Collectors;

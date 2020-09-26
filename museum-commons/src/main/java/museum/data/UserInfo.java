@@ -16,6 +16,7 @@ public class UserInfo implements Unique {
 
 	public long experience;
 	private double money;
+	private long timePlayed;
 	private PickaxeType pickaxeType;
 	public List<MuseumInfo> museumInfos;
 	public List<SubjectInfo> subjectInfos;
@@ -24,7 +25,7 @@ public class UserInfo implements Unique {
 	private long pickedCoinsCount;
 	private V3 lastPosition;
 	private List<DonateType> donates;
-    private List<BoosterInfo> localBoosters;
-    private double income;
+	private List<BoosterInfo> localBoosters;
+	private double income;
 
 }

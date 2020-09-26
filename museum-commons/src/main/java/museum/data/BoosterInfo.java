@@ -2,8 +2,6 @@ package museum.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import museum.boosters.BoosterType;
 import museum.utils.MultiTimeBar;
 import museum.utils.UtilTime;

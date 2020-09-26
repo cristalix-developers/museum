@@ -49,7 +49,10 @@ public class BeforePacketHandler implements Prepare {
 
 	public static final ItemStack EMERGENCY_STOP = Items.render("go-back-item").asBukkitMirror();
 	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
-	private static final ItemStack EMERALD_ITEM = Items.render("emerald-item").asBukkitCopy();
+	private static final ItemStack[] INTERACT_ITEMS = Items.items.keySet().stream()
+			.filter(closure -> closure.contains("treasure"))
+			.map(closure -> Items.render(closure).asBukkitMirror())
+			.toArray(ItemStack[]::new);
 	private static final ItemStack AIR_ITEM = ru.cristalix.core.item.Items.builder()
 			.type(Material.AIR)
 			.build();
@@ -168,10 +171,10 @@ public class BeforePacketHandler implements Prepare {
 
 		excavation.setHitsLeft(excavation.getHitsLeft() - 1);
 		if (excavation.getHitsLeft() == 0 || force) {
-			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 10 сек.");
+			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 5 сек.");
 			MessageUtil.find("excavationend").send(user);
 			excavation.setHitsLeft(-1);
-			B.postpone(200, () -> {
+			B.postpone(100, () -> {
 				user.setState(user.getLastMuseum() == null ?
 						user.getMuseums().get(Managers.museum.getPrototype("main")) :
 						user.getLastMuseum()
@@ -186,9 +189,9 @@ public class BeforePacketHandler implements Prepare {
 	@SuppressWarnings("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
-			// С некоторым шансом может выпасть эмеральд
-			if (Vector.random.nextFloat() > .9)
-				user.getPlayer().getInventory().addItem(EMERALD_ITEM);
+			// С некоторым шансом может выпасть интерактивая вещь
+			if (Vector.random.nextFloat() > .98)
+				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 			// Перебрать все кирки и эффекты на них
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {

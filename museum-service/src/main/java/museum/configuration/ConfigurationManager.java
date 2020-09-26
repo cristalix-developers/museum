@@ -3,10 +3,10 @@ package museum.configuration;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import museum.packages.RequestConfigurationsPackage;
-import ru.cristalix.core.CoreApi;
 import museum.packages.ConfigurationsPackage;
+import museum.packages.RequestConfigurationsPackage;
 import museum.socket.ServerSocketHandler;
+import ru.cristalix.core.CoreApi;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -17,9 +17,9 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class ConfigurationManager {
 
-	private final String configFile, guiFile, itemsFile;
+	private final String configFile, itemsFile;
 
-	private String configData, guiData, itemsData;
+	private String configData, itemsData;
 
 	public void init() {
 		reload();
@@ -39,13 +39,10 @@ public class ConfigurationManager {
 		Pair<String, Boolean> config = load(configFile, configData);
 		configData = config.getKey();
 
-		Pair<String, Boolean> gui = load(guiFile, guiData);
-		guiData = gui.getKey();
-
 		Pair<String, Boolean> items = load(itemsFile, itemsData);
 		itemsData = items.getKey();
 
-		if (config.getValue() || gui.getValue() || items.getValue())
+		if (config.getValue() || items.getValue())
 			ServerSocketHandler.broadcast(pckg());
 	}
 
@@ -59,12 +56,11 @@ public class ConfigurationManager {
 	}
 
 	public ConfigurationsPackage pckg() {
-		return new ConfigurationsPackage(configData, guiData, itemsData);
+		return new ConfigurationsPackage(configData, itemsData);
 	}
 
 	public void fillRequest(RequestConfigurationsPackage pckg) {
 		pckg.setConfigData(configData);
-		pckg.setGuisData(guiData);
 		pckg.setItemsData(itemsData);
 	}
 

@@ -1,6 +1,6 @@
 package museum.config.gui
 
-import clepto.bukkit.item.Items
+
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.prototype.Managers
@@ -14,13 +14,10 @@ import static org.bukkit.Material.CLAY_BALL
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
 
 Guis.register 'excavation', { player ->
-
     def user = App.app.getUser((Player) player)
 
     title 'Раскопки'
-
     layout 'OOOOOOOOX'
-
     button MuseumGuis.background
 
     Managers.excavation.toSorted { a, b -> a.requiredLevel <=> b.requiredLevel }.each { excavation ->
@@ -32,7 +29,11 @@ Guis.register 'excavation', { player ->
 
                 Минимальный уровень: $excavation.requiredLevel
                 Кол-во ударов: $excavation.hitCount
+
+                Можно найти:
                 """
+                excavation.availableSkeletonPrototypes
+                        .forEach(prototype -> text " - §b$prototype.title")
             } leftClick {
                 closeInventory()
                 performCommand 'excavation ' + excavation.address

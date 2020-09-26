@@ -1,15 +1,15 @@
 package museum;
 
 import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import ru.cristalix.core.CoreApi;
 import museum.boosters.BoosterType;
 import museum.data.BoosterInfo;
 import museum.packages.GlobalBoostersPackage;
 import museum.packages.MuseumPackage;
 import museum.socket.ServerSocketHandler;
 import museum.utils.UtilTime;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import ru.cristalix.core.CoreApi;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class BoosterManager implements Subservice {
 
 	private final Map<BoosterType, BoosterInfo> globalBoosters;
-	private Map<UUID, Set<UUID>> thanksMap = new ConcurrentHashMap<>();
+	private final Map<UUID, Set<UUID>> thanksMap = new ConcurrentHashMap<>();
 
 	public BoosterManager() {
 		try {

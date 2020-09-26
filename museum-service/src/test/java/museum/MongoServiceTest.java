@@ -1,7 +1,5 @@
 package museum;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.mongodb.async.SingleResultCallback;
 import com.mongodb.async.client.MongoClient;
 import com.mongodb.async.client.MongoClients;
@@ -22,6 +20,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 public class MongoServiceTest {
 
@@ -48,12 +48,12 @@ public class MongoServiceTest {
 
     @Test
     void testSalaryTop() throws Exception {
-        testTop(TopPackage.TopType.SALARY, Comparator.comparingDouble(UserInfo::getIncome).reversed(), 50, 50);
+        testTop(TopPackage.TopType.INCOME, Comparator.comparingDouble(UserInfo::getIncome).reversed(), 50, 50);
     }
 
     @Test
     void testSalaryTopLimit() throws Exception {
-        testTop(TopPackage.TopType.SALARY, Comparator.comparingDouble(UserInfo::getIncome).reversed(), 50, 15);
+        testTop(TopPackage.TopType.INCOME, Comparator.comparingDouble(UserInfo::getIncome).reversed(), 50, 15);
     }
 
     @Test
@@ -120,9 +120,17 @@ public class MongoServiceTest {
         return new UserInfo(UUID.randomUUID(),
                 RANDOM.nextInt(1000000),
                 RANDOM.nextInt(1000000),
-                PickaxeType.DEFAULT, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
-                RANDOM.nextInt(100), RANDOM.nextInt(1000000), new V3(0, 0, 0), Collections.emptyList(), Collections.emptyList(),
-                RANDOM.nextInt(1000000));
+                RANDOM.nextInt(1000000),
+                PickaxeType.DEFAULT,
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                RANDOM.nextInt(100),
+                RANDOM.nextInt(1000000),
+                new V3(0, 0, 0),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                RANDOM.nextInt(1000000)
+        );
     }
-
 }

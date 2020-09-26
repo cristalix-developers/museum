@@ -3,9 +3,8 @@ package museum.config.gui
 import clepto.bukkit.menu.Guis
 import clepto.humanize.TimeFormatter
 import museum.App
-import museum.player.User
+import museum.museum.Museum
 import museum.util.LevelSystem
-import org.bukkit.Statistic
 import org.bukkit.entity.Player
 
 import java.text.DecimalFormat
@@ -17,8 +16,7 @@ def formatter = TimeFormatter.builder() accuracy 500 build()
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
 
 Guis.register 'main', { player ->
-
-    User user = App.app.getUser((Player) player)
+    def user = App.app.getUser((Player) player)
 
     title 'Главное меню'
     layout 'FH-SMT-JS'
@@ -33,7 +31,7 @@ Guis.register 'main', { player ->
         Денег: ${moneyFormatter.format(user.money)}
         Опыт: $user.experience
         Опыта осталось: ${LevelSystem.formatExperience(user.experience)}
-        Часов сыграно: ${user.player.getStatistic(Statistic.PLAY_ONE_TICK) / 720_000}
+        Часов сыграно: ${user.timePlayed / 3_600_000}
         Монет собрано: $user.pickedCoinsCount
         Кирка: $user.pickaxeType.name
         Раскопок: $user.excavationCount
@@ -62,14 +60,15 @@ Guis.register 'main', { player ->
         Приобретите новую кирку,
         и разгодайте тайны песка...
         """
+        nbt.HideFlags = 63
     } leftClick {
         performCommand('gui pickaxe')
     }
 
     button 'M' icon {
         item CLAY_BALL
-        nbt([other: 'guild_bank'])
-        def museum = user.lastMuseum
+        nbt.other = 'guild_bank'
+        def museum = (Museum) user.state
         text """
         &bМузей
     
@@ -122,5 +121,3 @@ Guis.register 'main', { player ->
     }
 
 }
-
-

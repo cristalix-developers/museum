@@ -1,6 +1,7 @@
 package museum.command;
 
 import clepto.bukkit.B;
+import lombok.val;
 import museum.App;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.prototype.Managers;
@@ -16,8 +17,11 @@ public class AdminCommand {
 			if (!sender.isOp())
 				return null;
 			if (args.length == 0)
-				return "§cИспользование: §e/money [Количество денег]";
-			app.getUser(sender).setMoney(Double.parseDouble(args[0]));
+				return "§cИспользование: §e/money [Игрок] [Количество денег]";
+			val player = Bukkit.getPlayer(args[0]);
+			if (player == null)
+				return null;
+			app.getUser(player).setMoney(Double.parseDouble(args[1]));
 			return "§aВаше количество денег изменено.";
 		}, "money");
 
