@@ -2,6 +2,7 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.museum.Museum
 import museum.museum.map.SkeletonSubjectPrototype
 import museum.museum.subject.Allocation
 import museum.museum.subject.SkeletonSubject
@@ -135,6 +136,7 @@ Guis.register 'manipulator', { player ->
                             subject.skeleton = skeleton
                         }
                         subject.updateSkeleton true
+                        user.updateIncome()
                     }
                     Guis.open(delegate, 'manipulator', subject)
                 }

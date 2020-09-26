@@ -34,6 +34,7 @@ import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 import ru.cristalix.core.util.UtilV3;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	private final CraftWorld world;
 	private double income;
 	private String title;
-	private List<Coin> coins = new ArrayList<>();
+	private Set<Coin> coins = ConcurrentHashMap.newKeySet();
 
 	public Museum(MuseumPrototype prototype, MuseumInfo info, User owner) {
 		super(prototype, info, owner);

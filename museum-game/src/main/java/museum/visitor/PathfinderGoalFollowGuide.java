@@ -1,6 +1,10 @@
 package museum.visitor;
 
 import lombok.val;
+import museum.App;
+import museum.museum.Coin;
+import museum.museum.Museum;
+import museum.player.User;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
@@ -73,7 +77,17 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 		this.h = 10;
 
 		// tryMoveToEntityLiving(...)
-		if (this.navigation.a(this.guide, this.followSpeed)) return;
+		if (this.navigation.a(this.guide, this.followSpeed)) {
+			// Если в музее игрока есть кто-либо - создать монету
+			val coin = new Coin(visitor.locX, visitor.locY, visitor.locZ);
+			for (User user : App.getApp().getUsers()) {
+				if (Math.random() < .01 && user.getState() instanceof Museum) {
+					coin.create(user.getConnection());
+					((Museum) user.getState()).getCoins().add(coin);
+				}
+			}
+			return;
+		}
 
 		if (this.visitor.isLeashed()) return;
 		if (this.visitor.isPassenger()) return;
@@ -97,11 +111,11 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 					to = event.getTo();
 					this.visitor.setPositionRotation(to.getX(), to.getY(), to.getZ(), to.getYaw(), to.getPitch());
 					this.navigation.p();
+
 					return;
 				}
 			}
 		}
-
 	}
 
 	protected boolean isTeleportationViable(int i, int j, int k, int l, int i1) {
@@ -110,5 +124,4 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 		return iblockdata.d(this.world, blockposition, EnumDirection.DOWN) == EnumBlockFaceShape.SOLID && iblockdata.a(this.visitor) && this.world.isEmpty(blockposition.up()) && this.world.isEmpty(
 				blockposition.up(2));
 	}
-
 }

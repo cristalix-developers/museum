@@ -63,6 +63,8 @@ public class User implements PlayerWrapper {
 			this.lastLocation = Managers.museum.getPrototype("main").getSpawn();
 
 		this.state = this.museums.get(Managers.museum.getPrototype("main"));
+
+		updateIncome();
 	}
 
 	public void setState(State state) {
@@ -144,4 +146,10 @@ public class User implements PlayerWrapper {
 		return null;
 	}
 
+	public void updateIncome() {
+		setIncome(0.1);
+		for (Museum museum : getMuseums())
+			for (Subject subject : museum.getSubjects())
+				setIncome(getIncome() + subject.getIncome());
+	}
 }

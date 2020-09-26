@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import museum.App;
 import museum.museum.Museum;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -36,11 +37,11 @@ public class MuseumEventHandler implements Listener {
 		val player = event.getPlayer();
 		val user = app.getUser(player.getUniqueId());
 
-		if (!(user.getState() instanceof Museum))
+		if (!(user.getState() instanceof Museum)) {
 			return;
+		}
 
 		// Попытка скушать монетки
 		((Museum) user.getState()).getCoins().removeIf(coin -> coin.pickUp(user, to, 1.7, player.getEntityId()));
 	}
-
 }

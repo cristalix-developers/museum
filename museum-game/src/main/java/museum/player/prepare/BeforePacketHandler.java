@@ -190,7 +190,7 @@ public class BeforePacketHandler implements Prepare {
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
 			// С некоторым шансом может выпасть интерактивая вещь
-			if (Vector.random.nextFloat() > .5)
+			if (Vector.random.nextFloat() > .98)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 			// Перебрать все кирки и эффекты на них
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
