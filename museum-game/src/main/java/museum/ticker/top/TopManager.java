@@ -1,12 +1,20 @@
 package museum.ticker.top;
 
 import com.google.common.collect.Maps;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import lombok.RequiredArgsConstructor;
 import museum.App;
 import museum.data.UserInfo;
 import museum.packages.TopPackage;
+import museum.player.User;
 import museum.ticker.Ticked;
 import museum.tops.TopEntry;
+import net.minecraft.server.v1_12_R1.PacketDataSerializer;
+import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
+import org.bukkit.entity.Player;
+import ru.cristalix.core.GlobalSerializers;
+import ru.cristalix.core.util.UtilNetty;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +28,7 @@ public class TopManager implements Ticked {
 
 	private static final int UPDATE_SECONDS = 20;
 	private static final int DATA_COUNT = 10;
+	private final ByteBuf buffer = Unpooled.buffer();
 	private final App app;
 	private final Map<TopPackage.TopType, List<TopEntry<UserInfo, Object>>> tops = Maps.newConcurrentMap();
 
@@ -42,8 +51,10 @@ public class TopManager implements Ticked {
 	}
 
 	public void sendTops() {
-		//ByteBuf buffer = Unpooled.buffer();
-		//UtilNetty.writeVarInt(buffer, 475284);
-		//player.getHandle().playerConnection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
+		buffer.clear();
+		UtilNetty.writeString(buffer, GlobalSerializers.toJson(tops));
+		for (User user : app.getUsers()) {
+			user.getConnection().sendPacket(new PacketPlayOutCustomPayload("top", new PacketDataSerializer(buffer)));
+		}
 	}
 }
