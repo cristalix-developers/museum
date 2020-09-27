@@ -65,14 +65,13 @@ public class BeforePacketHandler implements Prepare {
 					@Override
 					protected void decode(ChannelHandlerContext channelHandlerContext, Packet packet, List<Object> list) {
 						if (packet instanceof PacketPlayInUseEntity) {
-							MinecraftServer.SERVER.postToMainThread(() -> {
-								PacketPlayInUseEntity pc = (PacketPlayInUseEntity) packet;
-								if (pc.d == null || !pc.d.equals(EnumHand.MAIN_HAND))
-									return;
-								if (!pc.action.equals(PacketPlayInUseEntity.EnumEntityUseAction.INTERACT_AT))
-									return;
-								WorkerHandler.acceptClick(user, pc.getEntityId());
-							});
+							PacketPlayInUseEntity pc = (PacketPlayInUseEntity) packet;
+							if (pc.d == null || !pc.d.equals(EnumHand.MAIN_HAND))
+								return;
+							if (!pc.action.equals(PacketPlayInUseEntity.EnumEntityUseAction.INTERACT_AT))
+								return;
+							MinecraftServer.SERVER.postToMainThread(() ->
+									WorkerHandler.acceptClick(user, pc.getEntityId()));
 						}
 						list.add(packet);
 					}

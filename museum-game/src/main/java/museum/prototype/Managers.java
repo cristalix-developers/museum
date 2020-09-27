@@ -60,13 +60,20 @@ public class Managers {
 
 			else builder = SubjectPrototype.builder();
 
-			builder.icon(getUnderItem(box.getLabel("icon")));
-
 			// Добавляю блок, на который можно ставить данный Subject
 			val ableLabel = box.getLabel("able");
 			val ableBlock = ableLabel.subtract(0, 1, 0).getBlock();
 			builder.able(ableBlock.getDrops().iterator().next().getType());
 			ableBlock.setType(Material.AIR);
+
+			val title = box.requireLabel("title").getTag();
+
+			ItemStack icon = getUnderItem(box.getLabel("icon"));
+			icon = ru.cristalix.core.item.Items.fromStack(icon)
+					.displayName("§6" + title + " §7(Описание)")
+					.loreLines("", "§7Можно ставить на " + ableBlock.getType().name().toLowerCase())
+					.build();
+			builder.icon(icon);
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
 					.relativeManipulators(box.getLabels("manipulator").stream()
@@ -82,7 +89,7 @@ public class Managers {
 							.map(Label::getTag)
 							.map(Integer::parseInt)
 							.orElse(0)
-					).title(box.requireLabel("title").getTag())
+					).title(title)
 					.box(box)
 					.type(type)
 					.build();
