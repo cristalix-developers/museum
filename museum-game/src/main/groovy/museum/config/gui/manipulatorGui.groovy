@@ -68,8 +68,7 @@ Guis.register 'manipulator', { player ->
     }
 
     button 'I' icon {
-        // ToDo: Перенести этот DynamicItem на новый API
-        def itemStack = abstractSubject.prototype.icon.render()
+        def itemStack = abstractSubject.prototype.icon
         item itemStack.type
         data itemStack.durability
         text """

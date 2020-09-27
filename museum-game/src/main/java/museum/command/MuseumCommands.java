@@ -4,11 +4,13 @@ import clepto.bukkit.B;
 import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
+import museum.data.SubjectInfo;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SkeletonSubjectPrototype;
+import museum.museum.map.SubjectPrototype;
 import museum.museum.map.SubjectType;
 import museum.museum.subject.Allocation;
 import museum.museum.subject.CollectorSubject;
@@ -56,6 +58,31 @@ public class MuseumCommands {
 		B.regCommand(this::cmdSkeleton, "skeleton");
 		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
+		B.regCommand(this::cmdBuy, "buy");
+	}
+
+	private String cmdBuy(Player sender, String[] args) {
+		if (args.length == 0)
+			return "§cИспользование: §f/buy [subject-address]";
+
+		SubjectPrototype prototype;
+		try {
+			prototype = Managers.subject.getPrototype(args[0]);
+		} catch (Exception e) {
+			return e.getMessage();
+		}
+		if (prototype == null)
+			return null;
+
+		val user = app.getUser(sender);
+
+		if (user.getMoney() < prototype.getPrice())
+			return MessageUtil.get("nomoney");
+
+		user.setMoney(user.getMoney() - prototype.getPrice());
+		user.getSubjects().add(new Subject(prototype, new SubjectInfo(UUID.randomUUID(), prototype.getAddress()), user));
+
+		return MessageUtil.get("finally-buy");
 	}
 
 	private String cmdVisit(Player sender, String[] args) {
