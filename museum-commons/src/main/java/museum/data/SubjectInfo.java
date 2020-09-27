@@ -22,7 +22,7 @@ public class SubjectInfo implements Info, Unique {
 	public String metadata;
 	public int slot;
 
-	private Color color = Color.WHITE;
+	private Color color = Color.BLUE;
 
 	public static SubjectInfo generateNew(String prototypeAddress) {
 		return new SubjectInfo(UUID.randomUUID(), prototypeAddress);

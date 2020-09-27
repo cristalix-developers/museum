@@ -12,10 +12,7 @@ import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SkeletonSubjectPrototype;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.map.SubjectType;
-import museum.museum.subject.Allocation;
-import museum.museum.subject.CollectorSubject;
-import museum.museum.subject.SkeletonSubject;
-import museum.museum.subject.Subject;
+import museum.museum.subject.*;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.State;
@@ -54,7 +51,6 @@ public class MuseumCommands {
 		B.regCommand(this::cmdInvite, "invite");
 		B.regCommand(this::cmdExcavation, "excavation", "exc");
 		B.regCommand(this::cmdPickaxe, "pickaxe");
-		B.regCommand(this::cmdSubject, "subject");
 		B.regCommand(this::cmdSkeleton, "skeleton");
 		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
@@ -291,128 +287,4 @@ public class MuseumCommands {
 		player.performCommand("gui pickaxe");
 		return MessageUtil.get("newpickaxe");
 	}
-
-	private String cmdSubject(Player player, String[] args) {
-		if (args.length < 2)
-			return null;
-
-		UUID subjectUuid;
-
-		try {
-			subjectUuid = UUID.fromString(args[1]);
-		} catch (IllegalArgumentException ignored) {
-			return null;
-		}
-
-		val user = app.getUser(player);
-		State state = user.getState();
-		if (!(state instanceof Museum))
-			return MessageUtil.get("not-in-museum");
-		Museum museum = (Museum) state;
-		val subject = museum.getSubjectByUuid(subjectUuid);
-		if (museum.getOwner() != user)
-			return MessageUtil.get("owner-crash");
-
-		if (subject == null)
-			return null;
-
-		val allocation = subject.getAllocation();
-
-		if ("color".equals(args[0]) && args.length == 3) {
-
-			Color color;
-			try {
-				color = Color.valueOf(args[2]);
-			} catch (Exception e) {
-				return null;
-			}
-
-			subject.getCachedInfo().setColor(color);
-
-			if (allocation != null) {
-				allocation.prepareUpdate(data -> applyColor(data, color));
-				allocation.perform(Allocation.Action.UPDATE_BLOCKS);
-			}
-
-			return MessageUtil.get("color-changed");
-		} else if ("special".equals(args[0])) {
-			if (subject instanceof SkeletonSubject)
-				player.performCommand("gui skeleton-manipulator " + subjectUuid.toString());
-			else if (subject instanceof CollectorSubject)
-				player.performCommand("gui collector-manipulator " + subjectUuid.toString());
-		} else if ("destroy".equals(args[0])) {
-			if (allocation == null)
-				return null;
-			allocation.perform(PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES);
-			subject.setAllocation(null);
-
-			player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
-			player.closeInventory();
-			return MessageUtil.get("destroyed");
-		} else if ("setdino".equals(args[0]) && args.length == 3) {
-			if (!(subject instanceof SkeletonSubject))
-				return null;
-			val skeletonSubject = (SkeletonSubject) subject;
-			val previousSkeleton = skeletonSubject.getSkeleton();
-
-			SkeletonPrototype newSkeletonType = null;
-			try {
-				newSkeletonType = Managers.skeleton.getByIndex(Integer.parseInt(args[2]));
-			} catch (Exception ignored) {
-			}
-
-			// Заменять на && не надо, ибо другая логика
-			if (newSkeletonType == null) {
-				if (previousSkeleton != null)
-					skeletonSubject.setSkeleton(null);
-			} else {
-				// Если этот скелет уже выставлен на другой витрине, потребовать сперва убрать его оттуда
-				for (val anotherSubject : museum.getSubjects(SubjectType.SKELETON_CASE)) {
-					if (anotherSubject == subject)
-						continue;
-					val skeleton = anotherSubject.getSkeleton();
-					if (skeleton == null) continue;
-					if (skeleton.getCachedInfo().getPrototypeAddress().equals(newSkeletonType.getAddress())) {
-						user.closeInventory();
-						return MessageUtil.get("standlocked");
-					}
-				}
-
-				if (newSkeletonType.getSize() > ((SkeletonSubjectPrototype) subject.getPrototype()).getSize())
-					return null;
-
-				val newSkeleton = user.getSkeletons().get(newSkeletonType);
-
-				if (newSkeleton == null || newSkeleton == previousSkeleton || newSkeleton.getUnlockedFragments().isEmpty())
-					return null;
-
-				skeletonSubject.setSkeleton(newSkeleton);
-			}
-
-			if (allocation != null) {
-				if (previousSkeleton != null) {
-					allocation.perform(HIDE_PIECES);
-					allocation.removePiece(previousSkeleton.getPrototype());
-				}
-				skeletonSubject.updateSkeleton(true);
-			}
-
-			// Если до изменения был динозавр и он удален, то написать об этом
-			if (previousSkeleton != null) {
-				if (newSkeletonType == null) {
-					player.closeInventory();
-					return MessageUtil.get("freestand");
-				}
-				return null;
-			}
-			// Если динозавр не удален и поставлен новый динозавр, то написать об этом
-			if (newSkeletonType != null) {
-				player.closeInventory();
-				return MessageUtil.get("standplaced");
-			}
-			return null;
-		}
-		return null;
-	}
-
 }

@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import museum.App;
 import museum.data.UserInfo;
 import museum.packages.TopPackage;
@@ -52,9 +53,11 @@ public class TopManager implements Ticked {
 
 	public void sendTops() {
 		buffer.clear();
+		buffer.resetReaderIndex();
+		buffer.resetWriterIndex();
 		UtilNetty.writeString(buffer, GlobalSerializers.toJson(tops));
-		for (User user : app.getUsers()) {
-			user.getConnection().sendPacket(new PacketPlayOutCustomPayload("top", new PacketDataSerializer(buffer)));
-		}
+		val packet = new PacketPlayOutCustomPayload("top", new PacketDataSerializer(buffer));
+		for (User user : app.getUsers())
+			user.sendPacket(packet);
 	}
 }

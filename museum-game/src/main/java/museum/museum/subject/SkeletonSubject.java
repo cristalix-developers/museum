@@ -60,7 +60,6 @@ public class SkeletonSubject extends Subject {
 			this.skeletonLocation.setRot(rot);
 
 			this.updateSkeleton(false);
-
 		}
 	}
 

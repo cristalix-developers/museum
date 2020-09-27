@@ -1,11 +1,14 @@
 package museum.museum.subject;
 
+import clepto.bukkit.B;
+import clepto.bukkit.groovy.Do;
 import lombok.val;
 import museum.data.SubjectInfo;
 import museum.museum.Museum;
 import museum.museum.map.FountainPrototype;
 import museum.museum.map.SubjectPrototype;
 import museum.player.User;
+import museum.util.Colorizer;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Color;
 import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
@@ -17,36 +20,16 @@ import ru.cristalix.core.util.UtilV3;
  */
 public class FountainSubject extends Subject {
 
-	private static final int UPPER_ID_BOUND = -10_000;
-	private static final int NEG_ID_BOUND = -100_000;
+	private static final int UPPER_ID_BOUND = -900;
+	private static final int NEG_ID_BOUND = -1_000;
 
-	private final Color colour;
-	private final EntityFallingBlock entity;
-	private final PacketPlayOutSpawnEntity spawn;
-	private final PacketPlayOutEntityMetadata metadata;
-	private final PacketPlayOutEntityDestroy destroy;
+	private EntityFallingBlock entity;
+	private PacketPlayOutSpawnEntity spawn;
+	private PacketPlayOutEntityMetadata metadata;
+	private PacketPlayOutEntityDestroy destroy;
 
 	public FountainSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
-		val acceptedPrototype = ((FountainPrototype) prototype);
-		this.colour = Color.AQUA;
-		val label = acceptedPrototype.getSource();
-		val world = prototype.getBox().getWorld().getHandle();
-		// То место, откуда вылетают частицы воды
-		val acceptedSource = label.clone().subtract(prototype.getBox().getCenter()).add(UtilV3.toVector(info.location));
-		// Блок, по примеру которого делается вода
-		val icon = label.clone().subtract(0, 1, 0).getBlock();
-		//noinspection deprecation
-		entity = new EntityFallingBlock(
-				world, acceptedSource.getX() + .5, acceptedSource.getY() + 1, acceptedSource.getZ() + .5,
-				CraftMagicNumbers.getBlock(icon.getType()).fromLegacyData(icon.getData())
-		);
-		entity.id = NEG_ID_BOUND;
-
-		// Создание пакетов
-		spawn = new PacketPlayOutSpawnEntity(entity, 70, Block.getCombinedId(entity.block));
-		metadata = new PacketPlayOutEntityMetadata(entity.id, entity.getDataWatcher(), true);
-		destroy = new PacketPlayOutEntityDestroy(entity.id, UPPER_ID_BOUND, UPPER_ID_BOUND - 1, UPPER_ID_BOUND - 2);
 	}
 
 	@Override
@@ -57,29 +40,56 @@ public class FountainSubject extends Subject {
 	@Override
 	public void setAllocation(Allocation allocation) {
 		super.setAllocation(allocation);
+		if (cachedInfo == null)
+			return;
+		val acceptedPrototype = ((FountainPrototype) prototype);
+		val label = acceptedPrototype.getSource();
+		val world = prototype.getBox().getWorld().getHandle();
+		// То место, откуда вылетают частицы воды
+		val acceptedSource = label.clone()
+				.subtract(prototype.getBox().getCenter())
+				.add(UtilV3.toVector(cachedInfo.location));
+		// Блок, по примеру которого делается вода
+		val icon = label.clone().subtract(0, 1, 0).getBlock();
+		entity = new EntityFallingBlock(
+				world, acceptedSource.getX() + .5, acceptedSource.getY() + 1, acceptedSource.getZ() + .5,
+				Colorizer.applyColor(CraftMagicNumbers.getBlock(icon.getType()).getBlockData(), cachedInfo.getColor())
+		);
+		entity.id = NEG_ID_BOUND;
+
+		// Создание пакетов
+		spawn = new PacketPlayOutSpawnEntity(entity, 70, Block.getCombinedId(entity.block));
+		metadata = new PacketPlayOutEntityMetadata(entity.id, entity.getDataWatcher(), true);
+		destroy = new PacketPlayOutEntityDestroy(entity.id);
 	}
 
 	public void throwWater(User user) {
-		if (!(user.getState() instanceof Museum))
+		if (!(user.getState() instanceof Museum) || !isAllocated())
 			return;
-		val connection = user.getConnection();
 		entity.id = entity.id < UPPER_ID_BOUND ? ++entity.id : NEG_ID_BOUND;
 		entity.ticksLived = 1;
 
 		// Замена поля entity id во всех пакетах
+		val oldId = entity.id;
 		spawn.a = entity.id;
 		metadata.a = entity.id;
-		destroy.a[0] = entity.id - 5;
 
 		// Отправка пакетов игроку
-		connection.sendPacket(spawn);
-		connection.sendPacket(metadata);
-		connection.sendPacket(new PacketPlayOutEntityVelocity(
-				entity.id,
-				Math.random() / 10 - .05,
-				.6,
-				Math.random() / 10 - .05
-		));
-		connection.sendPacket(destroy);
+		val users = user.getState().getUsers();
+		for (User visitor : users) {
+			visitor.sendPacket(spawn);
+			visitor.sendPacket(metadata);
+			visitor.sendPacket(new PacketPlayOutEntityVelocity(
+					entity.id,
+					Math.random() / 10 - .05,
+					.7,
+					Math.random() / 10 - .05
+			));
+		}
+		B.postpone(30, () -> {
+			destroy.a[0] = oldId;
+			for (User visitor : users)
+				visitor.sendPacket(destroy);
+		});
 	}
 }

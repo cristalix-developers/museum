@@ -12,7 +12,7 @@ public class Colorizer {
 	public static IBlockData applyColor(IBlockData data, Color color) {
 		Block block = data.getBlock();
 		// concrete и concrete_powder меняют цвет
-		return block == Blocks.dR || block == Blocks.dS ? block.fromLegacyData(color.getWoolData()) : data;
+		return block == Blocks.dR || block == Blocks.dS || block == Blocks.STAINED_GLASS ? block.fromLegacyData(color.getWoolData()) : data;
 	}
 
 }
