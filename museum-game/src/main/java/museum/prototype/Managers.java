@@ -1,8 +1,8 @@
 package museum.prototype;
 
 import clepto.ListUtils;
-import clepto.bukkit.DynamicItem;
 import clepto.bukkit.InvalidConfigException;
+import clepto.bukkit.item.Items;
 import clepto.cristalix.mapservice.Label;
 import clepto.cristalix.mapservice.MapServiceException;
 import lombok.val;
@@ -19,6 +19,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftItem;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Color;
@@ -26,6 +28,7 @@ import ru.cristalix.core.math.D2;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Managers {
 
@@ -57,24 +60,7 @@ public class Managers {
 
 			else builder = SubjectPrototype.builder();
 
-			val iconLabel = box.getLabel("icon");
-			DynamicItem icon = null;
-			if (iconLabel != null) {
-				Block iconBlock = iconLabel.subtract(0, 1, 0).getBlock();
-				iconBlock.getChunk().load();
-				if (iconBlock.getType() == Material.CHEST) {
-					try {
-						icon = new DynamicItem(((Chest) iconBlock.getState()).getBlockInventory().getItem(0));
-					} catch (Exception ignored) {
-					}
-				}
-				if (icon == null)
-					icon = new DynamicItem(iconBlock.getDrops().iterator().next());
-				iconBlock.setType(Material.AIR);
-			} else
-				icon = new DynamicItem(new ItemStack(Material.PACKED_ICE));
-
-			builder.icon(icon);
+			builder.icon(getUnderItem(box.getLabel("icon")));
 
 			// Добавляю блок, на который можно ставить данный Subject
 			val ableLabel = box.getLabel("able");
@@ -188,6 +174,9 @@ public class Managers {
 
 			val palletteName = "§eНужная руда";
 
+			val icon = getUnderItem(box.requireLabel("icon"));
+			Items.register("excavation-" + address, CraftItemStack.asNMSCopy(icon));
+
 			return new ExcavationPrototype(
 					address, skeletonPrototypes,
 					LocationUtil.resetLabelRotation(box.requireLabel("spawn"), 0),
@@ -196,17 +185,35 @@ public class Managers {
 					box.requireLabel("price").getTagDouble(),
 					box.requireLabel("title").getTag(),
 					packets,
-					Material.getMaterial(box.requireLabel("icon").getTag().toUpperCase()),
+					icon,
 					pallette.stream()
-						.map(pal -> {
-							val item = new ItemStack(pal[0], 1, (short) 0, (byte) pal[1]);
-							val meta = item.getItemMeta();
-							meta.setDisplayName(palletteName);
-							item.setItemMeta(meta);
-							return item;
-						}).toArray(ItemStack[]::new)
+							.map(pal -> {
+								val item = new ItemStack(pal[0], 1, (short) 0, (byte) pal[1]);
+								val meta = item.getItemMeta();
+								meta.setDisplayName(palletteName);
+								item.setItemMeta(meta);
+								return item;
+							}).toArray(ItemStack[]::new)
 			);
 		});
 	}
 
+	private static ItemStack getUnderItem(Label label) {
+		ItemStack icon = null;
+		if (label.getTag().isEmpty()) {
+			Block iconBlock = label.subtract(0, 1, 0).getBlock();
+			iconBlock.getChunk().load();
+			if (iconBlock.getType() == Material.CHEST) {
+				try {
+					icon = ((Chest) iconBlock.getState()).getBlockInventory().getItem(0).clone();
+				} catch (Exception ignored) {
+				}
+			}
+			if (icon == null)
+				icon = iconBlock.getDrops().iterator().next();
+			iconBlock.setType(Material.AIR);
+		} else
+			icon = new ItemStack(Material.valueOf(label.getTag().toUpperCase()));
+		return icon;
+	}
 }

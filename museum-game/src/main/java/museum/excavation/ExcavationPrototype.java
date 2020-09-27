@@ -21,7 +21,7 @@ public class ExcavationPrototype implements Prototype {
 	private final double price;
 	private final String title;
 	private final List<PacketPlayOutMapChunk> packets;
-	private final Material icon;
+	private final ItemStack icon;
 	private final ItemStack[] pallette;
 
 }

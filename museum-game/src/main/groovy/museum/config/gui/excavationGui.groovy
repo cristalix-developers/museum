@@ -1,6 +1,7 @@
 package museum.config.gui
 
-
+import clepto.bukkit.command.Commands
+import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.prototype.Managers
@@ -23,7 +24,7 @@ Guis.register 'excavation', { player ->
     Managers.excavation.toSorted { a, b -> a.requiredLevel <=> b.requiredLevel }.each { excavation ->
         if (user.level >= excavation.requiredLevel) {
             button 'O' icon {
-                item excavation.icon
+                apply Items.items['excavation-' + excavation.address]
                 text """
                 §b$excavation.title §6${moneyFormatter.format(excavation.price)}
 
@@ -54,4 +55,9 @@ Guis.register 'excavation', { player ->
     } leftClick {
         performCommand("gui main")
     }
+}
+
+Commands.registerCommand('item') handle {
+    player.getInventory().addItem(Items.render(args[0]).asBukkitMirror())
+    message Items.render(args[0])
 }

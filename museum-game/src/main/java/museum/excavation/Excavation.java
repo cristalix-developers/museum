@@ -71,5 +71,4 @@ public class Excavation implements State {
 				.record("Ударов", () -> Math.max(hitsLeft, 0) + " осталось")
 				.record("Шахта", prototype.getTitle());
 	}
-
 }

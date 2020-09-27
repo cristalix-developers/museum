@@ -244,8 +244,7 @@ public class MuseumCommands {
 
 		user.setMoney(user.getMoney() - proto.getPrice());
 
-		Excavation excavation = new Excavation(proto, proto.getHitCount());
-		user.setState(excavation);
+		user.setState(new Excavation(proto, proto.getHitCount()));
 
 		return null;
 	}
