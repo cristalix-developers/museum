@@ -181,9 +181,16 @@ public class MuseumService {
 			if (args[0].equals("delete")) {
 				if (args.length < 2) System.out.println("Usage: delete [uuid]");
 				else {
-					UUID uuid = UUID.fromString(args[1]);
-					userData.clear(uuid);
-					System.out.println("Removed " + uuid + "'s data from db...");
+					if (args[1].equals("all")) {
+						userData.findAll().thenAccept(map -> map.forEach(((uuid, userInfo) -> {
+							userData.clear(uuid);
+							System.out.println("Removed " + uuid);
+						})));
+					} else {
+						UUID uuid = UUID.fromString(args[1]);
+						userData.clear(uuid);
+						System.out.println("Removed " + uuid + "'s data from db...");
+					}
 				}
 			}
 		}
