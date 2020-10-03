@@ -70,7 +70,7 @@ public class PreparePlayerBrain implements Prepare {
 				if (iteration >= titles.size()) {
 					player.sendMessage(endMessage);
 					user.giveExperience(EXPERIENCE);
-					((Museum) user.getState()).giveMenu();
+					((Museum) user.getState()).giveMenu(user);
 					exit();
 					return;
 				}

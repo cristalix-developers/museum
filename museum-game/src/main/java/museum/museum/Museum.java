@@ -126,7 +126,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		val inventory = player.getInventory();
 
 		if (owner.getExperience() >= PreparePlayerBrain.EXPERIENCE)
-			giveMenu();
+			giveMenu(user);
 
 		if (this.owner != user)
 			inventory.setItem(8, backItem);
@@ -149,8 +149,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		});
 	}
 
-	public void giveMenu() {
-		val inventory = owner.getInventory();
+	public void giveMenu(User user) {
+		val inventory = user.getInventory();
 		inventory.clear();
 		inventory.setItem(0, menu);
 		inventory.setItem(4, visitorMenu);
