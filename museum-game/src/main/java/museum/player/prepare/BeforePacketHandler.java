@@ -60,24 +60,7 @@ public class BeforePacketHandler implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		val pipeline = user.getConnection().networkManager.channel.pipeline();
-		pipeline.addAfter("decoder", UUID.randomUUID().toString(), new MessageToMessageDecoder<Packet>() {
-					@Override
-					protected void decode(ChannelHandlerContext channelHandlerContext, Packet packet, List<Object> list) {
-						if (packet instanceof PacketPlayInUseEntity) {
-							PacketPlayInUseEntity pc = (PacketPlayInUseEntity) packet;
-							if (pc.d == null || !pc.d.equals(EnumHand.MAIN_HAND))
-								return;
-							if (!pc.action.equals(PacketPlayInUseEntity.EnumEntityUseAction.INTERACT_AT))
-								return;
-							MinecraftServer.SERVER.postToMainThread(() ->
-									WorkerHandler.acceptClick(user, pc.getEntityId()));
-						}
-						list.add(packet);
-					}
-				}
-		);
-		pipeline.addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
+		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
