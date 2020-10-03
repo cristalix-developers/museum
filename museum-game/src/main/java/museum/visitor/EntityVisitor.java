@@ -23,7 +23,7 @@ public class EntityVisitor extends EntityVillager {
 
 		val visitorGroup = uuid.get(getUniqueID());
 		if (visitorGroup.getGuide().equals(this)) {
-			this.goalSelector.a(1, new PathfinderGoalGotoStand(visitorGroup));
+			this.goalSelector.a(1, new PathfinderGoalGuide(visitorGroup));
 			return;
 		}
 

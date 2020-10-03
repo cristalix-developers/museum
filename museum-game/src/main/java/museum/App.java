@@ -115,7 +115,7 @@ public final class App extends JavaPlugin {
 
 		requestConfigurations();
 
-		// Прогрузка предметов из Groovy-скриптов
+		// Прогрузка Groovy-скриптов
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")));
 			while (true) {

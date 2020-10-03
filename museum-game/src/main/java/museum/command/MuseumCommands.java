@@ -54,6 +54,10 @@ public class MuseumCommands {
 		B.regCommand(this::cmdSkeleton, "skeleton");
 		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
+		B.regCommand((sender, args) -> VisitorHandler.getVisitorUuids().values().stream()
+				.distinct().findFirst().get().getCurrentRoute()
+				.stream().map(String::valueOf)
+				.collect(Collectors.joining("\n")), "routes");
 		B.regCommand(this::cmdBuy, "buy");
 	}
 

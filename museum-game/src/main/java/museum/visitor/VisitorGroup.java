@@ -1,13 +1,19 @@
 package museum.visitor;
 
 import clepto.ListUtils;
+import clepto.bukkit.B;
+import clepto.cristalix.mapservice.Label;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.val;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import ru.cristalix.core.formatting.Color;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Integer.MAX_VALUE;
 
@@ -18,16 +24,25 @@ public class VisitorGroup {
 	private List<EntityVisitor> crowd;
 	private final Node[] nodes;
 	private final List<Node> mainToVisit;
-	private List<Node> currentRoute;
+	private Deque<Node> currentRoute;
+	@Setter
 	private Node currentNode;
+	@Setter
+	private long idleStart;
 
-	public VisitorGroup(List<? extends Location> allNodes, List<? extends Location> mainNodes) {
+	public VisitorGroup(List<Label> allNodes, List<Label> mainNodes) {
 		int amount = allNodes.size();
 		this.nodes = new Node[amount];
 		int id = 0;
+		int woolColor = 0;
 		for (val loc : allNodes) {
-			nodes[id] = new Node(id, new boolean[amount], loc);
+			nodes[id] = new Node(id, loc.getTag(), new boolean[amount], loc);
 			id++;
+			loc.getChunk().load();
+			Block block = loc.clone().add(0, -1, 0).getBlock();
+			block.setType(Material.WOOL);
+			block.setData((byte) woolColor++);
+			if (woolColor == 16) woolColor = 0;
 		}
 		mainToVisit = new ArrayList<>();
 		for (Node node : nodes) {
@@ -63,7 +78,7 @@ public class VisitorGroup {
 				node.connections[neighbour.id] = true;
 			}
 		}
-		this.currentRoute = new ArrayList<>(mainToVisit);
+		this.currentRoute = new LinkedList<>(mainToVisit);
 	}
 
 	public void newMainRoute() {
@@ -87,7 +102,11 @@ public class VisitorGroup {
 				}
 			}
 		}
-		this.currentRoute = new ArrayList<>(visited);
+		B.bc("Новый маршрут: " + visited.stream().map(node -> {
+			Color color = Color.values()[node.id % 16];
+			return color.getChatFormat() + color.getTeamName();
+		}).collect(Collectors.joining("§f, ")));
+		this.currentRoute = new LinkedList<>(visited);
 	}
 
 	public void spawn() {
@@ -111,6 +130,7 @@ public class VisitorGroup {
 	@Data
 	public static class Node {
 		private final int id;
+		private final String name;
 		private final boolean[] connections;
 		private final Location location;
 	}
