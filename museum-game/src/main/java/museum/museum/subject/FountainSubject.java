@@ -40,7 +40,7 @@ public class FountainSubject extends Subject {
 	@Override
 	public void setAllocation(Allocation allocation) {
 		super.setAllocation(allocation);
-		if (cachedInfo == null)
+		if (cachedInfo == null || cachedInfo.location == null || prototype == null || allocation == null)
 			return;
 		val acceptedPrototype = ((FountainPrototype) prototype);
 		val label = acceptedPrototype.getSource();
@@ -64,7 +64,7 @@ public class FountainSubject extends Subject {
 	}
 
 	public void throwWater(User user) {
-		if (!(user.getState() instanceof Museum) || !isAllocated())
+		if (!(user.getState() instanceof Museum) || getAllocation() == null)
 			return;
 		entity.id = entity.id < UPPER_ID_BOUND ? ++entity.id : NEG_ID_BOUND;
 		entity.ticksLived = 1;
