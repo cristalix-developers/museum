@@ -9,32 +9,26 @@ import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
-import museum.museum.map.SkeletonSubjectPrototype;
 import museum.museum.map.SubjectPrototype;
-import museum.museum.map.SubjectType;
-import museum.museum.subject.*;
+import museum.museum.subject.Allocation;
+import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Skeleton;
-import museum.museum.subject.skeleton.SkeletonPrototype;
-import museum.player.State;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
-import museum.util.SubjectLogoUtil;
 import museum.util.VirtualSign;
+import museum.visitor.VisitorHandler;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import ru.cristalix.core.formatting.Color;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
-import static museum.museum.subject.Allocation.Action.*;
-import static museum.util.Colorizer.applyColor;
+import java.util.stream.Collectors;
 
 public class MuseumCommands {
 
