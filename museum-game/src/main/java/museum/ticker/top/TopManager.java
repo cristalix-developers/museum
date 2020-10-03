@@ -53,10 +53,9 @@ public class TopManager implements Ticked {
 
 	public void sendTops() {
 		buffer.clear();
-		buffer.resetReaderIndex();
-		buffer.resetWriterIndex();
 		UtilNetty.writeString(buffer, GlobalSerializers.toJson(tops));
-		val packet = new PacketPlayOutCustomPayload("top", new PacketDataSerializer(buffer));
+		val byteBuf = buffer.duplicate();
+		val packet = new PacketPlayOutCustomPayload("museum:top", new PacketDataSerializer(byteBuf));
 		for (User user : app.getUsers())
 			user.sendPacket(packet);
 	}
