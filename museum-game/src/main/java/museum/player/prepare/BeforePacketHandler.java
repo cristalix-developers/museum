@@ -61,7 +61,6 @@ public class BeforePacketHandler implements Prepare {
 	@Override
 	public void execute(User user, App app) {
 		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
-			@SuppressWarnings("deprecation")
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 				if (packetObj instanceof PacketPlayInUseItem) {

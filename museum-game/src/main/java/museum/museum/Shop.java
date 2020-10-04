@@ -36,6 +36,5 @@ public class Shop implements State {
 
 	@Override
 	public void leaveState(User user) {
-
 	}
 }

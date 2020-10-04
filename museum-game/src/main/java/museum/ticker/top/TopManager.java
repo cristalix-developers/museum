@@ -10,7 +10,6 @@ import museum.packages.TopPackage;
 import museum.player.User;
 import museum.ticker.Ticked;
 import museum.tops.TopEntry;
-import org.bukkit.Bukkit;
 import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.account.IAccountService;
 
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
 public class TopManager implements Ticked {
 
 	private static final int UPDATE_SECONDS = 20;
-	private static final int DATA_COUNT = 10;
+	private static final int DATA_COUNT = 100;
 	private final App app;
 	private final Map<TopPackage.TopType, List<TopEntry<String, Object>>> tops = Maps.newConcurrentMap();
 
@@ -42,16 +41,22 @@ public class TopManager implements Ticked {
 	public void updateData() {
 		Arrays.stream(TopPackage.TopType.values())
 				.forEach(type -> app.getClientSocket().writeAndAwaitResponse(new TopPackage(type, DATA_COUNT))
-				.thenAcceptAsync(pkg -> tops.put(type, pkg.getEntries().stream()
-						.map(entry -> {
-							val key = entry.getKey().getUuid();
-							val prefix = Cristalix.permissionService().getPermissionContext(key).join()
-									.getDonateGroup()
-									.getPrefix();
-							val nick = IAccountService.get().getNameByUuid(key).join();
-							return new TopEntry<>(prefix + nick, entry.getValue());
-						}).collect(Collectors.toList())
-				)));
+						.thenAcceptAsync(pkg -> tops.put(type, pkg.getEntries().stream()
+								.map(entry -> {
+									val key = entry.getKey().getUuid();
+									val context = Cristalix.permissionService().getPermissionContext(key).join();
+									val group = context.getBestGroup();
+									val nick = IAccountService.get().getNameByUuid(key).join();
+									return new TopEntry<>(
+											group.getPrefixColor() +
+													(group.getPrefix().isEmpty() ? "" : group.getPrefix() + " ") +
+													group.getNameColor() +
+													(context.getColor() == null ? "" : context.getColor()) +
+													nick,
+											entry.getValue()
+									);
+								}).collect(Collectors.toList())
+						)));
 	}
 
 	public void sendTops() {

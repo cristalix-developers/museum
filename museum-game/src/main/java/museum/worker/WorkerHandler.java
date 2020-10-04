@@ -6,14 +6,13 @@ import net.minecraft.server.v1_12_R1.PacketPlayOutEntity;
 import net.minecraft.server.v1_12_R1.PacketPlayOutEntityHeadRotation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.util.NumberConversions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
-import static org.bukkit.util.NumberConversions.*;
+import static org.bukkit.util.NumberConversions.square;
 
 /**
  * @author func 17.07.2020
@@ -74,8 +73,9 @@ public class WorkerHandler {
 	}
 
 	public static void load(User user) {
-		for (NpcWorker worker : workers)
-			if (worker.getLocation().distanceSquared(user.getLocation()) < 100_000)
-				worker.show(user);
+		for (NpcWorker worker : workers) {
+			worker.hide(user);
+			worker.show(user);
+		}
 	}
 }

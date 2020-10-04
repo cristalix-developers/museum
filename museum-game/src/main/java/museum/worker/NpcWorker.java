@@ -81,4 +81,8 @@ public class NpcWorker {
 		connection.sendPacket(new PacketPlayOutEntityHeadRotation(npcEntity, (byte) ((int) (location.getYaw() * 256F / 360F))));
 		connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(npcEntity.getId(), (byte) location.getYaw(), (byte) location.getPitch(), true));
 	}
+
+	public void hide(User user) {
+		user.sendPacket(new PacketPlayOutEntityDestroy(npcEntity.id));
+	}
 }
