@@ -55,6 +55,7 @@ public class PlayerDataManager implements Listener {
 				BeforePacketHandler.INSTANCE,
 				new PrepareJSAnime(),
 				new PrepareScoreBoard(),
+				PrepareShopBlocks.INSTANCE,
 				PreparePlayerBrain.INSTANCE
 		);
 

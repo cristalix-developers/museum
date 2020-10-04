@@ -1,4 +1,4 @@
-package museum.config
+package museum.config.listener
 
 import com.destroystokyo.paper.event.player.PlayerUseUnknownEntityEvent
 import museum.App

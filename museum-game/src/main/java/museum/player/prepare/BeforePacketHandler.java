@@ -45,7 +45,7 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
  */
 public class BeforePacketHandler implements Prepare {
 
-	public static final BeforePacketHandler INSTANCE = new BeforePacketHandler();
+	public static final Prepare INSTANCE = new BeforePacketHandler();
 
 	public static final ItemStack EMERGENCY_STOP = Items.render("go-back-item").asBukkitMirror();
 	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);

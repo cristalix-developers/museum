@@ -1,7 +1,7 @@
 package museum.museum.map;
 
-import clepto.bukkit.DynamicItem;
 import clepto.cristalix.mapservice.Box;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import museum.data.SubjectInfo;
@@ -28,9 +28,19 @@ public class SubjectPrototype implements Prototype {
 	private final List<V3> relativeManipulators;
 	private final ItemStack icon;
 	private final Material able;
+	private final SubjectDataForClient dataForClient;
 
 	public Subject provide(SubjectInfo info, User owner) {
 		return type.provide(this, info, owner);
 	}
 
+	@Data
+	public static class SubjectDataForClient {
+
+		private final String title;
+		private final V3 min;
+		private final V3 max;
+		private final double cost;
+
+	}
 }

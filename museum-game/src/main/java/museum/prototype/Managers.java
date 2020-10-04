@@ -25,6 +25,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Color;
 import ru.cristalix.core.math.D2;
+import ru.cristalix.core.util.UtilV3;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,7 +68,11 @@ public class Managers {
 			ableBlock.setType(Material.AIR);
 
 			val title = box.requireLabel("title").getTag();
-
+			double price = box.getLabels("price").stream()
+					.findAny()
+					.map(Label::getTagDouble)
+					.orElse(Double.NaN);
+			
 			ItemStack icon = getUnderItem(box.getLabel("icon"));
 			icon = ru.cristalix.core.item.Items.fromStack(icon)
 					.displayName("§6" + title + " §7(Описание)")
@@ -80,11 +85,13 @@ public class Managers {
 							.map(box::toRelativeVector)
 							.collect(Collectors.toList())
 					).address(address)
-					.price(box.getLabels("price").stream()
-							.findAny()
-							.map(Label::getTagDouble)
-							.orElse(Double.NaN)
-					).cristalixPrice(box.getLabels("cristalix-price").stream()
+					.price(price)
+					.dataForClient(new SubjectPrototype.SubjectDataForClient(
+							title,
+							UtilV3.fromVector(box.getMin().getDirection()),
+							UtilV3.fromVector(box.getMax().getDirection()),
+							price
+					)).cristalixPrice(box.getLabels("cristalix-price").stream()
 							.findAny()
 							.map(Label::getTag)
 							.map(Integer::parseInt)

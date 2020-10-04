@@ -1,4 +1,4 @@
-package museum.config
+package museum.config.listener
 
 import clepto.bukkit.menu.Guis
 import museum.excavation.Excavation

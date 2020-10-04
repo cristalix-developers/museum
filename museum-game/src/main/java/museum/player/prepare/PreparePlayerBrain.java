@@ -22,7 +22,7 @@ import static clepto.bukkit.Cycle.exit;
  */
 public class PreparePlayerBrain implements Prepare {
 
-	public static final PreparePlayerBrain INSTANCE = new PreparePlayerBrain();
+	public static final Prepare INSTANCE = new PreparePlayerBrain();
 	public static final int EXPERIENCE = 10;
 
 	private final List<Label> dots;

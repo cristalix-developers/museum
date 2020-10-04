@@ -24,7 +24,6 @@ public class PathfinderGoalGuide extends PathfinderGoal {
 	// shouldExecute()
 	@Override
 	public boolean a() {
-		B.bc("§7Called shouldExecute()");
 		return true;
 	}
 
@@ -35,7 +34,7 @@ public class PathfinderGoalGuide extends PathfinderGoal {
 	// resetTask()
 	@Override
 	public void d() {
-		B.bc("§7Called resetTask()");
+
 	}
 
 	// updateTask()
@@ -49,22 +48,15 @@ public class PathfinderGoalGuide extends PathfinderGoal {
 			currentTarget = group.getCurrentRoute().poll();
 			Location loc = currentTarget.getLocation();
 			navigation.a(loc.x, loc.y, loc.z, 0.65);
-			B.bc("§eНовая цель:§f " + currentTarget);
 		} else {
 			Location loc = currentTarget.getLocation();
 			navigation.a(loc.x, loc.y, loc.z, 0.65);
-			B.bc("§7 " + loc);
 			double distance = currentTarget.getLocation().distanceSquared(group.getGuide().getBukkitEntity().getLocation());
-			B.bc("§7distance: " + Math.sqrt(distance));
 			if (distance < 16) {
-				B.bc("§eДостиг цели:§f " + currentTarget);
 				idle = System.currentTimeMillis();
 				group.setCurrentNode(currentTarget);
 				currentTarget = null;
 			}
 		}
-		B.bc("§7Called updateTask() " + currentTarget);
-
 	}
-
 }
