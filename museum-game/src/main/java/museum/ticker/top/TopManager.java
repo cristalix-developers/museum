@@ -1,19 +1,23 @@
 package museum.ticker.top;
 
+import clepto.cristalix.Cristalix;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import museum.App;
 import museum.client_conversation.ClientPacket;
-import museum.data.UserInfo;
 import museum.packages.TopPackage;
 import museum.player.User;
 import museum.ticker.Ticked;
 import museum.tops.TopEntry;
+import org.bukkit.Bukkit;
 import ru.cristalix.core.GlobalSerializers;
+import ru.cristalix.core.account.IAccountService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author func 25.09.2020
@@ -25,7 +29,7 @@ public class TopManager implements Ticked {
 	private static final int UPDATE_SECONDS = 20;
 	private static final int DATA_COUNT = 10;
 	private final App app;
-	private final Map<TopPackage.TopType, List<TopEntry<UserInfo, Object>>> tops = Maps.newConcurrentMap();
+	private final Map<TopPackage.TopType, List<TopEntry<String, Object>>> tops = Maps.newConcurrentMap();
 
 	@Override
 	public void tick(int... args) {
@@ -36,13 +40,18 @@ public class TopManager implements Ticked {
 	}
 
 	public void updateData() {
-		for (TopPackage.TopType type : TopPackage.TopType.values()) {
-			app.getClientSocket().writeAndAwaitResponse(new TopPackage(type, DATA_COUNT))
-					.thenAcceptAsync(topPackage -> {
-						if (tops.containsKey(type)) tops.replace(type, topPackage.getEntries());
-						else tops.put(type, topPackage.getEntries());
-					});
-		}
+		Arrays.stream(TopPackage.TopType.values())
+				.forEach(type -> app.getClientSocket().writeAndAwaitResponse(new TopPackage(type, DATA_COUNT))
+				.thenAcceptAsync(pkg -> tops.put(type, pkg.getEntries().stream()
+						.map(entry -> {
+							val key = entry.getKey().getUuid();
+							val prefix = Cristalix.permissionService().getPermissionContext(key).join()
+									.getDonateGroup()
+									.getPrefix();
+							val nick = IAccountService.get().getNameByUuid(key).join();
+							return new TopEntry<>(prefix + nick, entry.getValue());
+						}).collect(Collectors.toList())
+				)));
 	}
 
 	public void sendTops() {

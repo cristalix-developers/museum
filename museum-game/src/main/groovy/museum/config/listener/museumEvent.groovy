@@ -15,7 +15,7 @@ on InventoryOpenEvent, {
 
 on PlayerMoveEvent, {
     if (from.blockX == to.blockX && from.blockY == to.blockY && from.blockZ == to.blockZ)
-        return;
+        return
 
     def user = App.app.getUser(player.uniqueId)
 

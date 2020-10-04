@@ -56,10 +56,10 @@ on PlayerInteractEvent, {
     for (item in player.inventory) {
         if (!item)
             continue
-        def tag = CraftItemStack.asNMSCopy(item).getTag()
+        def tag = CraftItemStack.asNMSCopy(item) tag
         if (!tag || !tag.hasKeyOfType('cost', 99))
             continue
-        def cost = tag.getInt('cost')
+        def cost = tag.getInt 'cost'
         item.amount = item.amount - 1
         user.money = user.money + cost
         MessageUtil.find "treasure-item" set 'cost', cost send user

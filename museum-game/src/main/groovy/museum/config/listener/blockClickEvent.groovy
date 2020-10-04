@@ -23,5 +23,4 @@ on PlayerInteractEvent, {
         bat.addPotionEffect invisible
         bat.addPassenger player as LivingEntity
     }
-    return
 }

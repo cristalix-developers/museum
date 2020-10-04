@@ -28,65 +28,65 @@ on EntityDismountEvent, {
 
 on EntityChangeBlockEvent, {
     if(entity instanceof FallingBlock)
-        cancelled = true
+        setCancelled true
 }
 
 on EntityDamageEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on PlayerArmorStandManipulateEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on BlockBreakEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on FoodLevelChangeEvent, {
-    foodLevel = 20
+    setFoodLevel 20
 }
 
 on BlockPhysicsEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on BlockFromToEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on PlayerInteractEntityEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on PlayerDropItemEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on HangingBreakByEntityEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on BlockBurnEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on EntityExplodeEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on PlayerArmorStandManipulateEvent, {
-    cancelled = true
+    setCancelled true
 }
 
 on CreatureSpawnEvent, {
-    cancelled = spawnReason == CreatureSpawnEvent.SpawnReason.NATURAL
+    setCancelled spawnReason == CreatureSpawnEvent.SpawnReason.NATURAL
 }
 
 on PlayerAdvancementCriterionGrantEvent, {
-     cancelled = true
+    setCancelled true
 }
 
 on PlayerSwapHandItemsEvent, {
-    cancelled = true
+    setCancelled true
 }
