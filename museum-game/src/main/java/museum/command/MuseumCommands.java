@@ -46,6 +46,7 @@ public class MuseumCommands {
 		B.regCommand(this::cmdExcavation, "excavation", "exc");
 		B.regCommand(this::cmdPickaxe, "pickaxe");
 		B.regCommand(this::cmdSkeleton, "skeleton");
+		B.regCommand(this::cmdRunTop, "runtop", "rt");
 		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
 		B.regCommand((sender, args) -> VisitorHandler.getVisitorUuids().values().stream()
@@ -53,6 +54,14 @@ public class MuseumCommands {
 				.stream().map(String::valueOf)
 				.collect(Collectors.joining("\n")), "routes");
 		B.regCommand(this::cmdBuy, "buy");
+	}
+
+	private String cmdRunTop(Player player, String[] args) {
+		if (player.isOp()) {
+			app.getTopManager().updateData();
+			app.getTopManager().sendTops();
+		}
+		return null;
 	}
 
 	private String cmdBuy(Player sender, String[] args) {

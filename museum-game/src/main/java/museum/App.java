@@ -56,6 +56,8 @@ public final class App extends JavaPlugin {
 
 	private PlayerDataManager playerDataManager;
 	@Getter
+	private TopManager topManager;
+	@Getter
 	private ClientSocket clientSocket;
 	@Getter
 	@Setter
@@ -134,6 +136,9 @@ public final class App extends JavaPlugin {
 		// Класс управляющий игроками
 		this.playerDataManager = new PlayerDataManager(this);
 
+		// Прогрузка мэнеджера топа
+		topManager = new TopManager(this);
+
 		// Инициализация команд
 		new MuseumCommands(this);
 		this.shop = new Shop(this);
@@ -151,7 +156,7 @@ public final class App extends JavaPlugin {
 		new TickTimerHandler(this, Arrays.asList(
 				new FountainHandler(this),
 				new WayParticleHandler(this),
-				new TopManager(this)
+				topManager
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
 		VisitorHandler.init(this, 1);
