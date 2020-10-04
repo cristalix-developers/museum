@@ -12,9 +12,6 @@ import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
-import museum.listener.BlockClickHandler;
-import museum.listener.MuseumEventHandler;
-import museum.listener.PassiveEventBlocker;
 import museum.museum.Shop;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
@@ -144,10 +141,7 @@ public final class App extends JavaPlugin {
 		// Регистрация обработчиков событий
 		B.events(
 				playerDataManager,
-				new PassiveEventBlocker(),
-				new MuseumEventHandler(this),
 				new GuiEvents(),
-				new BlockClickHandler(),
 				new BehaviourListener()
 		);
 

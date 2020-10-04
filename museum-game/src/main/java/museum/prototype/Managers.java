@@ -71,8 +71,8 @@ public class Managers {
 			double price = box.getLabels("price").stream()
 					.findAny()
 					.map(Label::getTagDouble)
-					.orElse(Double.NaN);
-			
+					.orElse(0D);
+
 			ItemStack icon = getUnderItem(box.getLabel("icon"));
 			icon = ru.cristalix.core.item.Items.fromStack(icon)
 					.displayName("§6" + title + " §7(Описание)")
