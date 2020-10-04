@@ -1,5 +1,6 @@
 package museum.ticker.top;
 
+import clepto.bukkit.B;
 import clepto.cristalix.Cristalix;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
@@ -47,12 +48,12 @@ public class TopManager implements Ticked {
 									val context = Cristalix.permissionService().getPermissionContext(key).join();
 									val group = context.getBestGroup();
 									val nick = IAccountService.get().getNameByUuid(key).join();
-									return new TopEntry<>(
+									return new TopEntry<>("" +
 											group.getPrefixColor() +
-													(group.getPrefix().isEmpty() ? "" : group.getPrefix() + " ") +
-													group.getNameColor() +
-													(context.getColor() == null ? "" : context.getColor()) +
-													nick,
+											(group.getPrefix().isEmpty() ? "" : group.getPrefix() + " ") +
+											group.getNameColor() +
+											(context.getColor() == null ? "" : context.getColor()) +
+											nick,
 											entry.getValue()
 									);
 								}).collect(Collectors.toList())
@@ -61,7 +62,7 @@ public class TopManager implements Ticked {
 
 	public void sendTops() {
 		val data = GlobalSerializers.toJson(tops);
-		val packet = new ClientPacket<String>("top");
+		val packet = new ClientPacket<String>("top-update");
 		for (User user : app.getUsers())
 			packet.send(user, data);
 	}

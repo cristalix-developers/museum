@@ -10,8 +10,6 @@ import ru.cristalix.core.util.UtilNetty;
 
 public class ClientPacket<D> {
 
-	private static final ByteBuf BUFFER = Unpooled.buffer();
-
 	private final String channel;
 
 	public ClientPacket(String channel) {
@@ -19,7 +17,7 @@ public class ClientPacket<D> {
 	}
 
 	public void send(User user, D data) {
-		val byteBuf = BUFFER.duplicate();
+		val byteBuf = Unpooled.buffer();
 		UtilNetty.writeString(byteBuf, data.toString());
 		user.sendPacket(new PacketPlayOutCustomPayload("museum:" + channel, new PacketDataSerializer(byteBuf)));
 	}
