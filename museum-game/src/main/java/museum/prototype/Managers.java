@@ -12,6 +12,8 @@ import museum.museum.map.*;
 import museum.museum.subject.skeleton.Rarity;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.util.LocationUtil;
+import museum.worker.NpcWorker;
+import museum.worker.WorkerUtil;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -52,21 +54,25 @@ public class Managers {
 						.speed(box.requireLabel("speed").getTagDouble());
 
 			else if (type == SubjectType.SKELETON_CASE)
-				builder = SkeletonSubjectPrototype.builder()
-						.size(box.requireLabel("size").getTagInt());
+				builder = SkeletonSubjectPrototype.builder().size(box.requireLabel("size").getTagInt());
 
 			else if (type == SubjectType.FOUNTAIN)
-				builder = FountainPrototype.builder()
-						.source(box.requireLabel("source"));
+				builder = FountainPrototype.builder().source(box.requireLabel("source"));
+
+			else if (type == SubjectType.STALL) {
+				val npc = box.requireLabel("npc");
+				builder = StallPrototype.builder().worker(WorkerUtil.add(new NpcWorker(
+						npc,
+						"http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27",
+						"Тест",
+						user -> user.sendMessage("тест шаверму")
+				)));
+			}
 
 			else builder = SubjectPrototype.builder();
 
 			// Добавляю блок, на который можно ставить данный Subject
-			val ableLabel = box.getLabel("able");
-			val ableBlock = ableLabel.subtract(0, 1, 0).getBlock();
-			builder.able(ableBlock.getDrops().iterator().next().getType());
-			ableBlock.setType(Material.AIR);
-
+			val ableItem = getUnderItem(box.getLabel("able"));
 			val title = box.requireLabel("title").getTag();
 			double price = box.getLabels("price").stream()
 					.findAny()
@@ -76,9 +82,10 @@ public class Managers {
 			ItemStack icon = getUnderItem(box.getLabel("icon"));
 			icon = ru.cristalix.core.item.Items.fromStack(icon)
 					.displayName("§6" + title + " §7(Описание)")
-					.loreLines("", "§7Можно ставить на " + ableBlock.getType().name().toLowerCase())
+					.loreLines("", "§7Можно ставить на " + ableItem.getType().name().toLowerCase())
 					.build();
 			builder.icon(icon);
+			builder.able(ableItem.getType());
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
 					.relativeManipulators(box.getLabels("manipulator").stream()

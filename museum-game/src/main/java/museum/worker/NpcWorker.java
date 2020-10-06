@@ -4,8 +4,10 @@ import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.Getter;
-import lombok.val;
+import lombok.Setter;
 import museum.App;
+import museum.museum.subject.skeleton.Displayable;
+import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
@@ -13,21 +15,22 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.util.NumberConversions;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**
  * @author func 16.09.2020
  * @project museum
  */
-public class NpcWorker {
+public class NpcWorker implements Displayable {
 
 	@Getter
-	private final Location location;
+	@Setter
+	private Location location;
 	private final EntityPlayer npcEntity;
 	@Getter
 	private final Consumer<User> onInteract;
@@ -67,22 +70,24 @@ public class NpcWorker {
 		return (T) metadata.getOrDefault(key, null);
 	}
 
-	public void show(User user) {
-		val connection = user.getConnection();
-
-		connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, this.npcEntity));
-		connection.sendPacket(new PacketPlayOutNamedEntitySpawn(this.npcEntity));
+	@Override
+	public void getShowPackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
+		this.npcEntity.setLocation(location.getX(), location.getY(), location.getZ(), (int) (location.getYaw() * 256F / 360F), (int) (location.getPitch() * 256F / 360F));
 
 		DataWatcher dataWatcher = this.npcEntity.getDataWatcher();
 		dataWatcher.set(EntityHuman.br, (byte) 127);
 
-		connection.sendPacket(new PacketPlayOutEntityMetadata(this.npcEntity.getId(), dataWatcher, true));
-
-		connection.sendPacket(new PacketPlayOutEntityHeadRotation(npcEntity, (byte) ((int) (location.getYaw() * 256F / 360F))));
-		connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutEntityLook(npcEntity.getId(), (byte) location.getYaw(), (byte) location.getPitch(), true));
+		buffer.addAll(Arrays.asList(
+				new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, this.npcEntity),
+				new PacketPlayOutNamedEntitySpawn(this.npcEntity),
+				new PacketPlayOutEntityMetadata(this.npcEntity.getId(), dataWatcher, true),
+				new PacketPlayOutEntityHeadRotation(npcEntity, (byte) ((int) (location.getYaw() * 256F / 360F))),
+				new PacketPlayOutEntity.PacketPlayOutEntityLook(npcEntity.getId(), (byte) location.getYaw(), (byte) location.getPitch(), true)
+		));
 	}
 
-	public void hide(User user) {
-		user.sendPacket(new PacketPlayOutEntityDestroy(npcEntity.id));
+	@Override
+	public void getHidePackets(Collection<Packet<PacketListenerPlayOut>> buffer) {
+		buffer.add(new PacketPlayOutEntityDestroy(npcEntity.id));
 	}
 }

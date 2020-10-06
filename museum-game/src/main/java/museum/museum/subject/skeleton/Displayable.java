@@ -17,7 +17,12 @@ public interface Displayable {
 		packets.forEach(user::sendPacket);
 	}
 
-	void getUpdatePackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position);
+	default void show(User user) {
+		show(user, null);
+	}
+
+	default void getUpdatePackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
+	}
 
 	default void update(User user, V4 position) {
 		Collection<Packet<PacketListenerPlayOut>> packets = new ArrayList<>();

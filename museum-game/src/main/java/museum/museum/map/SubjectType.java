@@ -17,6 +17,7 @@ public class SubjectType<T extends Subject> {
 	public static SubjectType<CollectorSubject> COLLECTOR;
 	public static SubjectType<MarkerSubject> MARKER;
 	public static SubjectType<FountainSubject> FOUNTAIN;
+	public static SubjectType<StallSubject> STALL;
 
 	private final String address;
 	private final Provider provider;
@@ -33,6 +34,7 @@ public class SubjectType<T extends Subject> {
 		COLLECTOR = new SubjectType<>("collector", CollectorSubject::new);
 		MARKER = new SubjectType<>("marker", MarkerSubject::new);
 		FOUNTAIN = new SubjectType<>("fountain", FountainSubject::new);
+		STALL = new SubjectType<>("stall", StallSubject::new);
 	}
 
 	public static SubjectType<?> byString(String query) {
@@ -47,6 +49,7 @@ public class SubjectType<T extends Subject> {
 		return provider.provide(prototype, info, user);
 	}
 
+	@FunctionalInterface
 	public interface Provider {
 		Subject provide(SubjectPrototype prototype, SubjectInfo info, User user);
 	}

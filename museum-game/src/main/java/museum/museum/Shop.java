@@ -6,7 +6,7 @@ import museum.App;
 import museum.player.State;
 import museum.player.User;
 import museum.util.LocationUtil;
-import museum.worker.WorkerHandler;
+import museum.worker.*;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
@@ -31,7 +31,8 @@ public class Shop implements State {
 		val inventory = user.getInventory();
 		inventory.clear();
 		inventory.setItem(8, back);
-		WorkerHandler.load(user);
+
+		WorkerUtil.reload(user);
 	}
 
 	@Override

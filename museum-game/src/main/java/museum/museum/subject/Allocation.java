@@ -10,6 +10,7 @@ import museum.App;
 import museum.data.SubjectInfo;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.AtomPiece;
+import museum.museum.subject.skeleton.Displayable;
 import museum.museum.subject.skeleton.Piece;
 import museum.museum.subject.skeleton.V4;
 import museum.player.State;
@@ -35,7 +36,8 @@ public class Allocation {
 	private final Collection<Packet<PacketListenerPlayOut>> updatePackets;
 	private final Collection<Packet<PacketListenerPlayOut>> removePackets;
 	private final Map<AtomPiece, V4> pieces = new HashMap<>();
-	private final State owner;
+	private final List<Displayable> displayables = new ArrayList<>();
+	private final State state;
 	private final List<Location> allocatedBlocks;
 	private final String clientData;
 
@@ -140,6 +142,10 @@ public class Allocation {
 		}
 	}
 
+	public void allocateDisplayable(Displayable displayable) {
+		displayables.add(displayable);
+	}
+
 	public void allocatePiece(Piece piece, V4 origin, boolean update) {
 		Map<AtomPiece, V4> freshPieces = new HashMap<>();
 		piece.recursiveTraverse(freshPieces, origin);
@@ -150,7 +156,7 @@ public class Allocation {
 				if (existing != null) atom.getUpdatePackets(packets, position);
 				else atom.getShowPackets(packets, position);
 			});
-			for (User user : owner.getUsers()) {
+			for (User user : state.getUsers()) {
 				packets.forEach(user::sendPacket);
 			}
 		}
@@ -167,7 +173,7 @@ public class Allocation {
 			ids[i++] = atomPiece.getStand().id;
 		}
 		PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(ids);
-		for (User user : owner.getUsers()) user.sendPacket(packet);
+		for (User user : state.getUsers()) user.sendPacket(packet);
 	}
 
 	public void perform(User user, Action... actions) {
@@ -179,7 +185,7 @@ public class Allocation {
 	}
 
 	public void perform(Action... actions) {
-		this.perform(owner.getUsers(), null, actions);
+		this.perform(state.getUsers(), null, actions);
 	}
 
 	public void perform(Collection<User> users, Action... actions) {
@@ -207,6 +213,8 @@ public class Allocation {
 				if (chunk == null || chunk.locX == (int) position.x >> 4 && chunk.locZ == (int) position.z >> 4)
 					piece.getShowPackets(buffer, position);
 			});
+		}), SPAWN_DISPLAYABLE((allocation, buffer, chunk) -> {
+			allocation.displayables.forEach(displayable -> displayable.getShowPackets(buffer, null));
 		}),
 		HIDE_BLOCKS((allocation, buffer, chunk) -> buffer.addAll(allocation.removePackets)),
 		HIDE_PIECES((allocation, buffer, chunk) -> {

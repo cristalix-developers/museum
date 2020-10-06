@@ -22,7 +22,7 @@ import museum.util.ChunkWriter;
 import museum.util.LocationUtil;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
-import museum.worker.WorkerHandler;
+import museum.worker.*;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.IBlockData;
@@ -139,7 +139,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 		player.setAllowFlight(true);
 
-		WorkerHandler.load(user);
+		WorkerUtil.reload(user);
 
 		B.postpone(20, () -> {
 			for (Subject subject : this.getSubjects()) {

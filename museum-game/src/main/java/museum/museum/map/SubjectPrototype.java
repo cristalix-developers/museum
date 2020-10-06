@@ -1,7 +1,6 @@
 package museum.museum.map;
 
 import clepto.cristalix.mapservice.Box;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import museum.data.SubjectInfo;

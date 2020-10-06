@@ -24,10 +24,10 @@ import museum.ticker.top.TopManager;
 import museum.util.MapLoader;
 import museum.util.MuseumChatService;
 import museum.visitor.VisitorHandler;
-import museum.worker.WorkerHandler;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
+import museum.worker.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
@@ -39,6 +39,7 @@ import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.realm.IRealmService;
+import ru.cristalix.core.realm.RealmStatus;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 
@@ -150,7 +151,7 @@ public final class App extends JavaPlugin {
 				new BehaviourListener()
 		);
 
-		new WorkerHandler(this);
+		WorkerUtil.init(this);
 
 		// Обработка каждого тика
 		new TickTimerHandler(this, Arrays.asList(
@@ -160,6 +161,15 @@ public final class App extends JavaPlugin {
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
 		VisitorHandler.init(this, 1);
+
+		// Вывод сервера в тесты
+		IRealmService.get().getCurrentRealmInfo().setStatus(RealmStatus.WAITING_FOR_PLAYERS);
+		IRealmService.get().getCurrentRealmInfo().setReadableName("Музей археологии - ALPHA");
+		IRealmService.get().getCurrentRealmInfo().setDescription(new String[]{
+				"",
+				"Находи и демонстрируй кости",
+				"динозавров, стань археологом!"
+		});
 	}
 
 	@Override
