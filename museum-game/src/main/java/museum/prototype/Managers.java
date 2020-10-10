@@ -12,7 +12,6 @@ import museum.museum.map.*;
 import museum.museum.subject.skeleton.Rarity;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.util.LocationUtil;
-import museum.worker.NpcWorker;
 import museum.worker.WorkerUtil;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Chunk;
@@ -21,7 +20,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.ItemStack;
@@ -31,7 +29,6 @@ import ru.cristalix.core.util.UtilV3;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Managers {
 
@@ -60,13 +57,12 @@ public class Managers {
 				builder = FountainPrototype.builder().source(box.requireLabel("source"));
 
 			else if (type == SubjectType.STALL) {
-				val npc = box.requireLabel("npc");
-				builder = StallPrototype.builder().worker(WorkerUtil.add(new NpcWorker(
-						npc,
-						"http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27",
-						"Тест",
-						user -> user.sendMessage("тест шаверму")
-				)));
+				val npc = WorkerUtil.STALL_WORKER_TEMPLATE;
+				val npcSpawn = box.requireLabel("npc").toCenterLocation();
+				npc.setLocation(npcSpawn);
+				builder = StallPrototype.builder()
+						.spawn(npcSpawn)
+						.worker(() -> npc);
 			}
 
 			else builder = SubjectPrototype.builder();

@@ -145,6 +145,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 			for (Subject subject : this.getSubjects()) {
 				subject.getAllocation().perform(user, UPDATE_BLOCKS);
 				subject.getAllocation().perform(user, SPAWN_PIECES);
+				subject.getAllocation().perform(user, SPAWN_DISPLAYABLE);
 			}
 		});
 	}
@@ -158,7 +159,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 	@Override
 	public void leaveState(User user) {
-		this.iterateSubjects(subject -> subject.getAllocation().perform(user, HIDE_BLOCKS, HIDE_PIECES));
+		this.iterateSubjects(subject -> subject.getAllocation().perform(user, HIDE_BLOCKS, HIDE_PIECES, DESTROY_DISPLAYABLE));
 		user.setLastLocation(user.getLocation());
 		user.setLastPosition(UtilV3.fromVector(user.getLocation().toVector()));
 

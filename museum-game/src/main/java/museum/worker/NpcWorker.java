@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static java.lang.Math.*;
+import static org.bukkit.util.NumberConversions.square;
+
 /**
  * @author func 16.09.2020
  * @project museum
@@ -89,5 +92,28 @@ public class NpcWorker implements Displayable {
 	@Override
 	public void getHidePackets(Collection<Packet<PacketListenerPlayOut>> buffer) {
 		buffer.add(new PacketPlayOutEntityDestroy(npcEntity.id));
+	}
+
+	@Override
+	public void getUpdatePackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
+		Location target = position.toLocation(App.getApp().getWorld());
+		// Если игрок и НПС слишком далеко, то не нужно поворачивать ему голову
+		if (location.distanceSquared(target) > 2200)
+			return;
+		// Поворот головы НПС для игрока
+		PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook pckg = new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook();
+		float yawDeg = (float) toDegrees(atan2(location.getX() - target.getX(), target.getZ() - location.getZ()));
+		byte yaw = (byte) ((int) (yawDeg * 256.0F / 360.0F));
+		pckg.a = npcEntity.id;
+		pckg.e = yaw;
+		float pitchDeg = (float) toDegrees(atan2(location.getY() - target.getY(), sqrt(square(location.getX() - target.getX()) + square(location.getZ() - target.getZ()))));
+		pckg.f = (byte) ((int) (pitchDeg * 256.0F / 360.0F));
+		pckg.g = true;
+		pckg.h = false;
+		buffer.add(pckg);
+		PacketPlayOutEntityHeadRotation rot = new PacketPlayOutEntityHeadRotation();
+		rot.a = npcEntity.id;
+		rot.b = yaw;
+		buffer.add(rot);
 	}
 }

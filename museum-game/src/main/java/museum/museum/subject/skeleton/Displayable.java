@@ -21,13 +21,13 @@ public interface Displayable {
 		show(user, null);
 	}
 
-	default void getUpdatePackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
-	}
+	void getUpdatePackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position);
 
 	default void update(User user, V4 position) {
 		Collection<Packet<PacketListenerPlayOut>> packets = new ArrayList<>();
 		this.getUpdatePackets(packets, position);
 		packets.forEach(user::sendPacket);
+		packets.clear();
 	}
 
 	void getHidePackets(Collection<Packet<PacketListenerPlayOut>> buffer);

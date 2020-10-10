@@ -5,7 +5,6 @@ import museum.data.SubjectInfo;
 import museum.museum.map.SubjectPrototype;
 import museum.player.User;
 import museum.prototype.Storable;
-import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
 
 /**
@@ -32,7 +31,6 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 
 	@Override
 	protected void updateInfo() {
-		super.updateInfo();
 		this.cachedInfo.location = isAllocated() ? UtilV3.fromVector(allocation.getOrigin().toVector()) : null;
 	}
 

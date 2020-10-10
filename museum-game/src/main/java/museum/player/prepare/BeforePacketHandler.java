@@ -133,7 +133,7 @@ public class BeforePacketHandler implements Prepare {
 		}
 
 		user.getInventory().setItemInMainHand(AIR_ITEM);
-		subject.getAllocation().perform(Allocation.Action.UPDATE_BLOCKS, Allocation.Action.SPAWN_PIECES);
+		subject.getAllocation().perform(Allocation.Action.UPDATE_BLOCKS, Allocation.Action.SPAWN_PIECES, Allocation.Action.SPAWN_DISPLAYABLE);
 		for (User viewer : viewers) {
 			viewer.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
 		}

@@ -7,6 +7,7 @@ import museum.museum.Coin;
 import museum.museum.Museum;
 import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.FountainSubject;
+import museum.museum.subject.StallSubject;
 import museum.museum.subject.Subject;
 import museum.player.PlayerDataManager;
 import museum.ticker.Ticked;
@@ -52,7 +53,9 @@ public class TickTimerHandler extends BukkitRunnable {
 					if (subject instanceof CollectorSubject)
 						((CollectorSubject) subject).move(time);
 					else if (counter % 5 == 0 && subject instanceof FountainSubject)
-						((FountainSubject) subject).throwWater(user);
+						((FountainSubject) subject).throwWater();
+					else if (subject instanceof StallSubject)
+						((StallSubject) subject).update();
 				}
 				// Если монеты устарели, что бы не копились на клиенте, удаляю
 				museum.getCoins().removeIf(coin -> {

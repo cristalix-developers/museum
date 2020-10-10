@@ -146,6 +146,10 @@ public class Allocation {
 		displayables.add(displayable);
 	}
 
+	public void removeDisplayable(Displayable displayable) {
+		displayables.remove(displayable);
+	}
+
 	public void allocatePiece(Piece piece, V4 origin, boolean update) {
 		Map<AtomPiece, V4> freshPieces = new HashMap<>();
 		piece.recursiveTraverse(freshPieces, origin);
@@ -215,8 +219,9 @@ public class Allocation {
 			});
 		}), SPAWN_DISPLAYABLE((allocation, buffer, chunk) -> {
 			allocation.displayables.forEach(displayable -> displayable.getShowPackets(buffer, null));
-		}),
-		HIDE_BLOCKS((allocation, buffer, chunk) -> buffer.addAll(allocation.removePackets)),
+		}), DESTROY_DISPLAYABLE((allocation, buffer, chunk) -> {
+			allocation.displayables.forEach(displayable -> displayable.getHidePackets(buffer));
+		}), HIDE_BLOCKS((allocation, buffer, chunk) -> buffer.addAll(allocation.removePackets)),
 		HIDE_PIECES((allocation, buffer, chunk) -> {
 			int[] ids = new int[allocation.pieces.size()];
 			int i = 0;

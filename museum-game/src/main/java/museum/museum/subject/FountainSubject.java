@@ -1,7 +1,6 @@
 package museum.museum.subject;
 
 import clepto.bukkit.B;
-import clepto.bukkit.groovy.Do;
 import lombok.val;
 import museum.data.SubjectInfo;
 import museum.museum.Museum;
@@ -62,8 +61,8 @@ public class FountainSubject extends Subject {
 		destroy = new PacketPlayOutEntityDestroy(entity.id);
 	}
 
-	public void throwWater(User user) {
-		if (!(user.getState() instanceof Museum) || getAllocation() == null)
+	public void throwWater() {
+		if (!(owner.getState() instanceof Museum) || getAllocation() == null)
 			return;
 		entity.id = entity.id < UPPER_ID_BOUND ? ++entity.id : NEG_ID_BOUND;
 		entity.ticksLived = 1;
@@ -74,7 +73,7 @@ public class FountainSubject extends Subject {
 		metadata.a = entity.id;
 
 		// Отправка пакетов игроку
-		val users = user.getState().getUsers();
+		val users = owner.getState().getUsers();
 		for (User visitor : users) {
 			visitor.sendPacket(spawn);
 			visitor.sendPacket(metadata);
