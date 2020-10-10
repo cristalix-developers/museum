@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class WorkerUtil {
 
+	// todo: remove that shit in future
 	public static final NpcWorker STALL_WORKER_TEMPLATE = new NpcWorker(
 			new Location(App.getApp().getWorld(), 0, 0, 0),
 			"http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27",
@@ -47,10 +48,8 @@ public class WorkerUtil {
 					continue;
 				val playerLoc = V4.fromLocation(user.getLocation());
 
-				for (NpcWorker worker : workers) {
-					worker.getUpdatePackets(new ArrayList<>(), playerLoc);
+				for (NpcWorker worker : workers)
 					worker.update(user, playerLoc);
-				}
 			}
 		}, 1, 1);
 	}

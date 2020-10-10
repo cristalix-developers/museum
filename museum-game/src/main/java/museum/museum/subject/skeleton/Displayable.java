@@ -27,7 +27,6 @@ public interface Displayable {
 		Collection<Packet<PacketListenerPlayOut>> packets = new ArrayList<>();
 		this.getUpdatePackets(packets, position);
 		packets.forEach(user::sendPacket);
-		packets.clear();
 	}
 
 	void getHidePackets(Collection<Packet<PacketListenerPlayOut>> buffer);

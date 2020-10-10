@@ -13,7 +13,6 @@ import museum.worker.NpcWorker;
 import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.util.UtilV3;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -55,8 +54,6 @@ public class StallSubject extends Subject {
 	}
 
 	public void update() {
-		val v4 = V4.fromLocation(owner.getLocation());
-		worker.getUpdatePackets(new ArrayList<>(), v4);
-		worker.update(owner, v4);
+		worker.update(owner, V4.fromLocation(owner.getLocation()));
 	}
 }
