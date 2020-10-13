@@ -1,6 +1,5 @@
 package museum.visitor;
 
-import clepto.bukkit.B;
 import net.minecraft.server.v1_12_R1.NavigationAbstract;
 import net.minecraft.server.v1_12_R1.PathfinderGoal;
 import org.bukkit.Location;

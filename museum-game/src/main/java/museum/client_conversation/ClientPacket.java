@@ -1,6 +1,5 @@
 package museum.client_conversation;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.val;
 import museum.player.User;

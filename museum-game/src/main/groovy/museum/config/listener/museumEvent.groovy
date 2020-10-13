@@ -6,7 +6,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerMoveEvent
 
-import static clepto.bukkit.behaviour.Behaviour.*
+import static clepto.bukkit.behaviour.Behaviour.on
 
 on InventoryOpenEvent, {
     def type = inventory.type

@@ -6,7 +6,7 @@ import museum.App;
 import museum.player.State;
 import museum.player.User;
 import museum.util.LocationUtil;
-import museum.worker.*;
+import museum.worker.WorkerUtil;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;

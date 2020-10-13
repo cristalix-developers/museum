@@ -7,11 +7,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockBurnEvent
 import org.bukkit.event.block.BlockFromToEvent
 import org.bukkit.event.block.BlockPhysicsEvent
-import org.bukkit.event.entity.CreatureSpawnEvent
-import org.bukkit.event.entity.EntityChangeBlockEvent
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityExplodeEvent
-import org.bukkit.event.entity.FoodLevelChangeEvent
+import org.bukkit.event.entity.*
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent
 import org.bukkit.event.player.PlayerDropItemEvent
@@ -19,7 +15,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.spigotmc.event.entity.EntityDismountEvent
 
-import static clepto.bukkit.behaviour.Behaviour.*
+import static clepto.bukkit.behaviour.Behaviour.on
 
 on EntityDismountEvent, {
     if (dismounted.type == EntityType.BAT)
