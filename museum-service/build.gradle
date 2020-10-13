@@ -1,14 +1,14 @@
 dependencies {
     implementation project(":museum-commons")
     compileOnly 'org.mongodb:mongodb-driver-async:3.7.1'
-    compileOnly files("../external/microservice-1.0.jar")
+    compileOnly files("../external/microservice-1.0.4.jar")
     compileOnly 'com.google.guava:guava:21.0'
     compileOnly 'io.netty:netty-all:4.1.37.Final'
     compileOnly files("../external/waterfall-chat-1.0.jar")
 
     testCompile project(":museum-commons")
     testCompile 'org.mongodb:mongodb-driver-async:3.7.1'
-    testCompile files("../external/microservice-1.0.jar")
+    testCompile files("../external/microservice-1.0.4.jar")
     testCompile 'com.google.guava:guava:21.0'
     testCompile 'io.netty:netty-all:4.1.37.Final'
     testCompile files("../external/waterfall-chat-1.0.jar")
