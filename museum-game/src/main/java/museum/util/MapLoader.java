@@ -26,9 +26,11 @@ public class MapLoader {
 
 		try {
 			app.setMap(new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get()));
-		} catch (InterruptedException | ExecutionException e) {
-			throw new RuntimeException(e);
+		} catch (InterruptedException | ExecutionException exception) {
+			exception.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
+
 		val world = app.getWorld();
 		world.setGameRuleValue("mobGriefing", "false");
 		world.setGameRuleValue("doTileDrops", "false");

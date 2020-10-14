@@ -30,9 +30,7 @@ import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 public class PlayerDataManager implements Listener {
@@ -74,7 +72,7 @@ public class PlayerDataManager implements Listener {
 				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid);
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 				userMap.put(uuid, new User(userInfo));
-			} catch (InterruptedException | ExecutionException | TimeoutException ex) {
+			} catch (Exception ex) {
 				event.setCancelReason("Не удалось загрузить статистику о музее.");
 				event.setCancelled(true);
 				ex.printStackTrace();
