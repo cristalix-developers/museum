@@ -14,14 +14,14 @@ import org.bukkit.Location;
  */
 public class Coin {
 
-	public static final ItemStack COIN = clepto.bukkit.item.Items.render("coin");
+	public static final ItemStack COIN_ITEM = clepto.bukkit.item.Items.render("coin");
 	public static final int SECONDS_LIVE = 20;
 	private final EntityItem entityItem;
 	@Getter
 	private final long timestamp;
 
 	public Coin(double x, double y, double z) {
-		entityItem = new EntityItem(App.getApp().getNMSWorld(), x, y, z, COIN);
+		entityItem = new EntityItem(App.getApp().getNMSWorld(), x, y, z, COIN_ITEM);
 		timestamp = System.currentTimeMillis();
 	}
 

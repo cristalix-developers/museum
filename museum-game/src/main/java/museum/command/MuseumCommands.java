@@ -4,42 +4,37 @@ import clepto.bukkit.B;
 import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
+import museum.data.SubjectInfo;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
-import museum.museum.map.SkeletonSubjectPrototype;
-import museum.museum.map.SubjectType;
+import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.Allocation;
-import museum.museum.subject.CollectorSubject;
-import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Skeleton;
-import museum.museum.subject.skeleton.SkeletonPrototype;
-import museum.player.State;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
-import museum.util.SubjectLogoUtil;
 import museum.util.VirtualSign;
+import museum.visitor.VisitorHandler;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import ru.cristalix.core.formatting.Color;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
-import static museum.museum.subject.Allocation.Action.*;
-import static museum.util.Colorizer.applyColor;
+import java.util.stream.Collectors;
 
 public class MuseumCommands {
 
 	private final App app;
+	private static final String NO_MONEY_MESSAGE = MessageUtil.get("nomoney");
+	private static final String PLAYER_OFFLINE_MESSAGE = MessageUtil.get("playeroffline");
 
 	public MuseumCommands(App app) {
 		this.app = app;
@@ -52,10 +47,47 @@ public class MuseumCommands {
 		B.regCommand(this::cmdInvite, "invite");
 		B.regCommand(this::cmdExcavation, "excavation", "exc");
 		B.regCommand(this::cmdPickaxe, "pickaxe");
-		B.regCommand(this::cmdSubject, "subject");
 		B.regCommand(this::cmdSkeleton, "skeleton");
+		B.regCommand(this::cmdRunTop, "runtop", "rt");
 		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
+		B.regCommand((sender, args) -> VisitorHandler.getVisitorUuids().values().stream()
+				.distinct().findFirst().get().getCurrentRoute()
+				.stream().map(String::valueOf)
+				.collect(Collectors.joining("\n")), "routes");
+		B.regCommand(this::cmdBuy, "buy");
+	}
+
+	private String cmdRunTop(Player player, String[] args) {
+		if (player.isOp()) {
+			app.getTopManager().updateData();
+			app.getTopManager().sendTops();
+		}
+		return null;
+	}
+
+	private String cmdBuy(Player sender, String[] args) {
+		if (args.length == 0)
+			return "§cИспользование: §f/buy [subject-address]";
+
+		SubjectPrototype prototype;
+		try {
+			prototype = Managers.subject.getPrototype(args[0]);
+		} catch (Exception e) {
+			return e.getMessage();
+		}
+		if (prototype == null)
+			return null;
+
+		val user = app.getUser(sender);
+
+		if (user.getMoney() < prototype.getPrice())
+			return NO_MONEY_MESSAGE;
+
+		user.setMoney(user.getMoney() - prototype.getPrice());
+		user.getSubjects().add(new Subject(prototype, new SubjectInfo(UUID.randomUUID(), prototype.getAddress()), user));
+
+		return MessageUtil.get("finally-buy");
 	}
 
 	private String cmdVisit(Player sender, String[] args) {
@@ -67,7 +99,7 @@ public class MuseumCommands {
 		val ownerPlayer = Bukkit.getPlayer(args[1]);
 
 		if (ownerPlayer == null || !ownerPlayer.isOnline())
-			return MessageUtil.get("playeroffline");
+			return PLAYER_OFFLINE_MESSAGE;
 
 		val ownerUser = app.getUser(ownerPlayer);
 		String address = args.length > 2 ? args[2] : "main";
@@ -94,7 +126,7 @@ public class MuseumCommands {
 		if (args.length < 2)
 			return null;
 		if (owner == null || !owner.getPlayer().isOnline() || owner.getState() == null || owner.equals(visitor)) {
-			return MessageUtil.get("playeroffline");
+			return PLAYER_OFFLINE_MESSAGE;
 		}
 
 		double price;
@@ -108,14 +140,12 @@ public class MuseumCommands {
 		val state = owner.getState();
 
 		if (state instanceof Museum) {
-			val museum = (Museum) state;
-
 			if (visitor.getMoney() <= price)
-				return MessageUtil.get("nomoney");
+				return NO_MONEY_MESSAGE;
 
 			visitor.setMoney(visitor.getMoney() - price);
 			owner.setMoney(owner.getMoney() + price);
-			visitor.setState(museum);
+			visitor.setState(state);
 			MessageUtil.find("traveler")
 					.set("visitor", visitor.getName())
 					.set("price", MessageUtil.toMoneyFormat(price))
@@ -170,14 +200,13 @@ public class MuseumCommands {
 	private String cmdShop(Player sender, String[] args) {
 		User user = app.getUser(sender);
 
-		if (user.getExperience() <= PreparePlayerBrain.EXPERIENCE)
+		if (user.getExperience() < PreparePlayerBrain.EXPERIENCE)
 			return null;
 
 		if (user.getState() instanceof Excavation)
-			// ToDo: Автоматический триггер возвращения домой с возможностью отмены
 			return "§cВы на раскопках, сперва вернитесь домой";
 		user.setState(app.getShop());
-		return MessageUtil.get("welcome-gallery");
+		return null;
 	}
 
 	private String cmdChangeTitle(Player sender, String[] args) {
@@ -210,7 +239,7 @@ public class MuseumCommands {
 					MessageUtil.find("playeroffline").send(user);
 					return;
 				} else if (invited.equals(sender)) {
-					MessageUtil.find("inviteyourself").send(user);
+					user.sendMessage(PLAYER_OFFLINE_MESSAGE);
 					return;
 				}
 				MessageUtil.find("invited").send(user);
@@ -240,12 +269,11 @@ public class MuseumCommands {
 		player.closeInventory();
 
 		if (proto.getPrice() > user.getMoney())
-			return MessageUtil.get("nomoney");
+			return NO_MONEY_MESSAGE;
 
 		user.setMoney(user.getMoney() - proto.getPrice());
 
-		Excavation excavation = new Excavation(proto, proto.getHitCount());
-		user.setState(excavation);
+		user.setState(new Excavation(proto, proto.getHitCount()));
 
 		return null;
 	}
@@ -258,135 +286,11 @@ public class MuseumCommands {
 		player.closeInventory();
 
 		if (user.getMoney() < pickaxe.getPrice())
-			return MessageUtil.get("nomoney");
+			return NO_MONEY_MESSAGE;
 
 		user.setPickaxeType(pickaxe);
 		user.setMoney(user.getMoney() - pickaxe.getPrice());
 		player.performCommand("gui pickaxe");
 		return MessageUtil.get("newpickaxe");
 	}
-
-	private String cmdSubject(Player player, String[] args) {
-		if (args.length < 2)
-			return null;
-
-		UUID subjectUuid;
-
-		try {
-			subjectUuid = UUID.fromString(args[1]);
-		} catch (IllegalArgumentException ignored) {
-			return null;
-		}
-
-		val user = app.getUser(player);
-		State state = user.getState();
-		if (!(state instanceof Museum))
-			return MessageUtil.get("not-in-museum");
-		Museum museum = (Museum) state;
-		val subject = museum.getSubjectByUuid(subjectUuid);
-		if (museum.getOwner() != user)
-			return MessageUtil.get("owner-crash");
-
-		if (subject == null)
-			return null;
-
-		val allocation = subject.getAllocation();
-
-		if ("color".equals(args[0]) && args.length == 3) {
-
-			Color color;
-			try {
-				color = Color.valueOf(args[2]);
-			} catch (Exception e) {
-				return null;
-			}
-
-			subject.getCachedInfo().setColor(color);
-
-			if (allocation != null) {
-				allocation.prepareUpdate(data -> applyColor(data, color));
-				allocation.perform(Allocation.Action.UPDATE_BLOCKS);
-			}
-
-			return MessageUtil.get("color-changed");
-		} else if ("special".equals(args[0])) {
-			if (subject instanceof SkeletonSubject)
-				player.performCommand("gui skeleton-manipulator " + subjectUuid.toString());
-			else if (subject instanceof CollectorSubject)
-				player.performCommand("gui collector-manipulator " + subjectUuid.toString());
-		} else if ("destroy".equals(args[0])) {
-			if (allocation == null)
-				return null;
-			allocation.perform(PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES);
-			subject.setAllocation(null);
-
-			player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
-			player.closeInventory();
-			return MessageUtil.get("destroyed");
-		} else if ("setdino".equals(args[0]) && args.length == 3) {
-			if (!(subject instanceof SkeletonSubject))
-				return null;
-			val skeletonSubject = (SkeletonSubject) subject;
-			val previousSkeleton = skeletonSubject.getSkeleton();
-
-			SkeletonPrototype newSkeletonType = null;
-			try {
-				newSkeletonType = Managers.skeleton.getByIndex(Integer.parseInt(args[2]));
-			} catch (Exception ignored) {
-			}
-
-			// Заменять на && не надо, ибо другая логика
-			if (newSkeletonType == null) {
-				if (previousSkeleton != null)
-					skeletonSubject.setSkeleton(null);
-			} else {
-				// Если этот скелет уже выставлен на другой витрине, потребовать сперва убрать его оттуда
-				for (val anotherSubject : museum.getSubjects(SubjectType.SKELETON_CASE)) {
-					if (anotherSubject == subject)
-						continue;
-					val skeleton = anotherSubject.getSkeleton();
-					if (skeleton == null) continue;
-					if (skeleton.getCachedInfo().getPrototypeAddress().equals(newSkeletonType.getAddress())) {
-						user.closeInventory();
-						return MessageUtil.get("standlocked");
-					}
-				}
-
-				if (newSkeletonType.getSize() > ((SkeletonSubjectPrototype) subject.getPrototype()).getSize())
-					return null;
-
-				val newSkeleton = user.getSkeletons().get(newSkeletonType);
-
-				if (newSkeleton == null || newSkeleton == previousSkeleton || newSkeleton.getUnlockedFragments().isEmpty())
-					return null;
-
-				skeletonSubject.setSkeleton(newSkeleton);
-			}
-
-			if (allocation != null) {
-				if (previousSkeleton != null) {
-					allocation.perform(HIDE_PIECES);
-					allocation.removePiece(previousSkeleton.getPrototype());
-				}
-				skeletonSubject.updateSkeleton(true);
-			}
-
-			// Если до изменения был динозавр и он удален, то написать об этом
-			if (previousSkeleton != null) {
-				if (newSkeletonType == null) {
-					player.closeInventory();
-					return MessageUtil.get("freestand");
-				}
-				return null;
-			}
-			// Если динозавр не удален и поставлен новый динозавр, то написать об этом
-			if (newSkeletonType != null) {
-				player.closeInventory();
-				return MessageUtil.get("standplaced");
-			}
-			return null;
-		}
-		return null;
-	}
-
 }

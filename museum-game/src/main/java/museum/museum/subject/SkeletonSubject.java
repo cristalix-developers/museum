@@ -60,7 +60,6 @@ public class SkeletonSubject extends Subject {
 			this.skeletonLocation.setRot(rot);
 
 			this.updateSkeleton(false);
-
 		}
 	}
 
@@ -85,7 +84,7 @@ public class SkeletonSubject extends Subject {
 	public double getIncome() {
 		if (skeleton == null)
 			return 0;
-		return skeleton.getUnlockedFragments().size() * skeleton.getPrototype().getPrice();
+		return skeleton.getUnlockedFragments().size() * (double) skeleton.getPrototype().getPrice();
 	}
 
 	public void setSkeleton(Skeleton skeleton) {

@@ -43,7 +43,6 @@ public class CollectorSubject extends Subject {
 
 	@Override
 	public void updateInfo() {
-		super.updateInfo();
 		cachedInfo.metadata = String.valueOf(id);
 	}
 

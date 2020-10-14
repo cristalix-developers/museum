@@ -16,6 +16,7 @@ import museum.socket.ServerSocketHandler;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
+import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.microservice.MicroServicePlatform;
 import ru.cristalix.core.microservice.MicroserviceBootstrap;
@@ -23,6 +24,8 @@ import ru.cristalix.core.network.ISocketClient;
 import ru.cristalix.core.network.packages.FillLauncherUserDataPackage;
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage;
 import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage;
+import ru.cristalix.core.permissions.IPermissionService;
+import ru.cristalix.core.permissions.PermissionService;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -62,6 +65,7 @@ public class MuseumService {
 
 	public static void main(String[] args) {
 		MicroserviceBootstrap.bootstrap(new MicroServicePlatform(2));
+		CoreApi.get().registerService(IPermissionService.class, new PermissionService(ISocketClient.get()));
 
 		ServerSocket serverSocket = new ServerSocket(14653);
 		serverSocket.start();
@@ -181,9 +185,16 @@ public class MuseumService {
 			if (args[0].equals("delete")) {
 				if (args.length < 2) System.out.println("Usage: delete [uuid]");
 				else {
-					UUID uuid = UUID.fromString(args[1]);
-					userData.clear(uuid);
-					System.out.println("Removed " + uuid + "'s data from db...");
+					if (args[1].equals("all")) {
+						userData.findAll().thenAccept(map -> map.forEach(((uuid, userInfo) -> {
+							userData.clear(uuid);
+							System.out.println("Removed " + uuid);
+						})));
+					} else {
+						UUID uuid = UUID.fromString(args[1]);
+						userData.clear(uuid);
+						System.out.println("Removed " + uuid + "'s data from db...");
+					}
 				}
 			}
 		}

@@ -1,23 +1,19 @@
 package museum.ticker.top;
 
 import com.google.common.collect.Maps;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import museum.App;
-import museum.data.UserInfo;
+import museum.client_conversation.ClientPacket;
 import museum.packages.TopPackage;
 import museum.player.User;
 import museum.ticker.Ticked;
 import museum.tops.TopEntry;
-import net.minecraft.server.v1_12_R1.PacketDataSerializer;
-import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
-import org.bukkit.entity.Player;
 import ru.cristalix.core.GlobalSerializers;
-import ru.cristalix.core.util.UtilNetty;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author func 25.09.2020
@@ -27,10 +23,9 @@ import java.util.Map;
 public class TopManager implements Ticked {
 
 	private static final int UPDATE_SECONDS = 20;
-	private static final int DATA_COUNT = 10;
-	private final ByteBuf buffer = Unpooled.buffer();
+	private static final int DATA_COUNT = 100;
 	private final App app;
-	private final Map<TopPackage.TopType, List<TopEntry<UserInfo, Object>>> tops = Maps.newConcurrentMap();
+	private final Map<TopPackage.TopType, List<TopEntry<String, Object>>> tops = Maps.newConcurrentMap();
 
 	@Override
 	public void tick(int... args) {
@@ -43,18 +38,19 @@ public class TopManager implements Ticked {
 	public void updateData() {
 		for (TopPackage.TopType type : TopPackage.TopType.values()) {
 			app.getClientSocket().writeAndAwaitResponse(new TopPackage(type, DATA_COUNT))
-					.thenAcceptAsync(topPackage -> {
-						if (tops.containsKey(type)) tops.replace(type, topPackage.getEntries());
-						else tops.put(type, topPackage.getEntries());
-					});
+					.thenAcceptAsync(pkg -> tops.put(type, pkg.getEntries().stream()
+							.map(entry -> new TopEntry<>(
+									entry.getDisplayName(),
+									entry.getValue()
+							)).collect(Collectors.toList())
+					));
 		}
 	}
 
 	public void sendTops() {
-		buffer.clear();
-		UtilNetty.writeString(buffer, GlobalSerializers.toJson(tops));
-		for (User user : app.getUsers()) {
-			user.getConnection().sendPacket(new PacketPlayOutCustomPayload("top", new PacketDataSerializer(buffer)));
-		}
+		val data = GlobalSerializers.toJson(tops);
+		val packet = new ClientPacket<String>("top-update");
+		for (User user : app.getUsers())
+			packet.send(user, data);
 	}
 }

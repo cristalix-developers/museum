@@ -68,13 +68,13 @@ public class MongoServiceTest {
 
     void testTop(TopPackage.TopType topType, Comparator<UserInfo> comparator, int generate, int limit) throws Exception {
         Thread.sleep(100L);
-        UserDataMongoAdapter adapter = userData;
+        MongoAdapter adapter = userData;
         CompletableFuture<Void> dropFuture = new CompletableFuture<>();
         adapter.getData().drop(adapter.getSession(), wrap(dropFuture));
         dropFuture.join();
         List<UserInfo> generated = generateUserInfos(generate);
         pushAll(adapter, generated.stream().map(info -> Document.parse(GlobalSerializers.toJson(info))).collect(Collectors.toList())).join();
-        List<TopEntry<UserInfo, Object>> list = adapter.getTop(topType, limit).join();
+        List<TopEntry<UserInfo, Object>> list = (List<TopEntry<UserInfo, Object>>) adapter.<Object>makeRatingByField(topType.name().toLowerCase(), limit).join();
         List<UUID> expected = generated.stream().sorted(comparator).map(UserInfo::getUuid).collect(Collectors.toList());
         deleteAll(adapter, expected).join();
         assertIterableEquals(

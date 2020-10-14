@@ -5,7 +5,6 @@ import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.prototype.Prototype;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class ExcavationPrototype implements Prototype {
 	private final double price;
 	private final String title;
 	private final List<PacketPlayOutMapChunk> packets;
-	private final Material icon;
+	private final ItemStack icon;
 	private final ItemStack[] pallette;
 
 }

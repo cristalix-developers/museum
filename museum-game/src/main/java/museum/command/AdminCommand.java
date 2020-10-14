@@ -1,6 +1,7 @@
 package museum.command;
 
 import clepto.bukkit.B;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
 import museum.museum.subject.skeleton.SkeletonPrototype;
@@ -11,8 +12,16 @@ import org.bukkit.Bukkit;
  * @author func 25.08.2020
  * @project museum
  */
+@UtilityClass
 public class AdminCommand {
-	public static void init(App app) {
+
+	public void init(App app) {
+		registerMoneyCmd(app);
+		registerExpCmd(app);
+		registerDinoCmd(app);
+	}
+
+	private void registerMoneyCmd(App app) {
 		B.regCommand((sender, args) -> {
 			if (!sender.isOp())
 				return null;
@@ -24,7 +33,9 @@ public class AdminCommand {
 			app.getUser(player).setMoney(Double.parseDouble(args[1]));
 			return "§aВаше количество денег изменено.";
 		}, "money");
+	}
 
+	private void registerExpCmd(App app) {
 		B.regCommand((sender, args) -> {
 			if (!sender.isOp())
 				return null;
@@ -36,7 +47,9 @@ public class AdminCommand {
 				app.getUser(Bukkit.getPlayer(args[0])).giveExperience(Integer.parseInt(args[1]));
 			return "§aОпыт изменен.";
 		}, "exp");
+	}
 
+	private void registerDinoCmd(App app) {
 		B.regCommand((sender, args) -> {
 			if (!sender.isOp())
 				return null;

@@ -24,7 +24,7 @@ public class PrepareScoreBoard implements Prepare {
 	}
 
 	public static void addServerInfo(SimpleBoardObjective objective) {
-		long megabyte = 1024 * 1024;
+		long megabyte = 1024 * 1024L;
 		Runtime runtime = Runtime.getRuntime();
 
 		objective.startGroup("Сервер")

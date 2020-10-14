@@ -20,6 +20,4 @@ public interface State {
 	default Collection<User> getUsers() {
 		return ListUtils.filter(App.getApp().getUsers(), user -> user.getState() == this);
 	}
-
-
 }

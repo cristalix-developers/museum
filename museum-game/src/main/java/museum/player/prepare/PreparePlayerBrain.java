@@ -22,7 +22,7 @@ import static clepto.bukkit.Cycle.exit;
  */
 public class PreparePlayerBrain implements Prepare {
 
-	public static final PreparePlayerBrain INSTANCE = new PreparePlayerBrain();
+	public static final Prepare INSTANCE = new PreparePlayerBrain();
 	public static final int EXPERIENCE = 10;
 
 	private final List<Label> dots;
@@ -36,11 +36,11 @@ public class PreparePlayerBrain implements Prepare {
 	public PreparePlayerBrain() {
 		dots = App.getApp().getMap().getLabels("guide");
 
-		// При &&& след. текст становится на второе место
+		// При next след. текст становится на второе место
 		Stream.of(
 				"Привет! 䀈", "Это.nextТвой. Музей. 㸾", "Заполняйnextвитрины 㜤",
 				"Раскапывайnextдинозавров 㿿", "Собирай монеты 㜰", "Кастомизируй 㟡",
-				"Играй сnextдрузьями 㭿", "Удачи! 㬂"
+				"Играй сnextдрузьями 㭿", "Удачи! 㲺"
 		).map(line -> {
 			if (line.contains("next")) {
 				String[] separated = line.split("next");
@@ -70,7 +70,7 @@ public class PreparePlayerBrain implements Prepare {
 				if (iteration >= titles.size()) {
 					player.sendMessage(endMessage);
 					user.giveExperience(EXPERIENCE);
-					((Museum) user.getState()).giveMenu();
+					((Museum) user.getState()).giveMenu(user);
 					exit();
 					return;
 				}

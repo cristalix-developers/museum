@@ -8,13 +8,11 @@ import clepto.cristalix.mapservice.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
-import museum.listener.BlockClickHandler;
-import museum.listener.MuseumEventHandler;
-import museum.listener.PassiveEventBlocker;
 import museum.museum.Shop;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
@@ -27,7 +25,7 @@ import museum.ticker.top.TopManager;
 import museum.util.MapLoader;
 import museum.util.MuseumChatService;
 import museum.visitor.VisitorHandler;
-import museum.worker.WorkerHandler;
+import museum.worker.WorkerUtil;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
@@ -42,6 +40,7 @@ import ru.cristalix.core.inventory.IInventoryService;
 import ru.cristalix.core.inventory.InventoryService;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.realm.IRealmService;
+import ru.cristalix.core.realm.RealmStatus;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.ScoreboardService;
 
@@ -58,6 +57,8 @@ public final class App extends JavaPlugin {
 	private static App app;
 
 	private PlayerDataManager playerDataManager;
+	@Getter
+	private TopManager topManager;
 	@Getter
 	private ClientSocket clientSocket;
 	@Getter
@@ -115,27 +116,24 @@ public final class App extends JavaPlugin {
 
 		requestConfigurations();
 
-		// Прогрузка предметов из Groovy-скриптов
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")));
+		// Прогрузка Groovy-скриптов
+		try(val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {
 			while (true) {
 				String line = reader.readLine();
 				if (line == null || line.isEmpty()) break;
 				Class<?> scriptClass = Class.forName(line);
 				if (!Script.class.isAssignableFrom(scriptClass)) continue;
-				Script script = (Script) scriptClass.newInstance();
-				try {
-					script.run();
-				} catch (Throwable throwable) {
-					Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", throwable);
-				}
+				readScript(scriptClass);
 			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception exception) {
+			exception.printStackTrace();
 		}
 
 		// Класс управляющий игроками
 		this.playerDataManager = new PlayerDataManager(this);
+
+		// Прогрузка мэнеджера топа
+		topManager = new TopManager(this);
 
 		// Инициализация команд
 		new MuseumCommands(this);
@@ -144,23 +142,29 @@ public final class App extends JavaPlugin {
 		// Регистрация обработчиков событий
 		B.events(
 				playerDataManager,
-				new PassiveEventBlocker(),
-				new MuseumEventHandler(this),
 				new GuiEvents(),
-				new BlockClickHandler(),
 				new BehaviourListener()
 		);
 
-		new WorkerHandler(this);
+		WorkerUtil.init(this);
 
 		// Обработка каждого тика
 		new TickTimerHandler(this, Arrays.asList(
 				new FountainHandler(this),
 				new WayParticleHandler(this),
-				new TopManager(this)
+				topManager
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
 		VisitorHandler.init(this, 1);
+
+		// Вывод сервера в тесты
+		IRealmService.get().getCurrentRealmInfo().setStatus(RealmStatus.WAITING_FOR_PLAYERS);
+		IRealmService.get().getCurrentRealmInfo().setReadableName("Музей археологии - ALPHA");
+		IRealmService.get().getCurrentRealmInfo().setDescription(new String[]{
+				"",
+				"Находи и демонстрируй кости",
+				"динозавров, стань археологом!"
+		});
 	}
 
 	@Override
@@ -168,8 +172,8 @@ public final class App extends JavaPlugin {
 		clientSocket.write(playerDataManager.bulk(true));
 		try {
 			Thread.sleep(1000L); // Если вдруг он не успеет написать в сокет(хотя вряд ли, конечно)
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception exception) {
+			exception.printStackTrace();
 		}
 	}
 
@@ -229,4 +233,12 @@ public final class App extends JavaPlugin {
 		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 	}
 
+	private void readScript(Class<?> scriptClass) throws Exception {
+		Script script = (Script) scriptClass.newInstance();
+		try {
+			script.run();
+		} catch (Exception exception) {
+			Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", exception);
+		}
+	}
 }

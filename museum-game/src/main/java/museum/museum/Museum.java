@@ -22,7 +22,7 @@ import museum.util.ChunkWriter;
 import museum.util.LocationUtil;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
-import museum.worker.WorkerHandler;
+import museum.worker.WorkerUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.IBlockData;
@@ -105,7 +105,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 	@Override
 	public void enterState(User user) {
-		user.teleport(prototype.getBox().contains(user.getLastLocation()) && owner == user ? user.getLastLocation() : prototype.getSpawn());
+		teleportUser(user);
 
 		cachedInfo.views++;
 
@@ -126,7 +126,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		val inventory = player.getInventory();
 
 		if (owner.getExperience() >= PreparePlayerBrain.EXPERIENCE)
-			giveMenu();
+			giveMenu(user);
 
 		if (this.owner != user)
 			inventory.setItem(8, backItem);
@@ -139,18 +139,19 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 		player.setAllowFlight(true);
 
-		WorkerHandler.load(user);
+		WorkerUtil.reload(user);
 
 		B.postpone(20, () -> {
 			for (Subject subject : this.getSubjects()) {
 				subject.getAllocation().perform(user, UPDATE_BLOCKS);
 				subject.getAllocation().perform(user, SPAWN_PIECES);
+				subject.getAllocation().perform(user, SPAWN_DISPLAYABLE);
 			}
 		});
 	}
 
-	public void giveMenu() {
-		val inventory = owner.getInventory();
+	public void giveMenu(User user) {
+		val inventory = user.getInventory();
 		inventory.clear();
 		inventory.setItem(0, menu);
 		inventory.setItem(4, visitorMenu);
@@ -158,21 +159,12 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 	@Override
 	public void leaveState(User user) {
-		this.iterateSubjects(subject -> subject.getAllocation().perform(user, HIDE_BLOCKS, HIDE_PIECES));
+		this.iterateSubjects(subject -> subject.getAllocation().perform(user, HIDE_BLOCKS, HIDE_PIECES, DESTROY_DISPLAYABLE));
 		user.setLastLocation(user.getLocation());
 		user.setLastPosition(UtilV3.fromVector(user.getLocation().toVector()));
 
 		coins.forEach(coin -> coin.remove(user.getConnection()));
 		coins.clear();
-	}
-
-	private void iterateSubjects(Consumer<Subject> action) {
-		for (Subject subject : owner.getSubjects()) {
-			Allocation allocation = subject.getAllocation();
-			if (allocation == null) continue;
-			if (!prototype.getBox().contains(allocation.getOrigin())) continue;
-			action.accept(subject);
-		}
 	}
 
 	public void updateIncrease() {
@@ -234,6 +226,22 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		Allocation allocation = Allocation.allocate(this, subject.getCachedInfo(), subject.getPrototype(), location);
 		subject.setAllocation(allocation);
 		return allocation != null;
+	}
+
+	private void iterateSubjects(Consumer<Subject> action) {
+		for (Subject subject : owner.getSubjects()) {
+			Allocation allocation = subject.getAllocation();
+			if (allocation == null) continue;
+			if (!prototype.getBox().contains(allocation.getOrigin())) continue;
+			action.accept(subject);
+		}
+	}
+
+	private void teleportUser(User user) {
+		user.teleport(prototype.getBox().contains(user.getLastLocation()) && owner == user ?
+				user.getLastLocation() :
+				prototype.getSpawn()
+		);
 	}
 
 }

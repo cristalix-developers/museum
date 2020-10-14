@@ -2,7 +2,6 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import museum.App
-import museum.museum.Museum
 import museum.museum.map.SkeletonSubjectPrototype
 import museum.museum.subject.Allocation
 import museum.museum.subject.SkeletonSubject
@@ -68,8 +67,7 @@ Guis.register 'manipulator', { player ->
     }
 
     button 'I' icon {
-        // ToDo: Перенести этот DynamicItem на новый API
-        def itemStack = abstractSubject.prototype.icon.render()
+        def itemStack = abstractSubject.prototype.icon
         item itemStack.type
         data itemStack.durability
         text """
@@ -85,7 +83,7 @@ Guis.register 'manipulator', { player ->
     } leftClick {
         def allocation = abstractSubject.allocation
         if (!allocation) return
-        allocation.perform PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES
+        allocation.perform PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES, DESTROY_DISPLAYABLE
         abstractSubject.allocation = null
 
         inventory.addItem SubjectLogoUtil.encodeSubjectToItemStack(abstractSubject)

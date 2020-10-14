@@ -64,9 +64,4 @@ public class AtomPiece implements Displayable, Piece {
 		buffer.add(packetDestroy);
 	}
 
-	@Override
-	public int hashCode() {
-		return this.stand.id;
-	}
-
 }

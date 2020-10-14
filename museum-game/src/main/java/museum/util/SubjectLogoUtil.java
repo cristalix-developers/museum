@@ -15,25 +15,27 @@ import java.util.UUID;
  */
 public class SubjectLogoUtil {
 
+	private static final String SECURITY_FIELD_NAME = "subject-uuid";
+
 	public static ItemStack encodeSubjectToItemStack(Subject subject) {
-		val itemProto = subject.getPrototype().getIcon().render();
+		val itemProto = subject.getPrototype().getIcon();
 		val nmsItem = CraftItemStack.asNMSCopy(itemProto);
 		val nbtTagCompound = nmsItem.getTag() != null ? nmsItem.getTag() : new NBTTagCompound();
-		nbtTagCompound.setString("subject-uuid", String.valueOf(subject.getCachedInfo().getUuid()));
+		nbtTagCompound.setString(SECURITY_FIELD_NAME, String.valueOf(subject.getCachedInfo().getUuid()));
 		nmsItem.setTag(nbtTagCompound);
 		return CraftItemStack.asBukkitCopy(nmsItem);
 	}
 
 	public static Subject decodeItemStackToSubject(User user, ItemStack itemStack) {
-		if (itemStack == null)// || itemStack.getItemMeta() == null)
+		if (itemStack == null)
 			return null;
 
 		val nmsCopy = CraftItemStack.asNMSCopy(itemStack);
 		val tag = nmsCopy.getTag();
 
-		if (tag == null || !tag.hasKeyOfType("subject-uuid", 8))
+		if (tag == null || !tag.hasKeyOfType(SECURITY_FIELD_NAME, 8))
 			return null;
 
-		return user.getSubject(UUID.fromString(tag.getString("subject-uuid")));
+		return user.getSubject(UUID.fromString(tag.getString(SECURITY_FIELD_NAME)));
 	}
 }

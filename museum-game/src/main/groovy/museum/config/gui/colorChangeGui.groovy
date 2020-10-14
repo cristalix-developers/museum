@@ -2,6 +2,7 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import museum.museum.subject.Allocation
+import museum.museum.subject.FountainSubject
 import museum.museum.subject.Subject
 import org.bukkit.Material
 import ru.cristalix.core.formatting.Color
@@ -35,6 +36,9 @@ Guis.register 'colorChange', {
             if (allocation) {
                 allocation.prepareUpdate(data -> applyColor(data, color))
                 allocation.perform(Allocation.Action.UPDATE_BLOCKS)
+            }
+            if (subject instanceof FountainSubject) {
+                subject.setAllocation(subject.getAllocation())
             }
         }
     }

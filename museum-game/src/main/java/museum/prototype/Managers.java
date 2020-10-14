@@ -1,8 +1,8 @@
 package museum.prototype;
 
 import clepto.ListUtils;
-import clepto.bukkit.DynamicItem;
 import clepto.bukkit.InvalidConfigException;
+import clepto.bukkit.item.Items;
 import clepto.cristalix.mapservice.Label;
 import clepto.cristalix.mapservice.MapServiceException;
 import lombok.val;
@@ -12,6 +12,7 @@ import museum.museum.map.*;
 import museum.museum.subject.skeleton.Rarity;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.util.LocationUtil;
+import museum.worker.WorkerUtil;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -19,10 +20,12 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Color;
 import ru.cristalix.core.math.D2;
+import ru.cristalix.core.util.UtilV3;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +36,9 @@ public class Managers {
 	public static PrototypeManager<MuseumPrototype> museum;
 	public static PrototypeManager<SkeletonPrototype> skeleton;
 	public static PrototypeManager<ExcavationPrototype> excavation;
+
+	private static final String TITLE_FIELD = "title";
+	private static final String PRICE_FIELD = "price";
 
 	@SuppressWarnings("deprecation")
 	public static void init() {
@@ -48,55 +54,55 @@ public class Managers {
 						.speed(box.requireLabel("speed").getTagDouble());
 
 			else if (type == SubjectType.SKELETON_CASE)
-				builder = SkeletonSubjectPrototype.builder()
-						.size(box.requireLabel("size").getTagInt());
+				builder = SkeletonSubjectPrototype.builder().size(box.requireLabel("size").getTagInt());
 
 			else if (type == SubjectType.FOUNTAIN)
-				builder = FountainPrototype.builder()
-						.source(box.requireLabel("source"));
+				builder = FountainPrototype.builder().source(box.requireLabel("source"));
+
+			else if (type == SubjectType.STALL) {
+				val npc = WorkerUtil.STALL_WORKER_TEMPLATE;
+				val npcSpawn = box.requireLabel("npc").toCenterLocation();
+				npc.setLocation(npcSpawn);
+				builder = StallPrototype.builder()
+						.spawn(npcSpawn)
+						.worker(() -> npc);
+			}
 
 			else builder = SubjectPrototype.builder();
 
-			val iconLabel = box.getLabel("icon");
-			DynamicItem icon = null;
-			if (iconLabel != null) {
-				Block iconBlock = iconLabel.subtract(0, 1, 0).getBlock();
-				iconBlock.getChunk().load();
-				if (iconBlock.getType() == Material.CHEST) {
-					try {
-						icon = new DynamicItem(((Chest) iconBlock.getState()).getBlockInventory().getItem(0));
-					} catch (Exception ignored) {
-					}
-				}
-				if (icon == null)
-					icon = new DynamicItem(iconBlock.getDrops().iterator().next());
-				iconBlock.setType(Material.AIR);
-			} else
-				icon = new DynamicItem(new ItemStack(Material.PACKED_ICE));
-
-			builder.icon(icon);
-
 			// Добавляю блок, на который можно ставить данный Subject
-			val ableLabel = box.getLabel("able");
-			val ableBlock = ableLabel.subtract(0, 1, 0).getBlock();
-			builder.able(ableBlock.getDrops().iterator().next().getType());
-			ableBlock.setType(Material.AIR);
+			val ableItem = getUnderItem(box.getLabel("able"));
+			val title = box.requireLabel(TITLE_FIELD).getTag();
+			double price = box.getLabels(PRICE_FIELD).stream()
+					.findAny()
+					.map(Label::getTagDouble)
+					.orElse(0D);
+
+			ItemStack icon = getUnderItem(box.getLabel("icon"));
+			icon = ru.cristalix.core.item.Items.fromStack(icon)
+					.displayName("§6" + title + " §7(Описание)")
+					.loreLines("", "§7Можно ставить на " + ableItem.getType().name().toLowerCase())
+					.build();
+			builder.icon(icon);
+			builder.able(ableItem.getType());
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
 					.relativeManipulators(box.getLabels("manipulator").stream()
 							.map(box::toRelativeVector)
 							.collect(Collectors.toList())
 					).address(address)
-					.price(box.getLabels("price").stream()
-							.findAny()
-							.map(Label::getTagDouble)
-							.orElse(Double.NaN)
-					).cristalixPrice(box.getLabels("cristalix-price").stream()
+					.price(price)
+					.dataForClient(new SubjectPrototype.SubjectDataForClient(
+							title,
+							UtilV3.fromVector(box.getMin().getDirection()),
+							UtilV3.fromVector(box.getMax().getDirection()),
+							price
+					)).cristalixPrice(box.getLabels("cristalix-price").stream()
 							.findAny()
 							.map(Label::getTag)
 							.map(Integer::parseInt)
 							.orElse(0)
-					).title(box.requireLabel("title").getTag())
+					).title(title)
 					.box(box)
 					.type(type)
 					.build();
@@ -117,7 +123,7 @@ public class Managers {
 		});
 
 		skeleton = new PrototypeManager<>("skeleton", (address, box) -> {
-			String title = box.requireLabel("title").getTag();
+			String title = box.requireLabel(TITLE_FIELD).getTag();
 			int size = box.requireLabel("size").getTagInt();
 			Rarity rarity = Rarity.valueOf(box.requireLabel("rarity").getTag().toUpperCase());
 			Label origin = box.requireLabel("origin");
@@ -128,7 +134,7 @@ public class Managers {
 			if (stands.isEmpty())
 				throw new MapServiceException("Skeleton " + address + " has no bone armorstands!");
 
-			return new SkeletonPrototype(address, title, origin, size, rarity, stands, box.requireLabel("price").getTagInt());
+			return new SkeletonPrototype(address, title, origin, size, rarity, stands, box.requireLabel(PRICE_FIELD).getTagInt());
 		});
 
 		excavation = new PrototypeManager<>("excavation", (address, box) -> {
@@ -188,25 +194,46 @@ public class Managers {
 
 			val palletteName = "§eНужная руда";
 
+			val icon = getUnderItem(box.requireLabel("icon"));
+			Items.register("excavation-" + address, CraftItemStack.asNMSCopy(icon));
+
 			return new ExcavationPrototype(
 					address, skeletonPrototypes,
 					LocationUtil.resetLabelRotation(box.requireLabel("spawn"), 0),
 					box.requireLabel("hit-count").getTagInt(),
 					box.requireLabel("required-level").getTagInt(),
-					box.requireLabel("price").getTagDouble(),
-					box.requireLabel("title").getTag(),
+					box.requireLabel(PRICE_FIELD).getTagDouble(),
+					box.requireLabel(TITLE_FIELD).getTag(),
 					packets,
-					Material.getMaterial(box.requireLabel("icon").getTag().toUpperCase()),
+					icon,
 					pallette.stream()
-						.map(pal -> {
-							val item = new ItemStack(pal[0], 1, (short) 0, (byte) pal[1]);
-							val meta = item.getItemMeta();
-							meta.setDisplayName(palletteName);
-							item.setItemMeta(meta);
-							return item;
-						}).toArray(ItemStack[]::new)
+							.map(pal -> {
+								val item = new ItemStack(pal[0], 1, (short) 0, (byte) pal[1]);
+								val meta = item.getItemMeta();
+								meta.setDisplayName(palletteName);
+								item.setItemMeta(meta);
+								return item;
+							}).toArray(ItemStack[]::new)
 			);
 		});
 	}
 
+	private static ItemStack getUnderItem(Label label) {
+		ItemStack icon = null;
+		if (label.getTag().isEmpty()) {
+			Block iconBlock = label.subtract(0, 1, 0).getBlock();
+			iconBlock.getChunk().load();
+			if (iconBlock.getType() == Material.CHEST) {
+				try {
+					icon = ((Chest) iconBlock.getState()).getBlockInventory().getItem(0).clone();
+				} catch (Exception ignored) {
+				}
+			}
+			if (icon == null)
+				icon = iconBlock.getDrops().iterator().next();
+			iconBlock.setType(Material.AIR);
+		} else
+			icon = new ItemStack(Material.valueOf(label.getTag().toUpperCase()));
+		return icon;
+	}
 }

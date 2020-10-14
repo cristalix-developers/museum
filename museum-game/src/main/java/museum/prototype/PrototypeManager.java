@@ -18,7 +18,6 @@ public class PrototypeManager<T extends Prototype> implements Collection<T> {
 				.map(entry -> reader.readBox(entry.getKey(), entry.getValue()))
 				.filter(Objects::nonNull)
 				.forEach(this::registerPrototype);
-
 	}
 
 	public T getPrototype(String address) {

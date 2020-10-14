@@ -7,7 +7,6 @@ import clepto.bukkit.item.Items;
 import clepto.bukkit.menu.Guis;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.val;
 import museum.App;
 import museum.excavation.Excavation;
@@ -24,7 +23,6 @@ import museum.player.pickaxe.PickaxeType;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
-import museum.worker.WorkerHandler;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,7 +32,6 @@ import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import static museum.excavation.Excavation.isAir;
 import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.*;
@@ -45,7 +42,7 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
  */
 public class BeforePacketHandler implements Prepare {
 
-	public static final BeforePacketHandler INSTANCE = new BeforePacketHandler();
+	public static final Prepare INSTANCE = new BeforePacketHandler();
 
 	public static final ItemStack EMERGENCY_STOP = Items.render("go-back-item").asBukkitMirror();
 	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
@@ -60,74 +57,66 @@ public class BeforePacketHandler implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		val pipeline = user.getConnection().networkManager.channel.pipeline();
-		pipeline.addAfter("decoder", UUID.randomUUID().toString(), new MessageToMessageDecoder<Packet>() {
-					@Override
-					protected void decode(ChannelHandlerContext channelHandlerContext, Packet packet, List<Object> list) {
-						if (packet instanceof PacketPlayInUseEntity) {
-							MinecraftServer.SERVER.postToMainThread(() -> {
-								PacketPlayInUseEntity pc = (PacketPlayInUseEntity) packet;
-								if (pc.d == null || !pc.d.equals(EnumHand.MAIN_HAND))
-									return;
-								if (!pc.action.equals(PacketPlayInUseEntity.EnumEntityUseAction.INTERACT_AT))
-									return;
-								WorkerHandler.acceptClick(user, pc.getEntityId());
-							});
-						}
-						list.add(packet);
-					}
-				}
-		);
-		pipeline.addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
-			@SuppressWarnings("deprecation")
+		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
-				if (packetObj instanceof PacketPlayInUseItem) {
-					PacketPlayInUseItem packet = (PacketPlayInUseItem) packetObj;
-					if (packet.c == EnumHand.MAIN_HAND) {
-						if (isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
-							val itemInMainHand = user.getPlayer().getInventory().getItemInMainHand();
-
-							if (user.getState() instanceof Museum) {
-								Museum museum = (Museum) user.getState();
-								for (Subject subject : museum.getSubjects()) {
-									for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
-										BlockPosition pos = packet.a;
-										if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
-											packet.a = DUMMY; // Genius
-											MinecraftServer.SERVER.postToMainThread(() -> {
-												if (user != museum.getOwner())
-													MessageUtil.find("non-root").send(user);
-												else
-													Guis.open(user.getPlayer(), "manipulator", subject);
-											});
-											break;
-										}
-									}
-								}
-								BlockPosition blockPos = new BlockPosition(packet.a);
-								B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, museum, blockPos));
-							} else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP))
-								tryReturnPlayer(user, true);
-							packet.a = DUMMY;
-						}
-					} else if (packet.c == EnumHand.OFF_HAND)
-						packet.a = DUMMY;
-				} else if (packetObj instanceof PacketPlayInBlockDig) {
-					PacketPlayInBlockDig packet = (PacketPlayInBlockDig) packetObj;
-					boolean valid = user.getState() instanceof Excavation && isAir(user, packet.a);
-					if (packet.c == STOP_DESTROY_BLOCK && valid) {
-						user.sendAnime();
-						if (tryReturnPlayer(user, false))
-							return;
-						acceptedBreak(user, packet);
-					} else if (packet.c == START_DESTROY_BLOCK) {
-						packet.c = ABORT_DESTROY_BLOCK;
-						packet.a = DUMMY;
-					}
-				}
+				if (packetObj instanceof PacketPlayInUseItem)
+					onItemUse(user, (PacketPlayInUseItem) packetObj);
+				else if (packetObj instanceof PacketPlayInBlockDig)
+					onDigging(user, (PacketPlayInBlockDig) packetObj);
 				super.channelRead(channelHandlerContext, packetObj);
 			}
+		});
+	}
+
+	private void onDigging(User user, PacketPlayInBlockDig packet) {
+		boolean valid = user.getState() instanceof Excavation && isAir(user, packet.a);
+		if (packet.c == STOP_DESTROY_BLOCK && valid) {
+			user.sendAnime();
+			if (tryReturnPlayer(user, false))
+				return;
+			acceptedBreak(user, packet);
+		} else if (packet.c == START_DESTROY_BLOCK) {
+			packet.c = ABORT_DESTROY_BLOCK;
+			packet.a = DUMMY;
+		}
+	}
+
+	private void onItemUse(User user, PacketPlayInUseItem packet) {
+		if (packet.c == EnumHand.MAIN_HAND && isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
+			val itemInMainHand = user.getPlayer().getInventory().getItemInMainHand();
+
+			if (user.getState() instanceof Museum)
+				acceptMuseumClick(user, packet);
+			else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP))
+				tryReturnPlayer(user, true);
+			packet.a = DUMMY;
+		} else if (packet.c == EnumHand.OFF_HAND)
+			packet.a = DUMMY;
+	}
+
+	private void acceptMuseumClick(User user, PacketPlayInUseItem packet) {
+		Museum museum = (Museum) user.getState();
+		BlockPosition pos = packet.a;
+		for (Subject subject : museum.getSubjects()) {
+			for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
+				if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
+					openManipulator(user, museum, packet, subject);
+					break;
+				}
+			}
+		}
+		BlockPosition blockPos = new BlockPosition(packet.a);
+		B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, museum, blockPos));
+	}
+
+	private void openManipulator(User user, Museum museum, PacketPlayInUseItem packet, Subject subject) {
+		packet.a = DUMMY; // Genius
+		MinecraftServer.SERVER.postToMainThread(() -> {
+			if (user != museum.getOwner())
+				MessageUtil.find("non-root").send(user);
+			else
+				Guis.open(user.getPlayer(), "manipulator", subject);
 		});
 	}
 
@@ -155,7 +144,7 @@ public class BeforePacketHandler implements Prepare {
 		}
 
 		user.getInventory().setItemInMainHand(AIR_ITEM);
-		subject.getAllocation().perform(Allocation.Action.UPDATE_BLOCKS, Allocation.Action.SPAWN_PIECES);
+		subject.getAllocation().perform(Allocation.Action.UPDATE_BLOCKS, Allocation.Action.SPAWN_PIECES, Allocation.Action.SPAWN_DISPLAYABLE);
 		for (User viewer : viewers) {
 			viewer.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
 		}

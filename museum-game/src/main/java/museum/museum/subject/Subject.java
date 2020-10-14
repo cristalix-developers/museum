@@ -31,12 +31,10 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 
 	@Override
 	protected void updateInfo() {
-		super.updateInfo();
 		this.cachedInfo.location = isAllocated() ? UtilV3.fromVector(allocation.getOrigin().toVector()) : null;
 	}
 
 	public double getIncome() {
 		return 0;
 	}
-
 }

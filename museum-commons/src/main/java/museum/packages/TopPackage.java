@@ -3,8 +3,7 @@ package museum.packages;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import museum.data.UserInfo;
-import museum.tops.TopEntry;
+import museum.tops.PlayerTopEntry;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class TopPackage extends MuseumPackage {
     private final int limit;
 
     // response
-    private List<TopEntry<UserInfo, Object>> entries;
+    private List<PlayerTopEntry<Object>> entries;
 
     public enum TopType {
 
