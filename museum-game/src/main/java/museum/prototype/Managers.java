@@ -37,6 +37,9 @@ public class Managers {
 	public static PrototypeManager<SkeletonPrototype> skeleton;
 	public static PrototypeManager<ExcavationPrototype> excavation;
 
+	private static final String TITLE_FIELD = "title";
+	private static final String PRICE_FIELD = "price";
+
 	@SuppressWarnings("deprecation")
 	public static void init() {
 		subject = new PrototypeManager<>("subject", (address, box) -> {
@@ -69,8 +72,8 @@ public class Managers {
 
 			// Добавляю блок, на который можно ставить данный Subject
 			val ableItem = getUnderItem(box.getLabel("able"));
-			val title = box.requireLabel("title").getTag();
-			double price = box.getLabels("price").stream()
+			val title = box.requireLabel(TITLE_FIELD).getTag();
+			double price = box.getLabels(PRICE_FIELD).stream()
 					.findAny()
 					.map(Label::getTagDouble)
 					.orElse(0D);
@@ -120,7 +123,7 @@ public class Managers {
 		});
 
 		skeleton = new PrototypeManager<>("skeleton", (address, box) -> {
-			String title = box.requireLabel("title").getTag();
+			String title = box.requireLabel(TITLE_FIELD).getTag();
 			int size = box.requireLabel("size").getTagInt();
 			Rarity rarity = Rarity.valueOf(box.requireLabel("rarity").getTag().toUpperCase());
 			Label origin = box.requireLabel("origin");
@@ -131,7 +134,7 @@ public class Managers {
 			if (stands.isEmpty())
 				throw new MapServiceException("Skeleton " + address + " has no bone armorstands!");
 
-			return new SkeletonPrototype(address, title, origin, size, rarity, stands, box.requireLabel("price").getTagInt());
+			return new SkeletonPrototype(address, title, origin, size, rarity, stands, box.requireLabel(PRICE_FIELD).getTagInt());
 		});
 
 		excavation = new PrototypeManager<>("excavation", (address, box) -> {
@@ -199,8 +202,8 @@ public class Managers {
 					LocationUtil.resetLabelRotation(box.requireLabel("spawn"), 0),
 					box.requireLabel("hit-count").getTagInt(),
 					box.requireLabel("required-level").getTagInt(),
-					box.requireLabel("price").getTagDouble(),
-					box.requireLabel("title").getTag(),
+					box.requireLabel(PRICE_FIELD).getTagDouble(),
+					box.requireLabel(TITLE_FIELD).getTag(),
 					packets,
 					icon,
 					pallette.stream()
