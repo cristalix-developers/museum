@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 public class MuseumCommands {
 
 	private final App app;
+	private static final String NO_MONEY_MESSAGE = MessageUtil.get("nomoney");
+	private static final String PLAYER_OFFLINE_MESSAGE = MessageUtil.get("playeroffline");
 
 	public MuseumCommands(App app) {
 		this.app = app;
@@ -80,7 +82,7 @@ public class MuseumCommands {
 		val user = app.getUser(sender);
 
 		if (user.getMoney() < prototype.getPrice())
-			return MessageUtil.get("nomoney");
+			return NO_MONEY_MESSAGE;
 
 		user.setMoney(user.getMoney() - prototype.getPrice());
 		user.getSubjects().add(new Subject(prototype, new SubjectInfo(UUID.randomUUID(), prototype.getAddress()), user));
@@ -97,7 +99,7 @@ public class MuseumCommands {
 		val ownerPlayer = Bukkit.getPlayer(args[1]);
 
 		if (ownerPlayer == null || !ownerPlayer.isOnline())
-			return MessageUtil.get("playeroffline");
+			return PLAYER_OFFLINE_MESSAGE;
 
 		val ownerUser = app.getUser(ownerPlayer);
 		String address = args.length > 2 ? args[2] : "main";
@@ -124,7 +126,7 @@ public class MuseumCommands {
 		if (args.length < 2)
 			return null;
 		if (owner == null || !owner.getPlayer().isOnline() || owner.getState() == null || owner.equals(visitor)) {
-			return MessageUtil.get("playeroffline");
+			return PLAYER_OFFLINE_MESSAGE;
 		}
 
 		double price;
@@ -139,7 +141,7 @@ public class MuseumCommands {
 
 		if (state instanceof Museum) {
 			if (visitor.getMoney() <= price)
-				return MessageUtil.get("nomoney");
+				return NO_MONEY_MESSAGE;
 
 			visitor.setMoney(visitor.getMoney() - price);
 			owner.setMoney(owner.getMoney() + price);
@@ -237,7 +239,7 @@ public class MuseumCommands {
 					MessageUtil.find("playeroffline").send(user);
 					return;
 				} else if (invited.equals(sender)) {
-					MessageUtil.find("inviteyourself").send(user);
+					user.sendMessage(PLAYER_OFFLINE_MESSAGE);
 					return;
 				}
 				MessageUtil.find("invited").send(user);
@@ -267,7 +269,7 @@ public class MuseumCommands {
 		player.closeInventory();
 
 		if (proto.getPrice() > user.getMoney())
-			return MessageUtil.get("nomoney");
+			return NO_MONEY_MESSAGE;
 
 		user.setMoney(user.getMoney() - proto.getPrice());
 
@@ -284,7 +286,7 @@ public class MuseumCommands {
 		player.closeInventory();
 
 		if (user.getMoney() < pickaxe.getPrice())
-			return MessageUtil.get("nomoney");
+			return NO_MONEY_MESSAGE;
 
 		user.setPickaxeType(pickaxe);
 		user.setMoney(user.getMoney() - pickaxe.getPrice());
