@@ -60,52 +60,63 @@ public class BeforePacketHandler implements Prepare {
 		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
-				if (packetObj instanceof PacketPlayInUseItem) {
-					PacketPlayInUseItem packet = (PacketPlayInUseItem) packetObj;
-					if (packet.c == EnumHand.MAIN_HAND) {
-						if (isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
-							val itemInMainHand = user.getPlayer().getInventory().getItemInMainHand();
-
-							if (user.getState() instanceof Museum) {
-								Museum museum = (Museum) user.getState();
-								for (Subject subject : museum.getSubjects()) {
-									for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
-										BlockPosition pos = packet.a;
-										if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
-											packet.a = DUMMY; // Genius
-											MinecraftServer.SERVER.postToMainThread(() -> {
-												if (user != museum.getOwner())
-													MessageUtil.find("non-root").send(user);
-												else
-													Guis.open(user.getPlayer(), "manipulator", subject);
-											});
-											break;
-										}
-									}
-								}
-								BlockPosition blockPos = new BlockPosition(packet.a);
-								B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, museum, blockPos));
-							} else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP))
-								tryReturnPlayer(user, true);
-							packet.a = DUMMY;
-						}
-					} else if (packet.c == EnumHand.OFF_HAND)
-						packet.a = DUMMY;
-				} else if (packetObj instanceof PacketPlayInBlockDig) {
-					PacketPlayInBlockDig packet = (PacketPlayInBlockDig) packetObj;
-					boolean valid = user.getState() instanceof Excavation && isAir(user, packet.a);
-					if (packet.c == STOP_DESTROY_BLOCK && valid) {
-						user.sendAnime();
-						if (tryReturnPlayer(user, false))
-							return;
-						acceptedBreak(user, packet);
-					} else if (packet.c == START_DESTROY_BLOCK) {
-						packet.c = ABORT_DESTROY_BLOCK;
-						packet.a = DUMMY;
-					}
-				}
+				if (packetObj instanceof PacketPlayInUseItem)
+					onItemUse(user, (PacketPlayInUseItem) packetObj);
+				else if (packetObj instanceof PacketPlayInBlockDig)
+					onDigging(user, (PacketPlayInBlockDig) packetObj);
 				super.channelRead(channelHandlerContext, packetObj);
 			}
+		});
+	}
+
+	private void onDigging(User user, PacketPlayInBlockDig packet) {
+		boolean valid = user.getState() instanceof Excavation && isAir(user, packet.a);
+		if (packet.c == STOP_DESTROY_BLOCK && valid) {
+			user.sendAnime();
+			if (tryReturnPlayer(user, false))
+				return;
+			acceptedBreak(user, packet);
+		} else if (packet.c == START_DESTROY_BLOCK) {
+			packet.c = ABORT_DESTROY_BLOCK;
+			packet.a = DUMMY;
+		}
+	}
+
+	private void onItemUse(User user, PacketPlayInUseItem packet) {
+		if (packet.c == EnumHand.MAIN_HAND && isAir(user, packet.a) || isAir(user, packet.a.shift(packet.b))) {
+			val itemInMainHand = user.getPlayer().getInventory().getItemInMainHand();
+
+			if (user.getState() instanceof Museum)
+				acceptMuseumClick(user, packet);
+			else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP))
+				tryReturnPlayer(user, true);
+			packet.a = DUMMY;
+		} else if (packet.c == EnumHand.OFF_HAND)
+			packet.a = DUMMY;
+	}
+
+	private void acceptMuseumClick(User user, PacketPlayInUseItem packet) {
+		Museum museum = (Museum) user.getState();
+		BlockPosition pos = packet.a;
+		for (Subject subject : museum.getSubjects()) {
+			for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
+				if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
+					openManipulator(user, museum, packet, subject);
+					break;
+				}
+			}
+		}
+		BlockPosition blockPos = new BlockPosition(packet.a);
+		B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, museum, blockPos));
+	}
+
+	private void openManipulator(User user, Museum museum, PacketPlayInUseItem packet, Subject subject) {
+		packet.a = DUMMY; // Genius
+		MinecraftServer.SERVER.postToMainThread(() -> {
+			if (user != museum.getOwner())
+				MessageUtil.find("non-root").send(user);
+			else
+				Guis.open(user.getPlayer(), "manipulator", subject);
 		});
 	}
 
