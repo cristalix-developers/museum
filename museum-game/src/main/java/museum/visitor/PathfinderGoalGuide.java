@@ -30,10 +30,11 @@ public class PathfinderGoalGuide extends PathfinderGoal {
 	public boolean b() {
 		return true;
 	}
+
 	// resetTask()
 	@Override
 	public void d() {
-
+		// Ничего не делать при resetTask()
 	}
 
 	// updateTask()

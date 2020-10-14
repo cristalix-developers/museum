@@ -46,7 +46,8 @@ public class VisitorGroup {
 		}
 		mainToVisit = new ArrayList<>();
 		for (Node node : nodes) {
-			if (mainNodes.contains(node.location)) mainToVisit.add(node);
+			if (mainNodes.contains(node.location))
+				mainToVisit.add(node);
 
 			int[] distances = {MAX_VALUE, MAX_VALUE, MAX_VALUE, MAX_VALUE};
 			Node[] neighbours = {null, null, null, null};
@@ -60,7 +61,8 @@ public class VisitorGroup {
 				boolean failed = false;
 				int distance = Math.abs(dx + dz);
 				for (int i = 0; i < distance; i++) {
-					if (new Location(from.getWorld(), dx * i, y, dz * i).getBlock().getType() != Material.AIR) failed = true;
+					if (new Location(from.getWorld(), dx * i, y, dz * i).getBlock().getType() != Material.AIR)
+						failed = true;
 				}
 				if (failed) continue;
 
@@ -95,10 +97,11 @@ public class VisitorGroup {
 			for (int i = 0; i < vertex.connections.length; i++) {
 				if (i == vertex.id || !vertex.connections[i]) continue;
 				Node v = nodes[i];
-				if (v == target)
-				if (!visited.contains(v)) {
-					visited.add(v);
-					queue.add(v);
+				if (v == target) {
+					if (!visited.contains(v)) {
+						visited.add(v);
+						queue.add(v);
+					}
 				}
 			}
 		}
