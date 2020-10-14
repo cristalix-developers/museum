@@ -87,17 +87,7 @@ public class PlayerDataManager implements Listener {
 			client.write(new SaveUserPackage(event.getUuid(), info));
 		}, 100);
 		client.registerHandler(GlobalBoostersPackage.class, pckg -> globalBoosters = pckg.getBoosters());
-		client.registerHandler(ExtraDepositUserPackage.class, pckg -> {
-			User user = userMap.get(pckg.getUser());
-			if (user != null) {
-				if (pckg.getSum() != null)
-					user.setMoney(user.getMoney() + pckg.getSum());
-				if (pckg.getSeconds() != null) {
-					double result = pckg.getSeconds() * user.getMuseums().stream().mapToDouble(Museum::getIncome).sum(); // Типа того
-					user.setMoney(user.getMoney() + result);
-				}
-			}
-		});
+		client.registerHandler(ExtraDepositUserPackage.class, this::handleExtraDeposit);
 		this.timeBar = new MultiTimeBar(
 				() -> new ArrayList<>(globalBoosters),
 				5L, TimeUnit.SECONDS, () -> null
@@ -192,4 +182,15 @@ public class PlayerDataManager implements Listener {
 		return userMap.values();
 	}
 
+	private void handleExtraDeposit(ExtraDepositUserPackage pckg) {
+		User user = userMap.get(pckg.getUser());
+		if (user != null) {
+			if (pckg.getSum() != null)
+				user.setMoney(user.getMoney() + pckg.getSum());
+			if (pckg.getSeconds() != null) {
+				double result = pckg.getSeconds() * user.getMuseums().stream().mapToDouble(Museum::getIncome).sum(); // Типа того
+				user.setMoney(user.getMoney() + result);
+			}
+		}
+	}
 }

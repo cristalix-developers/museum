@@ -105,7 +105,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 	@Override
 	public void enterState(User user) {
-		user.teleport(prototype.getBox().contains(user.getLastLocation()) && owner == user ? user.getLastLocation() : prototype.getSpawn());
+		teleportUser(user);
 
 		cachedInfo.views++;
 
@@ -167,15 +167,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		coins.clear();
 	}
 
-	private void iterateSubjects(Consumer<Subject> action) {
-		for (Subject subject : owner.getSubjects()) {
-			Allocation allocation = subject.getAllocation();
-			if (allocation == null) continue;
-			if (!prototype.getBox().contains(allocation.getOrigin())) continue;
-			action.accept(subject);
-		}
-	}
-
 	public void updateIncrease() {
 		double[] i = {.1};
 		iterateSubjects(s -> i[0] += s.getIncome());
@@ -235,6 +226,22 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		Allocation allocation = Allocation.allocate(this, subject.getCachedInfo(), subject.getPrototype(), location);
 		subject.setAllocation(allocation);
 		return allocation != null;
+	}
+
+	private void iterateSubjects(Consumer<Subject> action) {
+		for (Subject subject : owner.getSubjects()) {
+			Allocation allocation = subject.getAllocation();
+			if (allocation == null) continue;
+			if (!prototype.getBox().contains(allocation.getOrigin())) continue;
+			action.accept(subject);
+		}
+	}
+
+	private void teleportUser(User user) {
+		user.teleport(prototype.getBox().contains(user.getLastLocation()) && owner == user ?
+				user.getLastLocation() :
+				prototype.getSpawn()
+		);
 	}
 
 }
