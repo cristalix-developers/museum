@@ -37,8 +37,8 @@ public class TickTimerHandler extends BukkitRunnable {
 		savePlayers();
 
 		// Вызов обработки тиков у всех побочных обработчиков
-		for (Ticked ticked : ticked)
-			ticked.tick(counter);
+		for (Ticked tickUnit : ticked)
+			tickUnit.tick(counter);
 
 		long currentTime = System.currentTimeMillis();
 		for (Player player : Bukkit.getOnlinePlayers()) {

@@ -123,15 +123,10 @@ public final class App extends JavaPlugin {
 				if (line == null || line.isEmpty()) break;
 				Class<?> scriptClass = Class.forName(line);
 				if (!Script.class.isAssignableFrom(scriptClass)) continue;
-				Script script = (Script) scriptClass.newInstance();
-				try {
-					script.run();
-				} catch (Throwable throwable) {
-					Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", throwable);
-				}
+				readScript(scriptClass);
 			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception exception) {
+			exception.printStackTrace();
 		}
 
 		// Класс управляющий игроками
@@ -177,8 +172,8 @@ public final class App extends JavaPlugin {
 		clientSocket.write(playerDataManager.bulk(true));
 		try {
 			Thread.sleep(1000L); // Если вдруг он не успеет написать в сокет(хотя вряд ли, конечно)
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception exception) {
+			exception.printStackTrace();
 		}
 	}
 
@@ -238,4 +233,12 @@ public final class App extends JavaPlugin {
 		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 	}
 
+	private void readScript(Class<?> scriptClass) throws Exception {
+		Script script = (Script) scriptClass.newInstance();
+		try {
+			script.run();
+		} catch (Exception exception) {
+			Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", exception);
+		}
+	}
 }
