@@ -1,3 +1,4 @@
+@groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.listener
 
 import clepto.bukkit.menu.Guis
@@ -7,21 +8,19 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 
-import static clepto.bukkit.behaviour.Behaviour.on
-import static clepto.bukkit.behaviour.Behaviour.when
 import static clepto.bukkit.item.Items.register
 import static museum.App.app
 import static org.bukkit.Material.*
 
-when PAPER used {
+on PAPER use {
     Guis.open player, 'main', null
 }
 
-when WOOD_DOOR used {
+on WOOD_DOOR use {
     player.performCommand 'gui visitor'
 }
 
-when SADDLE used {
+on SADDLE use {
     player.performCommand 'home'
 }
 

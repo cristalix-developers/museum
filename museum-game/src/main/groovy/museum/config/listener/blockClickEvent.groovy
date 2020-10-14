@@ -1,3 +1,4 @@
+@groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.listener
 
 import org.bukkit.Material
@@ -7,8 +8,6 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-
-import static clepto.bukkit.behaviour.Behaviour.*
 
 def invisible = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, false, false)
 

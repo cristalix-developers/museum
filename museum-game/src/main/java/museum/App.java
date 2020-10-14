@@ -2,7 +2,6 @@ package museum;
 
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
-import clepto.bukkit.behaviour.BehaviourListener;
 import clepto.bukkit.gui.GuiEvents;
 import clepto.cristalix.mapservice.WorldMeta;
 import groovy.lang.Script;
@@ -142,8 +141,7 @@ public final class App extends JavaPlugin {
 		// Регистрация обработчиков событий
 		B.events(
 				playerDataManager,
-				new GuiEvents(),
-				new BehaviourListener()
+				new GuiEvents()
 		);
 
 		WorkerUtil.init(this);

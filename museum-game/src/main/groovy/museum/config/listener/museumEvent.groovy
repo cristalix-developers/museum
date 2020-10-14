@@ -1,3 +1,4 @@
+@groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.listener
 
 import museum.App
@@ -5,8 +6,6 @@ import museum.museum.Museum
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerMoveEvent
-
-import static clepto.bukkit.behaviour.Behaviour.on
 
 on InventoryOpenEvent, {
     def type = inventory.type
