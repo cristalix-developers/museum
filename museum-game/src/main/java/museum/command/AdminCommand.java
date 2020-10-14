@@ -13,6 +13,12 @@ import org.bukkit.Bukkit;
  */
 public class AdminCommand {
 	public static void init(App app) {
+		registerMoneyCmd(app);
+		registerExpCmd(app);
+		registerDinoCmd(app);
+	}
+
+	private static void registerMoneyCmd(App app) {
 		B.regCommand((sender, args) -> {
 			if (!sender.isOp())
 				return null;
@@ -24,7 +30,9 @@ public class AdminCommand {
 			app.getUser(player).setMoney(Double.parseDouble(args[1]));
 			return "§aВаше количество денег изменено.";
 		}, "money");
+	}
 
+	private static void registerExpCmd(App app) {
 		B.regCommand((sender, args) -> {
 			if (!sender.isOp())
 				return null;
@@ -36,7 +44,9 @@ public class AdminCommand {
 				app.getUser(Bukkit.getPlayer(args[0])).giveExperience(Integer.parseInt(args[1]));
 			return "§aОпыт изменен.";
 		}, "exp");
+	}
 
+	private static void registerDinoCmd(App app) {
 		B.regCommand((sender, args) -> {
 			if (!sender.isOp())
 				return null;
