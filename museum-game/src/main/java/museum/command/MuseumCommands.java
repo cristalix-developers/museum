@@ -138,14 +138,12 @@ public class MuseumCommands {
 		val state = owner.getState();
 
 		if (state instanceof Museum) {
-			val museum = (Museum) state;
-
 			if (visitor.getMoney() <= price)
 				return MessageUtil.get("nomoney");
 
 			visitor.setMoney(visitor.getMoney() - price);
 			owner.setMoney(owner.getMoney() + price);
-			visitor.setState(museum);
+			visitor.setState(state);
 			MessageUtil.find("traveler")
 					.set("visitor", visitor.getName())
 					.set("price", MessageUtil.toMoneyFormat(price))
