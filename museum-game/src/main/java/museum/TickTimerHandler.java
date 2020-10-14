@@ -28,7 +28,7 @@ public class TickTimerHandler extends BukkitRunnable {
 	private final App app;
 	private final List<Ticked> ticked;
 	private final ClientSocket clientSocket;
-	private final static long AUTO_SAVE_PERIOD = 20 * 60 * 3;
+	private final static long AUTO_SAVE_PERIOD = 20 * 60 * 3L;
 	private final PlayerDataManager dataManager;
 	private int counter = 1;
 
