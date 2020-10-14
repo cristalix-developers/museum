@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import museum.App;
 import museum.data.SubjectInfo;
+import museum.museum.Museum;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.CollectorSubjectPrototype;
 import museum.museum.map.SubjectPrototype;
@@ -23,7 +24,7 @@ public class CollectorSubject extends Subject {
 	private final AtomPiece piece;
 	@Setter
 	private CollectorNavigator navigator;
-
+	@Getter
 	private final double radius;
 	private final int speed;
 
@@ -53,12 +54,14 @@ public class CollectorSubject extends Subject {
 	}
 
 	public void move(long iteration) {
-		if (navigator == null)
+		if (navigator == null || !isAllocated())
 			return;
 		Location location = getLocation(iteration);
-		// ToDo: Пофиксить монетки
-//		user.getCoins().removeIf(coin -> coin.pickUp(user, location, radius, piece.getStand().id));
-		if (isAllocated()) getAllocation().allocatePiece(piece, V4.fromLocation(location), true);
+
+		if (getAllocation().getState() instanceof Museum)
+			((Museum) getAllocation().getState()).getCoins()
+					.removeIf(coin -> coin.pickUp(owner, location, radius, piece.getStand().id));
+		getAllocation().allocatePiece(piece, V4.fromLocation(location), true);
 	}
 
 	public Location getCollectorLocation() {

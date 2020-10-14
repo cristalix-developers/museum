@@ -193,7 +193,8 @@ public final class App extends JavaPlugin {
 	}
 
 	public CompletableFuture<UserTransactionPackage.TransactionResponse> processDonate(UUID user, DonateType donate) {
-		return clientSocket.writeAndAwaitResponse(new UserTransactionPackage(user, donate, null)).thenApply(UserTransactionPackage::getResponse);
+		return clientSocket.writeAndAwaitResponse(new UserTransactionPackage(user, donate, null))
+				.thenApply(UserTransactionPackage::getResponse);
 	}
 
 	private InputStreamReader reader(String base64) {
@@ -210,14 +211,16 @@ public final class App extends JavaPlugin {
 
 	private void requestConfigurations() {
 		try {
-			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage()).get(3L, TimeUnit.SECONDS);
+			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage())
+					.get(3L, TimeUnit.SECONDS);
 			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getItemsData()));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.out.println("We can't receive museum configurations! Retry in 3sec");
+		} catch (Exception exception) {
+			exception.printStackTrace();
+			Bukkit.getLogger().severe("We can't receive museum configurations! Retry in 3sec");
 			try {
 				Thread.sleep(3000L);
-			} catch (Exception ignored) {
+			} catch (InterruptedException interruptedException) {
+				interruptedException.printStackTrace();
 			}
 			requestConfigurations();
 		}
@@ -231,9 +234,9 @@ public final class App extends JavaPlugin {
 		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 	}
 
-	private void readScript(Class<?> scriptClass) throws Exception {
-		Script script = (Script) scriptClass.newInstance();
+	private void readScript(Class<?> scriptClass) {
 		try {
+			Script script = (Script) scriptClass.newInstance();
 			script.run();
 		} catch (Exception exception) {
 			Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", exception);

@@ -129,6 +129,7 @@ public class Registry<I extends Info, P extends Prototype, S extends Storable<I,
 		this.elements.clear();
 	}
 
+	@Override
 	public Stream<S> stream() {
 		return this.elements.stream();
 	}

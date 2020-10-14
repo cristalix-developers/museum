@@ -47,8 +47,6 @@ public class PrepareScoreBoard implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		SimpleBoardObjective excavation = IScoreboardService.get().getPlayerObjective(user.getUuid(), "excavation");
-
 		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
 	}
 }

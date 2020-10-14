@@ -5,6 +5,7 @@ import clepto.bukkit.InvalidConfigException;
 import clepto.bukkit.item.Items;
 import clepto.cristalix.mapservice.Label;
 import clepto.cristalix.mapservice.MapServiceException;
+import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.data.SubjectInfo;
 import museum.excavation.ExcavationPrototype;
@@ -30,6 +31,7 @@ import ru.cristalix.core.util.UtilV3;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@UtilityClass
 public class Managers {
 
 	public static PrototypeManager<SubjectPrototype> subject;
@@ -226,7 +228,8 @@ public class Managers {
 			if (iconBlock.getType() == Material.CHEST) {
 				try {
 					icon = ((Chest) iconBlock.getState()).getBlockInventory().getItem(0).clone();
-				} catch (Exception ignored) {
+				} catch (Exception exception) {
+					exception.printStackTrace();
 				}
 			}
 			if (icon == null)

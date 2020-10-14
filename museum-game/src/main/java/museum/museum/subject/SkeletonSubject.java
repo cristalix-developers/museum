@@ -81,6 +81,7 @@ public class SkeletonSubject extends Subject {
 			cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot);
 	}
 
+	@Override
 	public double getIncome() {
 		if (skeleton == null)
 			return 0;

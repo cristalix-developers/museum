@@ -70,7 +70,8 @@ public class User implements PlayerWrapper {
 	public void setState(State state) {
 		AsyncCatcher.catchOp("user state change");
 		if (this.state != null && this.state != state) this.state.leaveState(this);
-		(this.state = state).enterState(this);
+		this.state = state;
+		state.enterState(this);
 		PrepareScoreBoard.setupScoreboard(this);
 	}
 
@@ -84,7 +85,7 @@ public class User implements PlayerWrapper {
 	public void sendAnime() {
 		ByteBuf buffer = Unpooled.buffer();
 		// ToDo: Вернуть счётчик на раскопках!
-//		UtilNetty.writeVarInt(buffer, interactItems == null ? -2 : interactItems.getHitsLeft() > 0 ? interactItems.getHitsLeft() : -1);
+		// UtilNetty.writeVarInt(buffer, interactItems == null ? -2 : interactItems.getHitsLeft() > 0 ? interactItems.getHitsLeft() : -1);
 		connection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
 	}
 

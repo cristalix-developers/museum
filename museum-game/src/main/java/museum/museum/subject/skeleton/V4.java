@@ -47,7 +47,7 @@ public class V4 implements Cloneable {
 		this.x += x;
 		this.y += y;
 		this.z += z;
-		this.rot += rot;
+		this.rot += yaw;
 		this.rot %= 360;
 		return this;
 	}
@@ -109,8 +109,8 @@ public class V4 implements Cloneable {
 	public V4 clone() {
 		try {
 			return (V4) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new RuntimeException(e);
+		} catch (Exception exception) {
+			throw new RuntimeException(exception);
 		}
 	}
 

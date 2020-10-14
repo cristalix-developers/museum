@@ -3,6 +3,7 @@ package museum.player.prepare;
 import clepto.cristalix.Scripts;
 import museum.App;
 import museum.player.User;
+import org.bukkit.Bukkit;
 import ru.cristalix.core.display.IDisplayService;
 import ru.cristalix.core.display.messages.JavaScriptMessage;
 
@@ -24,9 +25,10 @@ public class PrepareJSAnime implements Prepare {
 			dir.mkdirs();
 			File[] files = dir.listFiles();
 
-			if (files == null)
-				throw new RuntimeException("Cannot load scripts at " + SCRIPT_PATH + "!");
-
+			if (files == null) {
+				Bukkit.getLogger().severe("Cannot load scripts at " + SCRIPT_PATH + "!");
+				return;
+			}
 			this.codes = Scripts.loadAndMerge(files);
 		}
 
