@@ -8,6 +8,7 @@ import clepto.cristalix.mapservice.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
@@ -116,8 +117,7 @@ public final class App extends JavaPlugin {
 		requestConfigurations();
 
 		// Прогрузка Groovy-скриптов
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")));
+		try(val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {
 			while (true) {
 				String line = reader.readLine();
 				if (line == null || line.isEmpty()) break;
