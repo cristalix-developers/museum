@@ -11,6 +11,7 @@ import museum.data.UserInfo;
 import museum.donate.DonateType;
 import museum.handlers.PackageHandler;
 import museum.packages.*;
+import museum.realm.RealmsController;
 import museum.socket.ServerSocket;
 import museum.socket.ServerSocketHandler;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -24,8 +25,10 @@ import ru.cristalix.core.network.ISocketClient;
 import ru.cristalix.core.network.packages.FillLauncherUserDataPackage;
 import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage;
 import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage;
+import ru.cristalix.core.network.packages.TransferPlayerPackage;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.permissions.PermissionService;
+import ru.cristalix.core.realm.RealmInfo;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -62,6 +65,7 @@ public class MuseumService {
 
 	private static BoosterManager boosterManager;
 
+	private static RealmsController realmsController;
 
 	public static void main(String[] args) {
 		MicroserviceBootstrap.bootstrap(new MicroServicePlatform(2));
@@ -79,6 +83,7 @@ public class MuseumService {
 		boosterManager = new BoosterManager();
 		subservices.add(boosterManager);
 
+		realmsController = new RealmsController();
 
 		CONFIGURATION_MANAGER = new ConfigurationManager("config.yml", "items.yml");
 		CONFIGURATION_MANAGER.init();
@@ -155,6 +160,18 @@ public class MuseumService {
 			museumPackage.setEntries(res);
 			answer(channel, museumPackage);
 		})));
+		registerHandler(UserRequestJoinPackage.class, ((channel, serverName, museumPackage) -> {
+			Optional<RealmInfo> realm = realmsController.bestRealm();
+			boolean passed = false;
+			if (realm.isPresent()) {
+				passed = true;
+				RealmInfo realmInfo = realm.get();
+				realmInfo.setCurrentPlayers(realmInfo.getCurrentPlayers() + 1);
+				ISocketClient.get().write(new TransferPlayerPackage(museumPackage.getUser(), realmInfo.getRealmId(), Collections.emptyMap()));
+			}
+			museumPackage.setPassed(passed);
+			answer(channel, museumPackage);
+		}));
 
 		Thread consoleThread = new Thread(MuseumService::handleConsole);
 		consoleThread.setDaemon(true);

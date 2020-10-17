@@ -100,7 +100,8 @@ public class MongoAdapter<T extends Unique> {
 			models.add(model);
 		}
 
-		data.bulkWrite(session, models, this::handle);
+		if (!models.isEmpty())
+			data.bulkWrite(session, models, this::handle);
 	}
 
 	public <V> CompletableFuture<List<TopEntry<T, V>>> makeRatingByField(String fieldName, int limit) {
