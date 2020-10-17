@@ -11,6 +11,7 @@ import lombok.val;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
+import museum.command.WagonCommand;
 import museum.donate.DonateType;
 import museum.museum.Shop;
 import museum.museum.map.SubjectType;
@@ -82,7 +83,6 @@ public final class App extends JavaPlugin {
 		SubjectType.init();
 		Managers.init();
 		clepto.bukkit.menu.Guis.init();
-
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 		this.clientSocket = new ClientSocket(
 				"127.0.0.1",
@@ -135,6 +135,7 @@ public final class App extends JavaPlugin {
 		topManager = new TopManager(this);
 
 		// Инициализация команд
+		new WagonCommand(this);
 		new MuseumCommands(this);
 		this.shop = new Shop(this);
 
@@ -221,6 +222,7 @@ public final class App extends JavaPlugin {
 				Thread.sleep(3000L);
 			} catch (InterruptedException interruptedException) {
 				interruptedException.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 			requestConfigurations();
 		}

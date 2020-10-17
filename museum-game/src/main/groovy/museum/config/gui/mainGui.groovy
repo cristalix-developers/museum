@@ -110,14 +110,14 @@ Guis.register 'main', { player ->
     button 'S' icon {
         item STORAGE_MINECART
         text """
-        &bПостройки
+        &bЗаказать товар
 
-        Посетите галлерею построек
-        и выбирите, что ходите приобрести
-        для вашего музея!
+        Закажите фургон с продовольствием,
+        и заберите его на &lx: 295, z: -402,
+        &fза тем отнесите товар в лавку.
         """
     } leftClick {
-        performCommand 'gallery'
+        performCommand 'wagonbuy'
     }
 
 }

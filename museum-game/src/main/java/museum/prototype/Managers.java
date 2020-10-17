@@ -95,9 +95,10 @@ public class Managers {
 					).address(address)
 					.price(price)
 					.dataForClient(new SubjectPrototype.SubjectDataForClient(
+							address,
 							title,
-							UtilV3.fromVector(box.getMin().getDirection()),
-							UtilV3.fromVector(box.getMax().getDirection()),
+							UtilV3.fromVector(box.getMin().toVector()),
+							UtilV3.fromVector(box.getMax().toVector()),
 							price
 					)).cristalixPrice(box.getLabels("cristalix-price").stream()
 							.findAny()

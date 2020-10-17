@@ -3,8 +3,8 @@ package museum.player.prepare;
 import clepto.cristalix.Scripts;
 import museum.App;
 import museum.player.User;
+import museum.util.SendScriptUtil;
 import org.bukkit.Bukkit;
-import ru.cristalix.core.display.IDisplayService;
 import ru.cristalix.core.display.messages.JavaScriptMessage;
 
 import java.io.File;
@@ -31,7 +31,6 @@ public class PrepareJSAnime implements Prepare {
 			}
 			this.codes = Scripts.loadAndMerge(files);
 		}
-
-		IDisplayService.get().sendScripts(user.getUuid(), codes);
+		SendScriptUtil.sendScripts(user.getPlayer(), codes);
 	}
 }

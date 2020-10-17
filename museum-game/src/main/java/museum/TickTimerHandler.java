@@ -66,8 +66,12 @@ public class TickTimerHandler extends BukkitRunnable {
 				((CollectorSubject) subject).move(currentTime);
 			else if (counter % 5 == 0 && subject instanceof FountainSubject)
 				((FountainSubject) subject).throwWater();
-			else if (subject instanceof StallSubject)
-				((StallSubject) subject).update();
+			else if (subject instanceof StallSubject) {
+				val stall = (StallSubject) subject;
+				stall.rotateCustomerHead();
+				if (counter % (60 * 20L) == 0)
+					stall.update();
+			}
 		}
 		// Если монеты устарели, что бы не копились на клиенте, удаляю
 		museum.getCoins().removeIf(coin -> {

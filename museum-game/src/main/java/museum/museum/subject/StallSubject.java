@@ -9,11 +9,14 @@ import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.product.FoodProduct;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
+import museum.util.MessageUtil;
 import museum.worker.NpcWorker;
 import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.util.UtilV3;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author func 05.10.2020
@@ -26,11 +29,19 @@ public class StallSubject extends Subject {
 
 	public StallSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
-		food = info.metadata == null ?
-				Maps.newHashMap() :
-				GlobalSerializers.fromJson(info.metadata, new TypeToken<Map<String, Integer>>() {
-				}.getType());
+		if (info.metadata == null)
+			food = Maps.newHashMap();
+		else {
+			Map<FoodProduct, Integer> savedFood = GlobalSerializers.fromJson(info.metadata, new TypeToken<Map<FoodProduct, Integer>>() {
+			}.getType());
+			if (savedFood == null) {
+				food = Maps.newHashMap();
+			} else {
+				food = savedFood;
+			}
+		}
 		worker = ((StallPrototype) prototype).getWorker().get();
+		food.put(FoodProduct.COCA_COLA, 1000);
 	}
 
 	@Override
@@ -54,6 +65,23 @@ public class StallSubject extends Subject {
 	}
 
 	public void update() {
+		Set<FoodProduct> potentialFood = food.keySet();
+		if (potentialFood.isEmpty())
+			return;
+		int randomFoodIndex = (int) (Math.random() * potentialFood.size());
+		Map.Entry<FoodProduct, Integer> choiceFood = new ArrayList<>(food.entrySet()).get(randomFoodIndex);
+		val key = choiceFood.getKey();
+		food.replace(key, choiceFood.getValue() - 1);
+		if (food.get(key) <= 0)
+			food.remove(key);
+		MessageUtil.find("sell-product")
+				.set("title", key.getName())
+				.set("cost", key.getCost())
+				.send(owner);
+		owner.setMoney(owner.getMoney() - key.getCost());
+	}
+
+	public void rotateCustomerHead() {
 		worker.update(owner, V4.fromLocation(owner.getLocation()));
 	}
 }

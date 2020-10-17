@@ -36,6 +36,7 @@ public class SubjectPrototype implements Prototype {
 	@Data
 	public static class SubjectDataForClient {
 
+		private final String address;
 		private final String title;
 		private final V3 min;
 		private final V3 max;
