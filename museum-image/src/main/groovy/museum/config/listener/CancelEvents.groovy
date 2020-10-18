@@ -12,8 +12,13 @@ import org.bukkit.event.entity.*
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent
 import org.bukkit.event.player.PlayerDropItemEvent
+import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.spigotmc.event.entity.EntityDismountEvent
+
+on PlayerInteractEntityEvent, {
+    setCancelled true
+}
 
 on EntityDismountEvent, {
     if (dismounted.type == EntityType.BAT)

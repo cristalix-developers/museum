@@ -20,10 +20,7 @@ import museum.prototype.Managers;
 import museum.prototype.Registry;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
-import net.minecraft.server.v1_12_R1.Packet;
-import net.minecraft.server.v1_12_R1.PacketDataSerializer;
-import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
-import net.minecraft.server.v1_12_R1.PlayerConnection;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -50,6 +47,7 @@ public class User implements PlayerWrapper {
 	private Location lastLocation;
 	private State state;
 	private LocalArmorStand grabbedArmorstand;
+	private EntityArmorStand riding;
 	private long enterTime;
 
 	public User(UserInfo info) {

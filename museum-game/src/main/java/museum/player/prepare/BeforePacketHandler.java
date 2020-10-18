@@ -60,14 +60,21 @@ public class BeforePacketHandler implements Prepare {
 		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
+				System.out.println(packetObj.getClass());
 				if (packetObj instanceof PacketPlayInUseItem)
 					onItemUse(user, (PacketPlayInUseItem) packetObj);
 				else if (packetObj instanceof PacketPlayInBlockDig)
 					onDigging(user, (PacketPlayInBlockDig) packetObj);
-				else if (packetObj instanceof PacketPlayInEntityAction) {
-					val packet = (PacketPlayInEntityAction) packetObj;
-					if (packet.animation.equals(PacketPlayInEntityAction.EnumPlayerAction.START_SNEAKING)) {
-						// удаление с моба
+				else if (packetObj instanceof PacketPlayInSteerVehicle) {
+					// Если игрок на коллекторе и нажимает шифт, то скинуть его
+					val packet = (PacketPlayInSteerVehicle) packetObj;
+					if (packet.d) {
+						if (user.getRiding() != null) {
+							user.getRiding().passengers.clear();
+							val dismount = new PacketPlayOutMount(user.getRiding());
+							user.getState().getUsers().forEach(viewer -> viewer.sendPacket(dismount));
+							user.setRiding(null);
+						}
 					}
 				}
 				super.channelRead(channelHandlerContext, packetObj);

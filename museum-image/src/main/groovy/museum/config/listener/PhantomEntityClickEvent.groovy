@@ -20,6 +20,7 @@ on PlayerUseUnknownEntityEvent, {
             if (it.piece.stand.id == entityId) {
                 it.piece.stand.passengers.add(user.player.handle)
                 state.users*.sendPacket(new PacketPlayOutMount(it.piece.stand))
+                user.riding = it.piece.stand
                 return
             }
         }
