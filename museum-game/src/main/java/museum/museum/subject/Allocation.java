@@ -1,7 +1,6 @@
 package museum.museum.subject;
 
 import clepto.bukkit.world.Box;
-import clepto.bukkit.world.Orientation;
 import clepto.math.V3;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
@@ -9,7 +8,6 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import museum.App;
-import museum.data.SubjectInfo;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.AtomPiece;
 import museum.museum.subject.skeleton.Displayable;
@@ -18,9 +16,11 @@ import museum.museum.subject.skeleton.V4;
 import museum.player.State;
 import museum.player.User;
 import museum.util.ChunkWriter;
+import museum.util.LocationUtil;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import ru.cristalix.core.formatting.Color;
 
 import java.util.*;
 import java.util.function.Function;
@@ -41,7 +41,7 @@ public class Allocation {
 	private final List<Location> allocatedBlocks;
 	private final String clientData;
 
-	public static Allocation allocate(State owner, SubjectInfo info, SubjectPrototype prototype, Location origin) {
+	public static Allocation allocate(State owner, Color color, SubjectPrototype prototype, Location origin) {
 		if (origin == null) return null;
 
 		Box box = prototype.getBox();
@@ -73,7 +73,7 @@ public class Allocation {
 		for (int x = (int) box.getMin().getX(); x <= box.getMax().getX(); x++) {
 			for (int y = (int) box.getMin().getY(); y <= box.getMax().getY(); y++) {
 				for (int z = (int) box.getMin().getZ(); z <= box.getMax().getZ(); z++) {
-					val dst = box.transpose(absoluteOrigin, Orientation.values()[info.getRotation().ordinal()], relativeOrigin, x, y, z);
+					val dst = box.transpose(absoluteOrigin, LocationUtil.getOrientation(origin), relativeOrigin, x, y, z);
 					val src = new Location(App.getApp().getWorld(), x, y, z);
 
 					if (src.getBlock().getType() == Material.AIR) continue;
@@ -88,7 +88,7 @@ public class Allocation {
 					BlockPosition blockPos = nms(dst);
 					ChunkCoordIntPair chunkPos = new ChunkCoordIntPair(blockPos);
 
-					IBlockData data = applyColor(world.getType(nms(src)), info.getColor());
+					IBlockData data = applyColor(world.getType(nms(src)), color);
 
 					int xOffset = blockPos.getX() - (blockPos.getX() >> 4) * 16;
 					int yOffset = blockPos.getY();

@@ -223,7 +223,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	}
 
 	public boolean addSubject(Subject subject, Location location) {
-		Allocation allocation = Allocation.allocate(this, subject.getCachedInfo(), subject.getPrototype(), location);
+		Allocation allocation = Allocation.allocate(this, subject.getCachedInfo().getColor(), subject.getPrototype(), location);
 		subject.setAllocation(allocation);
 		return allocation != null;
 	}

@@ -39,7 +39,12 @@ subprojects {
     task deploy(type: Copy) {
         dependsOn build
         from jar
-        into rootProject.buildDir
+        String dirPath = System.getenv()["OUTPUT_DIR"]
+        File file = dirPath ? file(dirPath) : rootProject.buildDir
+        into file
+        doLast {
+            println "Deployed $jar.archiveName to $file.path"
+        }
     }
 
 }

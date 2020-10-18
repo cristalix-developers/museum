@@ -11,13 +11,15 @@ import org.bukkit.Location;
 public class PathfinderGoalGuide extends PathfinderGoal {
 
 	private final NavigationAbstract navigation;
+	private final EntityVisitor guide;
 	private final VisitorGroup group;
 	private long idle;
 	private VisitorGroup.Node currentTarget;
 
 	public PathfinderGoalGuide(VisitorGroup group) {
 		this.group = group;
-		this.navigation = group.getGuide().getNavigation();
+		this.guide = group.getGuide();
+		this.navigation = guide.getNavigation();
 	}
 
 	// shouldExecute()
