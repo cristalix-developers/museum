@@ -64,6 +64,12 @@ public class BeforePacketHandler implements Prepare {
 					onItemUse(user, (PacketPlayInUseItem) packetObj);
 				else if (packetObj instanceof PacketPlayInBlockDig)
 					onDigging(user, (PacketPlayInBlockDig) packetObj);
+				else if (packetObj instanceof PacketPlayInEntityAction) {
+					val packet = (PacketPlayInEntityAction) packetObj;
+					if (packet.animation.equals(PacketPlayInEntityAction.EnumPlayerAction.START_SNEAKING)) {
+						// удаление с моба
+					}
+				}
 				super.channelRead(channelHandlerContext, packetObj);
 			}
 		});
