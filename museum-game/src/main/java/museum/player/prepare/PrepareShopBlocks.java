@@ -1,6 +1,5 @@
 package museum.player.prepare;
 
-import clepto.bukkit.B;
 import museum.App;
 import museum.client_conversation.ClientPacket;
 import museum.museum.map.SubjectPrototype;
@@ -28,6 +27,6 @@ public class PrepareShopBlocks implements Prepare {
 							.toArray(SubjectPrototype.SubjectDataForClient[]::new)
 			);
 		}
-		B.postpone(220, () -> packet.send(user, dataForClients));
+		packet.send(user, dataForClients);
 	}
 }

@@ -60,7 +60,6 @@ public class BeforePacketHandler implements Prepare {
 		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
-				System.out.println(packetObj.getClass());
 				if (packetObj instanceof PacketPlayInUseItem)
 					onItemUse(user, (PacketPlayInUseItem) packetObj);
 				else if (packetObj instanceof PacketPlayInBlockDig)
