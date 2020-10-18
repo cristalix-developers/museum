@@ -2,6 +2,7 @@ package museum.museum.subject;
 
 import com.google.common.collect.Maps;
 import com.google.gson.reflect.TypeToken;
+import lombok.Getter;
 import lombok.val;
 import museum.data.SubjectInfo;
 import museum.museum.map.StallPrototype;
@@ -23,7 +24,7 @@ import java.util.Set;
  * @project museum
  */
 public class StallSubject extends Subject implements Incomeble {
-
+	@Getter
 	private final Map<FoodProduct, Integer> food;
 	private final NpcWorker worker;
 
@@ -41,11 +42,11 @@ public class StallSubject extends Subject implements Incomeble {
 			}
 		}
 		worker = ((StallPrototype) prototype).getWorker().get();
-		food.put(FoodProduct.COCA_COLA, 1000);
 	}
 
 	@Override
 	protected void updateInfo() {
+		super.updateInfo();
 		if (cachedInfo == null || !isAllocated())
 			return;
 		cachedInfo.metadata = food == null || food.isEmpty() ? "" : GlobalSerializers.toJson(food);
@@ -66,11 +67,20 @@ public class StallSubject extends Subject implements Incomeble {
 
 	@Override
 	public void handle(double... args) {
+		if (!isAllocated())
+			return;
 		if (args[0] % (60 * 20L) != 0)
 			return;
 		Set<FoodProduct> potentialFood = food.keySet();
-		if (potentialFood.isEmpty())
+		if (potentialFood.isEmpty()) {
+			val origin = getAllocation().getOrigin();
+			MessageUtil.find("no-product")
+					.set("x", origin.getX())
+					.set("y", origin.getY())
+					.set("z", origin.getZ())
+					.send(owner);
 			return;
+		}
 		int randomFoodIndex = (int) (Math.random() * potentialFood.size());
 		Map.Entry<FoodProduct, Integer> choiceFood = new ArrayList<>(food.entrySet()).get(randomFoodIndex);
 		val key = choiceFood.getKey();

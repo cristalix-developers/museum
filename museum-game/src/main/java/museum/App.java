@@ -11,7 +11,6 @@ import lombok.val;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
-import museum.command.WagonCommand;
 import museum.donate.DonateType;
 import museum.museum.Shop;
 import museum.museum.map.SubjectType;
@@ -34,6 +33,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.codehaus.groovy.runtime.m12n.RuntimeExtensionModules;
+import org.codehaus.groovy.runtime.m12n.SimpleExtensionModule;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
@@ -115,6 +116,18 @@ public final class App extends JavaPlugin {
 
 		requestConfigurations();
 
+		// Определение groovy операций
+		RuntimeExtensionModules.modules.add(new SimpleExtensionModule("museum", "1") {
+			@Override
+			public List<Class> getInstanceMethodsExtensionClasses() {
+				return Collections.singletonList(Extensions.class);
+			}
+			@Override
+			public List<Class> getStaticMethodsExtensionClasses() {
+				return new ArrayList<>();
+			}
+		});
+
 		// Прогрузка Groovy-скриптов
 		try(val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {
 			while (true) {
@@ -135,7 +148,6 @@ public final class App extends JavaPlugin {
 		topManager = new TopManager(this);
 
 		// Инициализация команд
-		new WagonCommand(this);
 		new MuseumCommands(this);
 		this.shop = new Shop(this);
 

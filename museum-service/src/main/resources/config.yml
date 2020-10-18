@@ -3,6 +3,12 @@ serviceRealm: MUSS-1
 chat:
   prefix: '§7[§l§bi§7] '
   messages:
+    congrats: '§e%SENDER% поздравил вас с повышением уровня!'
+    global-level-message: '!!! §e%NAME% достигнул уровня §b%LEVEL%§e, /congr %NAME% - что бы поздравить!'
+    box-recieved: '§fВы принесли груз, ожидайте продажи! §eСписок товаров:'
+    wagon-copy: 'Вы уже заказывали доставку продуктов, заберите её.'
+    no-product: '§fВ продуктовой лавке на §e%X% %Y% %Z%§f, закончился товар. Закажите его в меню.'
+    box-taken: 'Вы получили заказанные продукты.'
     collector-income: '§fСборщик монет собрал §e+%INCOME%'
     sell-product: '§fПродуктовая лавка продала §b%TITLE%§f, прибыль §e+%COST%$'
     wagon-buy: 'Вы успешно заказали поставку товара.'

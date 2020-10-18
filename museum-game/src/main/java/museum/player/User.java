@@ -1,5 +1,6 @@
 package museum.player;
 
+import clepto.bukkit.LocalArmorStand;
 import clepto.bukkit.event.PlayerWrapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -23,6 +24,7 @@ import net.minecraft.server.v1_12_R1.Packet;
 import net.minecraft.server.v1_12_R1.PacketDataSerializer;
 import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.spigotmc.AsyncCatcher;
@@ -47,6 +49,7 @@ public class User implements PlayerWrapper {
 	private PlayerConnection connection;
 	private Location lastLocation;
 	private State state;
+	private LocalArmorStand grabbedArmorstand;
 	private long enterTime;
 
 	public User(UserInfo info) {
@@ -85,7 +88,7 @@ public class User implements PlayerWrapper {
 	public void sendAnime() {
 		ByteBuf buffer = Unpooled.buffer();
 		// ToDo: Вернуть счётчик на раскопках!
-		// UtilNetty.writeVarInt(buffer, interactItems == null ? -2 : interactItems.getHitsLeft() > 0 ? interactItems.getHitsLeft() : -1);
+		// UtilNetty.writeVarInt(buffer, InteractItems == null ? -2 : InteractItems.getHitsLeft() > 0 ? InteractItems.getHitsLeft() : -1);
 		connection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
 	}
 
@@ -93,11 +96,19 @@ public class User implements PlayerWrapper {
 		int prevLevel = getLevel();
 		info.experience += exp;
 		int newLevel = getLevel();
-		if (newLevel != prevLevel)
+		if (newLevel != prevLevel) {
+			if (newLevel % 18 == 0) {
+				Bukkit.broadcastMessage(MessageUtil.find("global-level-message")
+						.set("name", getName())
+						.set("level", newLevel)
+						.getText()
+				);
+			}
 			MessageUtil.find("levelup")
 					.set("level", newLevel)
 					.set("exp", LevelSystem.getRequiredExperience(newLevel) - getExperience())
 					.send(this);
+		}
 	}
 
 	public int getLevel() {

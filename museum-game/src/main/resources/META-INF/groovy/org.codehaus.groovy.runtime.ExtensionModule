@@ -1,0 +1,3 @@
+moduleName=museum
+moduleVersion=1.0
+extensionClasses=museum.Extensions
