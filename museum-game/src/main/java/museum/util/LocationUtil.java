@@ -1,6 +1,6 @@
 package museum.util;
 
-import clepto.cristalix.mapservice.Label;
+import clepto.bukkit.world.Label;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 

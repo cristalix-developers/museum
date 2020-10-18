@@ -28,17 +28,17 @@ register 'collector-free', {
     nbt.museum = 'car'
 }
 
-register 'collector-amateur', {
+register 'prof-collector', {
     item CLAY_BALL
     nbt.museum = 'car1'
 }
 
-register 'collector-professional', {
+register 'pres-collector', {
     item CLAY_BALL
     nbt.museum = 'car2'
 }
 
-register 'collector-prestige', {
+register 'punk-collector', {
     item CLAY_BALL
     nbt.museum = 'parovoz'
     text '&7???'

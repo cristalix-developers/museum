@@ -3,6 +3,8 @@ serviceRealm: MUSS-1
 chat:
   prefix: '§7[§l§bi§7] '
   messages:
+    collector-income: '§fСборщик монет собрал §e+%INCOME%'
+    sell-product: '§fПродуктовая лавка продала §b%TITLE%§f, прибыль §e+%COST%$'
     wagon-buy: 'Вы успешно заказали поставку товара.'
     traveler: '§b%VISITOR%§7 посетил(а) ваш музей, прибыль §6+%PRICE%'
     museum-teleported: '%VISITOR% принял ваше предложение. И посетил ваш музей.'

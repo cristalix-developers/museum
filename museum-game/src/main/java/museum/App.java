@@ -3,7 +3,7 @@ package museum;
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
-import clepto.cristalix.mapservice.WorldMeta;
+import clepto.cristalix.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
 import lombok.Setter;

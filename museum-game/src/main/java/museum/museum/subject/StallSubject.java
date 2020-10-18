@@ -22,7 +22,7 @@ import java.util.Set;
  * @author func 05.10.2020
  * @project museum
  */
-public class StallSubject extends Subject {
+public class StallSubject extends Subject implements Incomeble {
 
 	private final Map<FoodProduct, Integer> food;
 	private final NpcWorker worker;
@@ -64,7 +64,10 @@ public class StallSubject extends Subject {
 		}
 	}
 
-	public void update() {
+	@Override
+	public void handle(double... args) {
+		if (args[0] % (60 * 20L) != 0)
+			return;
 		Set<FoodProduct> potentialFood = food.keySet();
 		if (potentialFood.isEmpty())
 			return;
@@ -78,7 +81,7 @@ public class StallSubject extends Subject {
 				.set("title", key.getName())
 				.set("cost", key.getCost())
 				.send(owner);
-		owner.setMoney(owner.getMoney() - key.getCost());
+		owner.setMoney(owner.getMoney() + key.getCost());
 	}
 
 	public void rotateCustomerHead() {

@@ -85,7 +85,10 @@ public class MuseumCommands {
 			return NO_MONEY_MESSAGE;
 
 		user.setMoney(user.getMoney() - prototype.getPrice());
-		user.getSubjects().add(new Subject(prototype, new SubjectInfo(UUID.randomUUID(), prototype.getAddress()), user));
+		user.getSubjects().add(new Subject(prototype, new SubjectInfo(
+				UUID.randomUUID(),
+				prototype.getAddress()
+		), user));
 
 		return MessageUtil.get("finally-buy");
 	}

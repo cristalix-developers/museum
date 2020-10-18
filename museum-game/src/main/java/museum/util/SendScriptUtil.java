@@ -1,8 +1,9 @@
 package museum.util;
 
-import clepto.cristalix.Cristalix;
 import lombok.experimental.UtilityClass;
+import lombok.val;
 import org.bukkit.entity.Player;
+import ru.cristalix.core.display.IDisplayService;
 import ru.cristalix.core.display.messages.JavaScriptMessage;
 
 /**
@@ -11,7 +12,10 @@ import ru.cristalix.core.display.messages.JavaScriptMessage;
  */
 @UtilityClass
 public class SendScriptUtil {
-	public static void sendScripts(Player player, JavaScriptMessage code) {
-		Cristalix.displayService().sendScripts(player.getUniqueId(), code);
+	public static void sendScripts(Player player, JavaScriptMessage... code) {
+		for (val script : code) {
+			IDisplayService.get().sendScripts(player.getUniqueId(), script);
+			System.out.println("sending...");
+		}
 	}
 }

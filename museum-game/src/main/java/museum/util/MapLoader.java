@@ -1,7 +1,7 @@
 package museum.util;
 
 import clepto.cristalix.Cristalix;
-import clepto.cristalix.mapservice.WorldMeta;
+import clepto.cristalix.WorldMeta;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;

@@ -136,7 +136,7 @@ public class BeforePacketHandler implements Prepare {
 			return;
 		}
 
-		Location origin = new Location(user.getWorld(), a.getX(), a.getY() + 1, a.getZ());
+		Location origin = location.clone().add(0, 1, 0);
 		Collection<User> viewers = museum.getUsers();
 		if (!museum.addSubject(subject, origin)) {
 			MessageUtil.find("cannot-place").send(user);

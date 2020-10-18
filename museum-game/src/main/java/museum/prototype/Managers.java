@@ -3,8 +3,8 @@ package museum.prototype;
 import clepto.ListUtils;
 import clepto.bukkit.InvalidConfigException;
 import clepto.bukkit.item.Items;
-import clepto.cristalix.mapservice.Label;
-import clepto.cristalix.mapservice.MapServiceException;
+import clepto.bukkit.world.Label;
+import clepto.bukkit.world.WorldConfigurationException;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.data.SubjectInfo;
@@ -89,10 +89,7 @@ public class Managers {
 			builder.able(ableItem.getType());
 
 			return builder.relativeOrigin(box.toRelativeVector(label.isPresent() ? label.get() : box.getCenter()))
-					.relativeManipulators(box.getLabels("manipulator").stream()
-							.map(box::toRelativeVector)
-							.collect(Collectors.toList())
-					).address(address)
+					.address(address)
 					.price(price)
 					.dataForClient(new SubjectPrototype.SubjectDataForClient(
 							address,
@@ -118,9 +115,9 @@ public class Managers {
 				String[] tag = label.getTag().split(" ");
 				SubjectPrototype prototype = subject.getPrototype(tag[0]);
 				if (prototype == null)
-					throw new MapServiceException("Illegal default subject '" + tag[0] + "' in museum " +
+					throw new WorldConfigurationException("Illegal default subject '" + tag[0] + "' in museum " +
 							address + " on " + label.getCoords());
-				defaultInfos.add(new SubjectInfo(new UUID(0, 0), prototype.getAddress(), label.toV3(), D2.PX, tag.length > 1 ? tag[1] : null, -1, Color.LIME));
+				defaultInfos.add(new SubjectInfo(new UUID(0, 0), prototype.getAddress(), UtilV3.fromVector(label.toVector()), D2.PX, tag.length > 1 ? tag[1] : null, -1, Color.LIME));
 			}
 			return new MuseumPrototype(address, box, box.requireLabel("spawn"), defaultInfos);
 		});
@@ -135,7 +132,7 @@ public class Managers {
 
 			List<ArmorStand> stands = box.getEntities(ArmorStand.class);
 			if (stands.isEmpty())
-				throw new MapServiceException("Skeleton " + address + " has no bone armorstands!");
+				throw new WorldConfigurationException("Skeleton " + address + " has no bone armorstands!");
 
 			return new SkeletonPrototype(address, title, origin, size, rarity, stands, box.requireLabel(PRICE_FIELD).getTagInt());
 		});
@@ -152,7 +149,7 @@ public class Managers {
 					}).collect(Collectors.toList());
 
 			if (pallette.isEmpty())
-				throw new MapServiceException("No pallette markers found for excavation " + address);
+				throw new WorldConfigurationException("No pallette markers found for excavation " + address);
 
 			List<SkeletonPrototype> skeletonPrototypes = box.getLabels("available").stream()
 					.map(label -> skeleton.getPrototype(label.getTag()))

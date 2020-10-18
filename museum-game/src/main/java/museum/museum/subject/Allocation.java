@@ -1,6 +1,8 @@
 package museum.museum.subject;
 
-import clepto.cristalix.mapservice.Box;
+import clepto.bukkit.world.Box;
+import clepto.bukkit.world.Orientation;
+import clepto.math.V3;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,8 +21,6 @@ import museum.util.ChunkWriter;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import ru.cristalix.core.math.V3;
-import ru.cristalix.core.util.UtilV3;
 
 import java.util.*;
 import java.util.function.Function;
@@ -48,9 +48,9 @@ public class Allocation {
 		Map<BlockPosition, IBlockData> blocks = Maps.newHashMap();
 		List<Location> allocated = new ArrayList<>();
 
-		V3 absoluteOrigin = UtilV3.fromVector(origin.toVector());
-		V3 relativeOrigin = box.getDimensions().clone().mult(0.5);
-		relativeOrigin.setY(0);
+		V3 absoluteOrigin = V3.of(origin.getX(), origin.getY(), origin.getZ());
+		V3 relativeOrigin = box.getDimensions().multiply(0.5);
+		relativeOrigin = relativeOrigin.withY(0);
 
 		int minX = Integer.MAX_VALUE;
 		int minY = Integer.MAX_VALUE;
@@ -73,7 +73,7 @@ public class Allocation {
 		for (int x = (int) box.getMin().getX(); x <= box.getMax().getX(); x++) {
 			for (int y = (int) box.getMin().getY(); y <= box.getMax().getY(); y++) {
 				for (int z = (int) box.getMin().getZ(); z <= box.getMax().getZ(); z++) {
-					val dst = box.transpose(absoluteOrigin, info.getRotation(), relativeOrigin, x, y, z);
+					val dst = box.transpose(absoluteOrigin, Orientation.values()[info.getRotation().ordinal()], relativeOrigin, x, y, z);
 					val src = new Location(App.getApp().getWorld(), x, y, z);
 
 					if (src.getBlock().getType() == Material.AIR) continue;

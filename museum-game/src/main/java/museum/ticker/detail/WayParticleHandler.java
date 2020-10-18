@@ -1,6 +1,6 @@
 package museum.ticker.detail;
 
-import clepto.cristalix.mapservice.Label;
+import clepto.bukkit.world.Label;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import museum.App;

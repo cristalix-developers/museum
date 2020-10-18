@@ -1,6 +1,6 @@
 package museum.museum.map;
 
-import clepto.cristalix.mapservice.Box;
+import clepto.bukkit.world.Box;
 import lombok.Data;
 import museum.data.SubjectInfo;
 import museum.prototype.Prototype;

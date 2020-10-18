@@ -1,7 +1,7 @@
 package museum.player.prepare;
 
 import clepto.bukkit.Cycle;
-import clepto.cristalix.mapservice.Label;
+import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
 import museum.App;
 import museum.museum.Museum;

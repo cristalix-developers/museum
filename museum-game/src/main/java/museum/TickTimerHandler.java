@@ -5,10 +5,7 @@ import lombok.val;
 import museum.client.ClientSocket;
 import museum.museum.Coin;
 import museum.museum.Museum;
-import museum.museum.subject.CollectorSubject;
-import museum.museum.subject.FountainSubject;
-import museum.museum.subject.StallSubject;
-import museum.museum.subject.Subject;
+import museum.museum.subject.*;
 import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.ticker.Ticked;
@@ -66,12 +63,11 @@ public class TickTimerHandler extends BukkitRunnable {
 				((CollectorSubject) subject).move(currentTime);
 			else if (counter % 5 == 0 && subject instanceof FountainSubject)
 				((FountainSubject) subject).throwWater();
-			else if (subject instanceof StallSubject) {
-				val stall = (StallSubject) subject;
-				stall.rotateCustomerHead();
-				if (counter % (60 * 20L) == 0)
-					stall.update();
-			}
+			else if (subject instanceof StallSubject)
+				((StallSubject) subject).rotateCustomerHead();
+			// Если постройка может приносить доход, попробовать
+			if (subject instanceof Incomeble) // else добавлять не нужно
+				((Incomeble) subject).handle(counter);
 		}
 		// Если монеты устарели, что бы не копились на клиенте, удаляю
 		museum.getCoins().removeIf(coin -> {

@@ -1,6 +1,6 @@
 package museum.museum.map;
 
-import clepto.cristalix.mapservice.MapServiceException;
+import clepto.bukkit.world.WorldConfigurationException;
 import museum.data.SubjectInfo;
 import museum.museum.subject.*;
 import museum.player.User;
@@ -42,7 +42,7 @@ public class SubjectType<T extends Subject> {
 		for (SubjectType<?> subjectType : registry)
 			if (subjectType.address.startsWith(query))
 				return subjectType;
-		throw new MapServiceException("Subject type '" + query + "' is not a valid type.");
+		throw new WorldConfigurationException("Subject type '" + query + "' is not a valid type.");
 	}
 
 	public Subject provide(SubjectPrototype prototype, SubjectInfo info, User user) {

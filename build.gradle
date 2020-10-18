@@ -25,7 +25,7 @@ subprojects {
         compileOnly 'io.netty:netty-all:4.1.50.Final'
         compileOnly 'com.google.guava:guava:29.0-jre'
         implementation 'com.google.code.gson:gson:2.8.6'
-        implementation 'clepto:clepto-java:0.3.8'
+        implementation 'clepto:clepto-java:0.3.9'
     }
 
     jar {

@@ -2,7 +2,7 @@ package museum.visitor;
 
 import clepto.ListUtils;
 import clepto.bukkit.B;
-import clepto.cristalix.mapservice.Label;
+import clepto.bukkit.world.Label;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
