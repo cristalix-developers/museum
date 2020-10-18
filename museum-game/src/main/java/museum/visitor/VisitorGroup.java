@@ -1,29 +1,21 @@
 package museum.visitor;
 
 import clepto.ListUtils;
-import clepto.bukkit.B;
 import clepto.bukkit.world.Label;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.val;
+import lombok.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import ru.cristalix.core.formatting.Color;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.lang.Integer.MAX_VALUE;
 
 @Getter
 public class VisitorGroup {
 
 	private EntityVisitor guide;
 	private List<EntityVisitor> crowd;
-	private final Node[] nodes;
-	private final List<Node> mainToVisit;
+	private final List<Node> nodes = new ArrayList<>();
+	private final List<Node> mainToVisit = new ArrayList<>();
 	private Deque<Node> currentRoute;
 	@Setter
 	private Node currentNode;
@@ -31,92 +23,87 @@ public class VisitorGroup {
 	private long idleStart;
 
 	public VisitorGroup(List<Label> allNodes, List<Label> mainNodes) {
-		int amount = allNodes.size();
-		this.nodes = new Node[amount];
-		int id = 0;
 		int woolColor = 0;
-		for (val loc : allNodes) {
-			nodes[id] = new Node(id, loc.getTag(), new boolean[amount], loc);
-			id++;
-			loc.getChunk().load();
-			Block block = loc.clone().add(0, -1, 0).getBlock();
+
+		List<Node> nodes = new ArrayList<>();
+		for (Label nodeLabel : allNodes) {
+			nodes.add(new Node(nodeLabel.getTag(), nodeLabel));
+			nodeLabel.getChunk().load();
+			Block block = nodeLabel.clone().add(0, -1, 0).getBlock();
 			block.setType(Material.WOOL);
 			block.setData((byte) woolColor++);
 			if (woolColor == 16) woolColor = 0;
 		}
-		mainToVisit = new ArrayList<>();
+
 		for (Node node : nodes) {
-			if (mainNodes.contains(node.location))
-				mainToVisit.add(node);
+			if (node.isImportant()) mainToVisit.add(node);
 
-			int[] distances = {MAX_VALUE, MAX_VALUE, MAX_VALUE, MAX_VALUE};
-			Node[] neighbours = {null, null, null, null};
-			for (Node adj : nodes) {
-				if (node == adj) continue;
-				int dx = adj.location.getBlockX() - node.location.getBlockX();
-				int dz = adj.location.getBlockZ() - node.location.getBlockZ();
-				if (dx != 0 && dz != 0) continue; // Only 90-degree nodes are considered to be adjacent.
-				int y = Math.max(adj.location.getBlockY(), node.location.getBlockY());
-				Location from = (dx + dz > 0 ? node : adj).location;
-				boolean failed = false;
-				int distance = Math.abs(dx + dz);
-				for (int i = 0; i < distance; i++) {
-					if (new Location(from.getWorld(), dx * i, y, dz * i).getBlock().getType() != Material.AIR)
-						failed = true;
+			for (Node another : nodes) {
+				if (another == node) continue;
+				if (another.getLocation().distanceSquared(node.getLocation()) < 121) {
+					node.getNeighbours().add(another);
+					another.getNeighbours().add(node);
 				}
-				if (failed) continue;
-
-				int offset = (Integer.signum(dx) + Integer.signum(dz) + 1) / 2;
-				if (dz != 0) offset += 2;
-
-				if (distances[offset] > distance) continue;
-				distances[offset] = distance;
-				neighbours[offset] = adj;
-			}
-
-			for (val neighbour : neighbours) {
-				if (neighbour == null) continue;
-				neighbour.connections[node.id] = true;
-				node.connections[neighbour.id] = true;
 			}
 		}
-		this.currentRoute = new LinkedList<>(mainToVisit);
+
+		currentNode = nodes.get(0);
+
+	}
+
+	public List<Node> route(Node sourceNode, Node destinationNode) {
+
+		Map<Node, Node> previousNodeMap = new HashMap<>();
+		Node currentNode = sourceNode;
+
+		Queue<Node> queue = new LinkedList<>();
+		queue.add(currentNode);
+
+		Set<Node> visitedNodes = new HashSet<>();
+		visitedNodes.add(currentNode);
+
+		// Search
+		while (!queue.isEmpty()) {
+			currentNode = queue.remove();
+			if (currentNode.equals(destinationNode)) break;
+
+			for (Node nextNode : currentNode.getNeighbours()) {
+				if (visitedNodes.contains(nextNode)) continue;
+
+				queue.add(nextNode);
+				visitedNodes.add(nextNode);
+
+				// Look up of next node instead of previous.
+				previousNodeMap.put(nextNode, currentNode);
+			}
+		}
+
+		// If all nodes are explored and the destination node hasn't been found.
+		if (!currentNode.equals(destinationNode))
+			throw new RuntimeException("No feasible path.");
+
+		// Reconstruct path from the tail
+		List<Node> directions = new LinkedList<>();
+		for (Node node = destinationNode; node != null; node = previousNodeMap.get(node)) {
+			directions.add(node);
+		}
+
+		Collections.reverse(directions);
+
+		return directions;
+
 	}
 
 	public void newMainRoute() {
-		Node target = ListUtils.random(mainToVisit);
-		mainToVisit.remove(target);
-
-		Set<Node> visited = new LinkedHashSet<>();
-		Queue<Node> queue = new LinkedList<>();
-		queue.add(currentNode);
-		visited.add(currentNode);
-
-		while (!queue.isEmpty()) {
-			Node vertex = queue.poll();
-			for (int i = 0; i < vertex.connections.length; i++) {
-				if (i == vertex.id || !vertex.connections[i]) continue;
-				Node v = nodes[i];
-				if (v == target) {
-					if (!visited.contains(v)) {
-						visited.add(v);
-						queue.add(v);
-					}
-				}
-			}
-		}
-		B.bc("Новый маршрут: " + visited.stream().map(node -> {
-			Color color = Color.values()[node.id % 16];
-			return color.getChatFormat() + color.getTeamName();
-		}).collect(Collectors.joining("§f, ")));
-		this.currentRoute = new LinkedList<>(visited);
+		Node target = ListUtils.random(this.mainToVisit);
+		this.mainToVisit.remove(target);
+		this.currentRoute = new LinkedList<>(route(this.currentNode, target));
 	}
 
 	public void spawn() {
-		nodes[0].getLocation().getChunk().load();
-		currentNode = nodes[0];
-		mainToVisit.remove(nodes[0]);
-		Location loc = nodes[0].getLocation();
+		Location loc = currentNode.getLocation();
+		loc.getChunk().load();
+		mainToVisit.remove(currentNode);
 		this.guide = new EntityVisitor(loc.getWorld(), this);
 		this.guide.setCustomName("Гид");
 		this.guide.setCustomNameVisible(true);
@@ -130,12 +117,21 @@ public class VisitorGroup {
 		}
 	}
 
-	@Data
+	@Getter
+	@RequiredArgsConstructor
+	@ToString
 	public static class Node {
-		private final int id;
+
 		private final String name;
-		private final boolean[] connections;
 		private final Location location;
+
+		@ToString.Exclude
+		private final List<Node> neighbours = new ArrayList<>();
+
+		public boolean isImportant() {
+			return name != null && !name.isEmpty();
+		}
+
 	}
 
 }

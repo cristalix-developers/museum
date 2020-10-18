@@ -18,16 +18,16 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 	private final double followSpeed;
 	private final NavigationAbstract navigation;
 	private int h;
-	float maxDist;
-	float minDist;
+	float safeDist;
+	float hurryDist;
 
-	public PathfinderGoalFollowGuide(EntityVisitor visitor, double followSpeed, float minDistance, float maxDistance) {
+	public PathfinderGoalFollowGuide(EntityVisitor visitor, double followSpeed, float hurryDistance, float safeDistance) {
 		this.visitor = visitor;
 		this.world = visitor.world;
 		this.followSpeed = followSpeed;
 		this.navigation = visitor.getNavigation();
-		this.minDist = minDistance;
-		this.maxDist = maxDistance;
+		this.hurryDist = hurryDistance;
+		this.safeDist = safeDistance;
 		this.a(3);
 		if (!(visitor.getNavigation() instanceof Navigation) && !(visitor.getNavigation() instanceof NavigationFlying)) {
 			throw new IllegalArgumentException("Unsupported mob type for FollowOwnerGoal");
@@ -46,7 +46,7 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 		if (visitorGroup == null) return false;
 		EntityVisitor guide = visitorGroup.getGuide();
 		if (guide == null) return false;
-		if (this.visitor.h(guide) < (double) (this.minDist * this.minDist)) return false;
+		if (this.visitor.h(guide) < (double) (this.hurryDist * this.hurryDist)) return false;
 		this.guide = guide;
 		return true;
 	}
@@ -54,7 +54,7 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 	// shouldContinueExecuting()
 	@Override
 	public boolean b() {
-		return !this.navigation.o() && this.visitor.h(this.guide) > (double) (this.maxDist * this.maxDist);
+		return !this.navigation.o() && this.visitor.h(this.guide) > (double) (this.safeDist * this.safeDist);
 	}
 
 	// startExecuting()
