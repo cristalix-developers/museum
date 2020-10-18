@@ -1,12 +1,8 @@
 package museum.player.prepare;
 
-import clepto.cristalix.Scripts;
+import lombok.val;
 import museum.App;
 import museum.player.User;
-import ru.cristalix.core.display.IDisplayService;
-import ru.cristalix.core.display.messages.JavaScriptMessage;
-
-import java.io.File;
 
 /**
  * @author func 13.06.2020
@@ -14,22 +10,14 @@ import java.io.File;
  */
 public class PrepareJSAnime implements Prepare {
 
-	private static final String SCRIPT_PATH = "scripts/";
-	private JavaScriptMessage codes;
+	public static final Prepare INSTANCE = new PrepareJSAnime();
+	public static final String AVAILABLE_SCRIPTS = "museum holo";
+
+	private static final String[] separated = AVAILABLE_SCRIPTS.split("\\s+");
 
 	@Override
 	public void execute(User user, App app) {
-		if (codes == null) {
-			File dir = new File(SCRIPT_PATH);
-			dir.mkdirs();
-			File[] files = dir.listFiles();
-
-			if (files == null)
-				throw new RuntimeException("Cannot load scripts at " + SCRIPT_PATH + "!");
-
-			this.codes = Scripts.loadAndMerge(files);
-		}
-
-		IDisplayService.get().sendScripts(user.getUuid(), codes);
+		for (val script : separated)
+			user.performCommand("u " + script);
 	}
 }

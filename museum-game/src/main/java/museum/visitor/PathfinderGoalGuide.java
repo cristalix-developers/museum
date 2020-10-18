@@ -1,5 +1,6 @@
 package museum.visitor;
 
+import clepto.bukkit.B;
 import net.minecraft.server.v1_12_R1.NavigationAbstract;
 import net.minecraft.server.v1_12_R1.PathfinderGoal;
 import org.bukkit.Location;
@@ -11,13 +12,14 @@ import org.bukkit.Location;
 public class PathfinderGoalGuide extends PathfinderGoal {
 
 	private final NavigationAbstract navigation;
+	private final EntityVisitor guide;
 	private final VisitorGroup group;
 	private long idle;
-	private VisitorGroup.Node currentTarget;
 
 	public PathfinderGoalGuide(VisitorGroup group) {
 		this.group = group;
-		this.navigation = group.getGuide().getNavigation();
+		this.guide = group.getGuide();
+		this.navigation = guide.getNavigation();
 	}
 
 	// shouldExecute()
@@ -40,23 +42,22 @@ public class PathfinderGoalGuide extends PathfinderGoal {
 	// updateTask()
 	@Override
 	public void e() {
-		if (currentTarget == null) {
-			if (System.currentTimeMillis() - idle < 5000) return;
-			idle = 0;
-			if (group.getCurrentRoute() == null || group.getCurrentRoute().isEmpty())
-				group.newMainRoute();
-			currentTarget = group.getCurrentRoute().poll();
-			Location loc = currentTarget.getLocation();
-			navigation.a(loc.x, loc.y, loc.z, 0.65);
-		} else {
-			Location loc = currentTarget.getLocation();
-			navigation.a(loc.x, loc.y, loc.z, 0.65);
-			double distance = currentTarget.getLocation().distanceSquared(group.getGuide().getBukkitEntity().getLocation());
-			if (distance < 16) {
-				idle = System.currentTimeMillis();
-				group.setCurrentNode(currentTarget);
-				currentTarget = null;
+		double distance = group.getCurrentNode().getLocation().distanceSquared(group.getGuide().getBukkitEntity().getLocation());
+		if (distance < 4) {
+			if (group.getCurrentNode().isImportant()) {
+				if (idle == 0) idle = System.currentTimeMillis();
+				if (System.currentTimeMillis() - idle < 5000) return;
+				idle = 0;
 			}
+			if (group.getCurrentRoute() == null || group.getCurrentRoute().isEmpty()) {
+				group.newMainRoute();
+			}
+			group.setCurrentNode(group.getCurrentRoute().poll());
+			Location loc = group.getCurrentNode().getLocation();
+			navigation.a(loc.x, loc.y, loc.z, 0.45);
+		} else {
+			Location loc = group.getCurrentNode().getLocation();
+			navigation.a(loc.x, loc.y, loc.z, 0.45);
 		}
 	}
 }

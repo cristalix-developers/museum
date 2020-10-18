@@ -5,6 +5,7 @@ import museum.data.SubjectInfo;
 import museum.museum.map.SubjectPrototype;
 import museum.player.User;
 import museum.prototype.Storable;
+import ru.cristalix.core.math.D2;
 import ru.cristalix.core.util.UtilV3;
 
 /**
@@ -32,6 +33,7 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 	@Override
 	protected void updateInfo() {
 		this.cachedInfo.location = isAllocated() ? UtilV3.fromVector(allocation.getOrigin().toVector()) : null;
+		this.cachedInfo.rotation = isAllocated() ? D2.PX : null;
 	}
 
 	public double getIncome() {

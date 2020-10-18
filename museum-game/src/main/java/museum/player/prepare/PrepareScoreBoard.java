@@ -24,16 +24,9 @@ public class PrepareScoreBoard implements Prepare {
 	}
 
 	public static void addServerInfo(SimpleBoardObjective objective) {
-		long megabyte = 1024 * 1024L;
-		Runtime runtime = Runtime.getRuntime();
-
 		objective.startGroup("Сервер")
 				.record("Онлайн", () -> Bukkit.getOnlinePlayers().size() + "")
-				.record("total/max/free", () ->
-						runtime.totalMemory() / megabyte + " " +
-								runtime.maxMemory() / megabyte + " " +
-								runtime.freeMemory() / megabyte
-				).record("TPS", () -> String.format("%.2f", Bukkit.getTPS()[0]));
+				.record("TPS", () -> String.format("%.2f", Bukkit.getTPS()[0]));
 	}
 
 	public static void setupScoreboard(User user) {
@@ -47,8 +40,6 @@ public class PrepareScoreBoard implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		SimpleBoardObjective excavation = IScoreboardService.get().getPlayerObjective(user.getUuid(), "excavation");
-
 		IScoreboardService.get().setCurrentObjective(user.getUuid(), "main");
 	}
 }

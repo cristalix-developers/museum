@@ -51,7 +51,7 @@ public class PlayerDataManager implements Listener {
 
 		prepares = Arrays.asList(
 				BeforePacketHandler.INSTANCE,
-				new PrepareJSAnime(),
+				PrepareJSAnime.INSTANCE,
 				new PrepareScoreBoard(),
 				PrepareTop.INSTANCE,
 				PrepareShopBlocks.INSTANCE,
@@ -95,22 +95,19 @@ public class PlayerDataManager implements Listener {
 	}
 
 	@EventHandler
-	public void onPreLogin(AsyncPlayerPreLoginEvent e) {
+	public void onPreLogin(AsyncPlayerPreLoginEvent event) {
 		try {
-			UserInfoPackage userInfoPackage = app.getClientSocket().writeAndAwaitResponse(new UserInfoPackage(e.getUniqueId()))
+			UserInfoPackage userInfoPackage = app.getClientSocket().writeAndAwaitResponse(new UserInfoPackage(event.getUniqueId()))
 					.get(5L, TimeUnit.SECONDS);
 			UserInfo userInfo = userInfoPackage.getUserInfo();
-			if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(e.getUniqueId());
+			if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(event.getUniqueId());
 			if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 			User user = new User(userInfo);
-			userMap.put(e.getUniqueId(), user);
+			userMap.put(event.getUniqueId(), user);
 
-			try {
-				e.setSpawnLocation(user.getLastLocation());
-			} catch (NoSuchMethodError ignored) {
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+			event.setSpawnLocation(user.getLastLocation());
+		} catch (Exception exception) {
+			exception.printStackTrace();
 		}
 	}
 

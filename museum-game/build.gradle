@@ -6,11 +6,11 @@ apply from: 'mavenAuth.gradle'
 dependencies {
     compileOnly 'bottle:bottle-minecraft:1.0.2'
     compileOnly 'bottle:bottle-libs:1.0'
-    compileOnly 'org.codehaus.groovy:groovy:3.0.5'
+    compileOnly 'org.codehaus.groovy:groovy:3.0.5-aug'
     compileOnly 'cristalix:bukkit-core:20.08.28'
     implementation project(':museum-commons')
-    implementation 'clepto:clepto-bukkit:3.0.17'
-    implementation 'clepto:clepto-cristalix:2.4.5'
+    implementation 'clepto:clepto-bukkit:3.2.8'
+    implementation 'clepto:clepto-cristalix:3.0.0'
 }
 
 // Скачивать *-SNAPHOT заново при каждом билде
@@ -20,4 +20,5 @@ configurations.all {
 
 ext.bukkitPlugin = [mainClass: 'museum.App', dependencies: 'CoreAPI']
 apply from: 'bukkitPlugin.gradle'
-apply from: 'groovyCollector.gradle'
+
+tasks.getByName('bukkitPlugin').with(project(':museum-image').jar)

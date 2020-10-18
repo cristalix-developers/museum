@@ -1,5 +1,6 @@
 package museum.player;
 
+import lombok.experimental.UtilityClass;
 import museum.data.MuseumInfo;
 import museum.data.PickaxeType;
 import museum.data.SubjectInfo;
@@ -12,6 +13,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
+@UtilityClass
 public class DefaultElements {
 
 	public static UserInfo createNewUserInfo(UUID userId) {

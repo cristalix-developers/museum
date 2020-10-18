@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class MuseumCommands {
 
 	private final App app;
-	private static final String NO_MONEY_MESSAGE = MessageUtil.get("nomoney");
+	public static final String NO_MONEY_MESSAGE = MessageUtil.get("nomoney");
 	private static final String PLAYER_OFFLINE_MESSAGE = MessageUtil.get("playeroffline");
 
 	public MuseumCommands(App app) {
@@ -85,7 +85,10 @@ public class MuseumCommands {
 			return NO_MONEY_MESSAGE;
 
 		user.setMoney(user.getMoney() - prototype.getPrice());
-		user.getSubjects().add(new Subject(prototype, new SubjectInfo(UUID.randomUUID(), prototype.getAddress()), user));
+		user.getSubjects().add(new Subject(prototype, new SubjectInfo(
+				UUID.randomUUID(),
+				prototype.getAddress()
+		), user));
 
 		return MessageUtil.get("finally-buy");
 	}

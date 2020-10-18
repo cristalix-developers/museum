@@ -1,6 +1,5 @@
 package museum.visitor;
 
-import clepto.cristalix.mapservice.MapServiceException;
 import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.val;
@@ -29,7 +28,7 @@ public class VisitorHandler {
 			new VisitorGroup(labels, nodes).spawn();
 
 		if (labels.isEmpty())
-			throw new MapServiceException("Not visitors nodes found.");
+			throw new RuntimeException("Not visitors nodes found.");
 	}
 
 }

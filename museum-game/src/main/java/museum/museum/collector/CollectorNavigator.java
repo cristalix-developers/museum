@@ -57,7 +57,10 @@ public class CollectorNavigator {
 		Location from = node.location;
 		Location to = node.next.location;
 		float yaw = (float) Math.toDegrees(Math.atan2(to.getX() - from.getX(), from.getZ() - to.getZ())) + 180;
-		//float pitch = (float) Math.toDegrees(Math.atan2(to.getY() - from.getY(), Math.sqrt(NumberConversions.square(to.getX() - from.getX()) + NumberConversions.square(to.getZ() - from.getZ()))));
+		//float pitch = (float) Math.toDegrees(Math.atan2(to.getY() - from.getY(),
+		//Math.sqrt(NumberConversions.square(to.getX() - from.getX()) +
+		//NumberConversions.square(to.getZ() - from.getZ()))));
+		
 		double localPart = (part - p) / node.part;
 		double x = (to.getX() - from.getX()) * localPart;
 		double y = (to.getY() - from.getY()) * localPart;

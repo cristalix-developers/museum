@@ -3,6 +3,7 @@ package museum.config.gui
 import clepto.bukkit.menu.Guis
 import clepto.humanize.TimeFormatter
 import museum.App
+import museum.config.command.WagonConfig
 import museum.museum.Museum
 import museum.util.LevelSystem
 import org.bukkit.entity.Player
@@ -74,12 +75,12 @@ Guis.register 'main', { player ->
     
         Хозяин: &e$museum.owner.name
         Название: &e$museum.title
-        Посещений: &e$museum.views
+        Посещений: &b$museum.views
     
-        Доход: &e$museum.income
+        Доход: &a$museum.income
         Витрин: &e${museum.subjects.size()}
     
-        Создан &e${formatter.format(Duration.ofMillis(System.currentTimeMillis() - museum.creationDate.time))} назад
+        Создан &a${formatter.format(Duration.ofMillis(System.currentTimeMillis() - museum.creationDate.time))} назад
         """
     }
 
@@ -110,14 +111,15 @@ Guis.register 'main', { player ->
     button 'S' icon {
         item STORAGE_MINECART
         text """
-        &bПостройки
+        &bЗаказать товар | &e$WagonConfig.COST\$
 
-        Посетите галлерею построек
-        и выбирите, что ходите приобрести
-        для вашего музея!
+        Закажите фургон с продовольствием,
+        и заберите его на &lx: 295, z: -402,
+        &fза тем отнесите товар в лавку.
         """
     } leftClick {
-        performCommand 'gallery'
+        performCommand 'wagonbuy'
+        closeInventory()
     }
 
 }

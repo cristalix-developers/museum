@@ -1,0 +1,22 @@
+apply plugin: 'groovy'
+
+project.ext.mavenUri = "$nmsMavenUri $cristalixMavenUri"
+apply from: '../museum-game/mavenAuth.gradle'
+
+dependencies {
+    compileOnly project(':museum-game')
+    compileOnly 'bottle:bottle-minecraft:1.0.2'
+    compileOnly 'bottle:bottle-libs:1.0'
+    compileOnly 'org.codehaus.groovy:groovy:3.0.5'
+    compileOnly 'cristalix:bukkit-core:20.08.28'
+    implementation project(':museum-commons')
+    implementation 'clepto:clepto-bukkit:3.2.8'
+    implementation 'clepto:clepto-cristalix:3.0.0'
+}
+
+// Скачивать *-SNAPHOT заново при каждом билде
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+apply from: 'groovyCollector.gradle'

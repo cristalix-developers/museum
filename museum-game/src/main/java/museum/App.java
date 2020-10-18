@@ -2,9 +2,8 @@ package museum;
 
 import clepto.bukkit.B;
 import clepto.bukkit.Lemonade;
-import clepto.bukkit.behaviour.BehaviourListener;
 import clepto.bukkit.gui.GuiEvents;
-import clepto.cristalix.mapservice.WorldMeta;
+import clepto.cristalix.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +33,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.codehaus.groovy.runtime.m12n.RuntimeExtensionModules;
+import org.codehaus.groovy.runtime.m12n.SimpleExtensionModule;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.inventory.IInventoryService;
@@ -83,7 +84,6 @@ public final class App extends JavaPlugin {
 		SubjectType.init();
 		Managers.init();
 		clepto.bukkit.menu.Guis.init();
-
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 		this.clientSocket = new ClientSocket(
 				"127.0.0.1",
@@ -116,6 +116,18 @@ public final class App extends JavaPlugin {
 
 		requestConfigurations();
 
+		// Определение groovy операций
+		RuntimeExtensionModules.modules.add(new SimpleExtensionModule("museum", "1") {
+			@Override
+			public List<Class> getInstanceMethodsExtensionClasses() {
+				return Collections.singletonList(Extensions.class);
+			}
+			@Override
+			public List<Class> getStaticMethodsExtensionClasses() {
+				return new ArrayList<>();
+			}
+		});
+
 		// Прогрузка Groovy-скриптов
 		try(val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {
 			while (true) {
@@ -142,8 +154,7 @@ public final class App extends JavaPlugin {
 		// Регистрация обработчиков событий
 		B.events(
 				playerDataManager,
-				new GuiEvents(),
-				new BehaviourListener()
+				new GuiEvents()
 		);
 
 		WorkerUtil.init(this);
@@ -195,7 +206,8 @@ public final class App extends JavaPlugin {
 	}
 
 	public CompletableFuture<UserTransactionPackage.TransactionResponse> processDonate(UUID user, DonateType donate) {
-		return clientSocket.writeAndAwaitResponse(new UserTransactionPackage(user, donate, null)).thenApply(UserTransactionPackage::getResponse);
+		return clientSocket.writeAndAwaitResponse(new UserTransactionPackage(user, donate, null))
+				.thenApply(UserTransactionPackage::getResponse);
 	}
 
 	private InputStreamReader reader(String base64) {
@@ -212,14 +224,17 @@ public final class App extends JavaPlugin {
 
 	private void requestConfigurations() {
 		try {
-			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage()).get(3L, TimeUnit.SECONDS);
+			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage())
+					.get(3L, TimeUnit.SECONDS);
 			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getItemsData()));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.out.println("We can't receive museum configurations! Retry in 3sec");
+		} catch (Exception exception) {
+			exception.printStackTrace();
+			Bukkit.getLogger().severe("We can't receive museum configurations! Retry in 3sec");
 			try {
 				Thread.sleep(3000L);
-			} catch (Exception ignored) {
+			} catch (InterruptedException interruptedException) {
+				interruptedException.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 			requestConfigurations();
 		}
@@ -233,9 +248,9 @@ public final class App extends JavaPlugin {
 		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
 	}
 
-	private void readScript(Class<?> scriptClass) throws Exception {
-		Script script = (Script) scriptClass.newInstance();
+	private void readScript(Class<?> scriptClass) {
 		try {
+			Script script = (Script) scriptClass.newInstance();
 			script.run();
 		} catch (Exception exception) {
 			Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", exception);

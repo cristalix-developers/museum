@@ -25,7 +25,7 @@ subprojects {
         compileOnly 'io.netty:netty-all:4.1.50.Final'
         compileOnly 'com.google.guava:guava:29.0-jre'
         implementation 'com.google.code.gson:gson:2.8.6'
-        implementation 'clepto:clepto-java:0.3.8'
+        implementation 'clepto:clepto-java:0.3.9'
     }
 
     jar {
@@ -39,7 +39,12 @@ subprojects {
     task deploy(type: Copy) {
         dependsOn build
         from jar
-        into rootProject.buildDir
+        String dirPath = System.getenv()["OUTPUT_DIR"]
+        File file = dirPath ? file(dirPath) : rootProject.buildDir
+        into file
+        doLast {
+            println "Deployed $jar.archiveName to $file.path"
+        }
     }
 
 }

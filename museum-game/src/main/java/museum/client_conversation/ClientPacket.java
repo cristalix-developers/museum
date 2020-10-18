@@ -18,6 +18,6 @@ public class ClientPacket<D> {
 	public void send(User user, D data) {
 		val byteBuf = Unpooled.buffer();
 		UtilNetty.writeString(byteBuf, data.toString());
-		user.sendPacket(new PacketPlayOutCustomPayload("museum:" + channel, new PacketDataSerializer(byteBuf)));
+		user.sendPacket(new PacketPlayOutCustomPayload(channel, new PacketDataSerializer(byteBuf)));
 	}
 }

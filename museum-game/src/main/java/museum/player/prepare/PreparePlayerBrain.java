@@ -1,7 +1,7 @@
 package museum.player.prepare;
 
 import clepto.bukkit.Cycle;
-import clepto.cristalix.mapservice.Label;
+import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
 import museum.App;
 import museum.museum.Museum;
@@ -23,7 +23,7 @@ import static clepto.bukkit.Cycle.exit;
 public class PreparePlayerBrain implements Prepare {
 
 	public static final Prepare INSTANCE = new PreparePlayerBrain();
-	public static final int EXPERIENCE = 10;
+	public static final int EXPERIENCE = 3;
 
 	private final List<Label> dots;
 	private final List<Title> titles = new ArrayList<>();

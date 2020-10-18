@@ -6,7 +6,6 @@ import org.bukkit.entity.Player
 
 import static clepto.bukkit.menu.Guis.register
 import static museum.App.getApp
-import static museum.config.gui.MuseumGuis.moneyFormatter
 
 register 'visitor', { player ->
     def visitor = app.getUser((Player) player)
@@ -37,7 +36,7 @@ register 'visitor', { player ->
             item Material.WOOD_DOOR
             text """Музей §b${museum.title.toLowerCase()}
             
-            Цена визита: §6${moneyFormatter.format(price)}
+            Цена визита: §6${MuseumGuis.moneyFormatter.format(price)}
             Фрагментов:  §b$fragments
             """
         } leftClick {

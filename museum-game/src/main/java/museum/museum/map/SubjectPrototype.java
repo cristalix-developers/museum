@@ -1,6 +1,7 @@
 package museum.museum.map;
 
-import clepto.cristalix.mapservice.Box;
+import clepto.bukkit.world.Box;
+import clepto.math.V3;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import museum.data.SubjectInfo;
@@ -9,7 +10,6 @@ import museum.player.User;
 import museum.prototype.Prototype;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import ru.cristalix.core.math.V3;
 
 import java.util.List;
 
@@ -36,9 +36,10 @@ public class SubjectPrototype implements Prototype {
 	@Data
 	public static class SubjectDataForClient {
 
+		private final String address;
 		private final String title;
-		private final V3 min;
-		private final V3 max;
+		private final ru.cristalix.core.math.V3 min;
+		private final ru.cristalix.core.math.V3 max;
 		private final double cost;
 
 	}

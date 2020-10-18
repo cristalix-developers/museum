@@ -1,6 +1,8 @@
 package museum.museum.subject;
 
-import clepto.cristalix.mapservice.Box;
+import clepto.bukkit.world.Box;
+import clepto.bukkit.world.Orientation;
+import clepto.math.V3;
 import lombok.Getter;
 import museum.data.SubjectInfo;
 import museum.museum.Museum;
@@ -10,8 +12,6 @@ import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.prototype.Managers;
-import ru.cristalix.core.math.V3;
-import ru.cristalix.core.util.UtilV3;
 
 import static museum.museum.subject.skeleton.Piece.orientedOffset;
 
@@ -50,9 +50,9 @@ public class SkeletonSubject extends Subject {
 			Box box = prototype.getBox();
 			V3 o = prototype.getRelativeOrigin();
 			this.skeletonLocation = V4.fromLocation(box.transpose(
-					UtilV3.fromVector(box.getMin().toVector()),
-					cachedInfo.getRotation(),
-					new V3(o.getX(), 0, o.getZ()),
+					V3.of(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ()),
+					Orientation.values()[cachedInfo.getRotation().ordinal()],
+					V3.of(o.getX(), 0, o.getZ()),
 					(int) o.getX(),
 					(int) o.getY(),
 					(int) o.getZ()
@@ -81,6 +81,7 @@ public class SkeletonSubject extends Subject {
 			cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot);
 	}
 
+	@Override
 	public double getIncome() {
 		if (skeleton == null)
 			return 0;

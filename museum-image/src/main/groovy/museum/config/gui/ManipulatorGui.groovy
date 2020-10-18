@@ -5,10 +5,13 @@ import museum.App
 import museum.museum.map.SkeletonSubjectPrototype
 import museum.museum.subject.Allocation
 import museum.museum.subject.SkeletonSubject
+import museum.museum.subject.StallSubject
 import museum.museum.subject.Subject
+import museum.museum.subject.product.FoodProduct
 import museum.museum.subject.skeleton.Skeleton
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
+import org.bukkit.Material
 import org.bukkit.entity.Player
 
 import static clepto.bukkit.item.Items.items
@@ -64,16 +67,6 @@ Guis.register 'manipulator', { player ->
         text "»$abstractSubject.cachedInfo.color.chatColor §lИзменить цвет §f«"
     } leftClick {
         Guis.open(delegate, 'colorChange', abstractSubject)
-    }
-
-    button 'I' icon {
-        def itemStack = abstractSubject.prototype.icon
-        item itemStack.type
-        data itemStack.durability
-        text """
-            §a$abstractSubject.prototype.title
-            §eДоход: §f$abstractSubject.income
-        """
     }
 
     button 'D' icon {
@@ -149,5 +142,35 @@ Guis.register 'manipulator', { player ->
             rows.times { gui.layout += '-OOOOOOO-' }
             gui.layout += '---------'
         }
+    } else if (abstractSubject instanceof StallSubject) {
+        (FoodProduct.values().length / 9).times { gui.layout += 'OOOOOOOOO' }
+        def summary = 0
+        abstractSubject.food.forEach { key, value ->
+            def term = value * key.cost
+            summary = summary + term
+            button 'O' icon {
+                item Material.SLIME_BALL
+                text "x$value $key.name &e=$term\$"
+            }
+        }
+        button 'I' icon {
+            def itemStack = abstractSubject.prototype.icon
+            item itemStack.type
+            data itemStack.durability
+            text """
+            §a$abstractSubject.prototype.title
+            §fТоваров на §e$summary\$
+            """
+        }
+    }
+
+    button 'I' icon {
+        def itemStack = abstractSubject.prototype.icon
+        item itemStack.type
+        data itemStack.durability
+        text """
+            §a$abstractSubject.prototype.title
+            §eДоход: §f$abstractSubject.income
+        """
     }
 }

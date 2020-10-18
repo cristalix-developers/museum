@@ -64,6 +64,18 @@ public class BeforePacketHandler implements Prepare {
 					onItemUse(user, (PacketPlayInUseItem) packetObj);
 				else if (packetObj instanceof PacketPlayInBlockDig)
 					onDigging(user, (PacketPlayInBlockDig) packetObj);
+				else if (packetObj instanceof PacketPlayInSteerVehicle) {
+					// Если игрок на коллекторе и нажимает шифт, то скинуть его
+					val packet = (PacketPlayInSteerVehicle) packetObj;
+					if (packet.d) {
+						if (user.getRiding() != null) {
+							user.getRiding().passengers.clear();
+							val dismount = new PacketPlayOutMount(user.getRiding());
+							user.getState().getUsers().forEach(viewer -> viewer.sendPacket(dismount));
+							user.setRiding(null);
+						}
+					}
+				}
 				super.channelRead(channelHandlerContext, packetObj);
 			}
 		});
@@ -136,7 +148,7 @@ public class BeforePacketHandler implements Prepare {
 			return;
 		}
 
-		Location origin = new Location(user.getWorld(), a.getX(), a.getY() + 1, a.getZ());
+		Location origin = location.clone().add(0, 1, 0);
 		Collection<User> viewers = museum.getUsers();
 		if (!museum.addSubject(subject, origin)) {
 			MessageUtil.find("cannot-place").send(user);

@@ -1,13 +1,13 @@
 package museum.museum.subject;
 
-import clepto.cristalix.mapservice.Box;
+import clepto.bukkit.world.Box;
+import clepto.math.V3;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import museum.App;
-import museum.data.SubjectInfo;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.AtomPiece;
 import museum.museum.subject.skeleton.Displayable;
@@ -16,11 +16,11 @@ import museum.museum.subject.skeleton.V4;
 import museum.player.State;
 import museum.player.User;
 import museum.util.ChunkWriter;
+import museum.util.LocationUtil;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import ru.cristalix.core.math.V3;
-import ru.cristalix.core.util.UtilV3;
+import ru.cristalix.core.formatting.Color;
 
 import java.util.*;
 import java.util.function.Function;
@@ -41,16 +41,16 @@ public class Allocation {
 	private final List<Location> allocatedBlocks;
 	private final String clientData;
 
-	public static Allocation allocate(State owner, SubjectInfo info, SubjectPrototype prototype, Location origin) {
+	public static Allocation allocate(State owner, Color color, SubjectPrototype prototype, Location origin) {
 		if (origin == null) return null;
 
 		Box box = prototype.getBox();
 		Map<BlockPosition, IBlockData> blocks = Maps.newHashMap();
 		List<Location> allocated = new ArrayList<>();
 
-		V3 absoluteOrigin = UtilV3.fromVector(origin.toVector());
-		V3 relativeOrigin = box.getDimensions().clone().mult(0.5);
-		relativeOrigin.setY(0);
+		V3 absoluteOrigin = V3.of(origin.getX(), origin.getY(), origin.getZ());
+		V3 relativeOrigin = box.getDimensions().multiply(0.5);
+		relativeOrigin = relativeOrigin.withY(0);
 
 		int minX = Integer.MAX_VALUE;
 		int minY = Integer.MAX_VALUE;
@@ -61,19 +61,19 @@ public class Allocation {
 		World world = App.getApp().getNMSWorld();
 
 		@AllArgsConstructor
-		class BlockData {
+		class BlockDataUnit {
 
 			final short offset;
 			final IBlockData blockData;
 
 		}
 
-		Map<ChunkCoordIntPair, List<BlockData>> chunkMap = new HashMap<>();
+		Map<ChunkCoordIntPair, List<BlockDataUnit>> chunkMap = new HashMap<>();
 
 		for (int x = (int) box.getMin().getX(); x <= box.getMax().getX(); x++) {
 			for (int y = (int) box.getMin().getY(); y <= box.getMax().getY(); y++) {
 				for (int z = (int) box.getMin().getZ(); z <= box.getMax().getZ(); z++) {
-					val dst = box.transpose(absoluteOrigin, info.getRotation(), relativeOrigin, x, y, z);
+					val dst = box.transpose(absoluteOrigin, LocationUtil.getOrientation(origin), relativeOrigin, x, y, z);
 					val src = new Location(App.getApp().getWorld(), x, y, z);
 
 					if (src.getBlock().getType() == Material.AIR) continue;
@@ -88,14 +88,14 @@ public class Allocation {
 					BlockPosition blockPos = nms(dst);
 					ChunkCoordIntPair chunkPos = new ChunkCoordIntPair(blockPos);
 
-					IBlockData data = applyColor(world.getType(nms(src)), info.getColor());
+					IBlockData data = applyColor(world.getType(nms(src)), color);
 
 					int xOffset = blockPos.getX() - (blockPos.getX() >> 4) * 16;
 					int yOffset = blockPos.getY();
 					int zOffset = blockPos.getZ() - (blockPos.getZ() >> 4) * 16;
 					short offset = (short) ((short) (((short) xOffset & 0xF) << 12) | (yOffset & 0xFF) % 256 | (zOffset & 0xFF) << 8);
 
-					BlockData blockData = new BlockData(offset, data);
+					BlockDataUnit blockData = new BlockDataUnit(offset, data);
 					chunkMap.computeIfAbsent(chunkPos, c -> new ArrayList<>()).add(blockData);
 
 					allocated.add(dst);
@@ -112,11 +112,11 @@ public class Allocation {
 			PacketPlayOutMultiBlockChange updatePacket = new PacketPlayOutMultiBlockChange();
 			PacketPlayOutMultiBlockChange removePacket = new PacketPlayOutMultiBlockChange();
 			updatePacket.a = removePacket.a = entry.getKey();
-			List<BlockData> list = entry.getValue();
+			List<BlockDataUnit> list = entry.getValue();
 			updatePacket.b = new PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[list.size()];
 			removePacket.b = new PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[list.size()];
 			for (int i = 0; i < list.size(); i++) {
-				BlockData blockData = list.get(i);
+				BlockDataUnit blockData = list.get(i);
 				updatePacket.b[i] = updatePacket.new MultiBlockChangeInfo(blockData.offset, blockData.blockData);
 				removePacket.b[i] = removePacket.new MultiBlockChangeInfo(blockData.offset, ChunkWriter.AIR_DATA);
 			}
@@ -168,11 +168,11 @@ public class Allocation {
 	}
 
 	public void removePiece(Piece piece) {
-		Map<AtomPiece, V4> pieces = new HashMap<>();
-		piece.recursiveTraverse(pieces, new V4(0, 0, 0, 0));
-		int[] ids = new int[pieces.size()];
+		Map<AtomPiece, V4> piecesToRemove = new HashMap<>();
+		piece.recursiveTraverse(piecesToRemove, new V4(0, 0, 0, 0));
+		int[] ids = new int[piecesToRemove.size()];
 		int i = 0;
-		for (AtomPiece atomPiece : pieces.keySet()) {
+		for (AtomPiece atomPiece : piecesToRemove.keySet()) {
 			this.pieces.remove(atomPiece);
 			ids[i++] = atomPiece.getStand().id;
 		}

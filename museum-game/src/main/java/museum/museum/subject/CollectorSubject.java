@@ -3,19 +3,22 @@ package museum.museum.subject;
 import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import museum.App;
 import museum.data.SubjectInfo;
+import museum.museum.Museum;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.CollectorSubjectPrototype;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.AtomPiece;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
+import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
 
-public class CollectorSubject extends Subject {
+public class CollectorSubject extends Subject implements Incomeble {
 
 	@Getter
 	private final int id;
@@ -23,7 +26,7 @@ public class CollectorSubject extends Subject {
 	private final AtomPiece piece;
 	@Setter
 	private CollectorNavigator navigator;
-
+	@Getter
 	private final double radius;
 	private final int speed;
 
@@ -43,6 +46,7 @@ public class CollectorSubject extends Subject {
 
 	@Override
 	public void updateInfo() {
+		super.updateInfo();
 		cachedInfo.metadata = String.valueOf(id);
 	}
 
@@ -53,12 +57,14 @@ public class CollectorSubject extends Subject {
 	}
 
 	public void move(long iteration) {
-		if (navigator == null)
+		if (navigator == null || !isAllocated())
 			return;
 		Location location = getLocation(iteration);
-		// ToDo: Пофиксить монетки
-//		user.getCoins().removeIf(coin -> coin.pickUp(user, location, radius, piece.getStand().id));
-		if (isAllocated()) getAllocation().allocatePiece(piece, V4.fromLocation(location), true);
+
+		if (getAllocation().getState() instanceof Museum)
+			((Museum) getAllocation().getState()).getCoins()
+					.removeIf(coin -> coin.pickUp(owner, location, radius, piece.getStand().id));
+		getAllocation().allocatePiece(piece, V4.fromLocation(location), true);
 	}
 
 	public Location getCollectorLocation() {
@@ -68,5 +74,16 @@ public class CollectorSubject extends Subject {
 	private Location getLocation(long time) {
 		int secondsPerLap = 200000 / speed;
 		return navigator == null ? getAllocation().getOrigin().toCenterLocation() : navigator.getLocation(time % secondsPerLap / (double) secondsPerLap);
+	}
+
+	@Override
+	public void handle(double... args) {
+		if (args[0] % (90 * 20L) != 0)
+			return;
+		val income = Math.random() * 100 + 100;
+		MessageUtil.find("collector-income")
+				.set("income", MessageUtil.toMoneyFormat(income))
+				.send(owner);
+		owner.setMoney(owner.getMoney() + income);
 	}
 }

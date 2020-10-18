@@ -4,6 +4,7 @@ import museum.player.User;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public class ProfessionalPickaxe implements Pickaxe {
 		animate(con, pos.south().west());
 		animate(con, pos.east().north());
 		animate(con, pos.north().east());
-		return null;
+		return Collections.emptyList();
 	}
 
 }

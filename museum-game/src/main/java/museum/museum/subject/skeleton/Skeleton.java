@@ -20,6 +20,7 @@ public class Skeleton extends Storable<SkeletonInfo, SkeletonPrototype> {
 				.collect(Collectors.toSet());
 	}
 
+	@Override
 	public void updateInfo() {
 		cachedInfo.setUnlockedFragmentAddresses(unlockedFragments.stream()
 				.map(Fragment::getAddress)

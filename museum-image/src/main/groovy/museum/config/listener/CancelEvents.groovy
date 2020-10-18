@@ -1,3 +1,4 @@
+@groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.listener
 
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent
@@ -15,7 +16,9 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.spigotmc.event.entity.EntityDismountEvent
 
-import static clepto.bukkit.behaviour.Behaviour.on
+on PlayerInteractEntityEvent, {
+    setCancelled true
+}
 
 on EntityDismountEvent, {
     if (dismounted.type == EntityType.BAT)
@@ -48,10 +51,6 @@ on BlockPhysicsEvent, {
 }
 
 on BlockFromToEvent, {
-    setCancelled true
-}
-
-on PlayerInteractEntityEvent, {
     setCancelled true
 }
 

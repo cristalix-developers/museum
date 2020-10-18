@@ -1,6 +1,7 @@
 package museum.util;
 
-import clepto.cristalix.mapservice.Label;
+import clepto.bukkit.world.Label;
+import clepto.bukkit.world.Orientation;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 
@@ -42,6 +43,15 @@ public class LocationUtil {
 		input.setPitch(Integer.parseInt(ss[++characterOffset]));
 
 		return input;
+	}
+
+	public Orientation getOrientation(Location location) {
+		float yaw = location.getYaw() % 360;
+		if (yaw < 0) yaw += 360;
+		if (yaw >= -45 && yaw <= 45) return Orientation.PX;
+		if (yaw >= 45 && yaw <= 135) return Orientation.PY;
+		if (yaw >= 135 && yaw <= 225) return Orientation.MX;
+		return Orientation.MY;
 	}
 
 }
