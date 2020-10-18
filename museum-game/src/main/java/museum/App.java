@@ -166,7 +166,7 @@ public final class App extends JavaPlugin {
 				topManager
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
-		VisitorHandler.init(this, 1);
+		VisitorHandler.init(this, 5);
 
 		// Вывод сервера в тесты
 		IRealmService.get().getCurrentRealmInfo().setStatus(RealmStatus.WAITING_FOR_PLAYERS);

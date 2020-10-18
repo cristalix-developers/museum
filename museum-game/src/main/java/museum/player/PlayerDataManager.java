@@ -134,7 +134,10 @@ public class PlayerDataManager implements Listener {
 		user.setPlayer(player);
 
 		player.addPotionEffect(NIGHT_VISION);
-		Bukkit.getOnlinePlayers().forEach(current -> player.hidePlayer(app, current)); // Скрытие игроков
+		Bukkit.getOnlinePlayers().forEach(current -> {
+			player.hidePlayer(app, current);
+			current.hidePlayer(app, player);
+		}); // Скрытие игроков
 		player.setGameMode(GameMode.ADVENTURE);
 		user.setState(user.getState()); // Загрузка музея
 

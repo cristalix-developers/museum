@@ -15,7 +15,9 @@ registerCommand 'u' handle {
     if (PrepareJSAnime.AVAILABLE_SCRIPTS.contains(fileName) || player.op) {
         def file = new File("scripts/" + fileName + ".bundle.js")
         SendScriptUtil.sendScripts(player.uniqueId, new JavaScriptMessage(file.text))
-        return "&bСкрипт объемом &f&l${file.bytes.size()}&b байт был отправлен. &f㲙"
+        if (player.op) {
+            return "&bСкрипт объемом &f&l${file.bytes.size()}&b байт был отправлен. &f㲙"
+        }
     }
 }
 

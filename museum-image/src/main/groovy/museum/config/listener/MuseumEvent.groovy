@@ -34,7 +34,7 @@ on PlayerMoveEvent, {
                     user.grabbedArmorstand = null
                     user.player.allowFlight = true
                     user.player.walkSpeed = 0.33
-                    MessageUtil.find('box-recieved').send user
+                    MessageUtil.find 'box-recieved' send user
                     def summary = 0
                     5.times {
                         def food = FoodProduct.values()[(Math.random() * FoodProduct.values().length) as int]

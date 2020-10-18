@@ -31,10 +31,10 @@ register 'visitor', { player ->
         if (visitor.state == museum || museum.getOwner() == visitor)
             return
         int fragments = it.skeletons.stream().mapToInt(s -> s.unlockedFragments.size()).sum().intValue()
-        double price = fragments * 3.33f
+        double price = fragments * 3.33f + 100
         button 'O' icon {
             item Material.WOOD_DOOR
-            text """Музей §b${museum.title.toLowerCase()}
+            text """§b${museum.title.toLowerCase()}
             
             Цена визита: §6${MuseumGuis.moneyFormatter.format(price)}
             Фрагментов:  §b$fragments

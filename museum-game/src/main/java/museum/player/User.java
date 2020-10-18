@@ -95,7 +95,7 @@ public class User implements PlayerWrapper {
 		info.experience += exp;
 		int newLevel = getLevel();
 		if (newLevel != prevLevel) {
-			if (newLevel % 18 == 0) {
+			if (newLevel % 50 == 0) {
 				Bukkit.broadcastMessage(MessageUtil.find("global-level-message")
 						.set("name", getName())
 						.set("level", newLevel)

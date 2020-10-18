@@ -10,8 +10,6 @@ registerCommand 'congr' handle {
         return
     def victim = Bukkit.getPlayer(args[0])
     if (victim && victim.isOnline()) {
-        MessageUtil.find('congrats')
-            .set('sender', player.name)
-            .send App.app.getUser(victim)
+        MessageUtil.find 'congrats' set 'sender', player.name send App.app.getUser(victim)
     }
 }
