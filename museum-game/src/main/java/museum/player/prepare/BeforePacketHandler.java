@@ -226,7 +226,7 @@ public class BeforePacketHandler implements Prepare {
 			Skeleton skeleton = user.getSkeletons().supply(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
-				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0);
+				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0) / 5;
 
 				String value = String.format("%.2f$", prize);
 

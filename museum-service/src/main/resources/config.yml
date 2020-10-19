@@ -3,8 +3,9 @@ serviceRealm: MUSS-1
 chat:
   prefix: '§7[§l§bi§7] '
   messages:
+    congr-send: 'Поздравление было отправлено.'
     congrats: '§e%SENDER% поздравил вас с повышением уровня!'
-    global-level-message: '!!! §e%NAME% достигнул уровня §b%LEVEL%§e, /congr %NAME% - что бы поздравить!'
+    global-level-message: '§cВНИМАНИЕ! §e%NAME% достигнул уровня §b%LEVEL%§e, поздравить /congr %NAME%'
     box-recieved: '§fВы принесли груз, ожидайте продажи! §eСписок товаров:'
     wagon-copy: 'Вы уже заказывали доставку продуктов, заберите её.'
     no-product: '§fВ продуктовой лавке на §e%X% %Y% %Z%§f, закончился товар. Закажите его в меню.'
