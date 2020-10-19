@@ -1,5 +1,6 @@
 package museum.player;
 
+import clepto.bukkit.B;
 import clepto.bukkit.LocalArmorStand;
 import clepto.bukkit.event.PlayerWrapper;
 import io.netty.buffer.ByteBuf;
@@ -21,7 +22,6 @@ import museum.prototype.Registry;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.spigotmc.AsyncCatcher;
@@ -96,7 +96,7 @@ public class User implements PlayerWrapper {
 		int newLevel = getLevel();
 		if (newLevel != prevLevel) {
 			if (newLevel % 50 == 0) {
-				Bukkit.broadcastMessage(MessageUtil.find("global-level-message")
+				B.bc(MessageUtil.find("global-level-message")
 						.set("name", getName())
 						.set("level", newLevel)
 						.getText()

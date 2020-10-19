@@ -51,6 +51,7 @@ public class TopManager implements Ticked {
 		val data = GlobalSerializers.toJson(tops);
 		val packet = new ClientPacket<String>("top-update");
 		for (User user : app.getUsers())
-			packet.send(user, data);
+			if (user.getConnection() != null)
+				packet.send(user, data);
 	}
 }

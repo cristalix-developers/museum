@@ -60,7 +60,7 @@ public class ServerSocket extends Thread {
 									new HttpRequestDecoder(),
 									new HttpObjectAggregator(6553600),
 									new HttpResponseEncoder(),
-									new WebSocketServerProtocolHandler("/"),
+									new WebSocketServerProtocolHandler("/", null, false, 6553600),
 									new ServerSocketHandler()
 							);
 						}
