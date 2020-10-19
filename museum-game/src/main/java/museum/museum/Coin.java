@@ -30,6 +30,8 @@ public class Coin {
 	}
 
 	public void create(PlayerConnection connection) {
+		if (connection == null)
+			return;
 		connection.sendPacket(new PacketPlayOutSpawnEntity(entityItem, 2));
 		connection.sendPacket(new PacketPlayOutEntityMetadata(entityItem.getId(), entityItem.getDataWatcher(), false));
 	}

@@ -112,8 +112,9 @@ public class MuseumCommands {
 		if (museum == null)
 			return MessageUtil.find("museum-not-found").set("type", address).getText();
 
-		if (user.getLastMuseum().equals(museum))
-			return MessageUtil.get("already-at-home");
+		if (user.getLastMuseum() != null)
+			if (user.getLastMuseum().equals(museum))
+				return MessageUtil.get("already-at-home");
 
 		user.setState(museum);
 
