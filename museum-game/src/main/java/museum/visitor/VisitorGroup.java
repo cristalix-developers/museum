@@ -78,9 +78,10 @@ public class VisitorGroup {
 			}
 		}
 
+		// todo: почему то, это часто происходит
 		// If all nodes are explored and the destination node hasn't been found.
 		if (!currentNode.equals(destinationNode))
-			throw new RuntimeException("No feasible path.");
+			return Collections.emptyList();
 
 		// Reconstruct path from the tail
 		List<Node> directions = new LinkedList<>();

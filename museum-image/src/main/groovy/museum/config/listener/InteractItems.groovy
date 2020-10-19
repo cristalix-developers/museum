@@ -3,8 +3,7 @@ package museum.config.listener
 
 import clepto.bukkit.menu.Guis
 import museum.excavation.Excavation
-import museum.util.MessageUtil
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import museum.util.TreasureUtil
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 
@@ -52,16 +51,5 @@ on PlayerInteractEvent, {
     def user = app.getUser player
     if (!(user.getState() instanceof Excavation))
         return
-    for (item in player.inventory) {
-        if (!item)
-            continue
-        def tag = CraftItemStack.asNMSCopy(item) tag
-        if (!tag || !tag.hasKeyOfType('cost', 99))
-            continue
-        def cost = tag.getInt 'cost'
-        item.amount = item.amount - 1
-        user.money = user.money + cost
-        MessageUtil.find "treasure-item" set 'cost', cost send user
-        return
-    }
+    TreasureUtil.sellAll(user)
 }

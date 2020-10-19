@@ -107,8 +107,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	public void enterState(User user) {
 		teleportUser(user);
 
-		cachedInfo.views++;
-
 		StringBuilder builder = new StringBuilder();
 		for (Subject subject : user.getSubjects()) {
 			if (!subject.isAllocated()) continue;
@@ -128,9 +126,10 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		if (owner.getExperience() >= PreparePlayerBrain.EXPERIENCE)
 			giveMenu(user);
 
-		if (this.owner != user)
+		if (this.owner != user) {
 			inventory.setItem(8, backItem);
-		else
+			cachedInfo.views++;
+		} else
 			for (Subject subject : user.getSubjects())
 				if (!subject.isAllocated())
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));

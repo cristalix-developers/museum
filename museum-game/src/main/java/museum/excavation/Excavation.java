@@ -9,6 +9,7 @@ import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
 import museum.util.ChunkWriter;
 import museum.util.MessageUtil;
+import museum.util.TreasureUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Material;
@@ -51,7 +52,7 @@ public class Excavation implements State {
 
 	@Override
 	public void leaveState(User user) {
-
+		TreasureUtil.sellAll(user);
 	}
 
 	@Override

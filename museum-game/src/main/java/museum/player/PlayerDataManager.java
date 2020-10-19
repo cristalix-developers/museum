@@ -152,7 +152,7 @@ public class PlayerDataManager implements Listener {
 			userMap.remove(event.getPlayer().getUniqueId());
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		timeBar.onQuit(event.getPlayer().getUniqueId());
 		event.setQuitMessage(null);

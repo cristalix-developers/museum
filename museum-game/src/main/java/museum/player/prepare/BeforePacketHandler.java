@@ -191,7 +191,7 @@ public class BeforePacketHandler implements Prepare {
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
 			// С некоторым шансом может выпасть интерактивая вещь
-			if (Vector.random.nextFloat() > .98)
+			if (Vector.random.nextFloat() > .995)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 			// Перебрать все кирки и эффекты на них
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
@@ -226,8 +226,7 @@ public class BeforePacketHandler implements Prepare {
 			Skeleton skeleton = user.getSkeletons().supply(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
-				double cost = proto.getPrice();
-				double prize = cost * (.75 + Math.random() * .50);
+				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0);
 
 				String value = String.format("%.2f$", prize);
 

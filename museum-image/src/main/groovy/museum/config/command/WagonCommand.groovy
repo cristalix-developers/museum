@@ -10,6 +10,8 @@ import net.minecraft.server.v1_12_R1.EnumItemSlot
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
+import org.bukkit.event.EventPriority
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 
 class WagonConfig {
@@ -25,6 +27,14 @@ Do.every 1 ticks {
         Location eyes = user.eyes
         user.grabbedArmorstand.setLocation eyes + eyes.direction * 1.5 + [0, -1.7, 0], false
         user.grabbedArmorstand.handle.yaw = user.location.yaw
+    }
+}
+
+on PlayerQuitEvent, EventPriority.LOWEST, {
+    if (playerOrderedWagon.contains(player.uniqueId)) {
+        def user = App.app.getUser player
+        user.money = user.money + WagonConfig.COST
+        playerOrderedWagon.remove player.uniqueId
     }
 }
 
@@ -48,7 +58,6 @@ registerCommand 'wagon' handle {
         playerOrderedWagon.remove user.uuid
         return MessageUtil.get('box-taken')
     }
-    return
 }
 
 registerCommand 'wagonbuy' handle {

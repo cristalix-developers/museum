@@ -58,7 +58,7 @@ public class ServerSocket extends Thread {
 						protected void initChannel(SocketChannel socketChannel) {
 							socketChannel.pipeline().addLast(
 									new HttpRequestDecoder(),
-									new HttpObjectAggregator(65536),
+									new HttpObjectAggregator(6553600),
 									new HttpResponseEncoder(),
 									new WebSocketServerProtocolHandler("/"),
 									new ServerSocketHandler()

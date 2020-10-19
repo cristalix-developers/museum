@@ -78,7 +78,7 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
 						config.setOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE);
 						ch.pipeline()
 								.addLast(new HttpClientCodec())
-								.addLast(new HttpObjectAggregator(65536))
+								.addLast(new HttpObjectAggregator(6553600))
 								.addLast(new WebSocketClientProtocolHandler(
 										WebSocketClientHandshakerFactory.newHandshaker(
 												URI.create("http://" + host + ":" + port + "/"),
@@ -86,7 +86,7 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
 												null,
 												false,
 												new DefaultHttpHeaders(),
-												65536
+												6553600
 										),
 										true
 								))
