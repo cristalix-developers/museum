@@ -85,7 +85,8 @@ public class MuseumCommands {
 			return NO_MONEY_MESSAGE;
 
 		user.setMoney(user.getMoney() - prototype.getPrice());
-		user.getSubjects().add(new Subject(prototype, new SubjectInfo(
+		// new Subject() писать нельзя - так как нужный класс (CollectorSubject...) не уточнет, и все сломается
+		user.getSubjects().add(prototype.provide(new SubjectInfo(
 				UUID.randomUUID(),
 				prototype.getAddress()
 		), user));
