@@ -5,6 +5,8 @@ import clepto.bukkit.LocalArmorStand
 import clepto.bukkit.groovy.Do
 import museum.App
 import museum.command.MuseumCommands
+import museum.museum.Museum
+import museum.museum.map.SubjectType
 import museum.util.MessageUtil
 import net.minecraft.server.v1_12_R1.EnumItemSlot
 import org.bukkit.Location
@@ -69,4 +71,20 @@ registerCommand 'wagonbuy' handle {
     user.money = user.money - WagonConfig.COST
     playerOrderedWagon.add user.uuid
     return MessageUtil.get('wagon-buy')
+}
+
+registerCommand 'go' handle {
+    def user = App.app.getUser player.uniqueId
+    def state = user.state
+    if (state instanceof Museum) {
+        for (stall in state.getSubjects(SubjectType.STALL)) {
+            if (stall.food.isEmpty() && stall.allocation) {
+                user.teleport(stall.allocation.origin + [0, 12, 0])
+                user.location.yaw = 0
+                user.location.pitch = 0
+                return
+            }
+        }
+    }
+    return
 }

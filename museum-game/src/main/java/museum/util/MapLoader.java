@@ -47,5 +47,4 @@ public class MapLoader {
 			return chunkWriter.build(flags);
 		};
 	}
-
 }

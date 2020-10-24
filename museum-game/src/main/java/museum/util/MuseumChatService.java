@@ -93,7 +93,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 				if (ps != null) original.add(ps);
 			}
 			val oldLegacy = legacy;
-			val builder = new ComponentBuilder(new TextComponent(""));
+			val builder = new ComponentBuilder(new TextComponent("§7[§b" + App.getApp().getUser(uuid).getLevel() + "§7] "));
 			event.setMessage(chatView.getFormattedComponent(uuid, context).thenCompose(message -> {
 				builder.append(message);
 				val future = permissionService.getNameColor(uuid);

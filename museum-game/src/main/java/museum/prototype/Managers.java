@@ -232,7 +232,6 @@ public class Managers {
 			}
 			if (icon == null)
 				icon = iconBlock.getDrops().iterator().next();
-			iconBlock.getDrops().clear();
 			iconBlock.setType(Material.AIR);
 		} else
 			icon = new ItemStack(Material.valueOf(label.getTag().toUpperCase()));

@@ -137,7 +137,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				if (!subject.isAllocated())
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 
-		player.setAllowFlight(true);
+		if (user.getGrabbedArmorstand() == null)
+			player.setAllowFlight(true);
 
 		WorkerUtil.reload(user);
 

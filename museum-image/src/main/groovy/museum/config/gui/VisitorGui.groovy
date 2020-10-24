@@ -38,6 +38,7 @@ register 'visitor', { player ->
             
             Цена визита: §6${MuseumGuis.moneyFormatter.format(price)}
             Фрагментов:  §b$fragments
+            Хозяин: §b$museum.owner.name
             """
         } leftClick {
             performCommand "travel $museum.owner.name $price"
