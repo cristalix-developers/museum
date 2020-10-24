@@ -73,7 +73,6 @@ public final class App extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		B.plugin = App.app = this;
-
 		// Загрузка мира
 		MapLoader.load(this);
 

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import museum.App;
+import museum.client_conversation.ClientPacket;
 import museum.data.MuseumInfo;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.MuseumPrototype;
@@ -86,6 +87,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 					if (route != null) collector.setNavigator(new CollectorNavigator(prototype, world,
 							route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 				});
+
+		updateIncrease();
 	}
 
 	@Override
@@ -117,7 +120,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		}
 		String payload = builder.toString();
 
-		user.sendPayload("museumsubjects", payload);
+		new ClientPacket<String>("museumsubjects").send(user, payload);
 		user.sendAnime();
 
 		val player = user.getPlayer();
@@ -133,8 +136,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 			for (Subject subject : user.getSubjects())
 				if (!subject.isAllocated())
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
-
-		updateIncrease();
 
 		player.setAllowFlight(true);
 

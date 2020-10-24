@@ -25,7 +25,6 @@ import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.spigotmc.AsyncCatcher;
-import ru.cristalix.core.util.UtilNetty;
 import ru.cristalix.core.util.UtilV3;
 
 import java.util.UUID;
@@ -136,13 +135,6 @@ public class User implements PlayerWrapper {
 		return sum;
 	}
 
-	public void sendPayload(String channel, String payload) {
-		ByteBuf buffer = Unpooled.buffer();
-		UtilNetty.writeString(buffer, payload);
-		PacketPlayOutCustomPayload packet = new PacketPlayOutCustomPayload(channel, new PacketDataSerializer(buffer));
-		player.getHandle().playerConnection.sendPacket(packet);
-	}
-
 	@Override
 	public String toString() {
 		return this.getDisplayName();
@@ -157,9 +149,8 @@ public class User implements PlayerWrapper {
 	}
 
 	public void updateIncome() {
-		setIncome(0.1);
+		setIncome(0);
 		for (Museum museum : getMuseums())
-			for (Subject subject : museum.getSubjects())
-				setIncome(getIncome() + subject.getIncome());
+			setIncome(getIncome() + museum.getIncome());
 	}
 }

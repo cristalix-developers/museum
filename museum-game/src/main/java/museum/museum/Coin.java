@@ -48,17 +48,18 @@ public class Coin {
 
 		App app = App.getApp();
 
+		val money = ((Museum) user.getState()).getIncome();
 		val message = new EntityArmorStand(app.getNMSWorld(), entityItem.getX(), entityItem.getY(), entityItem.getZ());
 		message.setCustomNameVisible(true);
 		message.setMarker(true);
 		message.setInvisible(true);
-		message.setCustomName("§6+ " + user.getIncome() + "$");
+		message.setCustomName("§6+ " + money + "$");
 
 		connection.sendPacket(new PacketPlayOutSpawnEntityLiving(message));
 		connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMove(message.getId(), 0, 3000, 0, false));
 
 		user.setPickedCoinsCount(user.getPickedCoinsCount() + 1);
-		user.setMoney(user.getMoney() + user.getIncome());
+		user.setMoney(user.getMoney() + money);
 
 		B.postpone(30, () -> {
 			remove(connection);

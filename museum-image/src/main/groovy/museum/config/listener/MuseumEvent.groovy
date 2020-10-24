@@ -6,9 +6,13 @@ import museum.museum.Museum
 import museum.museum.map.SubjectType
 import museum.museum.subject.product.FoodProduct
 import museum.util.MessageUtil
+import org.bukkit.Location
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerMoveEvent
+
+// todo delete this hardcode with requiredLabel
+def wagonLocation = new Location(App.app.getWorld(), 292, 87, -400)
 
 on InventoryOpenEvent, {
     def type = inventory.type
@@ -47,6 +51,8 @@ on PlayerMoveEvent, {
                     user.sendMessage("§e§lИтого: $summary\$")
                 }
             })
+        } else if (wagonLocation.distanceSquared(to) < 25) {
+            user.performCommand 'wagon'
         }
     }
 }
