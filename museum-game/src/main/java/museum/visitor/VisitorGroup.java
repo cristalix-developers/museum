@@ -23,16 +23,10 @@ public class VisitorGroup {
 	private long idleStart;
 
 	public VisitorGroup(List<Label> allNodes, List<Label> mainNodes) {
-		int woolColor = 0;
-
 		List<Node> nodes = new ArrayList<>();
 		for (Label nodeLabel : allNodes) {
 			nodes.add(new Node(nodeLabel.getTag(), nodeLabel));
 			nodeLabel.getChunk().load();
-			Block block = nodeLabel.clone().add(0, -1, 0).getBlock();
-			block.setType(Material.WOOL);
-			block.setData((byte) woolColor++);
-			if (woolColor == 16) woolColor = 0;
 		}
 
 		for (Node node : nodes) {
@@ -48,7 +42,6 @@ public class VisitorGroup {
 		}
 
 		currentNode = nodes.get(0);
-
 	}
 
 	public List<Node> route(Node sourceNode, Node destinationNode) {
