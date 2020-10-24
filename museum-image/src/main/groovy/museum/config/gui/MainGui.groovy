@@ -5,6 +5,7 @@ import clepto.humanize.TimeFormatter
 import museum.App
 import museum.config.command.WagonConfig
 import museum.museum.Museum
+import museum.museum.map.SubjectType
 import museum.util.LevelSystem
 import org.bukkit.entity.Player
 
@@ -78,7 +79,7 @@ Guis.register 'main', { player ->
         Посещений: &b$museum.views
     
         Доход: &a$museum.income
-        Витрин: &e${museum.subjects.size()}
+        Витрин: &e${museum.getSubjects(SubjectType.SKELETON_CASE).size()}
     
         Создан &a${formatter.format(Duration.ofMillis(System.currentTimeMillis() - museum.creationDate.time))} назад
         """

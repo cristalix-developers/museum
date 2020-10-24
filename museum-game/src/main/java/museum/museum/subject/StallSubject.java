@@ -12,6 +12,8 @@ import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.util.MessageUtil;
 import museum.worker.NpcWorker;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.util.UtilV3;
 
@@ -73,12 +75,9 @@ public class StallSubject extends Subject implements Incomeble {
 			return;
 		Set<FoodProduct> potentialFood = food.keySet();
 		if (potentialFood.isEmpty()) {
-			val origin = getAllocation().getOrigin();
-			MessageUtil.find("no-product")
-					.set("x", origin.getX())
-					.set("y", origin.getY())
-					.set("z", origin.getZ())
-					.send(owner);
+			TextComponent message = new TextComponent(MessageUtil.get("no-product"));
+			message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/go"));
+			owner.getPlayer().sendMessage(message);
 			return;
 		}
 		int randomFoodIndex = (int) (Math.random() * potentialFood.size());
