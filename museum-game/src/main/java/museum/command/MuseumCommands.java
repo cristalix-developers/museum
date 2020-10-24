@@ -286,15 +286,15 @@ public class MuseumCommands {
 	private String cmdPickaxe(Player player, String[] args) {
 		User user = this.app.getUser(player);
 		PickaxeType pickaxe = user.getPickaxeType().getNext();
-		if (pickaxe == user.getPickaxeType())
+		if (pickaxe == user.getPickaxeType() || pickaxe == null)
 			return null;
 		player.closeInventory();
 
 		if (user.getMoney() < pickaxe.getPrice())
 			return NO_MONEY_MESSAGE;
 
-		user.setPickaxeType(pickaxe);
 		user.setMoney(user.getMoney() - pickaxe.getPrice());
+		user.setPickaxeType(pickaxe);
 		player.performCommand("gui pickaxe");
 		return MessageUtil.get("newpickaxe");
 	}

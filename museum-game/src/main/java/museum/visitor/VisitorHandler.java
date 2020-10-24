@@ -25,10 +25,9 @@ public class VisitorHandler {
 				.collect(Collectors.toList());
 
 		for (int i = 0; i < groupAmount; i++)
-			new VisitorGroup(labels, nodes).spawn();
+			new VisitorGroup(labels).spawn();
 
 		if (labels.isEmpty())
 			throw new RuntimeException("Not visitors nodes found.");
 	}
-
 }

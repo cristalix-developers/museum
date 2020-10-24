@@ -1,6 +1,5 @@
 package museum.player;
 
-import clepto.bukkit.B;
 import clepto.bukkit.LocalArmorStand;
 import clepto.bukkit.event.PlayerWrapper;
 import io.netty.buffer.ByteBuf;
@@ -21,6 +20,8 @@ import museum.prototype.Managers;
 import museum.prototype.Registry;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -95,11 +96,14 @@ public class User implements PlayerWrapper {
 		int newLevel = getLevel();
 		if (newLevel != prevLevel) {
 			if (newLevel % 50 == 0) {
-				B.bc(MessageUtil.find("global-level-message")
-						.set("name", getName())
-						.set("level", newLevel)
-						.getText()
+				TextComponent message = new TextComponent("" +
+						"§cВНИМАНИЕ! §e" + getName() +
+						" достигнул уровня §b" + newLevel +
+						"§e, нажмите §e§lСЮДА§e что бы поздравить!"
 				);
+				message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/congr " + getName()));
+				for (User user : App.getApp().getUsers())
+					user.getPlayer().sendMessage(message);
 			}
 			MessageUtil.find("levelup")
 					.set("level", newLevel)

@@ -58,6 +58,18 @@ Items.register 'prestige', {
     """
 }
 
+Items.register 'legendary', {
+    item DIAMOND_PICKAXE
+    apply items['pickaxe-template']
+    enchant(Enchantment.DIG_SPEED, 1)
+    nbt.prison = '23feb'
+    text """
+    §b§lЛегендарная кирка
+
+    Абсолютное орудие.
+    """
+}
+
 Guis.register 'pickaxe', { player ->
     def user = App.app.getUser((Player) player)
 
@@ -72,9 +84,9 @@ Guis.register 'pickaxe', { player ->
             text '§8У вас наилучшая кирка.'
         } else {
             apply items[user.pickaxeType.next.name().toLowerCase()]
+            text ''
+            text "Цена: $user.pickaxeType.next.price"
         }
-        text ''
-        text "Цена: $user.pickaxeType.next.price"
     } leftClick {
         performCommand'pickaxe'
     }

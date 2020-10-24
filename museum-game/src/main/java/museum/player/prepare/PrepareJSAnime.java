@@ -11,7 +11,7 @@ import museum.player.User;
 public class PrepareJSAnime implements Prepare {
 
 	public static final Prepare INSTANCE = new PrepareJSAnime();
-	public static final String AVAILABLE_SCRIPTS = "museum amongus";
+	public static final String AVAILABLE_SCRIPTS = "museum amongus markuptext";
 
 	private static final String[] separated = AVAILABLE_SCRIPTS.split("\\s+");
 

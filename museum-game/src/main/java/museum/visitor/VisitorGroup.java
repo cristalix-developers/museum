@@ -14,13 +14,14 @@ public class VisitorGroup {
 	private List<EntityVisitor> crowd;
 	private final List<Node> nodes = new ArrayList<>();
 	private final List<Node> mainToVisit = new ArrayList<>();
+	private List<Node> way;
 	private Deque<Node> currentRoute;
 	@Setter
 	private Node currentNode;
 	@Setter
 	private long idleStart;
 
-	public VisitorGroup(List<Label> allNodes, List<Label> mainNodes) {
+	public VisitorGroup(List<Label> allNodes) {
 		List<Node> nodes = new ArrayList<>();
 		for (Label nodeLabel : allNodes) {
 			nodes.add(new Node(nodeLabel.getTag(), nodeLabel));
@@ -38,12 +39,11 @@ public class VisitorGroup {
 				}
 			}
 		}
-
+		way = new ArrayList<>(mainToVisit);
 		currentNode = nodes.get(0);
 	}
 
 	public List<Node> route(Node sourceNode, Node destinationNode) {
-
 		Map<Node, Node> previousNodeMap = new HashMap<>();
 		Node currentNode = sourceNode;
 
@@ -83,19 +83,20 @@ public class VisitorGroup {
 		Collections.reverse(directions);
 
 		return directions;
-
 	}
 
 	public void newMainRoute() {
-		Node target = ListUtils.random(this.mainToVisit);
-		this.mainToVisit.remove(target);
+		if (way.isEmpty())
+			way = new ArrayList<>(mainToVisit);
+		Node target = ListUtils.random(this.way);
+		this.way.remove(target);
 		this.currentRoute = new LinkedList<>(route(this.currentNode, target));
 	}
 
 	public void spawn() {
 		Location loc = currentNode.getLocation();
 		loc.getChunk().load();
-		mainToVisit.remove(currentNode);
+		way.remove(currentNode);
 		this.guide = new EntityVisitor(loc.getWorld(), this);
 		this.guide.setCustomName("Гид");
 		this.guide.setCustomNameVisible(true);
