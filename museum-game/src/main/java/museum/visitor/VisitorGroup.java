@@ -4,8 +4,6 @@ import clepto.ListUtils;
 import clepto.bukkit.world.Label;
 import lombok.*;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 
 import java.util.*;
 

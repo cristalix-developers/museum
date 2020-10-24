@@ -2,6 +2,7 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.config.command.WagonConfig
 import museum.museum.map.SkeletonSubjectPrototype
 import museum.museum.subject.Allocation
 import museum.museum.subject.SkeletonSubject
@@ -11,14 +12,12 @@ import museum.museum.subject.product.FoodProduct
 import museum.museum.subject.skeleton.Skeleton
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
-import org.bukkit.Material
 import org.bukkit.entity.Player
 
 import static clepto.bukkit.item.Items.items
 import static clepto.bukkit.item.Items.register
 import static museum.museum.subject.Allocation.Action.*
-import static org.bukkit.Material.CLAY_BALL
-import static org.bukkit.Material.CONCRETE
+import static org.bukkit.Material.*
 
 register 'lockedSkeleton', {
     item CLAY_BALL
@@ -143,13 +142,28 @@ Guis.register 'manipulator', { player ->
             gui.layout += '---------'
         }
     } else if (abstractSubject instanceof StallSubject) {
+        if (abstractSubject.food.isEmpty()) {
+            button 'I' icon {
+                item STORAGE_MINECART
+                text """
+                &bЗаказать товар | &e$WagonConfig.COST\$
+
+                Закажите фургон с продовольствием,
+                и заберите его на &lx: 295, z: -402,
+                &fза тем отнесите товар в лавку.
+                """
+            } leftClick {
+                performCommand 'wagonbuy'
+                closeInventory()
+            }
+        }
         (FoodProduct.values().length / 9).times { gui.layout += 'OOOOOOOOO' }
         def summary = 0
         abstractSubject.food.forEach { key, value ->
             def term = value * key.cost
             summary = summary + term
             button 'O' icon {
-                item Material.SLIME_BALL
+                item SLIME_BALL
                 text "x$value $key.name &e=$term\$"
             }
         }

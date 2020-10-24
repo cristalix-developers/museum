@@ -69,7 +69,7 @@ public class CollectorNavigator {
 	}
 
 	@Data
-	private static class Node {
+	public static class Node {
 
 		private final Location location;
 		private double distanceToNext;
