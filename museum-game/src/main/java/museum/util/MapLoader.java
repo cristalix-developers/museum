@@ -21,7 +21,7 @@ public class MapLoader {
 
 	public void load(App app) {
 		// Загрузка карты с сервера BUIL-1
-		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("Museum", "release")
+		MapListDataItem mapInfo = Cristalix.mapService().getLatestMapByGameTypeAndMapName("Museum", "release")
 				.orElseThrow(() -> new RuntimeException("Map Museum/release wasn't found in the MapService"));
 
 		try {
