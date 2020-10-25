@@ -42,14 +42,17 @@ public class Coin {
 				|| Math.abs(location.getY() - entityItem.getY()) > radius
 				|| Math.abs(location.getZ() - entityItem.getZ()) > radius)
 			return false;
+		val state = user.getState();
+		if (!(state instanceof Museum))
+			return false;
 
+		val money = ((Museum) state).getIncome();
 		val connection = user.getConnection();
 
 		connection.sendPacket(new PacketPlayOutCollect(entityItem.getId(), collectorId, 1));
 
 		App app = App.getApp();
 
-		val money = ((Museum) user.getState()).getIncome();
 		val message = new EntityArmorStand(app.getNMSWorld(), entityItem.getX(), entityItem.getY(), entityItem.getZ());
 		message.setCustomNameVisible(true);
 		message.setMarker(true);

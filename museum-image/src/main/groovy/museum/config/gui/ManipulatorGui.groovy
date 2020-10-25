@@ -51,7 +51,14 @@ register 'availableSkeleton', {
 
 Guis.register 'manipulator', { player ->
     def user = App.app.getUser((Player) player)
-    def abstractSubject = (Subject) context
+    Subject abstractSubject
+    try {
+        abstractSubject = user.getSubject(UUID.fromString(context as String))
+    } catch (Exception ignored) {
+        return
+    }
+    if (!abstractSubject)
+        return
 
     title abstractSubject.prototype.title
 
@@ -65,7 +72,7 @@ Guis.register 'manipulator', { player ->
         data abstractSubject.cachedInfo.color.woolData
         text "»$abstractSubject.cachedInfo.color.chatColor §lИзменить цвет §f«"
     } leftClick {
-        Guis.open(delegate, 'colorChange', abstractSubject)
+        Guis.open(delegate, 'colorChange', abstractSubject.cachedInfo.uuid)
     }
 
     button 'D' icon {
@@ -128,7 +135,7 @@ Guis.register 'manipulator', { player ->
                         subject.updateSkeleton true
                         user.updateIncome()
                     }
-                    Guis.open(delegate, 'manipulator', subject)
+                    Guis.open(delegate, 'manipulator', subject.cachedInfo.uuid)
                 }
             }
         }

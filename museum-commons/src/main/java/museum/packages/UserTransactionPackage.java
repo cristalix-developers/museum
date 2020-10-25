@@ -20,7 +20,7 @@ public class UserTransactionPackage extends MuseumPackage {
 
 	@AllArgsConstructor
 	@Getter
-	public static enum TransactionResponse {
+	public enum TransactionResponse {
 
 		INTERNAL_ERROR("Невозможно приобрести в данный момент. Попробуйте чуть позже", false),
 		INSUFFICIENT_FUNDS("Недостаточно средств на счёте", false),

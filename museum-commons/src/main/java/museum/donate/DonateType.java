@@ -7,14 +7,10 @@ import lombok.Getter;
 @Getter
 public enum DonateType {
 
-	COLLECTOR("Донатный сборщик монет", 299, true),
-	GLOBAL_MONEY_BOOSTER("Глобальный бустер на монетки", 149, false),
-	LOCAL_MONEY_BOOSTER("Локальный бустер на монетки", 99, false),
-	GLOBAL_VISITORS_BOOSTER("Глобальный бустер на посетителей", 149, false),
-	LOCAL_VISITORS_BOOSTER("Локальный бустер на посетителей", 99, false),
-	EXCAVATOR("10 экскаваторов", 59, false),
-	TNT("10 динамитов", 59, false),
-	HELPERS("10 помощников", 59, false),
+	GLOBAL_MONEY_BOOSTER("Глобальный бустер денег", 99, false),
+	GLOBAL_EXP_BOOSTER("Глобальный бустер опыта", 149, false),
+	LEGENDARY_PICKAXE("Легендарная кирка", 300, false),
+	STEAM_PUNK_COLLECTOR("Стим-панк сборщик монет", 300, false),
 	;
 
 	private final String name;

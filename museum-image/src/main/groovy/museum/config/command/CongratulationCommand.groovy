@@ -11,7 +11,11 @@ registerCommand 'congr' handle {
         return
     def victim = Bukkit.getPlayer(args[0])
     if (victim && victim.isOnline()) {
-        MessageUtil.find 'congr-send' send App.app.getUser(sender as CraftPlayer)
-        MessageUtil.find 'congrats' set 'sender', player.name send App.app.getUser(victim)
+        if (victim == sender)
+            MessageUtil.find 'lonely' send App.app.getUser(sender as CraftPlayer)
+        else {
+            MessageUtil.find 'congr-send' send App.app.getUser(sender as CraftPlayer)
+            MessageUtil.find 'congrats' set 'sender', player.name send App.app.getUser(victim)
+        }
     }
 }

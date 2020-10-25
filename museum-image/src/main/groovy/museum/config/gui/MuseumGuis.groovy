@@ -22,12 +22,12 @@ class MuseumGuis {
 
     static Gui.Button background = Guis.staticButton '-' fillAvailable() icon backgroundIcon
 
-    static Gui.Button backToManipulator(subject) {
+    static Gui.Button backToManipulator(uuid) {
         def button = Guis.staticButton('X').icon {
             item BARRIER
             text '§cНазад'
         } leftClick {
-            Guis.open(delegate, 'manipulator', subject)
+            Guis.open(delegate, 'manipulator', uuid)
         }
         return button
     }

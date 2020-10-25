@@ -2,8 +2,6 @@ package museum.player;
 
 import clepto.bukkit.LocalArmorStand;
 import clepto.bukkit.event.PlayerWrapper;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import lombok.Data;
 import lombok.experimental.Delegate;
 import museum.App;
@@ -22,7 +20,9 @@ import museum.util.LevelSystem;
 import museum.util.MessageUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.EntityArmorStand;
+import net.minecraft.server.v1_12_R1.Packet;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.spigotmc.AsyncCatcher;
@@ -77,17 +77,10 @@ public class User implements PlayerWrapper {
 	}
 
 	public Subject getSubject(UUID uuid) {
-		for (Subject subject : this.subjects) {
-			if (subject.getCachedInfo().getUuid().equals(uuid)) return subject;
-		}
+		for (Subject subject : this.subjects)
+			if (subject.getCachedInfo().getUuid().equals(uuid))
+				return subject;
 		return null;
-	}
-
-	public void sendAnime() {
-		ByteBuf buffer = Unpooled.buffer();
-		// ToDo: Вернуть счётчик на раскопках!
-		// UtilNetty.writeVarInt(buffer, InteractItems == null ? -2 : InteractItems.getHitsLeft() > 0 ? InteractItems.getHitsLeft() : -1);
-		connection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
 	}
 
 	public void giveExperience(long exp) {

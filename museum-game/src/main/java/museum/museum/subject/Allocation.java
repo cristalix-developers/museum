@@ -39,7 +39,8 @@ public class Allocation {
 	private final List<Displayable> displayables = new ArrayList<>();
 	private final State state;
 	private final List<Location> allocatedBlocks;
-	private final String clientData;
+	private final ru.cristalix.core.math.V3 min;
+	private final ru.cristalix.core.math.V3 max;
 
 	public static Allocation allocate(State owner, Color color, SubjectPrototype prototype, Location origin) {
 		if (origin == null) return null;
@@ -123,10 +124,9 @@ public class Allocation {
 			updatePackets.add(updatePacket);
 			removePackets.add(removePacket);
 		}
-
-		String clientData = minX + "_" + minY + "_" + minZ + "_" + maxX + "_" + maxY + "_" + maxZ;
-
-		return new Allocation(origin, blocks, updatePackets, removePackets, owner, allocated, clientData);
+		return new Allocation(origin, blocks, updatePackets, removePackets, owner, allocated,
+				new ru.cristalix.core.math.V3(minX, minY, minZ), new ru.cristalix.core.math.V3(maxX, maxY, maxZ)
+		);
 	}
 
 	public void prepareUpdate(Function<IBlockData, IBlockData> converter) {
@@ -207,7 +207,7 @@ public class Allocation {
 
 	@Override
 	public String toString() {
-		return origin + " " + clientData;
+		return origin + " ";
 	}
 
 	@RequiredArgsConstructor

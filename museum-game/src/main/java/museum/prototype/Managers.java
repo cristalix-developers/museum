@@ -96,7 +96,8 @@ public class Managers {
 							title,
 							UtilV3.fromVector(box.getMin().toVector()),
 							UtilV3.fromVector(box.getMax().toVector()),
-							price
+							price,
+							null
 					)).cristalixPrice(box.getLabels("cristalix-price").stream()
 							.findAny()
 							.map(Label::getTag)

@@ -30,6 +30,7 @@ import net.minecraft.server.v1_12_R1.IBlockData;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.inventory.ItemStack;
+import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 import ru.cristalix.core.util.UtilV3;
@@ -52,6 +53,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	private final ItemStack menu = Items.render("menu").asBukkitMirror();
 	private final ItemStack backItem = Items.render("back").asBukkitMirror();
 	private final ItemStack visitorMenu = Items.render("visitor-menu").asBukkitMirror();
+	private final ItemStack donateMenu = Items.render("donate-menu").asBukkitMirror();
 
 	private final CraftWorld world;
 	private double income;
@@ -110,19 +112,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	public void enterState(User user) {
 		teleportUser(user);
 
-		StringBuilder builder = new StringBuilder();
-		for (Subject subject : user.getSubjects()) {
-			if (!subject.isAllocated()) continue;
-			if (builder.length() > 0) builder.append('|');
-			builder.append(subject.getAllocation().getClientData())
-					.append('_').append(subject.getPrototype().getTitle())
-					.append('_').append(subject.getPrototype().getPrice());
-		}
-		String payload = builder.toString();
-
-		new ClientPacket<String>("museumsubjects").send(user, payload);
-		user.sendAnime();
-
 		val player = user.getPlayer();
 		val inventory = player.getInventory();
 
@@ -148,6 +137,12 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				subject.getAllocation().perform(user, SPAWN_PIECES);
 				subject.getAllocation().perform(user, SPAWN_DISPLAYABLE);
 			}
+			new ClientPacket<String>("museumsubjects").send(user, GlobalSerializers.toJson(user.getSubjects().stream()
+					.filter(Subject::isAllocated)
+					.map(Subject::getDataForClient)
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList())
+			));
 		});
 	}
 
@@ -156,6 +151,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		inventory.clear();
 		inventory.setItem(0, menu);
 		inventory.setItem(4, visitorMenu);
+		inventory.setItem(8, donateMenu);
 	}
 
 	@Override
@@ -244,5 +240,4 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				prototype.getSpawn()
 		);
 	}
-
 }

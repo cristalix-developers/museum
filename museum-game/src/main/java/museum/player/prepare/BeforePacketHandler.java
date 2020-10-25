@@ -84,7 +84,6 @@ public class BeforePacketHandler implements Prepare {
 	private void onDigging(User user, PacketPlayInBlockDig packet) {
 		boolean valid = user.getState() instanceof Excavation && isAir(user, packet.a);
 		if (packet.c == STOP_DESTROY_BLOCK && valid) {
-			user.sendAnime();
 			if (tryReturnPlayer(user, false))
 				return;
 			acceptedBreak(user, packet);
@@ -128,7 +127,7 @@ public class BeforePacketHandler implements Prepare {
 			if (user != museum.getOwner())
 				MessageUtil.find("non-root").send(user);
 			else
-				Guis.open(user.getPlayer(), "manipulator", subject);
+				Guis.open(user.getPlayer(), "manipulator", subject.getCachedInfo().getUuid());
 		});
 	}
 

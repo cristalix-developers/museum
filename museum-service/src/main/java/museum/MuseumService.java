@@ -44,17 +44,13 @@ public class MuseumService {
 	public static final String PASSWORD = System.getProperty("PASSWORD", "gVatjN43AJnbFq36Fa");
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
 	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
-		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
 		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
-		put(DonateType.LOCAL_VISITORS_BOOSTER, localBoosterPreAuthorize(BoosterType.VISITORS));
-		put(DonateType.GLOBAL_VISITORS_BOOSTER, globalBoosterPreAuthorize(BoosterType.VISITORS));
+		put(DonateType.GLOBAL_EXP_BOOSTER, globalBoosterPreAuthorize(BoosterType.EXP));
 	}};
 	private static final Map<DonateType, BiConsumer<UserTransactionPackage, UserInfo>> TRANSACTION_POST_AUTHORIZE_MAP
 			= new HashMap<DonateType, BiConsumer<UserTransactionPackage, UserInfo>>() {{
-		put(DonateType.LOCAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, false));
 		put(DonateType.GLOBAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, true));
-		put(DonateType.LOCAL_VISITORS_BOOSTER, boosterPostAuthorize(BoosterType.VISITORS, false));
-		put(DonateType.GLOBAL_VISITORS_BOOSTER, boosterPostAuthorize(BoosterType.VISITORS, true));
+		put(DonateType.GLOBAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, true));
 	}};
 	public static ConfigurationManager CONFIGURATION_MANAGER;
 
