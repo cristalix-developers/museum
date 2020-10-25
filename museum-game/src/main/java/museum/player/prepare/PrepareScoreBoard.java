@@ -25,8 +25,7 @@ public class PrepareScoreBoard implements Prepare {
 
 	public static void addServerInfo(SimpleBoardObjective objective) {
 		objective.startGroup("Сервер")
-				.record("Онлайн", () -> Bukkit.getOnlinePlayers().size() + "")
-				.record("TPS", () -> String.format("%.2f", Bukkit.getTPS()[0]));
+				.record("Онлайн", () -> Bukkit.getOnlinePlayers().size() + "");
 	}
 
 	public static void setupScoreboard(User user) {

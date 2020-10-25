@@ -71,7 +71,7 @@ public class StallSubject extends Subject implements Incomeble {
 	public void handle(double... args) {
 		if (!isAllocated())
 			return;
-		if (args[0] % (60 * 20L) != 0)
+		if (args[0] % (120 * 20L) != 0)
 			return;
 		Set<FoodProduct> potentialFood = food.keySet();
 		if (potentialFood.isEmpty()) {

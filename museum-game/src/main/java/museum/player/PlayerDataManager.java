@@ -13,9 +13,11 @@ import museum.museum.Museum;
 import museum.packages.*;
 import museum.player.prepare.*;
 import museum.utils.MultiTimeBar;
+import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -135,9 +137,12 @@ public class PlayerDataManager implements Listener {
 
 		player.addPotionEffect(NIGHT_VISION);
 
+		val show = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, user.getPlayer().getHandle());
 		Bukkit.getOnlinePlayers().forEach(current -> {
 			player.hidePlayer(app, current.getPlayer());
+			user.getConnection().sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, ((CraftPlayer) current).getHandle()));
 			current.hidePlayer(app, player);
+			((CraftPlayer) current).getHandle().playerConnection.sendPacket(show);
 		}); // Скрытие игроков
 		player.setGameMode(GameMode.ADVENTURE);
 		user.setState(user.getState()); // Загрузка музея
@@ -155,6 +160,10 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerQuit(PlayerQuitEvent event) {
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			((CraftPlayer) player).getHandle().playerConnection
+					.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, ((CraftPlayer) event.getPlayer()).getHandle()));
+		}
 		timeBar.onQuit(event.getPlayer().getUniqueId());
 		event.setQuitMessage(null);
 	}

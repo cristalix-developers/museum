@@ -30,7 +30,7 @@ Guis.register 'colorChange', { player ->
     '''
 
     button MuseumGuis.background
-    button MuseumGuis.backToManipulator(subject)
+    button MuseumGuis.backToManipulator(subject.cachedInfo.uuid)
 
     Color.values().each {color ->
         button 'C' icon {
