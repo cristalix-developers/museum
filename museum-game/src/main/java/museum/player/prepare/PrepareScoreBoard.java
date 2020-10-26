@@ -5,7 +5,7 @@ import museum.App;
 import museum.player.User;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
-import org.bukkit.Bukkit;
+import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.scoreboard.IScoreboardService;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
@@ -25,7 +25,7 @@ public class PrepareScoreBoard implements Prepare {
 
 	public static void addServerInfo(SimpleBoardObjective objective) {
 		objective.startGroup("Сервер")
-				.record("Онлайн", () -> Bukkit.getOnlinePlayers().size() + "");
+				.record("Онлайн", () -> IRealmService.get().getOnlineOnRealms("MUSM") + "");
 	}
 
 	public static void setupScoreboard(User user) {
