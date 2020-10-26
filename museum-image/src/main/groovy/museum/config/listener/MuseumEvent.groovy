@@ -25,6 +25,9 @@ on PlayerMoveEvent, {
 
     def user = App.app.getUser(player.uniqueId)
 
+    if (!user || !user.state)
+        return
+
     if (user.state instanceof Museum) {
         def museum = user.state as Museum
         if (museum.owner != user)

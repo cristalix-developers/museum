@@ -120,11 +120,6 @@ public class PlayerDataManager implements Listener {
 	}
 
 	@EventHandler
-	public void onSpawn(PlayerInitialSpawnEvent e) {
-		e.setSpawnLocation(app.getUser(e.getPlayer()).getLastLocation());
-	}
-
-	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		val player = (CraftPlayer) event.getPlayer();
 

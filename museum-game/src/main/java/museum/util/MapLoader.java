@@ -38,6 +38,8 @@ public class MapLoader {
 		// Инжектим блоки в чанки (patched paper)
 		app.getNMSWorld().chunkInterceptor = (chunk, flags, receiver) -> {
 			val user = app.getUser(receiver.getUniqueID());
+			if (user == null)
+				return new PacketPlayOutMapChunk(chunk, flags);
 			State state = user.getState();
 			if (state == null)
 				return new PacketPlayOutMapChunk(chunk, flags);
