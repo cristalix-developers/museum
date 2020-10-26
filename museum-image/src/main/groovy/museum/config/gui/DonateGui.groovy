@@ -10,7 +10,7 @@ import static org.bukkit.Material.*
 register 'donate-menu', {
     item GOLDEN_CARROT
     text """
-        >> §6Донат §f<<
+        >> §bВнутриигровые покупки §f<<
         
         Тут вы можете купить,
         интересные вещи...
@@ -22,7 +22,7 @@ on GOLDEN_CARROT use {
 }
 
 Guis.register 'donate', { player ->
-    title 'Донат'
+    title '§bВнутриигровые покупки'
     layout """
         ---------
         -X-M-Z-Y-
@@ -33,7 +33,7 @@ Guis.register 'donate', { player ->
     button 'D' icon {
         item GOLDEN_APPLE
         text """
-        §bЛокальный бустер денег §6§lx2 §f| §e99руб§f
+        §bЛокальный бустер денег §6§lx2 §f| §b99 кристальков§f
         
         Бустер только для тебя на §b1 час§f,
         получаете в два раза больше денег!
@@ -45,7 +45,7 @@ Guis.register 'donate', { player ->
     button 'N' icon {
         item EXP_BOTTLE
         text """
-        §bЛокальный бустер опыта §6§lx2 §f| §e99руб§f
+        §bЛокальный бустер опыта §6§lx2 §f| §b99 кристаликов§f
         
         Бустер только для тебя на §b1 час§f,
         получаете в два раза больше опыта!
@@ -57,7 +57,7 @@ Guis.register 'donate', { player ->
     button 'J' icon {
         item BEACON
         text """
-        §bГлобальный бустер посетителей §6§lx3 §f| §e149руб§f
+        §bГлобальный бустер посетителей §6§lx3 §f| §b149 кристаликов§f
         
         Общий бустер на §b1 час§f,
         в ТРИ раза больше посетителей!
@@ -69,7 +69,7 @@ Guis.register 'donate', { player ->
     button 'X' icon {
         item EXP_BOTTLE
         text """
-        §bГлобальный бустер опыта §6§lx2 §f| §e149руб§f
+        §bГлобальный бустер опыта §6§lx2 §f| §b149 кристаликов§f
         
         Общий бустер на §b1 час§f,
         все получат в два раза больше опыта!
@@ -82,7 +82,7 @@ Guis.register 'donate', { player ->
         item GOLDEN_APPLE
         data 1
         text """
-        §6Глобальный бустер денег §6§lx2 §f| §e199руб§f
+        §6Глобальный бустер денег §6§lx2 §f| §b199 кристаликов§f
         
         Общий бустер на §b1 час§f,
         все получат в два раза больше денег!
@@ -95,7 +95,7 @@ Guis.register 'donate', { player ->
         item CLAY_BALL
         nbt.museum = 'parovoz'
         text """
-        §6Стим-панк сборщик монет §f| §e249руб§f
+        §6Стим-панк сборщик монет §f| §b249 кристаликов§f
         
         §bБыстрее всех§f! Собирает самые
         дальние монеты -§b лучший выбор
@@ -111,7 +111,7 @@ Guis.register 'donate', { player ->
         nbt.HideFlags = 63
         nbt.prison = '23feb'
         text """
-        §bЛегендарная кирка §f| §e349руб§f
+        §bЛегендарная кирка §f| §b349 кристаликов§f
         
         Особая кирка, приносит 
         §b2 опыта за блок§f и
