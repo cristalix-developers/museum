@@ -83,7 +83,7 @@ public final class App extends JavaPlugin {
 		clepto.bukkit.menu.Guis.init();
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 		this.clientSocket = new ClientSocket(
-				"127.0.0.1",
+				"148.251.1.9",
 				14653,
 				"gVatjN43AJnbFq36Fa",
 				IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName()
@@ -169,6 +169,7 @@ public final class App extends JavaPlugin {
 		VisitorHandler.init(this, () -> (int) Math.ceil(5F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
 
 		// Вывод сервера в тесты
+		IRealmService.get().getCurrentRealmInfo().setLobbyServer(true);
 		IRealmService.get().getCurrentRealmInfo().setStatus(RealmStatus.WAITING_FOR_PLAYERS);
 		IRealmService.get().getCurrentRealmInfo().setReadableName("Музей археологии - ALPHA");
 		IRealmService.get().getCurrentRealmInfo().setDescription(new String[]{

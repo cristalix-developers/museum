@@ -210,6 +210,8 @@ public class MuseumCommands {
 		if (args.length == 0)
 			return "§cИспользование: §e/gui [адрес]";
 		try {
+			if (sender.getPlayer() == null)
+				return null;
 			clepto.bukkit.menu.Guis.open(sender, args[0], args.length > 1 ? args[1] : null);
 		} catch (NoSuchElementException ex) {
 			return MessageUtil.find("no-gui").set("gui", args[0]).getText();

@@ -42,8 +42,10 @@ public class TickTimerHandler extends BukkitRunnable {
 		long currentTime = System.currentTimeMillis();
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			val user = app.getUser(player.getUniqueId());
+			if (user == null)
+				continue;
 			if (user.getMuseums().size() == 0)
-				return;
+				continue;
 			for (Museum museum : user.getMuseums()) {
 				process(museum, user, currentTime);
 			}

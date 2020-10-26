@@ -25,11 +25,7 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 	private static final Map<String, Channel> connectedChannels = new ConcurrentHashMap<>();
 
 	public static void broadcast(MuseumPackage pckg) {
-		broadcast(UtilNetty.toFrame(pckg));
-	}
-
-	public static void broadcast(TextWebSocketFrame pckg) {
-		connectedChannels.values().forEach(channel -> send(channel, pckg));
+		connectedChannels.values().forEach(channel -> send(channel, UtilNetty.toFrame(pckg)));
 	}
 
 	public static void send(Channel channel, MuseumPackage pckg) {

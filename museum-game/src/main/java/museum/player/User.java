@@ -96,7 +96,8 @@ public class User implements PlayerWrapper {
 				);
 				message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/congr " + getName()));
 				for (User user : App.getApp().getUsers())
-					user.getPlayer().sendMessage(message);
+					if (user.getPlayer() != null)
+						user.getPlayer().sendMessage(message);
 			}
 			MessageUtil.find("levelup")
 					.set("level", newLevel)

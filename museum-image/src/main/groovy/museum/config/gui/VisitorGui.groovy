@@ -22,6 +22,10 @@ register 'visitor', { player ->
 
     button MuseumGuis.background
     app.users.each {
+        if (it.getPlayer() == null)
+            return
+        if (visitor.state == null)
+            return
         if (it == visitor)
             return
         def state = it.state
