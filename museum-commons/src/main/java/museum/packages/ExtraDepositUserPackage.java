@@ -14,7 +14,6 @@ public class ExtraDepositUserPackage extends MuseumPackage {
 	// request
 	private final UUID user;
 	private final Double sum; // nullable.
-	private final Double seconds; // nullable. seconds to deposite (earnPerSec * seconds)
 
 	// no response
 

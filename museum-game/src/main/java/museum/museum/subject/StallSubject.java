@@ -90,7 +90,7 @@ public class StallSubject extends Subject implements Incomeble {
 				.set("title", key.getName())
 				.set("cost", key.getCost())
 				.send(owner);
-		owner.setMoney(owner.getMoney() + key.getCost());
+		owner.depositMoneyWithBooster(key.getCost());
 	}
 
 	public void rotateCustomerHead() {

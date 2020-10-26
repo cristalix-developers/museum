@@ -16,9 +16,6 @@ registerCommand 'donate' handle {
 registerCommand 'proccessdonate' handle {
     def user = App.app.getUser player
 
-    user.sendMessage("Я тебе не позволю донатить на тестовом сервере!")
-    return
-
     def donate
     try {
         donate = DonateType.valueOf(args[0]) as DonateType
@@ -26,12 +23,11 @@ registerCommand 'proccessdonate' handle {
         return
     }
 
-    if (donate == DonateType.LEGENDARY_PICKAXE && user.pickaxeType == PickaxeType.LEGENDARY)
-        return
-
     App.app.processDonate(user.getUuid(), donate).thenAccept(transaction -> {
-        if (!transaction.ok)
+        if (!transaction.ok) {
+            user.sendMessage("§c" + transaction.name)
             return
+        }
         if (donate == DonateType.LEGENDARY_PICKAXE) {
             user.pickaxeType = PickaxeType.LEGENDARY
             user.sendMessage("§bПолучена легендарная кирка!")
@@ -44,4 +40,5 @@ registerCommand 'proccessdonate' handle {
             user.sendMessage("§bПолучен стим-панк коллектор!")
         }
     })
+    return
 }

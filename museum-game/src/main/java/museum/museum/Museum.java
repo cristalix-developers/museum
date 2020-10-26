@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import museum.App;
+import museum.boosters.BoosterType;
 import museum.client_conversation.ClientPacket;
 import museum.data.MuseumInfo;
 import museum.museum.collector.CollectorNavigator;
@@ -104,7 +105,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 		objective.startGroup("Музей");
 		if (owner != user) objective.record("Владелец", owner.getName());
-		objective.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(getIncome()))
+		objective.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(getIncome() * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)))
 				.record("Посещений", () -> "§b" + this.getViews());
 	}
 

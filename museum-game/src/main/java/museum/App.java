@@ -8,6 +8,7 @@ import groovy.lang.Script;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
@@ -53,21 +54,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+@Getter
 public final class App extends JavaPlugin {
 	@Getter
 	private static App app;
 
 	private PlayerDataManager playerDataManager;
-	@Getter
 	private TopManager topManager;
-	@Getter
 	private ClientSocket clientSocket;
-	@Getter
 	@Setter
 	private WorldMeta map;
 	private YamlConfiguration configuration;
 
-	@Getter
 	private Shop shop;
 
 	@Override
@@ -146,6 +144,9 @@ public final class App extends JavaPlugin {
 		// Прогрузка мэнеджера топа
 		topManager = new TopManager(this);
 
+		// Получение бустеров
+		requestBoosters();
+
 		// Инициализация команд
 		new MuseumCommands(this);
 		this.shop = new Shop(this);
@@ -165,7 +166,7 @@ public final class App extends JavaPlugin {
 				topManager
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
-		VisitorHandler.init(this, 5);
+		VisitorHandler.init(this, () -> (int) Math.ceil(5F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
 
 		// Вывод сервера в тесты
 		IRealmService.get().getCurrentRealmInfo().setStatus(RealmStatus.WAITING_FOR_PLAYERS);
@@ -245,6 +246,24 @@ public final class App extends JavaPlugin {
 				.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
 
 		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
+	}
+
+	private void requestBoosters() {
+		try {
+			RequestGlobalBoostersPackage pckg = clientSocket.writeAndAwaitResponse(new RequestGlobalBoostersPackage())
+					.get(3L, TimeUnit.SECONDS);
+			playerDataManager.setGlobalBoosters(pckg.getBoosters());
+		} catch (Exception exception) {
+			exception.printStackTrace();
+			Bukkit.getLogger().severe("We can't get boosters! Retry in 3sec");
+			try {
+				Thread.sleep(3000L);
+			} catch (InterruptedException interruptedException) {
+				interruptedException.printStackTrace();
+				Thread.currentThread().interrupt();
+			}
+			requestBoosters();
+		}
 	}
 
 	private void readScript(Class<?> scriptClass) {

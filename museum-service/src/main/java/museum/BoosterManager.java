@@ -8,7 +8,7 @@ import museum.packages.MuseumPackage;
 import museum.socket.ServerSocketHandler;
 import museum.utils.UtilTime;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.*;
 import ru.cristalix.core.CoreApi;
 
 import java.util.*;
@@ -21,17 +21,23 @@ import java.util.stream.Collectors;
 @Getter
 public class BoosterManager implements Subservice {
 
-	private final Map<BoosterType, BoosterInfo> globalBoosters;
+	private static final HoverEvent HOVER_EVENT = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {
+			new TextComponent("§eНАЖМИ НА МЕНЯ")
+	});
+	private static final ClickEvent CLICK_EVENT = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/thx");
+	private Map<BoosterType, BoosterInfo> globalBoosters = new HashMap<>(0);
 	private final Map<UUID, Set<UUID>> thanksMap = new ConcurrentHashMap<>();
 
 	public BoosterManager() {
-		try {
-			globalBoosters = MuseumService.globalBoosters
-					.findAll().get().values().stream()
-					.collect(Collectors.toMap(BoosterInfo::getType, b -> b, (var0, var1) -> var0, ConcurrentHashMap::new));
-		} catch (InterruptedException | ExecutionException e) {
-			throw new RuntimeException(e);
-		}
+		CoreApi.get().getPlatform().getScheduler().runAsyncDelayed(() -> {
+			try {
+				globalBoosters = MuseumService.globalBoosters.findAll().get().values().stream()
+						.collect(Collectors.toMap(BoosterInfo::getType, b -> b, (var0, var1) -> var0, ConcurrentHashMap::new));
+			} catch (InterruptedException | ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+
+		}, 3, TimeUnit.SECONDS);
 
 		this.updateOnRealms();
 
@@ -76,7 +82,15 @@ public class BoosterManager implements Subservice {
 							.append("\n")
 			);
 			alertMessage.append("        \n");
-			alertMessage.append("Поблагодарить ").append("/thx").color(ChatColor.LIGHT_PURPLE).bold(true).append("\n");
+			alertMessage.append("Поблагодарить ")
+					.event(CLICK_EVENT)
+					.event(HOVER_EVENT)
+					.append("/thx")
+					.event(CLICK_EVENT)
+					.event(HOVER_EVENT)
+					.color(ChatColor.LIGHT_PURPLE)
+					.bold(true)
+					.append("\n");
 			alertMessage.append("        \n");
 			alertMessage.append("================\n").color(ChatColor.YELLOW);
 			MuseumService.alertMessage(alertMessage.create());
@@ -91,11 +105,10 @@ public class BoosterManager implements Subservice {
 		return globalBoosters.values()
 				.stream()
 				.filter(booster -> thanksMap.computeIfAbsent(booster.getUuid(), uuid -> new HashSet<>()).add(user))
-				.peek(booster -> MuseumService.extra(
+				.peek(booster -> MuseumService.asyncExtra(
 						booster.getOwner(),
-						null,
-						(double) MuseumService.THANKS_SECONDS)
-				).count();
+						data -> data.getIncome() * MuseumService.INCOME_MULTIPLIER
+				)).count();
 	}
 
 	public void push(BoosterInfo booster) {

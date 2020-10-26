@@ -2,9 +2,7 @@
 package museum.config.gui
 
 import clepto.bukkit.menu.Guis
-import museum.App
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.entity.Player
 
 import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
@@ -24,15 +22,53 @@ on GOLDEN_CARROT use {
 }
 
 Guis.register 'donate', { player ->
-    def user = App.app.getUser((Player) player)
-
     title 'Раскопки'
-    layout '-M-Z-X-Y-'
+    layout """
+        ---D-N---
+        -J-M-Z-Y-
+        ----X----
+    """
+
+    button 'D' icon {
+        item EXP_BOTTLE
+        text """
+        §bЛокальный бустер денег §6§lx2 §f[§6149руб§f]
+        
+        Общий бустер на §b1 час§f,
+        все получат в два раза больше денег!
+        """
+    } leftClick {
+        performCommand("proccessdonate LOCAL_MONEY_BOOSTER")
+    }
+
+    button 'N' icon {
+        item EXP_BOTTLE
+        text """
+        §bЛокальный бустер опыта §6§lx2 §f[§6149руб§f]
+        
+        Общий бустер на §b1 час§f,
+        все получат в два раза больше опыта!
+        """
+    } leftClick {
+        performCommand("proccessdonate LOCAL_EXP_BOOSTER")
+    }
+
+    button 'J' icon {
+        item EXP_BOTTLE
+        text """
+        §bГлобальный бустер посетителей §6§lx2 §f[§6149руб§f]
+        
+        Общий бустер на §b1 час§f,
+        все получат в два раза больше посетителей!
+        """
+    } leftClick {
+        performCommand("proccessdonate GLOBAL_VILLAGER_BOOSTER")
+    }
 
     button 'X' icon {
         item EXP_BOTTLE
         text """
-        §bГлобальный бустер опыта §6§lx2
+        §bГлобальный бустер опыта §6§lx2 §f[§6149руб§f]
         
         Общий бустер на §b1 час§f,
         все получат в два раза больше опыта!
@@ -44,7 +80,7 @@ Guis.register 'donate', { player ->
     button 'Y' icon {
         item GOLD_BLOCK
         text """
-        §6Глобальный бустер денег §6§lx2
+        §6Глобальный бустер денег §6§lx2 §f[§699руб§f]
         
         Общий бустер на §b1 час§f,
         все получат в два раза больше денег!
@@ -57,7 +93,7 @@ Guis.register 'donate', { player ->
         item CLAY_BALL
         nbt.museum = 'parovoz'
         text """
-        §6Стим-панк сборщик монет
+        §6Стим-панк сборщик монет §f[§6300руб§f]
         
         §bБыстрее всех§f! Собирает самые
         дальние монеты -§b лучший выбор
@@ -73,7 +109,7 @@ Guis.register 'donate', { player ->
         nbt.HideFlags = 63
         nbt.prison = '23feb'
         text """
-        §bЛегендарная кирка
+        §bЛегендарная кирка §f[§6300руб§f]
         
         Особая кирка, приносит 
         §b3 опыта за блок§f и

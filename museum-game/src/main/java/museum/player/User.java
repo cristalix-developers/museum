@@ -83,9 +83,9 @@ public class User implements PlayerWrapper {
 		return null;
 	}
 
-	public void giveExperience(long exp) {
+	public void giveExperience(double exp) {
 		int prevLevel = getLevel();
-		info.experience += exp;
+		info.experience += exp * App.getApp().getPlayerDataManager().calcMultiplier(getUuid(), BoosterType.EXP);
 		int newLevel = getLevel();
 		if (newLevel != prevLevel) {
 			if (newLevel % 50 == 0) {
@@ -149,5 +149,9 @@ public class User implements PlayerWrapper {
 		setIncome(0);
 		for (Museum museum : getMuseums())
 			setIncome(getIncome() + museum.getIncome());
+	}
+
+	public void depositMoneyWithBooster(double income) {
+		setMoney(getMoney() + income * App.getApp().getPlayerDataManager().calcMultiplier(getUuid(), BoosterType.COINS));
 	}
 }

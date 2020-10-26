@@ -236,7 +236,7 @@ public class BeforePacketHandler implements Prepare {
 
 				user.getPlayer().sendTitle("§6Находка!", "§e+" + value);
 
-				user.setMoney(user.getMoney() + prize);
+				user.depositMoneyWithBooster(prize);
 
 			} else {
 				MessageUtil.find("findfragment")

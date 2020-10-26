@@ -4,7 +4,9 @@ import clepto.bukkit.B;
 import lombok.Getter;
 import lombok.val;
 import museum.App;
+import museum.boosters.BoosterType;
 import museum.player.User;
+import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 
@@ -15,7 +17,7 @@ import org.bukkit.Location;
 public class Coin {
 
 	public static final ItemStack COIN_ITEM = clepto.bukkit.item.Items.render("coin");
-	public static final int MAX_COIN_AMOUNT = 40;
+	public static final int MAX_COIN_AMOUNT = 20;
 	public static final int SECONDS_LIVE = 20;
 	private final EntityItem entityItem;
 	@Getter
@@ -46,7 +48,7 @@ public class Coin {
 		if (!(state instanceof Museum))
 			return false;
 
-		val money = ((Museum) state).getIncome();
+		val money = ((Museum) state).getIncome() ;
 		val connection = user.getConnection();
 
 		connection.sendPacket(new PacketPlayOutCollect(entityItem.getId(), collectorId, 1));
@@ -57,13 +59,13 @@ public class Coin {
 		message.setCustomNameVisible(true);
 		message.setMarker(true);
 		message.setInvisible(true);
-		message.setCustomName("§6+ " + money + "$");
+		message.setCustomName("§6+ " + MessageUtil.toMoneyFormat(money * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)));
 
 		connection.sendPacket(new PacketPlayOutSpawnEntityLiving(message));
 		connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMove(message.getId(), 0, 3000, 0, false));
 
 		user.setPickedCoinsCount(user.getPickedCoinsCount() + 1);
-		user.setMoney(user.getMoney() + money);
+		user.depositMoneyWithBooster(money);
 
 		B.postpone(30, () -> {
 			remove(connection);

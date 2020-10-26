@@ -3,13 +3,13 @@ package museum.player;
 import clepto.bukkit.B;
 import com.destroystokyo.paper.event.player.PlayerInitialSpawnEvent;
 import com.google.common.collect.Maps;
+import lombok.Setter;
 import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.data.BoosterInfo;
 import museum.data.UserInfo;
-import museum.museum.Museum;
 import museum.packages.*;
 import museum.player.prepare.*;
 import museum.utils.MultiTimeBar;
@@ -44,6 +44,7 @@ public class PlayerDataManager implements Listener {
 	private final App app;
 	private final Map<UUID, User> userMap = Maps.newHashMap();
 	private final MultiTimeBar timeBar;
+	@Setter
 	private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
 	private final List<Prepare> prepares;
 
@@ -169,9 +170,17 @@ public class PlayerDataManager implements Listener {
 	}
 
 	public double calcMultiplier(UUID user, BoosterType type) {
-		// todo: useless method
-		return userMap.get(user).calcMultiplier(type) + globalBoosters.stream().filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis()).mapToDouble(
-				booster -> booster.getMultiplier() - 1.0).sum();
+		return userMap.get(user).calcMultiplier(type) + globalBoosters.stream()
+				.filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis())
+				.mapToDouble(booster -> booster.getMultiplier() - 1.0)
+				.sum();
+	}
+
+	public double calcGlobalMultiplier(BoosterType type) {
+		return 1F + globalBoosters.stream()
+				.filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis())
+				.mapToDouble(booster -> booster.getMultiplier() - 1.0)
+				.sum();
 	}
 
 	public User getUser(UUID uuid) {
@@ -197,10 +206,6 @@ public class PlayerDataManager implements Listener {
 		if (user != null) {
 			if (pckg.getSum() != null)
 				user.setMoney(user.getMoney() + pckg.getSum());
-			if (pckg.getSeconds() != null) {
-				double result = pckg.getSeconds() * user.getMuseums().stream().mapToDouble(Museum::getIncome).sum(); // Типа того
-				user.setMoney(user.getMoney() + result);
-			}
 		}
 	}
 }

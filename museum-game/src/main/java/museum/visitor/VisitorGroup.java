@@ -10,6 +10,7 @@ import java.util.*;
 @Getter
 public class VisitorGroup {
 
+	private final UUID uuid = UUID.randomUUID();
 	private EntityVisitor guide;
 	private List<EntityVisitor> crowd;
 	private final List<Node> nodes = new ArrayList<>();
@@ -110,6 +111,12 @@ public class VisitorGroup {
 		}
 	}
 
+	public void remove() {
+		guide.die();
+		for (EntityVisitor visitor : crowd)
+			visitor.die();
+	}
+
 	@Getter
 	@RequiredArgsConstructor
 	@ToString
@@ -124,7 +131,18 @@ public class VisitorGroup {
 		public boolean isImportant() {
 			return name != null && !name.isEmpty();
 		}
-
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		VisitorGroup that = (VisitorGroup) o;
+		return uuid.equals(that.uuid);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(uuid);
+	}
 }

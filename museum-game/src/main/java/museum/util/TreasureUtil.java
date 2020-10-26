@@ -28,7 +28,7 @@ public class TreasureUtil {
 				continue;
 			getTreasurePrice(item).ifPresent(price -> {
 				item.setAmount(item.getAmount() - 1);
-				user.setMoney(user.getMoney() + price);
+				user.depositMoneyWithBooster(price);
 				MessageUtil.find("treasure-item")
 						.set("cost", price)
 						.send(user);
