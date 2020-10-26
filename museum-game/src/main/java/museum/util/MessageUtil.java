@@ -3,8 +3,10 @@ package museum.util;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
+import lombok.val;
 import museum.App;
 import museum.player.User;
+import ru.cristalix.core.formatting.Formatting;
 
 import java.text.DecimalFormat;
 
@@ -16,16 +18,12 @@ import java.text.DecimalFormat;
 public class MessageUtil {
 
 	private final DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###,###.##$");
-	private String PREFIX;
 
 	public String toMoneyFormat(double money) {
 		return MONEY_FORMAT.format(money);
 	}
 
 	public Message find(String locator) {
-		if (PREFIX == null)
-			PREFIX = App.getApp().getConfig().getString("chat.prefix");
-
 		return new Message(locator);
 	}
 
@@ -40,7 +38,13 @@ public class MessageUtil {
 		private String text;
 
 		public Message(String locator) {
-			text = PREFIX + App.getApp().getConfig().getString("chat.messages." + locator, locator);
+			val message = App.getApp().getConfig().getString("chat.messages." + locator);
+			if (message.startsWith("error"))
+				text = Formatting.error(message.substring(5));
+			else if (message.startsWith("fine"))
+				text = Formatting.fine(message.substring(4));
+			else
+				text = message;
 		}
 
 		public Message set(String key, String value) {

@@ -68,8 +68,8 @@ public class Coin {
 		user.depositMoneyWithBooster(money);
 
 		B.postpone(30, () -> {
-			remove(connection);
 			connection.sendPacket(new PacketPlayOutEntityDestroy(message.getId()));
+			remove(connection);
 		});
 		return true;
 	}

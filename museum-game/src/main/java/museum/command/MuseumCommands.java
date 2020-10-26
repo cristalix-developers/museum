@@ -25,7 +25,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import ru.cristalix.core.formatting.Formatting;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
@@ -89,7 +88,7 @@ public class MuseumCommands {
 			}
 		}
 		if (count > 32) {
-			return Formatting.error("У вас забит инвентарь, освободите его удалив не нужные постройки с /remove");
+			return MessageUtil.get("no-free-space");
 		}
 
 		if (user.getMoney() < prototype.getPrice())
@@ -182,6 +181,8 @@ public class MuseumCommands {
 	}
 
 	private String cmdSkeleton(Player sender, String[] args) {
+		if (!sender.isOp())
+			return null;
 		Collection<Skeleton> skeletons = this.app.getUser(sender).getSkeletons();
 		skeletons.forEach(skeleton ->
 				sender.sendMessage("§e" + skeleton.getPrototype().getAddress() + "§f: " + skeleton.getUnlockedFragments().size()));
@@ -189,6 +190,8 @@ public class MuseumCommands {
 	}
 
 	private String cmdSubjects(Player sender, String[] args) {
+		if (!sender.isOp())
+			return null;
 		Collection<Subject> subjects = this.app.getUser(sender).getSubjects();
 		for (Subject subject : subjects) {
 			String allocationInfo = "§cno allocation";
@@ -204,11 +207,12 @@ public class MuseumCommands {
 
 	private String cmdGui(Player sender, String[] args) {
 		this.app.getUser(sender);
-		if (args.length == 0) return "§cИспользование: §e/gui [адрес]";
+		if (args.length == 0)
+			return "§cИспользование: §e/gui [адрес]";
 		try {
 			clepto.bukkit.menu.Guis.open(sender, args[0], args.length > 1 ? args[1] : null);
 		} catch (NoSuchElementException ex) {
-			return "§cГуи с адресом §e" + args[0] + "§c не найден.";
+			return MessageUtil.find("no-gui").set("gui", args[0]).getText();
 		}
 		return null;
 	}
@@ -220,7 +224,7 @@ public class MuseumCommands {
 			return null;
 
 		if (user.getState() instanceof Excavation)
-			return "§cВы на раскопках, сперва вернитесь домой";
+			return MessageUtil.get("museum-first");
 		user.setState(app.getShop());
 		return null;
 	}
@@ -277,10 +281,12 @@ public class MuseumCommands {
 			return "/excavation <место>";
 		ExcavationPrototype proto = Managers.excavation.getPrototype(args[0]);
 		if (proto == null)
-			return "Такого места для раскопок нет";
-
+			return null;
 		if (user.getExperience() < PreparePlayerBrain.EXPERIENCE)
-			return "Опыта мало";
+			return null;
+
+		if (user.getGrabbedArmorstand() != null)
+			return MessageUtil.get("stall-first");
 
 		player.closeInventory();
 
