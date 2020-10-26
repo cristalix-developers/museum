@@ -22,20 +22,21 @@ on GOLDEN_CARROT use {
 }
 
 Guis.register 'donate', { player ->
-    title 'Раскопки'
+    title 'Донат'
     layout """
-        ---D-N---
-        -J-M-Z-Y-
-        ----X----
+        ---------
+        -X-M-Z-Y-
+        --N-J-D--
+        ---------
     """
 
     button 'D' icon {
-        item EXP_BOTTLE
+        item GOLDEN_APPLE
         text """
-        §bЛокальный бустер денег §6§lx2 §f[§6149руб§f]
+        §bЛокальный бустер денег §6§lx2 §f| §e99руб§f
         
-        Общий бустер на §b1 час§f,
-        все получат в два раза больше денег!
+        Бустер только для тебя на §b1 час§f,
+        получаете в два раза больше денег!
         """
     } leftClick {
         performCommand("proccessdonate LOCAL_MONEY_BOOSTER")
@@ -44,22 +45,22 @@ Guis.register 'donate', { player ->
     button 'N' icon {
         item EXP_BOTTLE
         text """
-        §bЛокальный бустер опыта §6§lx2 §f[§6149руб§f]
+        §bЛокальный бустер опыта §6§lx2 §f| §e99руб§f
         
-        Общий бустер на §b1 час§f,
-        все получат в два раза больше опыта!
+        Бустер только для тебя на §b1 час§f,
+        получаете в два раза больше опыта!
         """
     } leftClick {
         performCommand("proccessdonate LOCAL_EXP_BOOSTER")
     }
 
     button 'J' icon {
-        item EXP_BOTTLE
+        item BEACON
         text """
-        §bГлобальный бустер посетителей §6§lx2 §f[§6149руб§f]
+        §bГлобальный бустер посетителей §6§lx3 §f| §e149руб§f
         
         Общий бустер на §b1 час§f,
-        все получат в два раза больше посетителей!
+        в ТРИ раза больше посетителей!
         """
     } leftClick {
         performCommand("proccessdonate GLOBAL_VILLAGER_BOOSTER")
@@ -68,7 +69,7 @@ Guis.register 'donate', { player ->
     button 'X' icon {
         item EXP_BOTTLE
         text """
-        §bГлобальный бустер опыта §6§lx2 §f[§6149руб§f]
+        §bГлобальный бустер опыта §6§lx2 §f| §e149руб§f
         
         Общий бустер на §b1 час§f,
         все получат в два раза больше опыта!
@@ -78,9 +79,10 @@ Guis.register 'donate', { player ->
     }
 
     button 'Y' icon {
-        item GOLD_BLOCK
+        item GOLDEN_APPLE
+        enchant Enchantment.LUCK, 1
         text """
-        §6Глобальный бустер денег §6§lx2 §f[§699руб§f]
+        §6Глобальный бустер денег §6§lx2 §f| §e199руб§f
         
         Общий бустер на §b1 час§f,
         все получат в два раза больше денег!
@@ -93,7 +95,7 @@ Guis.register 'donate', { player ->
         item CLAY_BALL
         nbt.museum = 'parovoz'
         text """
-        §6Стим-панк сборщик монет §f[§6300руб§f]
+        §6Стим-панк сборщик монет §f| §e249руб§f
         
         §bБыстрее всех§f! Собирает самые
         дальние монеты -§b лучший выбор
@@ -109,10 +111,10 @@ Guis.register 'donate', { player ->
         nbt.HideFlags = 63
         nbt.prison = '23feb'
         text """
-        §bЛегендарная кирка §f[§6300руб§f]
+        §bЛегендарная кирка §f| §e349руб§f
         
         Особая кирка, приносит 
-        §b3 опыта за блок§f и
+        §b2 опыта за блок§f и
         вскапывает §bбольше всех 
         других! 
         """

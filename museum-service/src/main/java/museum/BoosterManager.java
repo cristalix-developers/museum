@@ -72,7 +72,7 @@ public class BoosterManager implements Subservice {
 			ComponentBuilder alertMessage = new ComponentBuilder("================\n").color(ChatColor.YELLOW);
 			alertMessage.append("     \n");
 			globalBoosters.forEach((type, boost) ->
-					alertMessage
+					alertMessage.bold(false)
 							.append("Бустер ").color(ChatColor.WHITE)
 							.append(type.getName()).color(ChatColor.AQUA)
 							.append(" от ").color(ChatColor.WHITE)

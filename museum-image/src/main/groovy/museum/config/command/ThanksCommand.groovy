@@ -7,7 +7,9 @@ import ru.cristalix.core.formatting.Formatting
 
 registerCommand 'thx' handle {
     App.app.clientSocket.writeAndAwaitResponse(new ThanksExecutePackage(player.uniqueId)).thenAccept {
-        player.sendMessage(Formatting.fine("Вы поблагодарили за $it.boostersCount бустеров!"))
+        def user = App.app.getUser player
+        player.sendMessage(Formatting.fine("Вы поблагодарили за $it.boostersCount бустер(ов)! + Монеты 㳞"))
+        user.money = user.money + user.income
     }
     return
 }
