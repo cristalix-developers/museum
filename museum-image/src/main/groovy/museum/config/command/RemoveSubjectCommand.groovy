@@ -4,6 +4,7 @@ package museum.config.command
 import museum.App
 import museum.museum.Museum
 import museum.util.SubjectLogoUtil
+import ru.cristalix.core.formatting.Formatting
 
 registerCommand 'remove' handle {
     def user = App.app.getUser(player)
@@ -14,7 +15,7 @@ registerCommand 'remove' handle {
         if (subject) {
             user.getInventory().setItemInHand(null)
             user.subjects.remove(subject)
-            user.sendMessage("Удалила? Если видишь это напиши 789")
+            user.sendMessage(Formatting.fine("Постройка успешно удалена."))
         }
     }
 }

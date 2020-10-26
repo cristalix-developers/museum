@@ -10,6 +10,7 @@ import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectPrototype;
+import museum.museum.map.SubjectType;
 import museum.museum.subject.Allocation;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Skeleton;
@@ -24,6 +25,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import ru.cristalix.core.formatting.Formatting;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
@@ -78,8 +80,17 @@ public class MuseumCommands {
 		}
 		if (prototype == null)
 			return null;
-
 		val user = app.getUser(sender);
+		// Если в инвентаре нету места
+		long count = 0L;
+		for (Subject subject : user.getSubjects()) {
+			if (!subject.isAllocated() && subject.getPrototype().getType() != SubjectType.MARKER) {
+				count++;
+			}
+		}
+		if (count > 32) {
+			return Formatting.error("У вас забит инвентарь, освободите его удалив не нужные постройки с /remove");
+		}
 
 		if (user.getMoney() < prototype.getPrice())
 			return NO_MONEY_MESSAGE;

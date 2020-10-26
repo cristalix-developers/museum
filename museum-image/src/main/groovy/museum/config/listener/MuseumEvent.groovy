@@ -27,6 +27,8 @@ on PlayerMoveEvent, {
 
     if (user.state instanceof Museum) {
         def museum = user.state as Museum
+        if (museum.owner != user)
+            return
         // Попытка скушать монетки
         museum.coins.removeIf(coin -> coin.pickUp(user, to, 1.7, player.entityId))
         if (user.grabbedArmorstand) {

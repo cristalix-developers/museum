@@ -49,7 +49,7 @@ public class TickTimerHandler extends BukkitRunnable {
 			}
 
 			if (counter % 100 != 0)
-				return;
+				continue;
 			val tab = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, user.getPlayer().getHandle());
 			for (Player target : Bukkit.getOnlinePlayers()) {
 				if (target == player)
