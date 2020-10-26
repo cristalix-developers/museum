@@ -60,7 +60,7 @@ public class StallSubject extends Subject implements Incomeble {
 		if (cachedInfo != null && allocation != null) {
 			// todo: what the fuck this hardcode nums
 			val spawn = ((StallPrototype) prototype).getSpawn().clone()
-					.subtract(prototype.getBox().getCenter().clone().subtract(0, 4, 0))
+					.subtract(prototype.getBox().getCenter().clone().subtract(.5, 4, -.5))
 					.add(UtilV3.toVector(cachedInfo.location));
 			worker.setLocation(spawn);
 			allocation.allocateDisplayable(worker);

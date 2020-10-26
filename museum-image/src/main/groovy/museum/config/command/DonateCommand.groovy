@@ -22,13 +22,12 @@ registerCommand 'proccessdonate' handle {
     try {
         donate = DonateType.valueOf(args[0]) as DonateType
     } catch (Exception ignored) {
-        return "1"
+        return
     }
 
     App.app.processDonate(user.getUuid(), donate).thenAccept(transaction -> {
         if (!transaction.ok) {
             user.sendMessage(Formatting.error(transaction.name))
-            return "2"
         }
         if (donate == DonateType.LEGENDARY_PICKAXE) {
             user.pickaxeType = PickaxeType.LEGENDARY

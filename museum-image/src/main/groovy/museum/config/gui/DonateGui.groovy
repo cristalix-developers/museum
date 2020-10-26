@@ -80,7 +80,7 @@ Guis.register 'donate', { player ->
 
     button 'Y' icon {
         item GOLDEN_APPLE
-        enchant Enchantment.LUCK, 1
+        data 1
         text """
         §6Глобальный бустер денег §6§lx2 §f| §e199руб§f
         

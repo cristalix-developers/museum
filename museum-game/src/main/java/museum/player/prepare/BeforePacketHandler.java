@@ -193,10 +193,10 @@ public class BeforePacketHandler implements Prepare {
 			if (Vector.random.nextFloat() > .995)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 			// Перебрать все кирки и эффекты на них
+			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
 					List<BlockPosition> positions = pickaxeType.getPickaxe().dig(user, packet.a);
-					user.giveExperience(pickaxeType.getExperience());
 					if (positions != null)
 						positions.forEach(position -> generateFragments(user, position));
 				}
@@ -225,7 +225,7 @@ public class BeforePacketHandler implements Prepare {
 			Skeleton skeleton = user.getSkeletons().supply(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
-				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0) / 5;
+				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0) / 22;
 
 				String value = String.format("%.2f$", prize);
 

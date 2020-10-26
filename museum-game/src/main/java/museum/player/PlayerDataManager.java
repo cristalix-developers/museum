@@ -169,8 +169,11 @@ public class PlayerDataManager implements Listener {
 		event.setQuitMessage(null);
 	}
 
-	public double calcMultiplier(UUID user, BoosterType type) {
-		return userMap.get(user).calcMultiplier(type) + globalBoosters.stream()
+	public double calcMultiplier(UUID uuid, BoosterType type) {
+		val user = userMap.get(uuid);
+		if (user == null)
+			return 1;
+		return user.calcMultiplier(type) + globalBoosters.stream()
 				.filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis())
 				.mapToDouble(booster -> booster.getMultiplier() - 1.0)
 				.sum();

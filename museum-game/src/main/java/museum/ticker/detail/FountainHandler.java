@@ -44,7 +44,7 @@ public class FountainHandler implements Ticked {
 
 	@Override
 	public void tick(int... args) {
-		if (args[0] % 3 != 0)
+		if (args[0] % 4 != 0)
 			return;
 		for (Fountain fountain : fountains)
 			fountain.spawnParticle();
@@ -68,7 +68,7 @@ public class FountainHandler implements Ticked {
 					(RANDOM.nextDouble()) * noise.getY(),
 					(RANDOM.nextDouble() - .5) * noise.getZ()
 			)));
-			B.postpone(30, particle::remove);
+			B.postpone(25, particle::remove);
 		}
 	}
 }

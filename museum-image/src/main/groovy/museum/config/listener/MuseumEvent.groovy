@@ -42,7 +42,7 @@ on PlayerMoveEvent, {
                     user.player.walkSpeed = 0.33
                     MessageUtil.find 'box-recieved' send user
                     def summary = 0
-                    5.times {
+                    8.times {
                         def food = FoodProduct.values()[(Math.random() * FoodProduct.values().length) as int]
                         stall.food.computeIfPresent food, (product, count) -> ++count
                         if (!stall.food.containsKey(food))

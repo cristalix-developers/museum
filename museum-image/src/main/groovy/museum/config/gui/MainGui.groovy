@@ -21,7 +21,10 @@ Guis.register 'main', { player ->
     def user = App.app.getUser((Player) player)
 
     title 'Главное меню'
-    layout 'FH-SMT-JS'
+    layout """
+        F--SMT--S
+        -H--O--J-
+    """
 
     button MuseumGuis.background
     button 'F' icon {
@@ -124,4 +127,15 @@ Guis.register 'main', { player ->
         closeInventory()
     }
 
+    button 'O' icon {
+        item ENDER_PEARL
+        text """
+        &bНочь &f/ &bДень
+
+        Меняйте режим так, как нравится глазам!
+        """
+    } leftClick {
+        user.getPlayer().setPlayerTime(user.getPlayer().getPlayerTime() == 18000 ? 6000 : 18000, false)
+        closeInventory()
+    }
 }
