@@ -240,10 +240,12 @@ public class MuseumCommands {
 		new VirtualSign().openSign(sender, lines -> {
 			for (String line : lines) {
 				if (line != null && !line.isEmpty()) {
-					((Museum) user.getState()).setTitle(line);
-					MessageUtil.find("museumtitlechange")
-							.set("title", line)
-							.send(user);
+					if (user.getState() instanceof Museum) {
+						((Museum) user.getState()).setTitle(line);
+						MessageUtil.find("museumtitlechange")
+								.set("title", line)
+								.send(user);
+					}
 				}
 			}
 		});
