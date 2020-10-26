@@ -189,6 +189,8 @@ public class BeforePacketHandler implements Prepare {
 	@SuppressWarnings("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
+			if (user.getPlayer() == null)
+				return;
 			// С некоторым шансом может выпасть интерактивая вещь
 			if (Vector.random.nextFloat() > .995)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));

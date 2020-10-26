@@ -106,7 +106,6 @@ public final class App extends JavaPlugin {
 		CoreApi.get().unregisterService(IChatService.class);
 		CoreApi.get().registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
 		CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
-		CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
 		// Регистрация обработчика пакета конфига
 		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);

@@ -107,7 +107,7 @@ public class MuseumCommands {
 	private String cmdVisit(Player sender, String[] args) {
 		val user = app.getUser(sender);
 
-		if (args.length == 0)
+		if (args.length <= 1)
 			return "§cИспользование: §f/museum visit [Игрок] [Музей]";
 
 		val ownerPlayer = Bukkit.getPlayer(args[1]);
