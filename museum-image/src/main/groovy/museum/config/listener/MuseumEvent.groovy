@@ -6,9 +6,13 @@ import museum.museum.Museum
 import museum.museum.map.SubjectType
 import museum.museum.subject.product.FoodProduct
 import museum.util.MessageUtil
+import org.bukkit.Location
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerMoveEvent
+
+// todo delete this hardcode with requiredLabel
+def wagonLocation = new Location(App.app.getWorld(), 292, 87, -400)
 
 on InventoryOpenEvent, {
     def type = inventory.type
@@ -21,8 +25,13 @@ on PlayerMoveEvent, {
 
     def user = App.app.getUser(player.uniqueId)
 
+    if (!user || !user.state)
+        return
+
     if (user.state instanceof Museum) {
         def museum = user.state as Museum
+        if (museum.owner != user)
+            return
         // Попытка скушать монетки
         museum.coins.removeIf(coin -> coin.pickUp(user, to, 1.7, player.entityId))
         if (user.grabbedArmorstand) {
@@ -34,9 +43,9 @@ on PlayerMoveEvent, {
                     user.grabbedArmorstand = null
                     user.player.allowFlight = true
                     user.player.walkSpeed = 0.33
-                    MessageUtil.find('box-recieved').send user
+                    MessageUtil.find 'box-recieved' send user
                     def summary = 0
-                    5.times {
+                    8.times {
                         def food = FoodProduct.values()[(Math.random() * FoodProduct.values().length) as int]
                         stall.food.computeIfPresent food, (product, count) -> ++count
                         if (!stall.food.containsKey(food))
@@ -47,6 +56,8 @@ on PlayerMoveEvent, {
                     user.sendMessage("§e§lИтого: $summary\$")
                 }
             })
+        } else if (wagonLocation.distanceSquared(to) < 25) {
+            user.performCommand 'wagon'
         }
     }
 }

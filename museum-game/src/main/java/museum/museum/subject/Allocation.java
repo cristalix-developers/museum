@@ -39,7 +39,8 @@ public class Allocation {
 	private final List<Displayable> displayables = new ArrayList<>();
 	private final State state;
 	private final List<Location> allocatedBlocks;
-	private final String clientData;
+	private final ru.cristalix.core.math.V3 min;
+	private final ru.cristalix.core.math.V3 max;
 
 	public static Allocation allocate(State owner, Color color, SubjectPrototype prototype, Location origin) {
 		if (origin == null) return null;
@@ -123,10 +124,9 @@ public class Allocation {
 			updatePackets.add(updatePacket);
 			removePackets.add(removePacket);
 		}
-
-		String clientData = minX + "_" + minY + "_" + minZ + "_" + maxX + "_" + maxY + "_" + maxZ;
-
-		return new Allocation(origin, blocks, updatePackets, removePackets, owner, allocated, clientData);
+		return new Allocation(origin, blocks, updatePackets, removePackets, owner, allocated,
+				new ru.cristalix.core.math.V3(minX, minY, minZ), new ru.cristalix.core.math.V3(maxX, maxY, maxZ)
+		);
 	}
 
 	public void prepareUpdate(Function<IBlockData, IBlockData> converter) {
@@ -161,6 +161,9 @@ public class Allocation {
 				else atom.getShowPackets(packets, position);
 			});
 			for (User user : state.getUsers()) {
+				// Если элемент слишком далеко не отправлять
+				if (user.getPlayer() == null || user.getLocation().distanceSquared(origin.toLocation(user.getWorld())) > 2000)
+					continue;
 				packets.forEach(user::sendPacket);
 			}
 		}
@@ -177,7 +180,9 @@ public class Allocation {
 			ids[i++] = atomPiece.getStand().id;
 		}
 		PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(ids);
-		for (User user : state.getUsers()) user.sendPacket(packet);
+		for (User user : state.getUsers())
+			if (user.getPlayer() != null)
+				user.sendPacket(packet);
 	}
 
 	public void perform(User user, Action... actions) {
@@ -207,7 +212,7 @@ public class Allocation {
 
 	@Override
 	public String toString() {
-		return origin + " " + clientData;
+		return origin + " ";
 	}
 
 	@RequiredArgsConstructor

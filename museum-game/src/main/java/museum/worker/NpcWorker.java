@@ -98,7 +98,7 @@ public class NpcWorker implements Displayable {
 	public void getUpdatePackets(Collection<Packet<PacketListenerPlayOut>> buffer, V4 position) {
 		Location target = position.toLocation(App.getApp().getWorld());
 		// Если игрок и НПС слишком далеко, то не нужно поворачивать ему голову
-		if (location.distanceSquared(target) > 2200)
+		if (location.distanceSquared(target) > 325)
 			return;
 		// Поворот головы НПС для игрока
 		PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook pckg = new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook();

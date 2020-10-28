@@ -4,35 +4,29 @@ import clepto.ListUtils;
 import clepto.bukkit.world.Label;
 import lombok.*;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 
 import java.util.*;
 
 @Getter
 public class VisitorGroup {
 
+	private final UUID uuid = UUID.randomUUID();
 	private EntityVisitor guide;
 	private List<EntityVisitor> crowd;
 	private final List<Node> nodes = new ArrayList<>();
 	private final List<Node> mainToVisit = new ArrayList<>();
+	private List<Node> way;
 	private Deque<Node> currentRoute;
 	@Setter
 	private Node currentNode;
 	@Setter
 	private long idleStart;
 
-	public VisitorGroup(List<Label> allNodes, List<Label> mainNodes) {
-		int woolColor = 0;
-
+	public VisitorGroup(List<Label> allNodes) {
 		List<Node> nodes = new ArrayList<>();
 		for (Label nodeLabel : allNodes) {
 			nodes.add(new Node(nodeLabel.getTag(), nodeLabel));
 			nodeLabel.getChunk().load();
-			Block block = nodeLabel.clone().add(0, -1, 0).getBlock();
-			block.setType(Material.WOOL);
-			block.setData((byte) woolColor++);
-			if (woolColor == 16) woolColor = 0;
 		}
 
 		for (Node node : nodes) {
@@ -46,13 +40,11 @@ public class VisitorGroup {
 				}
 			}
 		}
-
+		way = new ArrayList<>(mainToVisit);
 		currentNode = nodes.get(0);
-
 	}
 
 	public List<Node> route(Node sourceNode, Node destinationNode) {
-
 		Map<Node, Node> previousNodeMap = new HashMap<>();
 		Node currentNode = sourceNode;
 
@@ -78,9 +70,10 @@ public class VisitorGroup {
 			}
 		}
 
+		// todo: почему то, это часто происходит
 		// If all nodes are explored and the destination node hasn't been found.
 		if (!currentNode.equals(destinationNode))
-			throw new RuntimeException("No feasible path.");
+			return Collections.emptyList();
 
 		// Reconstruct path from the tail
 		List<Node> directions = new LinkedList<>();
@@ -91,19 +84,20 @@ public class VisitorGroup {
 		Collections.reverse(directions);
 
 		return directions;
-
 	}
 
 	public void newMainRoute() {
-		Node target = ListUtils.random(this.mainToVisit);
-		this.mainToVisit.remove(target);
+		if (way.isEmpty())
+			way = new ArrayList<>(mainToVisit);
+		Node target = ListUtils.random(this.way);
+		this.way.remove(target);
 		this.currentRoute = new LinkedList<>(route(this.currentNode, target));
 	}
 
 	public void spawn() {
 		Location loc = currentNode.getLocation();
 		loc.getChunk().load();
-		mainToVisit.remove(currentNode);
+		way.remove(currentNode);
 		this.guide = new EntityVisitor(loc.getWorld(), this);
 		this.guide.setCustomName("Гид");
 		this.guide.setCustomNameVisible(true);
@@ -115,6 +109,12 @@ public class VisitorGroup {
 			this.crowd.add(visitor);
 			PatchedEntity.VISITOR.spawn(visitor, loc);
 		}
+	}
+
+	public void remove() {
+		guide.die();
+		for (EntityVisitor visitor : crowd)
+			visitor.die();
 	}
 
 	@Getter
@@ -131,7 +131,18 @@ public class VisitorGroup {
 		public boolean isImportant() {
 			return name != null && !name.isEmpty();
 		}
-
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		VisitorGroup that = (VisitorGroup) o;
+		return uuid.equals(that.uuid);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(uuid);
+	}
 }

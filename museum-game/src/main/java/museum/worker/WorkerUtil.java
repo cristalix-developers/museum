@@ -37,6 +37,8 @@ public class WorkerUtil {
 				.map(label -> {
 					String[] ss = label.getTag().split("\\s+");
 					return new NpcWorker(label, test, ss[0], user -> {
+						if (ss.length < 2)
+							return;
 						if (ss[1].startsWith("/"))
 							user.performCommand(label.getTag().substring(ss[0].length() + 2));
 					});
@@ -51,7 +53,7 @@ public class WorkerUtil {
 				for (NpcWorker worker : workers)
 					worker.update(user, playerLoc);
 			}
-		}, 1, 1);
+		}, 20, 6);
 	}
 
 	public void acceptClick(User user, int id) {

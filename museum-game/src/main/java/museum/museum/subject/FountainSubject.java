@@ -9,6 +9,7 @@ import museum.museum.map.SubjectPrototype;
 import museum.player.User;
 import museum.util.Colorizer;
 import net.minecraft.server.v1_12_R1.*;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import ru.cristalix.core.util.UtilV3;
 
@@ -25,6 +26,8 @@ public class FountainSubject extends Subject {
 	private PacketPlayOutSpawnEntity spawn;
 	private PacketPlayOutEntityMetadata metadata;
 	private PacketPlayOutEntityDestroy destroy;
+
+	private Location spawnLocation;
 
 	public FountainSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
@@ -49,8 +52,14 @@ public class FountainSubject extends Subject {
 				.add(UtilV3.toVector(cachedInfo.location));
 		// Блок, по примеру которого делается вода
 		val icon = label.clone().subtract(0, 1, 0).getBlock();
+		spawnLocation = new Location(
+				prototype.getBox().getWorld(),
+				acceptedSource.getX() + .5,
+				acceptedSource.getY() + 1,
+				acceptedSource.getZ() + .5
+		);
 		entity = new EntityFallingBlock(
-				world, acceptedSource.getX() + .5, acceptedSource.getY() + 1, acceptedSource.getZ() + .5,
+				world, spawnLocation.getX(),  spawnLocation.getY(),  spawnLocation.getZ(),
 				Colorizer.applyColor(CraftMagicNumbers.getBlock(icon.getType()).getBlockData(), cachedInfo.getColor())
 		);
 		entity.id = NEG_ID_BOUND;
@@ -62,7 +71,7 @@ public class FountainSubject extends Subject {
 	}
 
 	public void throwWater() {
-		if (!(owner.getState() instanceof Museum) || getAllocation() == null)
+		if (!(owner.getState() instanceof Museum) || getAllocation() == null || entity == null)
 			return;
 		entity.id = entity.id < UPPER_ID_BOUND ? ++entity.id : NEG_ID_BOUND;
 		entity.ticksLived = 1;
@@ -75,6 +84,12 @@ public class FountainSubject extends Subject {
 		// Отправка пакетов игроку
 		val users = owner.getState().getUsers();
 		for (User visitor : users) {
+			if (visitor.getPlayer() == null)
+				continue;
+			// Если игрок далеко
+			/*if (entity.origin == null || visitor.getLocation().distanceSquared(spawnLocation) > 325)
+				continue;*/
+
 			visitor.sendPacket(spawn);
 			visitor.sendPacket(metadata);
 			visitor.sendPacket(new PacketPlayOutEntityVelocity(
@@ -86,8 +101,11 @@ public class FountainSubject extends Subject {
 		}
 		B.postpone(30, () -> {
 			destroy.a[0] = oldId;
-			for (User visitor : users)
+			for (User visitor : users) {
+				if (visitor.getPlayer() == null)
+					continue;
 				visitor.sendPacket(destroy);
+			}
 		});
 	}
 }

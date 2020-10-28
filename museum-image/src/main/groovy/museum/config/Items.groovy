@@ -70,7 +70,7 @@ register 'buy-floor', {
 register 'menu', {
     item PAPER
     text """
-        §f>> §6§lМеню §f<<
+        §f>> §6Меню §f<<
     
         Это меню, с помощью которого,
         настраивать музей, приглашать

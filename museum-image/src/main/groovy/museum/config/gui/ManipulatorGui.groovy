@@ -2,6 +2,7 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.config.command.WagonConfig
 import museum.museum.map.SkeletonSubjectPrototype
 import museum.museum.subject.Allocation
 import museum.museum.subject.SkeletonSubject
@@ -11,14 +12,12 @@ import museum.museum.subject.product.FoodProduct
 import museum.museum.subject.skeleton.Skeleton
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
-import org.bukkit.Material
 import org.bukkit.entity.Player
 
 import static clepto.bukkit.item.Items.items
 import static clepto.bukkit.item.Items.register
 import static museum.museum.subject.Allocation.Action.*
-import static org.bukkit.Material.CLAY_BALL
-import static org.bukkit.Material.CONCRETE
+import static org.bukkit.Material.*
 
 register 'lockedSkeleton', {
     item CLAY_BALL
@@ -52,7 +51,14 @@ register 'availableSkeleton', {
 
 Guis.register 'manipulator', { player ->
     def user = App.app.getUser((Player) player)
-    def abstractSubject = (Subject) context
+    Subject abstractSubject
+    try {
+        abstractSubject = user.getSubject(UUID.fromString(context as String))
+    } catch (Exception ignored) {
+        return
+    }
+    if (!abstractSubject)
+        return
 
     title abstractSubject.prototype.title
 
@@ -66,7 +72,7 @@ Guis.register 'manipulator', { player ->
         data abstractSubject.cachedInfo.color.woolData
         text "»$abstractSubject.cachedInfo.color.chatColor §lИзменить цвет §f«"
     } leftClick {
-        Guis.open(delegate, 'colorChange', abstractSubject)
+        Guis.open(delegate, 'colorChange', abstractSubject.cachedInfo.uuid)
     }
 
     button 'D' icon {
@@ -129,7 +135,7 @@ Guis.register 'manipulator', { player ->
                         subject.updateSkeleton true
                         user.updateIncome()
                     }
-                    Guis.open(delegate, 'manipulator', subject)
+                    Guis.open(delegate, 'manipulator', subject.cachedInfo.uuid)
                 }
             }
         }
@@ -143,13 +149,29 @@ Guis.register 'manipulator', { player ->
             gui.layout += '---------'
         }
     } else if (abstractSubject instanceof StallSubject) {
+        if (abstractSubject.food.isEmpty()) {
+            button 'I' icon {
+                item STORAGE_MINECART
+                text """
+                &bЗаказать товар | &e$WagonConfig.COST\$
+
+                Закажите фургон с продовольствием,
+                он будет вас ждать слева от музея, 
+                идите к желтому знаку за тем
+                &fотнесите товар в лавку.
+                """
+            } leftClick {
+                performCommand 'wagonbuy'
+                closeInventory()
+            }
+        }
         (FoodProduct.values().length / 9).times { gui.layout += 'OOOOOOOOO' }
         def summary = 0
         abstractSubject.food.forEach { key, value ->
             def term = value * key.cost
             summary = summary + term
             button 'O' icon {
-                item Material.SLIME_BALL
+                item SLIME_BALL
                 text "x$value $key.name &e=$term\$"
             }
         }

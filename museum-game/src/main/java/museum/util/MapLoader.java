@@ -21,7 +21,7 @@ public class MapLoader {
 
 	public void load(App app) {
 		// Загрузка карты с сервера BUIL-1
-		MapListDataItem mapInfo = Cristalix.mapService().getMapByGameTypeAndMapName("Museum", "release")
+		MapListDataItem mapInfo = Cristalix.mapService().getLatestMapByGameTypeAndMapName("Museum", "release")
 				.orElseThrow(() -> new RuntimeException("Map Museum/release wasn't found in the MapService"));
 
 		try {
@@ -38,6 +38,8 @@ public class MapLoader {
 		// Инжектим блоки в чанки (patched paper)
 		app.getNMSWorld().chunkInterceptor = (chunk, flags, receiver) -> {
 			val user = app.getUser(receiver.getUniqueID());
+			if (user == null)
+				return new PacketPlayOutMapChunk(chunk, flags);
 			State state = user.getState();
 			if (state == null)
 				return new PacketPlayOutMapChunk(chunk, flags);
@@ -47,5 +49,4 @@ public class MapLoader {
 			return chunkWriter.build(flags);
 		};
 	}
-
 }

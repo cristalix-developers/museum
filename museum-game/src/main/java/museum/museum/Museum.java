@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import museum.App;
+import museum.boosters.BoosterType;
+import museum.client_conversation.ClientPacket;
 import museum.data.MuseumInfo;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.MuseumPrototype;
@@ -29,6 +31,7 @@ import net.minecraft.server.v1_12_R1.IBlockData;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.inventory.ItemStack;
+import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 import ru.cristalix.core.util.UtilV3;
@@ -51,6 +54,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	private final ItemStack menu = Items.render("menu").asBukkitMirror();
 	private final ItemStack backItem = Items.render("back").asBukkitMirror();
 	private final ItemStack visitorMenu = Items.render("visitor-menu").asBukkitMirror();
+	private final ItemStack donateMenu = Items.render("donate-menu").asBukkitMirror();
 
 	private final CraftWorld world;
 	private double income;
@@ -86,6 +90,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 					if (route != null) collector.setNavigator(new CollectorNavigator(prototype, world,
 							route.stream().map(MarkerSubject::getLocation).collect(Collectors.toList())));
 				});
+
+		updateIncrease();
 	}
 
 	@Override
@@ -99,7 +105,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 		objective.startGroup("Музей");
 		if (owner != user) objective.record("Владелец", owner.getName());
-		objective.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(getIncome()))
+		objective.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(getIncome() * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)))
 				.record("Посещений", () -> "§b" + this.getViews());
 	}
 
@@ -107,37 +113,22 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	public void enterState(User user) {
 		teleportUser(user);
 
-		cachedInfo.views++;
-
-		StringBuilder builder = new StringBuilder();
-		for (Subject subject : user.getSubjects()) {
-			if (!subject.isAllocated()) continue;
-			if (builder.length() > 0) builder.append('|');
-			builder.append(subject.getAllocation().getClientData())
-					.append('_').append(subject.getPrototype().getTitle())
-					.append('_').append(subject.getPrototype().getPrice());
-		}
-		String payload = builder.toString();
-
-		user.sendPayload("museumsubjects", payload);
-		user.sendAnime();
-
 		val player = user.getPlayer();
 		val inventory = player.getInventory();
 
 		if (owner.getExperience() >= PreparePlayerBrain.EXPERIENCE)
 			giveMenu(user);
 
-		if (this.owner != user)
+		if (this.owner != user) {
 			inventory.setItem(8, backItem);
-		else
+			cachedInfo.views++;
+		} else
 			for (Subject subject : user.getSubjects())
 				if (!subject.isAllocated())
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 
-		updateIncrease();
-
-		player.setAllowFlight(true);
+		if (user.getGrabbedArmorstand() == null)
+			player.setAllowFlight(true);
 
 		WorkerUtil.reload(user);
 
@@ -147,6 +138,12 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				subject.getAllocation().perform(user, SPAWN_PIECES);
 				subject.getAllocation().perform(user, SPAWN_DISPLAYABLE);
 			}
+			new ClientPacket<String>("museumsubjects").send(user, GlobalSerializers.toJson(user.getSubjects().stream()
+					.filter(Subject::isAllocated)
+					.map(Subject::getDataForClient)
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList())
+			));
 		});
 	}
 
@@ -155,6 +152,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		inventory.clear();
 		inventory.setItem(0, menu);
 		inventory.setItem(4, visitorMenu);
+		inventory.setItem(8, donateMenu);
 	}
 
 	@Override
@@ -243,5 +241,4 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				prototype.getSpawn()
 		);
 	}
-
 }

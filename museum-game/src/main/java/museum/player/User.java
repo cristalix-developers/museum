@@ -2,8 +2,6 @@ package museum.player;
 
 import clepto.bukkit.LocalArmorStand;
 import clepto.bukkit.event.PlayerWrapper;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import lombok.Data;
 import lombok.experimental.Delegate;
 import museum.App;
@@ -20,12 +18,14 @@ import museum.prototype.Managers;
 import museum.prototype.Registry;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
-import net.minecraft.server.v1_12_R1.*;
-import org.bukkit.Bukkit;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.server.v1_12_R1.EntityArmorStand;
+import net.minecraft.server.v1_12_R1.Packet;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.spigotmc.AsyncCatcher;
-import ru.cristalix.core.util.UtilNetty;
 import ru.cristalix.core.util.UtilV3;
 
 import java.util.UUID;
@@ -49,6 +49,7 @@ public class User implements PlayerWrapper {
 	private LocalArmorStand grabbedArmorstand;
 	private EntityArmorStand riding;
 	private long enterTime;
+	private long lastTopUpdateTime = -1;
 
 	public User(UserInfo info) {
 		this.enterTime = System.currentTimeMillis();
@@ -77,30 +78,27 @@ public class User implements PlayerWrapper {
 	}
 
 	public Subject getSubject(UUID uuid) {
-		for (Subject subject : this.subjects) {
-			if (subject.getCachedInfo().getUuid().equals(uuid)) return subject;
-		}
+		for (Subject subject : this.subjects)
+			if (subject.getCachedInfo().getUuid().equals(uuid))
+				return subject;
 		return null;
 	}
 
-	public void sendAnime() {
-		ByteBuf buffer = Unpooled.buffer();
-		// ToDo: Вернуть счётчик на раскопках!
-		// UtilNetty.writeVarInt(buffer, InteractItems == null ? -2 : InteractItems.getHitsLeft() > 0 ? InteractItems.getHitsLeft() : -1);
-		connection.sendPacket(new PacketPlayOutCustomPayload("museum", new PacketDataSerializer(buffer)));
-	}
-
-	public void giveExperience(long exp) {
+	public void giveExperience(double exp) {
 		int prevLevel = getLevel();
-		info.experience += exp;
+		info.experience += exp * App.getApp().getPlayerDataManager().calcMultiplier(getUuid(), BoosterType.EXP);
 		int newLevel = getLevel();
 		if (newLevel != prevLevel) {
-			if (newLevel % 18 == 0) {
-				Bukkit.broadcastMessage(MessageUtil.find("global-level-message")
-						.set("name", getName())
-						.set("level", newLevel)
-						.getText()
+			if (newLevel % 50 == 0) {
+				TextComponent message = new TextComponent("" +
+						"§cВНИМАНИЕ! §e" + getName() +
+						" достигнул уровня §b" + newLevel +
+						"§e, нажмите §e§lСЮДА§e что бы поздравить!"
 				);
+				message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/congr " + getName()));
+				for (User user : App.getApp().getUsers())
+					if (user.getPlayer() != null)
+						user.getPlayer().sendMessage(message);
 			}
 			MessageUtil.find("levelup")
 					.set("level", newLevel)
@@ -136,13 +134,6 @@ public class User implements PlayerWrapper {
 		return sum;
 	}
 
-	public void sendPayload(String channel, String payload) {
-		ByteBuf buffer = Unpooled.buffer();
-		UtilNetty.writeString(buffer, payload);
-		PacketPlayOutCustomPayload packet = new PacketPlayOutCustomPayload(channel, new PacketDataSerializer(buffer));
-		player.getHandle().playerConnection.sendPacket(packet);
-	}
-
 	@Override
 	public String toString() {
 		return this.getDisplayName();
@@ -157,9 +148,12 @@ public class User implements PlayerWrapper {
 	}
 
 	public void updateIncome() {
-		setIncome(0.1);
+		setIncome(0);
 		for (Museum museum : getMuseums())
-			for (Subject subject : museum.getSubjects())
-				setIncome(getIncome() + subject.getIncome());
+			setIncome(getIncome() + museum.getIncome());
+	}
+
+	public void depositMoneyWithBooster(double income) {
+		setMoney(getMoney() + income * App.getApp().getPlayerDataManager().calcMultiplier(getUuid(), BoosterType.COINS));
 	}
 }

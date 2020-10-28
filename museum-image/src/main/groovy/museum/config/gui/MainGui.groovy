@@ -5,6 +5,7 @@ import clepto.humanize.TimeFormatter
 import museum.App
 import museum.config.command.WagonConfig
 import museum.museum.Museum
+import museum.museum.map.SubjectType
 import museum.util.LevelSystem
 import org.bukkit.entity.Player
 
@@ -15,12 +16,16 @@ import static org.bukkit.Material.*
 
 def formatter = TimeFormatter.builder() accuracy 500 build()
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
+def levelFormatter = new DecimalFormat('###,###,###,###,###,###.##')
 
 Guis.register 'main', { player ->
     def user = App.app.getUser((Player) player)
 
     title 'Главное меню'
-    layout 'FH-SMT-JS'
+    layout """
+        F--SMT--S
+        -H--O--J-
+    """
 
     button MuseumGuis.background
     button 'F' icon {
@@ -33,7 +38,7 @@ Guis.register 'main', { player ->
         Опыт: $user.experience
         Опыта осталось: ${LevelSystem.formatExperience(user.experience)}
         Часов сыграно: ${user.timePlayed / 3_600_000}
-        Монет собрано: $user.pickedCoinsCount
+        Монет собрано: ${moneyFormatter.format(user.pickedCoinsCount)} 
         Кирка: $user.pickaxeType.name
         Раскопок: $user.excavationCount
         Фрагментов: ${user.skeletons.stream().mapToInt(s -> s.unlockedFragments.size()).sum()}
@@ -45,7 +50,7 @@ Guis.register 'main', { player ->
         text """
         §bПереименовать музей
 
-        Если вам не нравтся
+        Если вам не нравится
         название вашего музея
         вы можете его изменить.
         """
@@ -59,7 +64,7 @@ Guis.register 'main', { player ->
         §bКирки
 
         Приобретите новую кирку,
-        и разгодайте тайны песка...
+        и разгадайте тайны песка...
         """
         nbt.HideFlags = 63
     } leftClick {
@@ -78,7 +83,7 @@ Guis.register 'main', { player ->
         Посещений: &b$museum.views
     
         Доход: &a$museum.income
-        Витрин: &e${museum.subjects.size()}
+        Витрин: &e${museum.getSubjects(SubjectType.SKELETON_CASE).size()}
     
         Создан &a${formatter.format(Duration.ofMillis(System.currentTimeMillis() - museum.creationDate.time))} назад
         """
@@ -114,12 +119,24 @@ Guis.register 'main', { player ->
         &bЗаказать товар | &e$WagonConfig.COST\$
 
         Закажите фургон с продовольствием,
-        и заберите его на &lx: 295, z: -402,
-        &fза тем отнесите товар в лавку.
+        он будет вас ждать слева от музея, 
+        идите к желтому знаку за тем
+        &fотнесите товар в лавку.
         """
     } leftClick {
         performCommand 'wagonbuy'
         closeInventory()
     }
 
+    button 'O' icon {
+        item ENDER_PEARL
+        text """
+        &bНочь &f/ &bДень
+
+        Меняйте режим так, как нравится глазам!
+        """
+    } leftClick {
+        user.getPlayer().setPlayerTime(user.getPlayer().getPlayerTime() == 18000 ? 6000 : 18000, false)
+        closeInventory()
+    }
 }

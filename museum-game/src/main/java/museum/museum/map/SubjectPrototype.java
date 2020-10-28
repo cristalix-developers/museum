@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @SuperBuilder
@@ -41,6 +42,7 @@ public class SubjectPrototype implements Prototype {
 		private final ru.cristalix.core.math.V3 min;
 		private final ru.cristalix.core.math.V3 max;
 		private final double cost;
+		private final UUID uuid;
 
 	}
 }

@@ -15,6 +15,6 @@ public class PrepareTop implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		packet.send(user, "{\"INCOME\":{\"x\":266,\"y\":88.5,\"z\":-270,\"yaw\":-135,\"title\":\"Топ по доходу\"},\"EXPERIENCE\":{\"x\":261,\"y\":88.5,\"z\":-278,\"yaw\":-90,\"title\":\"Топ по опыту\"},\"MONEY\":{\"x\":266,\"y\":88.5,\"z\":-286,\"yaw\":-45,\"title\":\"Топ по деньгам\"}}");
+		packet.send(user, "{\"INCOME\":{\"x\":266,\"y\":89.5,\"z\":-270,\"yaw\":-135,\"title\":\"Топ по доходу\"},\"EXPERIENCE\":{\"x\":261,\"y\":89.5,\"z\":-278,\"yaw\":-90,\"title\":\"Топ по опыту\"},\"MONEY\":{\"x\":266,\"y\":89.5,\"z\":-286,\"yaw\":-45,\"title\":\"Топ по деньгам\"}}");
 	}
 }

@@ -41,11 +41,15 @@ public class AdminCommand {
 				return null;
 			if (args.length == 0)
 				return "§cИспользование: §e/exp [Игрок] [Опыт] ИЛИ /exp [Опыт]";
-			if (args.length == 1)
-				app.getUser(sender).giveExperience(Integer.parseInt(args[0]));
-			else if (args.length == 2)
-				app.getUser(Bukkit.getPlayer(args[0])).giveExperience(Integer.parseInt(args[1]));
-			return "§aОпыт изменен.";
+			try {
+				if (args.length == 1)
+					app.getUser(sender).giveExperience(Integer.parseInt(args[0]));
+				else if (args.length == 2)
+					app.getUser(Bukkit.getPlayer(args[0])).giveExperience(Integer.parseInt(args[1]));
+				return "§aОпыт изменен.";
+			} catch (Exception exception) {
+				return exception.getMessage();
+			}
 		}, "exp");
 	}
 

@@ -61,7 +61,6 @@ public class MongoAdapter<T extends Unique> {
 		data.find(session, Filters.eq("uuid", uuid.toString()))
 				.first((result, throwable) -> {
 					try {
-						System.out.println(result);
 						future.complete(readDocument(result));
 					} catch (Exception e) {
 						e.printStackTrace();

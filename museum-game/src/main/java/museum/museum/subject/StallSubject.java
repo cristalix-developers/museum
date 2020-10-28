@@ -12,6 +12,8 @@ import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.util.MessageUtil;
 import museum.worker.NpcWorker;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.util.UtilV3;
 
@@ -58,7 +60,7 @@ public class StallSubject extends Subject implements Incomeble {
 		if (cachedInfo != null && allocation != null) {
 			// todo: what the fuck this hardcode nums
 			val spawn = ((StallPrototype) prototype).getSpawn().clone()
-					.subtract(prototype.getBox().getCenter().clone().subtract(0, 4, 0))
+					.subtract(prototype.getBox().getCenter().clone().subtract(.5, 4, -.5))
 					.add(UtilV3.toVector(cachedInfo.location));
 			worker.setLocation(spawn);
 			allocation.allocateDisplayable(worker);
@@ -69,16 +71,13 @@ public class StallSubject extends Subject implements Incomeble {
 	public void handle(double... args) {
 		if (!isAllocated())
 			return;
-		if (args[0] % (60 * 20L) != 0)
+		if (args[0] % (150 * 20L) != 0)
 			return;
 		Set<FoodProduct> potentialFood = food.keySet();
 		if (potentialFood.isEmpty()) {
-			val origin = getAllocation().getOrigin();
-			MessageUtil.find("no-product")
-					.set("x", origin.getX())
-					.set("y", origin.getY())
-					.set("z", origin.getZ())
-					.send(owner);
+			TextComponent message = new TextComponent(MessageUtil.get("no-product"));
+			message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/go"));
+			owner.getPlayer().sendMessage(message);
 			return;
 		}
 		int randomFoodIndex = (int) (Math.random() * potentialFood.size());
@@ -91,10 +90,12 @@ public class StallSubject extends Subject implements Incomeble {
 				.set("title", key.getName())
 				.set("cost", key.getCost())
 				.send(owner);
-		owner.setMoney(owner.getMoney() + key.getCost());
+		owner.depositMoneyWithBooster(key.getCost());
 	}
 
 	public void rotateCustomerHead() {
+		if (owner.getPlayer() == null)
+			return;
 		worker.update(owner, V4.fromLocation(owner.getLocation()));
 	}
 }

@@ -35,26 +35,29 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MuseumService {
 
 	public static final long DEFAULT_BOOSTER_TIME = TimeUnit.HOURS.toMillis(1L);
-	public static final int THANKS_SECONDS = 45;
+	public static final int INCOME_MULTIPLIER = 10;
 	public static final String PASSWORD = System.getProperty("PASSWORD", "gVatjN43AJnbFq36Fa");
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
 	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
-		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
 		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
-		put(DonateType.LOCAL_VISITORS_BOOSTER, localBoosterPreAuthorize(BoosterType.VISITORS));
-		put(DonateType.GLOBAL_VISITORS_BOOSTER, globalBoosterPreAuthorize(BoosterType.VISITORS));
+		put(DonateType.GLOBAL_EXP_BOOSTER, globalBoosterPreAuthorize(BoosterType.EXP));
+		put(DonateType.GLOBAL_VILLAGER_BOOSTER, globalBoosterPreAuthorize(BoosterType.VILLAGER));
+		put(DonateType.LOCAL_EXP_BOOSTER, localBoosterPreAuthorize(BoosterType.EXP));
+		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
 	}};
 	private static final Map<DonateType, BiConsumer<UserTransactionPackage, UserInfo>> TRANSACTION_POST_AUTHORIZE_MAP
 			= new HashMap<DonateType, BiConsumer<UserTransactionPackage, UserInfo>>() {{
-		put(DonateType.LOCAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, false));
 		put(DonateType.GLOBAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, true));
-		put(DonateType.LOCAL_VISITORS_BOOSTER, boosterPostAuthorize(BoosterType.VISITORS, false));
-		put(DonateType.GLOBAL_VISITORS_BOOSTER, boosterPostAuthorize(BoosterType.VISITORS, true));
+		put(DonateType.GLOBAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, true));
+		put(DonateType.GLOBAL_VILLAGER_BOOSTER, boosterPostAuthorize(BoosterType.VILLAGER, true));
+		put(DonateType.LOCAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, false));
+		put(DonateType.LOCAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, false));
 	}};
 	public static ConfigurationManager CONFIGURATION_MANAGER;
 
@@ -112,10 +115,12 @@ public class MuseumService {
 				val preHandler = TRANSACTION_PRE_AUTHORIZE_MAP.get(pckg.getDonate());
 				if (preHandler != null && !preHandler.test(pckg, info)) {
 					pckg.setResponse(UserTransactionPackage.TransactionResponse.INTERNAL_ERROR);
+					answer(channel, pckg);
 					return;
 				}
 				if (pckg.getDonate().isSave() && info.getDonates().contains(pckg.getDonate())) {
 					pckg.setResponse(UserTransactionPackage.TransactionResponse.ALREADY_BUYED);
+					answer(channel, pckg);
 					return;
 				}
 				processInvoice(pckg.getUser(), pckg.getDonate().getPrice(), pckg.getDonate().getName()).thenAccept(response -> {
@@ -147,12 +152,18 @@ public class MuseumService {
 		}));
 		registerHandler(ThanksExecutePackage.class, ((channel, serverName, museumPackage) -> {
 			long boosters = boosterManager.executeThanks(museumPackage.getUser());
-			extra(museumPackage.getUser(), null, (double) (THANKS_SECONDS * boosters));
-			museumPackage.setBoostersCount(boosters);
-			answer(channel, museumPackage);
+			userData.find(museumPackage.getUser()).thenAccept(data -> {
+				extra(museumPackage.getUser(), data.getIncome() * INCOME_MULTIPLIER * boosters);
+				museumPackage.setBoostersCount(boosters);
+				answer(channel, museumPackage);
+			});
 		}));
 		registerHandler(RequestConfigurationsPackage.class, ((channel, serverName, museumPackage) -> {
 			CONFIGURATION_MANAGER.fillRequest(museumPackage);
+			answer(channel, museumPackage);
+		}));
+		registerHandler(RequestGlobalBoostersPackage.class, ((channel, serverName, museumPackage) -> {
+			museumPackage.setBoosters(new ArrayList<>(boosterManager.getGlobalBoosters().values()));
 			answer(channel, museumPackage);
 		}));
 		registerHandler(TopPackage.class, ((channel, serverName, museumPackage) ->
@@ -291,9 +302,22 @@ public class MuseumService {
 		return ISocketClient.get().<FillLauncherUserDataPackage>writeAndAwaitResponse(pc).thenApply(FillLauncherUserDataPackage::getUsernameList);
 	}
 
-	public static void extra(UUID user, Double sum, Double seconds) {
-		// TODO: we need to calculate money for offline users.
-		ServerSocketHandler.broadcast(new ExtraDepositUserPackage(user, sum, seconds));
+	public static void extra(UUID user, Double sum) {
+		ServerSocketHandler.broadcast(new ExtraDepositUserPackage(user, sum));
+	}
+
+	public static void asyncExtra(UUID user, Function<UserInfo, Double> supplier) {
+		CompletableFuture.runAsync(() -> {
+			try {
+				UserInfo info = userData.find(user).get(4, TimeUnit.SECONDS);
+				extra(user, supplier.apply(info));
+			} catch (Exception e) {
+				e.printStackTrace();
+				CoreApi.get().getPlatform().getScheduler().runSyncDelayed(() -> {
+					asyncExtra(user, supplier);
+				}, 1, TimeUnit.SECONDS);
+			}
+		});
 	}
 
 	public static void sendMessage(Set<UUID> users, String message) {

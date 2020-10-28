@@ -32,7 +32,7 @@ public class BoosterInfo implements Unique, MultiTimeBar.MultiBarInstance {
 
 	@Override
 	public String getTitle() {
-		return "§eБустер §a" + getType().getName() + " §eот §b" + getType().getName() + " §a(" + UtilTime.formatTime(until - System.currentTimeMillis(), false) + ") §b/thx";
+		return "§eБустер §a" + getType().getName() + " §eот §b" + ownerName + " §a(" + UtilTime.formatTime(until - System.currentTimeMillis(), false) + ") §b/thx";
 	}
 
 	public boolean hadExpire() {

@@ -81,9 +81,16 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 			// Если в музее игрока есть кто-либо - создать монету
 			val coin = new Coin(visitor.locX, visitor.locY, visitor.locZ);
 			for (User user : App.getApp().getUsers()) {
-				if (Math.random() < .01 && user.getState() instanceof Museum) {
+				if (user.getPlayer() == null)
+					continue;
+				if (Math.random() < .012 && user.getState() instanceof Museum) {
+					val museum = ((Museum) user.getState());
+					if (!museum.getOwner().equals(user))
+						continue;
+					if (museum.getCoins().size() > Coin.MAX_COIN_AMOUNT)
+						continue;
 					coin.create(user.getConnection());
-					((Museum) user.getState()).getCoins().add(coin);
+					museum.getCoins().add(coin);
 				}
 			}
 			return;

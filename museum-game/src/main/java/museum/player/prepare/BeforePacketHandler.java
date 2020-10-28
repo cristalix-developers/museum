@@ -84,7 +84,6 @@ public class BeforePacketHandler implements Prepare {
 	private void onDigging(User user, PacketPlayInBlockDig packet) {
 		boolean valid = user.getState() instanceof Excavation && isAir(user, packet.a);
 		if (packet.c == STOP_DESTROY_BLOCK && valid) {
-			user.sendAnime();
 			if (tryReturnPlayer(user, false))
 				return;
 			acceptedBreak(user, packet);
@@ -124,11 +123,11 @@ public class BeforePacketHandler implements Prepare {
 
 	private void openManipulator(User user, Museum museum, PacketPlayInUseItem packet, Subject subject) {
 		packet.a = DUMMY; // Genius
-		MinecraftServer.SERVER.postToMainThread(() -> {
+		B.run(() -> {
 			if (user != museum.getOwner())
 				MessageUtil.find("non-root").send(user);
 			else
-				Guis.open(user.getPlayer(), "manipulator", subject);
+				Guis.open(user.getPlayer(), "manipulator", subject.getCachedInfo().getUuid());
 		});
 	}
 
@@ -166,15 +165,14 @@ public class BeforePacketHandler implements Prepare {
 
 	private boolean tryReturnPlayer(User user, boolean force) {
 		Excavation excavation = ((Excavation) user.getState());
+		excavation.setHitsLeft(excavation.getHitsLeft() - 1);
 
-		if (excavation.getHitsLeft() == -1)
+		if (excavation.getHitsLeft() < 0)
 			return true;
 
-		excavation.setHitsLeft(excavation.getHitsLeft() - 1);
-		if (excavation.getHitsLeft() == 0 || force) {
+		if (excavation.getHitsLeft() < 1 || force) {
 			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 5 сек.");
 			MessageUtil.find("excavationend").send(user);
-			excavation.setHitsLeft(-1);
 			B.postpone(100, () -> {
 				user.setState(user.getLastMuseum() == null ?
 						user.getMuseums().get(Managers.museum.getPrototype("main")) :
@@ -182,7 +180,8 @@ public class BeforePacketHandler implements Prepare {
 				);
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			});
-			return true;
+			excavation.setHitsLeft(-1);
+			return false;
 		}
 		return excavation.getHitsLeft() < 0;
 	}
@@ -190,14 +189,16 @@ public class BeforePacketHandler implements Prepare {
 	@SuppressWarnings("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
+			if (user.getPlayer() == null)
+				return;
 			// С некоторым шансом может выпасть интерактивая вещь
-			if (Vector.random.nextFloat() > .98)
+			if (Vector.random.nextFloat() > .991)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 			// Перебрать все кирки и эффекты на них
+			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
 				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
 					List<BlockPosition> positions = pickaxeType.getPickaxe().dig(user, packet.a);
-					user.giveExperience(pickaxeType.getExperience());
 					if (positions != null)
 						positions.forEach(position -> generateFragments(user, position));
 				}
@@ -226,8 +227,7 @@ public class BeforePacketHandler implements Prepare {
 			Skeleton skeleton = user.getSkeletons().supply(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
-				double cost = proto.getPrice();
-				double prize = cost * (.75 + Math.random() * .50);
+				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0) / 30;
 
 				String value = String.format("%.2f$", prize);
 
@@ -238,8 +238,7 @@ public class BeforePacketHandler implements Prepare {
 
 				user.getPlayer().sendTitle("§6Находка!", "§e+" + value);
 
-				user.setMoney(user.getMoney() + prize);
-
+				user.depositMoneyWithBooster(prize);
 			} else {
 				MessageUtil.find("findfragment")
 						.set("name", fragment.getAddress())

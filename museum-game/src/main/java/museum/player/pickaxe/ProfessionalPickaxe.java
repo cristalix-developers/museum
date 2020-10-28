@@ -15,15 +15,15 @@ public class ProfessionalPickaxe implements Pickaxe {
 
 	@Override
 	public List<BlockPosition> dig(User user, BlockPosition pos) {
-		PlayerConnection con = user.getConnection();
-		animate(con, pos.west().west());
-		animate(con, pos.south().south());
-		animate(con, pos.east().east());
-		animate(con, pos.north().north());
-		animate(con, pos.west().south());
-		animate(con, pos.south().west());
-		animate(con, pos.east().north());
-		animate(con, pos.north().east());
+		PlayerConnection connection = user.getConnection();
+		animate(connection, pos.west().west());
+		animate(connection, pos.south().south());
+		animate(connection, pos.east().east());
+		animate(connection, pos.north().north());
+		animate(connection, pos.west().south());
+		animate(connection, pos.south().west());
+		animate(connection, pos.east().north());
+		animate(connection, pos.north().east());
 		return Collections.emptyList();
 	}
 

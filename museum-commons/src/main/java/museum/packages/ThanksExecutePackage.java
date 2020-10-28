@@ -12,7 +12,7 @@ import java.util.UUID;
 public class ThanksExecutePackage extends MuseumPackage {
 
 	// request
-	private UUID user;
+	private final UUID user;
 
 	// response
 	private long boostersCount; // Количество бустеров, за которые поблагодарил игрок

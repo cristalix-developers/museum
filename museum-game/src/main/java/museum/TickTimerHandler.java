@@ -9,7 +9,9 @@ import museum.museum.subject.*;
 import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.ticker.Ticked;
+import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -40,8 +42,23 @@ public class TickTimerHandler extends BukkitRunnable {
 		long currentTime = System.currentTimeMillis();
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			val user = app.getUser(player.getUniqueId());
+			if (user == null)
+				continue;
+			if (user.getMuseums().size() == 0)
+				continue;
 			for (Museum museum : user.getMuseums()) {
 				process(museum, user, currentTime);
+			}
+			if (counter % 160 != 0)
+				continue;
+			val tab = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, user.getPlayer().getHandle());
+			for (Player target : Bukkit.getOnlinePlayers()) {
+				if (target == player)
+					continue;
+				player.hidePlayer(app, target);
+				target.hidePlayer(app, player);
+				user.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, ((CraftPlayer) target).getHandle()));
+				((CraftPlayer) target).getHandle().playerConnection.sendPacket(tab);
 			}
 		}
 	}
@@ -63,7 +80,7 @@ public class TickTimerHandler extends BukkitRunnable {
 				((CollectorSubject) subject).move(currentTime);
 			else if (counter % 5 == 0 && subject instanceof FountainSubject)
 				((FountainSubject) subject).throwWater();
-			else if (subject instanceof StallSubject)
+			else if (counter % 5 == 0 && subject instanceof StallSubject)
 				((StallSubject) subject).rotateCustomerHead();
 			// Если постройка может приносить доход, попробовать
 			if (subject instanceof Incomeble) // else добавлять не нужно

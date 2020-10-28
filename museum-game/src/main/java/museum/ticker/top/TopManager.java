@@ -22,16 +22,28 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TopManager implements Ticked {
 
-	private static final int UPDATE_SECONDS = 20;
-	private static final int DATA_COUNT = 100;
+	private static final int UPDATE_SECONDS = 120;
+	private static final int DATA_COUNT = 15;
 	private final App app;
 	private final Map<TopPackage.TopType, List<TopEntry<String, Object>>> tops = Maps.newConcurrentMap();
+
+	private String data;
+	private final ClientPacket<String> updatePacket = new ClientPacket<>("top-update");
 
 	@Override
 	public void tick(int... args) {
 		if (args[0] % (20 * UPDATE_SECONDS) == 0) {
 			updateData();
-			sendTops();
+			data = GlobalSerializers.toJson(tops);
+		}
+		if (data == null || data.isEmpty() || data.equals("{}"))
+			return;
+		val time = System.currentTimeMillis();
+		for (User user : app.getUsers()) {
+			if (user.getConnection() != null && time - user.getLastTopUpdateTime() > UPDATE_SECONDS * 1000) {
+				user.setLastTopUpdateTime(time);
+				updatePacket.send(user, data);
+			}
 		}
 	}
 
@@ -45,12 +57,5 @@ public class TopManager implements Ticked {
 							)).collect(Collectors.toList())
 					));
 		}
-	}
-
-	public void sendTops() {
-		val data = GlobalSerializers.toJson(tops);
-		val packet = new ClientPacket<String>("top-update");
-		for (User user : app.getUsers())
-			packet.send(user, data);
 	}
 }

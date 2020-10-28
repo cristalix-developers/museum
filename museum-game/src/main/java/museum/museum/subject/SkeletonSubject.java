@@ -70,6 +70,8 @@ public class SkeletonSubject extends Subject {
 		V4 absoluteLocation = V4.fromLocation(allocation.getOrigin()).add(this.skeletonLocation);
 		skeleton.getUnlockedFragments().forEach(fragment ->
 				allocation.allocatePiece(fragment, orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment)), sendUpdates));
+		if (owner.getState() == null)
+			return;
 		((Museum) owner.getState()).updateIncrease();
 	}
 
@@ -85,7 +87,7 @@ public class SkeletonSubject extends Subject {
 	public double getIncome() {
 		if (skeleton == null)
 			return 0;
-		return skeleton.getUnlockedFragments().size() * (double) skeleton.getPrototype().getPrice();
+		return skeleton.getUnlockedFragments().size() * (double) skeleton.getPrototype().getPrice() / 300;
 	}
 
 	public void setSkeleton(Skeleton skeleton) {

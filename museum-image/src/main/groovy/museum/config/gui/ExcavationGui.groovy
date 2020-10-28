@@ -44,7 +44,9 @@ Guis.register 'excavation', { player ->
                 item CLAY_BALL
                 nbt.other = 'tochka'
                 text.clear()
-                text '§8???'
+                text """
+                §8??? §f[§e$excavation.requiredLevel LVL§f]
+                """
             }
         }
     }

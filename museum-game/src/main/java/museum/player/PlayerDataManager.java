@@ -1,21 +1,22 @@
 package museum.player;
 
 import clepto.bukkit.B;
-import com.destroystokyo.paper.event.player.PlayerInitialSpawnEvent;
 import com.google.common.collect.Maps;
+import lombok.Setter;
 import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.data.BoosterInfo;
 import museum.data.UserInfo;
-import museum.museum.Museum;
 import museum.packages.*;
 import museum.player.prepare.*;
 import museum.utils.MultiTimeBar;
+import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -42,6 +43,7 @@ public class PlayerDataManager implements Listener {
 	private final App app;
 	private final Map<UUID, User> userMap = Maps.newHashMap();
 	private final MultiTimeBar timeBar;
+	@Setter
 	private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
 	private final List<Prepare> prepares;
 
@@ -113,12 +115,10 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler
 	public void onSpawn(PlayerSpawnLocationEvent e) {
-		e.setSpawnLocation(app.getUser(e.getPlayer()).getLastLocation());
-	}
-
-	@EventHandler
-	public void onSpawn(PlayerInitialSpawnEvent e) {
-		e.setSpawnLocation(app.getUser(e.getPlayer()).getLastLocation());
+		val user = app.getUser(e.getPlayer());
+		if (user == null)
+			return;
+		e.setSpawnLocation(user.getLastLocation());
 	}
 
 	@EventHandler
@@ -134,7 +134,15 @@ public class PlayerDataManager implements Listener {
 		user.setPlayer(player);
 
 		player.addPotionEffect(NIGHT_VISION);
-		Bukkit.getOnlinePlayers().forEach(current -> player.hidePlayer(app, current)); // Скрытие игроков
+
+		// Отправка таба
+		val show = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, user.getPlayer().getHandle());
+		Bukkit.getOnlinePlayers().forEach(current -> {
+			player.hidePlayer(app, current.getPlayer());
+			user.getConnection().sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, ((CraftPlayer) current).getHandle()));
+			current.hidePlayer(app, player);
+			((CraftPlayer) current).getHandle().playerConnection.sendPacket(show);
+		}); // Скрытие игроков
 		player.setGameMode(GameMode.ADVENTURE);
 		user.setState(user.getState()); // Загрузка музея
 
@@ -149,16 +157,30 @@ public class PlayerDataManager implements Listener {
 			userMap.remove(event.getPlayer().getUniqueId());
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerQuit(PlayerQuitEvent event) {
+		val removePlayer = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, ((CraftPlayer) event.getPlayer()).getHandle());
+		for (Player player : Bukkit.getOnlinePlayers())
+			((CraftPlayer) player).getHandle().playerConnection.sendPacket(removePlayer);
 		timeBar.onQuit(event.getPlayer().getUniqueId());
 		event.setQuitMessage(null);
 	}
 
-	public double calcMultiplier(UUID user, BoosterType type) {
-		// todo: useless method
-		return userMap.get(user).calcMultiplier(type) + globalBoosters.stream().filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis()).mapToDouble(
-				booster -> booster.getMultiplier() - 1.0).sum();
+	public double calcMultiplier(UUID uuid, BoosterType type) {
+		val user = userMap.get(uuid);
+		if (user == null)
+			return 1;
+		return user.calcMultiplier(type) + globalBoosters.stream()
+				.filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis())
+				.mapToDouble(booster -> booster.getMultiplier() - 1.0)
+				.sum();
+	}
+
+	public double calcGlobalMultiplier(BoosterType type) {
+		return 1F + globalBoosters.stream()
+				.filter(booster -> booster.getType() == type && booster.getUntil() > System.currentTimeMillis())
+				.mapToDouble(booster -> booster.getMultiplier() - 1.0)
+				.sum();
 	}
 
 	public User getUser(UUID uuid) {
@@ -184,10 +206,6 @@ public class PlayerDataManager implements Listener {
 		if (user != null) {
 			if (pckg.getSum() != null)
 				user.setMoney(user.getMoney() + pckg.getSum());
-			if (pckg.getSeconds() != null) {
-				double result = pckg.getSeconds() * user.getMuseums().stream().mapToDouble(Museum::getIncome).sum(); // Типа того
-				user.setMoney(user.getMoney() + result);
-			}
 		}
 	}
 }

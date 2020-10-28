@@ -59,6 +59,9 @@ public final class VirtualSign {
         }
         connection.sendPacket(new PacketPlayOutOpenSignEditor(position));
         Channel channel = connection.networkManager.channel;
+        try {
+            channel.pipeline().remove("sign_handler");
+        } catch (Exception ignored) { }
         channel.pipeline().addAfter("decoder", "sign_handler", new MessageToMessageDecoder<Packet<?>>() {
             @Override
             @SuppressWarnings("deprecation")
@@ -86,5 +89,4 @@ public final class VirtualSign {
         });
         channel.flush();
     }
-
 }

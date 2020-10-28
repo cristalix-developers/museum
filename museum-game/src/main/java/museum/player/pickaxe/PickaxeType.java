@@ -12,8 +12,9 @@ import lombok.Getter;
 public enum PickaxeType {
 
 	DEFAULT(new DefaultPickaxe(), 1),
-	PROFESSIONAL(new ProfessionalPickaxe(), 3),
-	PRESTIGE(new PrestigePickaxe(), 5);
+	PROFESSIONAL(new ProfessionalPickaxe(), 1),
+	PRESTIGE(new PrestigePickaxe(), 1),
+	LEGENDARY(new PrestigePickaxe(), 2);
 
 	private final Pickaxe pickaxe;
 	private final int experience;

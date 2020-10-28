@@ -8,6 +8,7 @@ import groovy.lang.Script;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
@@ -37,8 +38,6 @@ import org.codehaus.groovy.runtime.m12n.RuntimeExtensionModules;
 import org.codehaus.groovy.runtime.m12n.SimpleExtensionModule;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
-import ru.cristalix.core.inventory.IInventoryService;
-import ru.cristalix.core.inventory.InventoryService;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.realm.RealmStatus;
@@ -53,27 +52,23 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+@Getter
 public final class App extends JavaPlugin {
 	@Getter
 	private static App app;
 
 	private PlayerDataManager playerDataManager;
-	@Getter
 	private TopManager topManager;
-	@Getter
 	private ClientSocket clientSocket;
-	@Getter
 	@Setter
 	private WorldMeta map;
 	private YamlConfiguration configuration;
 
-	@Getter
 	private Shop shop;
 
 	@Override
 	public void onEnable() {
 		B.plugin = App.app = this;
-
 		// Загрузка мира
 		MapLoader.load(this);
 
@@ -86,7 +81,7 @@ public final class App extends JavaPlugin {
 		clepto.bukkit.menu.Guis.init();
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 		this.clientSocket = new ClientSocket(
-				"127.0.0.1",
+				"148.251.1.9",
 				14653,
 				"gVatjN43AJnbFq36Fa",
 				IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName()
@@ -109,7 +104,6 @@ public final class App extends JavaPlugin {
 		CoreApi.get().unregisterService(IChatService.class);
 		CoreApi.get().registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
 		CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
-		CoreApi.get().registerService(IInventoryService.class, new InventoryService());
 
 		// Регистрация обработчика пакета конфига
 		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
@@ -147,6 +141,9 @@ public final class App extends JavaPlugin {
 		// Прогрузка мэнеджера топа
 		topManager = new TopManager(this);
 
+		// Получение бустеров
+		requestBoosters();
+
 		// Инициализация команд
 		new MuseumCommands(this);
 		this.shop = new Shop(this);
@@ -166,9 +163,10 @@ public final class App extends JavaPlugin {
 				topManager
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
-		VisitorHandler.init(this, 1);
+		VisitorHandler.init(this, () -> (int) Math.ceil(3F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
 
 		// Вывод сервера в тесты
+		IRealmService.get().getCurrentRealmInfo().setLobbyServer(true);
 		IRealmService.get().getCurrentRealmInfo().setStatus(RealmStatus.WAITING_FOR_PLAYERS);
 		IRealmService.get().getCurrentRealmInfo().setReadableName("Музей археологии - ALPHA");
 		IRealmService.get().getCurrentRealmInfo().setDescription(new String[]{
@@ -246,6 +244,24 @@ public final class App extends JavaPlugin {
 				.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
 
 		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
+	}
+
+	private void requestBoosters() {
+		try {
+			RequestGlobalBoostersPackage pckg = clientSocket.writeAndAwaitResponse(new RequestGlobalBoostersPackage())
+					.get(3L, TimeUnit.SECONDS);
+			playerDataManager.setGlobalBoosters(pckg.getBoosters());
+		} catch (Exception exception) {
+			exception.printStackTrace();
+			Bukkit.getLogger().severe("We can't get boosters! Retry in 3sec");
+			try {
+				Thread.sleep(3000L);
+			} catch (InterruptedException interruptedException) {
+				interruptedException.printStackTrace();
+				Thread.currentThread().interrupt();
+			}
+			requestBoosters();
+		}
 	}
 
 	private void readScript(Class<?> scriptClass) {

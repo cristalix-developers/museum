@@ -16,6 +16,7 @@ import ru.cristalix.core.util.UtilV3;
 public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 
 	private Allocation allocation;
+	private SubjectPrototype.SubjectDataForClient dataForClient;
 
 	public Subject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
@@ -28,6 +29,16 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 	public void setAllocation(Allocation allocation) {
 		this.allocation = allocation;
 		this.updateInfo();
+		if (allocation != null) {
+			dataForClient = new SubjectPrototype.SubjectDataForClient(
+					prototype.getAddress(),
+					prototype.getTitle(),
+					allocation.getMin(),
+					allocation.getMax(),
+					prototype.getPrice(),
+					cachedInfo.uuid
+			);
+		}
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectPrototype;
+import museum.museum.map.SubjectType;
 import museum.museum.subject.Allocation;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Skeleton;
@@ -18,7 +19,6 @@ import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import museum.util.VirtualSign;
-import museum.visitor.VisitorHandler;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -28,7 +28,6 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class MuseumCommands {
 
@@ -51,17 +50,13 @@ public class MuseumCommands {
 		B.regCommand(this::cmdRunTop, "runtop", "rt");
 		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
-		B.regCommand((sender, args) -> VisitorHandler.getVisitorUuids().values().stream()
-				.distinct().findFirst().get().getCurrentRoute()
-				.stream().map(String::valueOf)
-				.collect(Collectors.joining("\n")), "routes");
 		B.regCommand(this::cmdBuy, "buy");
 	}
 
 	private String cmdRunTop(Player player, String[] args) {
 		if (player.isOp()) {
-			app.getTopManager().updateData();
-			app.getTopManager().sendTops();
+			// Топы сами обновятся, потому что якобы "не обновлялись"
+			app.getUser(player).setLastTopUpdateTime(-1);
 		}
 		return null;
 	}
@@ -78,14 +73,24 @@ public class MuseumCommands {
 		}
 		if (prototype == null)
 			return null;
-
 		val user = app.getUser(sender);
+		// Если в инвентаре нету места
+		long count = 0L;
+		for (Subject subject : user.getSubjects()) {
+			if (!subject.isAllocated() && subject.getPrototype().getType() != SubjectType.MARKER) {
+				count++;
+			}
+		}
+		if (count > 32) {
+			return MessageUtil.get("no-free-space");
+		}
 
 		if (user.getMoney() < prototype.getPrice())
 			return NO_MONEY_MESSAGE;
 
 		user.setMoney(user.getMoney() - prototype.getPrice());
-		user.getSubjects().add(new Subject(prototype, new SubjectInfo(
+		// new Subject() писать нельзя - так как нужный класс (CollectorSubject...) не уточнет, и все сломается
+		user.getSubjects().add(prototype.provide(new SubjectInfo(
 				UUID.randomUUID(),
 				prototype.getAddress()
 		), user));
@@ -96,7 +101,7 @@ public class MuseumCommands {
 	private String cmdVisit(Player sender, String[] args) {
 		val user = app.getUser(sender);
 
-		if (args.length == 0)
+		if (args.length <= 1)
 			return "§cИспользование: §f/museum visit [Игрок] [Музей]";
 
 		val ownerPlayer = Bukkit.getPlayer(args[1]);
@@ -112,8 +117,9 @@ public class MuseumCommands {
 		if (museum == null)
 			return MessageUtil.find("museum-not-found").set("type", address).getText();
 
-		if (user.getLastMuseum().equals(museum))
-			return MessageUtil.get("already-at-home");
+		if (user.getLastMuseum() != null)
+			if (user.getLastMuseum().equals(museum))
+				return MessageUtil.get("already-at-home");
 
 		user.setState(museum);
 
@@ -159,6 +165,8 @@ public class MuseumCommands {
 
 	private String cmdHome(Player sender, String[] args) {
 		val user = this.app.getUser(sender);
+		if (user.getState() == null)
+			return null;
 		if (user.getState() instanceof Museum && ((Museum) user.getState()).getOwner().equals(user))
 			return MessageUtil.get("already-at-home");
 		user.setState(user.getLastMuseum() == null ?
@@ -169,6 +177,8 @@ public class MuseumCommands {
 	}
 
 	private String cmdSkeleton(Player sender, String[] args) {
+		if (!sender.isOp())
+			return null;
 		Collection<Skeleton> skeletons = this.app.getUser(sender).getSkeletons();
 		skeletons.forEach(skeleton ->
 				sender.sendMessage("§e" + skeleton.getPrototype().getAddress() + "§f: " + skeleton.getUnlockedFragments().size()));
@@ -176,6 +186,8 @@ public class MuseumCommands {
 	}
 
 	private String cmdSubjects(Player sender, String[] args) {
+		if (!sender.isOp())
+			return null;
 		Collection<Subject> subjects = this.app.getUser(sender).getSubjects();
 		for (Subject subject : subjects) {
 			String allocationInfo = "§cno allocation";
@@ -191,11 +203,14 @@ public class MuseumCommands {
 
 	private String cmdGui(Player sender, String[] args) {
 		this.app.getUser(sender);
-		if (args.length == 0) return "§cИспользование: §e/gui [адрес]";
+		if (args.length == 0)
+			return "§cИспользование: §e/gui [адрес]";
 		try {
+			if (sender.getPlayer() == null)
+				return null;
 			clepto.bukkit.menu.Guis.open(sender, args[0], args.length > 1 ? args[1] : null);
 		} catch (NoSuchElementException ex) {
-			return "§cГуи с адресом §e" + args[0] + "§c не найден.";
+			return MessageUtil.find("no-gui").set("gui", args[0]).getText();
 		}
 		return null;
 	}
@@ -203,11 +218,14 @@ public class MuseumCommands {
 	private String cmdShop(Player sender, String[] args) {
 		User user = app.getUser(sender);
 
+		if (user.getPlayer() == null)
+			return null;
+
 		if (user.getExperience() < PreparePlayerBrain.EXPERIENCE)
 			return null;
 
 		if (user.getState() instanceof Excavation)
-			return "§cВы на раскопках, сперва вернитесь домой";
+			return MessageUtil.get("museum-first");
 		user.setState(app.getShop());
 		return null;
 	}
@@ -221,10 +239,12 @@ public class MuseumCommands {
 		new VirtualSign().openSign(sender, lines -> {
 			for (String line : lines) {
 				if (line != null && !line.isEmpty()) {
-					((Museum) user.getState()).setTitle(line);
-					MessageUtil.find("museumtitlechange")
-							.set("title", line)
-							.send(user);
+					if (user.getState() instanceof Museum) {
+						((Museum) user.getState()).setTitle(line);
+						MessageUtil.find("museumtitlechange")
+								.set("title", line)
+								.send(user);
+					}
 				}
 			}
 		});
@@ -262,21 +282,29 @@ public class MuseumCommands {
 		User user = this.app.getUser(player);
 		if (args.length == 0)
 			return "/excavation <место>";
-		ExcavationPrototype proto = Managers.excavation.getPrototype(args[0]);
-		if (proto == null)
-			return "Такого места для раскопок нет";
+		ExcavationPrototype prototype;
+		try {
+			prototype = Managers.excavation.getPrototype(args[0]);
+		} catch (Exception ignore) {
+			return null;
+		}
+		if (prototype == null)
+			return null;
+		if (user.getLevel() < PreparePlayerBrain.EXPERIENCE)
+			return null;
+		if (user.getLevel() < prototype.getRequiredLevel())
+			return null;
 
-		if (user.getExperience() < PreparePlayerBrain.EXPERIENCE)
-			return "Опыта мало";
+		if (user.getGrabbedArmorstand() != null)
+			return MessageUtil.get("stall-first");
 
 		player.closeInventory();
 
-		if (proto.getPrice() > user.getMoney())
+		if (prototype.getPrice() > user.getMoney())
 			return NO_MONEY_MESSAGE;
 
-		user.setMoney(user.getMoney() - proto.getPrice());
-
-		user.setState(new Excavation(proto, proto.getHitCount()));
+		user.setMoney(user.getMoney() - prototype.getPrice());
+		user.setState(new Excavation(prototype, prototype.getHitCount()));
 
 		return null;
 	}
@@ -284,15 +312,15 @@ public class MuseumCommands {
 	private String cmdPickaxe(Player player, String[] args) {
 		User user = this.app.getUser(player);
 		PickaxeType pickaxe = user.getPickaxeType().getNext();
-		if (pickaxe == user.getPickaxeType())
+		if (pickaxe == user.getPickaxeType() || pickaxe == null)
 			return null;
 		player.closeInventory();
 
 		if (user.getMoney() < pickaxe.getPrice())
 			return NO_MONEY_MESSAGE;
 
-		user.setPickaxeType(pickaxe);
 		user.setMoney(user.getMoney() - pickaxe.getPrice());
+		user.setPickaxeType(pickaxe);
 		player.performCommand("gui pickaxe");
 		return MessageUtil.get("newpickaxe");
 	}
