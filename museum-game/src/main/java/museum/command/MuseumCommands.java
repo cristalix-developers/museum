@@ -19,7 +19,6 @@ import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import museum.util.VirtualSign;
-import museum.visitor.VisitorHandler;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -29,7 +28,6 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class MuseumCommands {
 
@@ -52,17 +50,13 @@ public class MuseumCommands {
 		B.regCommand(this::cmdRunTop, "runtop", "rt");
 		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
-		B.regCommand((sender, args) -> VisitorHandler.getVisitorUuids().values().stream()
-				.distinct().findFirst().get().getCurrentRoute()
-				.stream().map(String::valueOf)
-				.collect(Collectors.joining("\n")), "routes");
 		B.regCommand(this::cmdBuy, "buy");
 	}
 
 	private String cmdRunTop(Player player, String[] args) {
 		if (player.isOp()) {
-			app.getTopManager().updateData();
-			app.getTopManager().sendTops();
+			// Топы сами обновятся, потому что якобы "не обновлялись"
+			app.getUser(player).setLastTopUpdateTime(-1);
 		}
 		return null;
 	}
@@ -171,6 +165,8 @@ public class MuseumCommands {
 
 	private String cmdHome(Player sender, String[] args) {
 		val user = this.app.getUser(sender);
+		if (user.getState() == null)
+			return null;
 		if (user.getState() instanceof Museum && ((Museum) user.getState()).getOwner().equals(user))
 			return MessageUtil.get("already-at-home");
 		user.setState(user.getLastMuseum() == null ?
@@ -221,6 +217,9 @@ public class MuseumCommands {
 
 	private String cmdShop(Player sender, String[] args) {
 		User user = app.getUser(sender);
+
+		if (user.getPlayer() == null)
+			return null;
 
 		if (user.getExperience() < PreparePlayerBrain.EXPERIENCE)
 			return null;
@@ -283,10 +282,17 @@ public class MuseumCommands {
 		User user = this.app.getUser(player);
 		if (args.length == 0)
 			return "/excavation <место>";
-		ExcavationPrototype proto = Managers.excavation.getPrototype(args[0]);
-		if (proto == null)
+		ExcavationPrototype prototype;
+		try {
+			prototype = Managers.excavation.getPrototype(args[0]);
+		} catch (Exception ignore) {
 			return null;
-		if (user.getExperience() < PreparePlayerBrain.EXPERIENCE)
+		}
+		if (prototype == null)
+			return null;
+		if (user.getLevel() < PreparePlayerBrain.EXPERIENCE)
+			return null;
+		if (user.getLevel() < prototype.getRequiredLevel())
 			return null;
 
 		if (user.getGrabbedArmorstand() != null)
@@ -294,12 +300,11 @@ public class MuseumCommands {
 
 		player.closeInventory();
 
-		if (proto.getPrice() > user.getMoney())
+		if (prototype.getPrice() > user.getMoney())
 			return NO_MONEY_MESSAGE;
 
-		user.setMoney(user.getMoney() - proto.getPrice());
-
-		user.setState(new Excavation(proto, proto.getHitCount()));
+		user.setMoney(user.getMoney() - prototype.getPrice());
+		user.setState(new Excavation(prototype, prototype.getHitCount()));
 
 		return null;
 	}

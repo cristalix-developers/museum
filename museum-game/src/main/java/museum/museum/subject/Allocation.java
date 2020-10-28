@@ -161,6 +161,9 @@ public class Allocation {
 				else atom.getShowPackets(packets, position);
 			});
 			for (User user : state.getUsers()) {
+				// Если элемент слишком далеко не отправлять
+				if (user.getPlayer() == null || user.getLocation().distanceSquared(origin.toLocation(user.getWorld())) > 2000)
+					continue;
 				packets.forEach(user::sendPacket);
 			}
 		}
@@ -177,7 +180,9 @@ public class Allocation {
 			ids[i++] = atomPiece.getStand().id;
 		}
 		PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(ids);
-		for (User user : state.getUsers()) user.sendPacket(packet);
+		for (User user : state.getUsers())
+			if (user.getPlayer() != null)
+				user.sendPacket(packet);
 	}
 
 	public void perform(User user, Action... actions) {

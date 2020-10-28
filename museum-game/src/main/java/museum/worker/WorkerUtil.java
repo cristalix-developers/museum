@@ -53,7 +53,7 @@ public class WorkerUtil {
 				for (NpcWorker worker : workers)
 					worker.update(user, playerLoc);
 			}
-		}, 1, 1);
+		}, 20, 6);
 	}
 
 	public void acceptClick(User user, int id) {

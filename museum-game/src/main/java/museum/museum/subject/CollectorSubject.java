@@ -60,7 +60,6 @@ public class CollectorSubject extends Subject implements Incomeble {
 		if (navigator == null || !isAllocated())
 			return;
 		Location location = getLocation(iteration);
-
 		if (getAllocation().getState() instanceof Museum)
 			((Museum) getAllocation().getState()).getCoins()
 					.removeIf(coin -> coin.pickUp(owner, location, radius, piece.getStand().id));
@@ -78,9 +77,9 @@ public class CollectorSubject extends Subject implements Incomeble {
 
 	@Override
 	public void handle(double... args) {
-		if (args[0] % (250 * 20L) != 0)
+		if (args[0] % (60 * 20L) != 0)
 			return;
-		val income = (Math.random() * prototype.getPrice() / 300) + 20;
+		val income = (Math.random() * prototype.getPrice() / 2000) + 20;
 		MessageUtil.find("collector-income")
 				.set("income", MessageUtil.toMoneyFormat(income))
 				.send(owner);

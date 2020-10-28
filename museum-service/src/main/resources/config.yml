@@ -3,7 +3,7 @@ serviceRealm: MUSS-1
 chat:
   messages:
     stall-first: 'errorСперва отнесите груз в лавку. 㲓'
-    museum-fisrt: 'errorВы на раскопках, сперва вернитесь в музей. 㦼'
+    museum-first: 'errorВы на раскопках, сперва вернитесь в музей. 㦼'
     no-gui: 'errorМеню с адресом §b%GUI%§f не найден. 㫺'
     no-free-space: 'errorУ вас забит инвентарь, освободите его удалив не нужные постройки с /§cremove §f㦼'
     congr-send: 'fineПоздравление было отправлено. 㜗'

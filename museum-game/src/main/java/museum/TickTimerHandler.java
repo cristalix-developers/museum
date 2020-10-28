@@ -49,8 +49,7 @@ public class TickTimerHandler extends BukkitRunnable {
 			for (Museum museum : user.getMuseums()) {
 				process(museum, user, currentTime);
 			}
-
-			if (counter % 100 != 0)
+			if (counter % 160 != 0)
 				continue;
 			val tab = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, user.getPlayer().getHandle());
 			for (Player target : Bukkit.getOnlinePlayers()) {
@@ -81,7 +80,7 @@ public class TickTimerHandler extends BukkitRunnable {
 				((CollectorSubject) subject).move(currentTime);
 			else if (counter % 5 == 0 && subject instanceof FountainSubject)
 				((FountainSubject) subject).throwWater();
-			else if (subject instanceof StallSubject)
+			else if (counter % 5 == 0 && subject instanceof StallSubject)
 				((StallSubject) subject).rotateCustomerHead();
 			// Если постройка может приносить доход, попробовать
 			if (subject instanceof Incomeble) // else добавлять не нужно

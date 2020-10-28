@@ -4,18 +4,10 @@ package museum.config.listener
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.FallingBlock
-import org.bukkit.event.block.Action
-import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.block.BlockBurnEvent
-import org.bukkit.event.block.BlockFromToEvent
-import org.bukkit.event.block.BlockPhysicsEvent
+import org.bukkit.event.block.*
 import org.bukkit.event.entity.*
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent
-import org.bukkit.event.player.PlayerDropItemEvent
-import org.bukkit.event.player.PlayerInteractEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerSwapHandItemsEvent
+import org.bukkit.event.player.*
 import org.spigotmc.event.entity.EntityDismountEvent
 
 on PlayerInteractEntityEvent, {
@@ -53,7 +45,19 @@ on FoodLevelChangeEvent, {
     setFoodLevel 20
 }
 
+on BlockFadeEvent, {
+    setCancelled true
+}
+
 on BlockPhysicsEvent, {
+    setCancelled true
+}
+
+on BlockSpreadEvent, {
+    setCancelled true
+}
+
+on BlockGrowEvent, {
     setCancelled true
 }
 

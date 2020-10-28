@@ -38,8 +38,6 @@ import org.codehaus.groovy.runtime.m12n.RuntimeExtensionModules;
 import org.codehaus.groovy.runtime.m12n.SimpleExtensionModule;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
-import ru.cristalix.core.inventory.IInventoryService;
-import ru.cristalix.core.inventory.InventoryService;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.realm.RealmStatus;
@@ -165,7 +163,7 @@ public final class App extends JavaPlugin {
 				topManager
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
-		VisitorHandler.init(this, () -> (int) Math.ceil(5F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
+		VisitorHandler.init(this, () -> (int) Math.ceil(3F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
 
 		// Вывод сервера в тесты
 		IRealmService.get().getCurrentRealmInfo().setLobbyServer(true);

@@ -16,6 +16,7 @@ import static org.bukkit.Material.*
 
 def formatter = TimeFormatter.builder() accuracy 500 build()
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
+def levelFormatter = new DecimalFormat('###,###,###,###,###,###.##')
 
 Guis.register 'main', { player ->
     def user = App.app.getUser((Player) player)
@@ -37,7 +38,7 @@ Guis.register 'main', { player ->
         Опыт: $user.experience
         Опыта осталось: ${LevelSystem.formatExperience(user.experience)}
         Часов сыграно: ${user.timePlayed / 3_600_000}
-        Монет собрано: $user.pickedCoinsCount
+        Монет собрано: ${moneyFormatter.format(user.pickedCoinsCount)} 
         Кирка: $user.pickaxeType.name
         Раскопок: $user.excavationCount
         Фрагментов: ${user.skeletons.stream().mapToInt(s -> s.unlockedFragments.size()).sum()}

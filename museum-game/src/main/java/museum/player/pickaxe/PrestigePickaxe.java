@@ -3,9 +3,8 @@ package museum.player.pickaxe;
 import museum.player.User;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author func 24.05.2020
@@ -15,9 +14,19 @@ public class PrestigePickaxe implements Pickaxe {
 
 	@Override
 	public List<BlockPosition> dig(User user, BlockPosition pos) {
-		return Stream.of(pos.east().east(), pos.west().west(), pos.south().south(), pos.north().north())
-				.filter(p -> breakBlock(user, p))
-				.collect(Collectors.toList());
+		List<BlockPosition> list = new ArrayList<>();
+		BlockPosition[] positions = {
+				pos.east().east(),
+				pos.west().west(),
+				pos.south().south(),
+				pos.north().north()
+		};
+		for (BlockPosition blockPosition : positions) {
+			if (breakBlock(user, blockPosition)) {
+				list.add(blockPosition);
+			}
+		}
+		return list;
 	}
 
 }

@@ -22,9 +22,9 @@ register 'visitor', { player ->
 
     button MuseumGuis.background
     app.users.each {
-        if (it.getPlayer() == null)
+        if (!it.getPlayer())
             return
-        if (visitor.state == null)
+        if (!visitor.state)
             return
         if (it == visitor)
             return

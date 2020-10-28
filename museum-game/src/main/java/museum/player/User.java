@@ -49,6 +49,7 @@ public class User implements PlayerWrapper {
 	private LocalArmorStand grabbedArmorstand;
 	private EntityArmorStand riding;
 	private long enterTime;
+	private long lastTopUpdateTime = -1;
 
 	public User(UserInfo info) {
 		this.enterTime = System.currentTimeMillis();

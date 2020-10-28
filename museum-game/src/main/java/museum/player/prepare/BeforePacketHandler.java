@@ -123,7 +123,7 @@ public class BeforePacketHandler implements Prepare {
 
 	private void openManipulator(User user, Museum museum, PacketPlayInUseItem packet, Subject subject) {
 		packet.a = DUMMY; // Genius
-		MinecraftServer.SERVER.postToMainThread(() -> {
+		B.run(() -> {
 			if (user != museum.getOwner())
 				MessageUtil.find("non-root").send(user);
 			else
@@ -165,15 +165,14 @@ public class BeforePacketHandler implements Prepare {
 
 	private boolean tryReturnPlayer(User user, boolean force) {
 		Excavation excavation = ((Excavation) user.getState());
+		excavation.setHitsLeft(excavation.getHitsLeft() - 1);
 
-		if (excavation.getHitsLeft() == -1)
+		if (excavation.getHitsLeft() < 0)
 			return true;
 
-		excavation.setHitsLeft(excavation.getHitsLeft() - 1);
-		if (excavation.getHitsLeft() == 0 || force) {
+		if (excavation.getHitsLeft() < 1 || force) {
 			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 5 сек.");
 			MessageUtil.find("excavationend").send(user);
-			excavation.setHitsLeft(-1);
 			B.postpone(100, () -> {
 				user.setState(user.getLastMuseum() == null ?
 						user.getMuseums().get(Managers.museum.getPrototype("main")) :
@@ -181,7 +180,8 @@ public class BeforePacketHandler implements Prepare {
 				);
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			});
-			return true;
+			excavation.setHitsLeft(-1);
+			return false;
 		}
 		return excavation.getHitsLeft() < 0;
 	}
@@ -192,7 +192,7 @@ public class BeforePacketHandler implements Prepare {
 			if (user.getPlayer() == null)
 				return;
 			// С некоторым шансом может выпасть интерактивая вещь
-			if (Vector.random.nextFloat() > .995)
+			if (Vector.random.nextFloat() > .991)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 			// Перебрать все кирки и эффекты на них
 			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
@@ -227,7 +227,7 @@ public class BeforePacketHandler implements Prepare {
 			Skeleton skeleton = user.getSkeletons().supply(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
-				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0) / 22;
+				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0) / 30;
 
 				String value = String.format("%.2f$", prize);
 
@@ -239,7 +239,6 @@ public class BeforePacketHandler implements Prepare {
 				user.getPlayer().sendTitle("§6Находка!", "§e+" + value);
 
 				user.depositMoneyWithBooster(prize);
-
 			} else {
 				MessageUtil.find("findfragment")
 						.set("name", fragment.getAddress())

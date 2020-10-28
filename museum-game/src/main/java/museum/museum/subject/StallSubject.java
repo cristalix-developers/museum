@@ -71,7 +71,7 @@ public class StallSubject extends Subject implements Incomeble {
 	public void handle(double... args) {
 		if (!isAllocated())
 			return;
-		if (args[0] % (120 * 20L) != 0)
+		if (args[0] % (150 * 20L) != 0)
 			return;
 		Set<FoodProduct> potentialFood = food.keySet();
 		if (potentialFood.isEmpty()) {
@@ -94,6 +94,8 @@ public class StallSubject extends Subject implements Incomeble {
 	}
 
 	public void rotateCustomerHead() {
+		if (owner.getPlayer() == null)
+			return;
 		worker.update(owner, V4.fromLocation(owner.getLocation()));
 	}
 }

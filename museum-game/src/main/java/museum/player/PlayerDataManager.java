@@ -1,7 +1,6 @@
 package museum.player;
 
 import clepto.bukkit.B;
-import com.destroystokyo.paper.event.player.PlayerInitialSpawnEvent;
 import com.google.common.collect.Maps;
 import lombok.Setter;
 import lombok.val;
@@ -116,7 +115,10 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler
 	public void onSpawn(PlayerSpawnLocationEvent e) {
-		e.setSpawnLocation(app.getUser(e.getPlayer()).getLastLocation());
+		val user = app.getUser(e.getPlayer());
+		if (user == null)
+			return;
+		e.setSpawnLocation(user.getLastLocation());
 	}
 
 	@EventHandler
@@ -133,6 +135,7 @@ public class PlayerDataManager implements Listener {
 
 		player.addPotionEffect(NIGHT_VISION);
 
+		// Отправка таба
 		val show = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, user.getPlayer().getHandle());
 		Bukkit.getOnlinePlayers().forEach(current -> {
 			player.hidePlayer(app, current.getPlayer());
@@ -156,10 +159,9 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerQuit(PlayerQuitEvent event) {
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			((CraftPlayer) player).getHandle().playerConnection
-					.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, ((CraftPlayer) event.getPlayer()).getHandle()));
-		}
+		val removePlayer = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, ((CraftPlayer) event.getPlayer()).getHandle());
+		for (Player player : Bukkit.getOnlinePlayers())
+			((CraftPlayer) player).getHandle().playerConnection.sendPacket(removePlayer);
 		timeBar.onQuit(event.getPlayer().getUniqueId());
 		event.setQuitMessage(null);
 	}
