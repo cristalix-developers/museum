@@ -10,9 +10,7 @@ import museum.packages.MuseumMetricsPackage;
 import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.ticker.Ticked;
-import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.cristalix.core.realm.IRealmService;
@@ -53,17 +51,6 @@ public class TickTimerHandler extends BukkitRunnable {
 				continue;
 			for (Museum museum : user.getMuseums()) {
 				process(museum, user, currentTime);
-			}
-			if (counter % 300 != 0)
-				continue;
-			for (Player target : Bukkit.getOnlinePlayers()) {
-				if (target == player)
-					continue;
-				player.hidePlayer(app, target);
-				user.sendPacket(new PacketPlayOutPlayerInfo(
-						PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER,
-						((CraftPlayer) target).getHandle()
-				));
 			}
 		}
 	}

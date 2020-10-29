@@ -135,18 +135,23 @@ public class PlayerDataManager implements Listener {
 
 		player.addPotionEffect(NIGHT_VISION);
 
-		// Отправка таба
-		val show = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, user.getPlayer().getHandle());
-		Bukkit.getOnlinePlayers().forEach(current -> {
-			player.hidePlayer(app, current.getPlayer());
-			user.getConnection().sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, ((CraftPlayer) current).getHandle()));
-			current.hidePlayer(app, player);
-			((CraftPlayer) current).getHandle().playerConnection.sendPacket(show);
-		}); // Скрытие игроков
 		player.setGameMode(GameMode.ADVENTURE);
 		user.setState(user.getState()); // Загрузка музея
 
-		B.postpone(1, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
+		B.postpone(1, () -> {
+			// Отправка таба
+			val show = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, user.getPlayer().getHandle());
+			// Скрытие игроков
+			for (Player current : Bukkit.getOnlinePlayers()) {
+				if (current == null)
+					continue;
+				player.hidePlayer(app, current.getPlayer());
+				user.getConnection().sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, ((CraftPlayer) current).getHandle()));
+				current.hidePlayer(app, player);
+				((CraftPlayer) current).getHandle().playerConnection.sendPacket(show);
+			}
+			prepares.forEach(prepare -> prepare.execute(user, app));
+		});
 
 		event.setJoinMessage(null);
 	}
