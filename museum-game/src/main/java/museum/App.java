@@ -38,6 +38,9 @@ import org.codehaus.groovy.runtime.m12n.RuntimeExtensionModules;
 import org.codehaus.groovy.runtime.m12n.SimpleExtensionModule;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
+import ru.cristalix.core.command.ICommandService;
+import ru.cristalix.core.coupons.BukkitCouponsService;
+import ru.cristalix.core.coupons.ICouponsService;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.realm.RealmStatus;
@@ -101,9 +104,11 @@ public final class App extends JavaPlugin {
 		});
 
 		// Регистрация Core сервисов
-		CoreApi.get().unregisterService(IChatService.class);
-		CoreApi.get().registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
-		CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
+		val core = CoreApi.get();
+		core.unregisterService(IChatService.class);
+		core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
+		core.registerService(IScoreboardService.class, new ScoreboardService());
+		core.registerService(ICouponsService.class, new BukkitCouponsService(core.getSocketClient(), ICommandService.get()));
 
 		// Регистрация обработчика пакета конфига
 		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
@@ -164,7 +169,7 @@ public final class App extends JavaPlugin {
 				topManager
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
-		VisitorHandler.init(this, () -> (int) Math.ceil(5F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
+		VisitorHandler.init(this, () -> (int) Math.ceil(3F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
 
 		// Вывод сервера меню
 		val realm = IRealmService.get().getCurrentRealmInfo();

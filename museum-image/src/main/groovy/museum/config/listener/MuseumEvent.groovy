@@ -21,7 +21,7 @@ on InventoryOpenEvent, {
 }
 
 on AsyncPlayerChatEvent, {
-    if (message.contains("invite") || message.contains("museum invite") || message.contains("посетите мой")) {
+    if (message.contains("visit") || message.contains("museum visit") || message.contains("посетите мой")) {
         player.sendMessage MessageUtil.get("no-spam")
         setCancelled true
     }
