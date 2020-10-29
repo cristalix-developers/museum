@@ -21,13 +21,12 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.GlobalSerializers;
+import ru.cristalix.core.coupons.CouponData;
+import ru.cristalix.core.lib.Futures;
 import ru.cristalix.core.microservice.MicroServicePlatform;
 import ru.cristalix.core.microservice.MicroserviceBootstrap;
 import ru.cristalix.core.network.ISocketClient;
-import ru.cristalix.core.network.packages.FillLauncherUserDataPackage;
-import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage;
-import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage;
-import ru.cristalix.core.network.packages.TransferPlayerPackage;
+import ru.cristalix.core.network.packages.*;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.permissions.PermissionService;
 import ru.cristalix.core.realm.RealmInfo;
@@ -131,22 +130,27 @@ public class MuseumService {
 					answer(channel, pckg);
 					return;
 				}
-				processInvoice(pckg.getUser(), pckg.getDonate().getPrice(), pckg.getDonate().getName()).thenAccept(response -> {
-					UserTransactionPackage.TransactionResponse resp = UserTransactionPackage.TransactionResponse.OK;
-					if (response.getErrorMessage() != null) {
-						String err = response.getErrorMessage();
-						if (err.equalsIgnoreCase("Недостаточно средств на счету"))
-							resp = UserTransactionPackage.TransactionResponse.INSUFFICIENT_FUNDS;
-						else {
-							System.out.println(err);
-							resp = UserTransactionPackage.TransactionResponse.INTERNAL_ERROR;
+				findCoupon(pckg.getUser()).thenAccept(data -> {
+					int price = pckg.getDonate().getPrice();
+					if (data != null)
+						price = (int) data.priceWithDiscount(price);
+					processInvoice(pckg.getUser(), price, pckg.getDonate().getName()).thenAccept(response -> {
+						UserTransactionPackage.TransactionResponse resp = UserTransactionPackage.TransactionResponse.OK;
+						if (response.getErrorMessage() != null) {
+							String err = response.getErrorMessage();
+							if (err.equalsIgnoreCase("Недостаточно средств на счету"))
+								resp = UserTransactionPackage.TransactionResponse.INSUFFICIENT_FUNDS;
+							else {
+								System.out.println(err);
+								resp = UserTransactionPackage.TransactionResponse.INTERNAL_ERROR;
+							}
 						}
-					}
-					if (resp == UserTransactionPackage.TransactionResponse.OK) {
-						Optional.ofNullable(TRANSACTION_POST_AUTHORIZE_MAP.get(pckg.getDonate())).ifPresent(consumer -> consumer.accept(pckg, info));
-					}
-					pckg.setResponse(resp);
-					answer(channel, pckg);
+						if (resp == UserTransactionPackage.TransactionResponse.OK) {
+							Optional.ofNullable(TRANSACTION_POST_AUTHORIZE_MAP.get(pckg.getDonate())).ifPresent(consumer -> consumer.accept(pckg, info));
+						}
+						pckg.setResponse(resp);
+						answer(channel, pckg);
+					});
 				});
 			});
 		});
@@ -393,5 +397,17 @@ public class MuseumService {
 			builder.append("sent_bytes{packet=\"").append(key).append("\"} ").append(value.getSentBytes()).append("\n");
 		});
 		return builder.toString();
+	}
+
+	private static CompletableFuture<CouponData> findCoupon(UUID user) {
+		CompletableFuture<CouponData> future = new CompletableFuture<>();
+		Futures.fail(Futures.timeout(
+				ISocketClient.get().<CouponsDataPackage>writeAndAwaitResponse(new CouponsDataPackage(user)).thenAccept(pckg -> future.complete(pckg.getData())),
+				5L, TimeUnit.SECONDS
+		), throwable -> {
+			throwable.printStackTrace();
+			future.complete(null);
+		});
+		return future;
 	}
 }
