@@ -123,9 +123,11 @@ public class MuseumCommands {
 
 		user.setState(museum);
 
-		return MessageUtil.find("museum-teleported")
+		MessageUtil.find("museum-teleported")
 				.set("visitor", user.getName())
-				.getText();
+				.send(ownerUser);
+
+		return null;
 	}
 
 	private String cmdTravel(Player sender, String[] args) {

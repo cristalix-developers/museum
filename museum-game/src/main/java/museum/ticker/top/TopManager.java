@@ -8,9 +8,11 @@ import museum.client_conversation.ClientPacket;
 import museum.packages.TopPackage;
 import museum.player.User;
 import museum.ticker.Ticked;
+import museum.tops.PlayerTopEntry;
 import museum.tops.TopEntry;
 import ru.cristalix.core.GlobalSerializers;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

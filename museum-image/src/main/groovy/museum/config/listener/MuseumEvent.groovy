@@ -9,6 +9,7 @@ import museum.util.MessageUtil
 import org.bukkit.Location
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerMoveEvent
 
 // todo delete this hardcode with requiredLabel
@@ -17,6 +18,13 @@ def wagonLocation = new Location(App.app.getWorld(), 292, 87, -400)
 on InventoryOpenEvent, {
     def type = inventory.type
     cancelled = type == InventoryType.SHULKER_BOX || type == InventoryType.FURNACE
+}
+
+on AsyncPlayerChatEvent, {
+    if (message.contains("invite") || message.contains("museum invite") || message.contains("посетите мой")) {
+        player.sendMessage MessageUtil.get("no-spam")
+        setCancelled true
+    }
 }
 
 on PlayerMoveEvent, {

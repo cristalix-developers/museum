@@ -1,4 +1,6 @@
 dependencies {
+    compile "org.slf4j:slf4j-simple:1.7.30"
+    compile group: 'io.javalin', name: 'javalin', version: '3.11.2'
     implementation project(":museum-commons")
     compileOnly 'org.mongodb:mongodb-driver-async:3.7.1'
     compileOnly files("../external/microservice-1.0.4.jar")

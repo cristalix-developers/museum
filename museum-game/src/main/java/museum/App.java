@@ -81,7 +81,7 @@ public final class App extends JavaPlugin {
 		clepto.bukkit.menu.Guis.init();
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 		this.clientSocket = new ClientSocket(
-				"148.251.1.9",
+				"127.0.0.1",
 				14653,
 				"gVatjN43AJnbFq36Fa",
 				IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName()
@@ -116,6 +116,7 @@ public final class App extends JavaPlugin {
 			public List<Class> getInstanceMethodsExtensionClasses() {
 				return Collections.singletonList(Extensions.class);
 			}
+
 			@Override
 			public List<Class> getStaticMethodsExtensionClasses() {
 				return new ArrayList<>();
@@ -123,7 +124,7 @@ public final class App extends JavaPlugin {
 		});
 
 		// Прогрузка Groovy-скриптов
-		try(val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {
+		try (val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {
 			while (true) {
 				String line = reader.readLine();
 				if (line == null || line.isEmpty()) break;
@@ -163,17 +164,14 @@ public final class App extends JavaPlugin {
 				topManager
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
-		VisitorHandler.init(this, () -> (int) Math.ceil(3F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
+		VisitorHandler.init(this, () -> (int) Math.ceil(5F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
 
-		// Вывод сервера в тесты
-		IRealmService.get().getCurrentRealmInfo().setLobbyServer(true);
-		IRealmService.get().getCurrentRealmInfo().setStatus(RealmStatus.WAITING_FOR_PLAYERS);
-		IRealmService.get().getCurrentRealmInfo().setReadableName("Музей археологии - ALPHA");
-		IRealmService.get().getCurrentRealmInfo().setDescription(new String[]{
-				"",
-				"Находи и демонстрируй кости",
-				"динозавров, стань археологом!"
-		});
+		// Вывод сервера меню
+		val realm = IRealmService.get().getCurrentRealmInfo();
+		realm.setLobbyServer(true);
+		realm.setStatus(RealmStatus.WAITING_FOR_PLAYERS);
+		realm.setGroupName("Музей");
+		IScoreboardService.get().getServerStatusBoard().setDisplayName("§fМузей #§b" + realm.getRealmId().getId());
 	}
 
 	@Override

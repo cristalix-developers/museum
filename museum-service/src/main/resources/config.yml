@@ -2,6 +2,7 @@ serviceRealm: MUSS-1
 
 chat:
   messages:
+    no-spam: 'Ваш музей прекрасен! Люди сами прийдут, ожидайте 䀈'
     stall-first: 'errorСперва отнесите груз в лавку. 㲓'
     museum-first: 'errorВы на раскопках, сперва вернитесь в музей. 㦼'
     no-gui: 'errorМеню с адресом §b%GUI%§f не найден. 㫺'

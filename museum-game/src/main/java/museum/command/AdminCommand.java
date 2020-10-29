@@ -4,6 +4,7 @@ import clepto.bukkit.B;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
+import museum.data.PickaxeType;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.prototype.Managers;
 import org.bukkit.Bukkit;
@@ -19,6 +20,7 @@ public class AdminCommand {
 		registerMoneyCmd(app);
 		registerExpCmd(app);
 		registerDinoCmd(app);
+		registerPickaxeCmd(app);
 	}
 
 	private void registerMoneyCmd(App app) {
@@ -31,8 +33,20 @@ public class AdminCommand {
 			if (player == null)
 				return null;
 			app.getUser(player).setMoney(Double.parseDouble(args[1]));
-			return "§aВаше количество денег изменено.";
+			return "§aКоличество денег изменено.";
 		}, "money");
+	}
+
+	private void registerPickaxeCmd(App app) {
+		B.regCommand((sender, args) -> {
+			if (!sender.isOp())
+				return null;
+			val player = Bukkit.getPlayer(args[0]);
+			if (player == null)
+				return null;
+			app.getUser(player).setPickaxeType(PickaxeType.LEGENDARY);
+			return "§aКирка выдана.";
+		}, "returnpickaxe");
 	}
 
 	private void registerExpCmd(App app) {
