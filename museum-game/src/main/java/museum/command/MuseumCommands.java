@@ -115,7 +115,7 @@ public class MuseumCommands {
 		MuseumPrototype prototype = Managers.museum.getPrototype(address);
 		Museum museum = prototype == null ? null : ownerUser.getMuseums().get(prototype);
 		if (museum == null)
-			return MessageUtil.find("museum-not-found").set("type", address).getText();
+			return MessageUtil.get("museum-not-found");
 
 		if (user.getLastMuseum() != null)
 			if (user.getLastMuseum().equals(museum))

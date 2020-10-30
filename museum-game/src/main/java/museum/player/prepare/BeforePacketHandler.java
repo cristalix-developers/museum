@@ -194,7 +194,7 @@ public class BeforePacketHandler implements Prepare {
 			if (user.getPlayer() == null)
 				return;
 			// С некоторым шансом может выпасть интерактивая вещь
-			if (Vector.random.nextFloat() > .93)
+			if (Vector.random.nextFloat() > .95)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 			// Перебрать все кирки и эффекты на них
 			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());

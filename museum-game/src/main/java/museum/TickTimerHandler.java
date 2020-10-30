@@ -28,7 +28,8 @@ public class TickTimerHandler extends BukkitRunnable {
 	private final App app;
 	private final List<Ticked> ticked;
 	private final ClientSocket clientSocket;
-	private final static long AUTO_SAVE_PERIOD = 20 * 60L;
+	// Осторожно, если оно будет маленьким, счетчик не дойдет до Incomeble
+	private final static long AUTO_SAVE_PERIOD = 20 * 60L * 3;
 	private final PlayerDataManager dataManager;
 	private int counter = 1;
 
