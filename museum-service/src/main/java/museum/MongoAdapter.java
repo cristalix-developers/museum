@@ -105,8 +105,11 @@ public class MongoAdapter<T extends Unique> {
 
 	public <V> CompletableFuture<List<TopEntry<T, V>>> makeRatingByField(String fieldName, int limit) {
 		val operations = Arrays.asList(
-				Aggregates.project(Projections.fields(Projections.include("uuid", fieldName), Projections.exclude("_id"))),
-				Aggregates.sort(Sorts.descending(fieldName)),
+				Aggregates.project(Projections.fields(
+						Projections.include("uuid"),
+						Projections.include(fieldName),
+						Projections.exclude("_id")
+				)), Aggregates.sort(Sorts.descending(fieldName)),
 				Aggregates.limit(limit)
 		);
 		List<TopEntry<T, V>> entries = new ArrayList<>();
