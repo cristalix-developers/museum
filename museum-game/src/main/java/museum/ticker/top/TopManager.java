@@ -8,11 +8,9 @@ import museum.client_conversation.ClientPacket;
 import museum.packages.TopPackage;
 import museum.player.User;
 import museum.ticker.Ticked;
-import museum.tops.PlayerTopEntry;
 import museum.tops.TopEntry;
 import ru.cristalix.core.GlobalSerializers;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,7 +36,7 @@ public class TopManager implements Ticked {
 			updateData();
 			data = GlobalSerializers.toJson(tops);
 		}
-		if (data == null || data.isEmpty() || data.equals("{}"))
+		if ("{}".equals(data) || data.isEmpty())
 			return;
 		val time = System.currentTimeMillis();
 		for (User user : app.getUsers()) {
@@ -53,10 +51,13 @@ public class TopManager implements Ticked {
 		for (TopPackage.TopType type : TopPackage.TopType.values()) {
 			app.getClientSocket().writeAndAwaitResponse(new TopPackage(type, DATA_COUNT))
 					.thenAcceptAsync(pkg -> tops.put(type, pkg.getEntries().stream()
-							.map(entry -> new TopEntry<>(
-									entry.getDisplayName(),
-									entry.getValue()
-							)).collect(Collectors.toList())
+							.map(entry -> {
+								System.out.println(entry.getUserName() + " " + entry.getValue());
+								return new TopEntry<>(
+										entry.getDisplayName(),
+										entry.getValue()
+								);
+							}).collect(Collectors.toList())
 					));
 		}
 	}
