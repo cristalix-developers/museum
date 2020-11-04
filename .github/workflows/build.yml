@@ -34,5 +34,16 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew --warning-mode all --no-daemon build
+      
+    - uses: actions/upload-artifact@v2
+      with:
+        name: museum-game.jar
+        path: museum-game/build/libs/museum-game.jar
+        
+    - uses: actions/upload-artifact@v2
+      with:
+        name: museum-service.jar
+        path: museum-service/build/libs/museum-service.jar
+        
     
     
