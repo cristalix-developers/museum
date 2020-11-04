@@ -101,9 +101,11 @@ public final class App extends JavaPlugin {
 		});
 
 		// Регистрация Core сервисов
-		CoreApi.get().unregisterService(IChatService.class);
-		CoreApi.get().registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
-		CoreApi.get().registerService(IScoreboardService.class, new ScoreboardService());
+		val core = CoreApi.get();
+		core.unregisterService(IChatService.class);
+		core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
+		core.registerService(IScoreboardService.class, new ScoreboardService());
+		//core.registerService(ICouponsService.class, new BukkitCouponsService(core.getSocketClient(), ICommandService.get()));
 
 		// Регистрация обработчика пакета конфига
 		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
@@ -116,6 +118,7 @@ public final class App extends JavaPlugin {
 			public List<Class> getInstanceMethodsExtensionClasses() {
 				return Collections.singletonList(Extensions.class);
 			}
+
 			@Override
 			public List<Class> getStaticMethodsExtensionClasses() {
 				return new ArrayList<>();
@@ -123,7 +126,7 @@ public final class App extends JavaPlugin {
 		});
 
 		// Прогрузка Groovy-скриптов
-		try(val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {
+		try (val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {
 			while (true) {
 				String line = reader.readLine();
 				if (line == null || line.isEmpty()) break;
@@ -165,15 +168,12 @@ public final class App extends JavaPlugin {
 
 		VisitorHandler.init(this, () -> (int) Math.ceil(3F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
 
-		// Вывод сервера в тесты
-		IRealmService.get().getCurrentRealmInfo().setLobbyServer(true);
-		IRealmService.get().getCurrentRealmInfo().setStatus(RealmStatus.WAITING_FOR_PLAYERS);
-		IRealmService.get().getCurrentRealmInfo().setReadableName("Музей археологии - ALPHA");
-		IRealmService.get().getCurrentRealmInfo().setDescription(new String[]{
-				"",
-				"Находи и демонстрируй кости",
-				"динозавров, стань археологом!"
-		});
+		// Вывод сервера меню
+		val realm = IRealmService.get().getCurrentRealmInfo();
+		realm.setLobbyServer(true);
+		realm.setStatus(RealmStatus.WAITING_FOR_PLAYERS);
+		realm.setGroupName("Музей");
+		IScoreboardService.get().getServerStatusBoard().setDisplayName("§fМузей #§b" + realm.getRealmId().getId());
 	}
 
 	@Override

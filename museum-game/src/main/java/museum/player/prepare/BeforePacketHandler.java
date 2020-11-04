@@ -9,6 +9,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.val;
 import museum.App;
+import museum.PacketMetrics;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
@@ -57,6 +58,7 @@ public class BeforePacketHandler implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
+		PacketMetrics.inject(user.getConnection().networkManager.channel);
 		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
@@ -192,7 +194,7 @@ public class BeforePacketHandler implements Prepare {
 			if (user.getPlayer() == null)
 				return;
 			// С некоторым шансом может выпасть интерактивая вещь
-			if (Vector.random.nextFloat() > .991)
+			if (Vector.random.nextFloat() > .95)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 			// Перебрать все кирки и эффекты на них
 			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());

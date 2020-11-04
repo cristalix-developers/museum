@@ -1,7 +1,9 @@
 package museum;
 
+import com.google.common.collect.Maps;
 import com.mongodb.async.client.MongoClient;
 import com.mongodb.async.client.MongoClients;
+import io.javalin.Javalin;
 import io.netty.channel.Channel;
 import lombok.val;
 import museum.boosters.BoosterType;
@@ -19,13 +21,12 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.GlobalSerializers;
+import ru.cristalix.core.coupons.CouponData;
+import ru.cristalix.core.lib.Futures;
 import ru.cristalix.core.microservice.MicroServicePlatform;
 import ru.cristalix.core.microservice.MicroserviceBootstrap;
 import ru.cristalix.core.network.ISocketClient;
-import ru.cristalix.core.network.packages.FillLauncherUserDataPackage;
-import ru.cristalix.core.network.packages.MoneyTransactionRequestPackage;
-import ru.cristalix.core.network.packages.MoneyTransactionResponsePackage;
-import ru.cristalix.core.network.packages.TransferPlayerPackage;
+import ru.cristalix.core.network.packages.*;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.permissions.PermissionService;
 import ru.cristalix.core.realm.RealmInfo;
@@ -64,6 +65,8 @@ public class MuseumService {
 	public static UserDataMongoAdapter userData;
 	public static MongoAdapter<BoosterInfo> globalBoosters;
 
+	public static final Map<String, MuseumMetricsPackage> METRICS = Maps.newConcurrentMap();
+
 	public static List<Subservice> subservices = new ArrayList<>();
 
 	private static BoosterManager boosterManager;
@@ -91,6 +94,10 @@ public class MuseumService {
 		CONFIGURATION_MANAGER = new ConfigurationManager("config.yml", "items.yml");
 		CONFIGURATION_MANAGER.init();
 
+		registerHandler(MuseumMetricsPackage.class, (channel, source, pckg) -> {
+			System.out.println("Received metrics.");
+			METRICS.put(pckg.getServerName(), pckg);
+		});
 		registerHandler(UserInfoPackage.class, (channel, source, pckg) -> {
 			System.out.println("Received UserInfoPackage from " + source + " for " + pckg.getUuid().toString());
 
@@ -123,22 +130,27 @@ public class MuseumService {
 					answer(channel, pckg);
 					return;
 				}
-				processInvoice(pckg.getUser(), pckg.getDonate().getPrice(), pckg.getDonate().getName()).thenAccept(response -> {
-					UserTransactionPackage.TransactionResponse resp = UserTransactionPackage.TransactionResponse.OK;
-					if (response.getErrorMessage() != null) {
-						String err = response.getErrorMessage();
-						if (err.equalsIgnoreCase("Недостаточно средств на счету"))
-							resp = UserTransactionPackage.TransactionResponse.INSUFFICIENT_FUNDS;
-						else {
-							System.out.println(err);
-							resp = UserTransactionPackage.TransactionResponse.INTERNAL_ERROR;
+				findCoupon(pckg.getUser()).thenAccept(data -> {
+					int price = pckg.getDonate().getPrice();
+					if (data != null)
+						price = (int) data.priceWithDiscount(price);
+					processInvoice(pckg.getUser(), price, pckg.getDonate().getName()).thenAccept(response -> {
+						UserTransactionPackage.TransactionResponse resp = UserTransactionPackage.TransactionResponse.OK;
+						if (response.getErrorMessage() != null) {
+							String err = response.getErrorMessage();
+							if (err.equalsIgnoreCase("Недостаточно средств на счету"))
+								resp = UserTransactionPackage.TransactionResponse.INSUFFICIENT_FUNDS;
+							else {
+								System.out.println(err);
+								resp = UserTransactionPackage.TransactionResponse.INTERNAL_ERROR;
+							}
 						}
-					}
-					if (resp == UserTransactionPackage.TransactionResponse.OK) {
-						Optional.ofNullable(TRANSACTION_POST_AUTHORIZE_MAP.get(pckg.getDonate())).ifPresent(consumer -> consumer.accept(pckg, info));
-					}
-					pckg.setResponse(resp);
-					answer(channel, pckg);
+						if (resp == UserTransactionPackage.TransactionResponse.OK) {
+							Optional.ofNullable(TRANSACTION_POST_AUTHORIZE_MAP.get(pckg.getDonate())).ifPresent(consumer -> consumer.accept(pckg, info));
+						}
+						pckg.setResponse(resp);
+						answer(channel, pckg);
+					});
 				});
 			});
 		});
@@ -183,6 +195,8 @@ public class MuseumService {
 			museumPackage.setPassed(passed);
 			answer(channel, museumPackage);
 		}));
+
+		Javalin.create().get("/", ctx -> ctx.result(createMetrics())).start(14888);
 
 		Thread consoleThread = new Thread(MuseumService::handleConsole);
 		consoleThread.setDaemon(true);
@@ -349,4 +363,51 @@ public class MuseumService {
 		});
 	}
 
+	private static String createMetrics() {
+		Map<String, MuseumMetricsPackage.PacketMetric> metrics = Maps.newHashMap();
+		StringBuilder builder = new StringBuilder();
+		METRICS.forEach((source, data) -> {
+			builder.append("online{realm=\"").append(source).append("\"} ").append(data.getOnline()).append("\n");
+			builder.append("tps{realm=\"").append(source).append("\"} ").append(data.getTps()).append("\n");
+			builder.append("free_memory{realm=\"").append(source).append("\"} ").append(data.getFreeMemory()).append("\n");
+			builder.append("allocated_memory{realm=\"").append(source).append("\"} ").append(data.getAllocatedMemory()).append("\n");
+			builder.append("total_memory{realm=\"").append(source).append("\"} ").append(data.getTotalMemory()).append("\n");
+
+			data.getMetrics().forEach((key, value) -> {
+				metrics.compute(key, (__, old) -> {
+					if (old != null) {
+						old.setCompressedBytes(old.getCompressedBytes() + value.getCompressedBytes());
+						old.setDecompressedBytes(old.getDecompressedBytes() + value.getDecompressedBytes());
+						old.setReceived(old.getReceived() + value.getReceived());
+						old.setReceivedBytes(old.getReceivedBytes() + value.getReceivedBytes());
+						old.setSent(old.getSent() + value.getSent());
+						old.setSentBytes(old.getSentBytes() + value.getSentBytes());
+						return old;
+					}
+					return value.clone();
+				});
+			});
+		});
+		metrics.forEach((key, value) -> {
+			builder.append("compressed_bytes{packet=\"").append(key).append("\"} ").append(value.getCompressedBytes()).append("\n");
+			builder.append("decompressed_bytes{packet=\"").append(key).append("\"} ").append(value.getDecompressedBytes()).append("\n");
+			builder.append("received{packet=\"").append(key).append("\"} ").append(value.getReceived()).append("\n");
+			builder.append("received_bytes{packet=\"").append(key).append("\"} ").append(value.getReceivedBytes()).append("\n");
+			builder.append("sent{packet=\"").append(key).append("\"} ").append(value.getSent()).append("\n");
+			builder.append("sent_bytes{packet=\"").append(key).append("\"} ").append(value.getSentBytes()).append("\n");
+		});
+		return builder.toString();
+	}
+
+	private static CompletableFuture<CouponData> findCoupon(UUID user) {
+		CompletableFuture<CouponData> future = new CompletableFuture<>();
+		Futures.fail(Futures.timeout(
+				ISocketClient.get().<CouponsDataPackage>writeAndAwaitResponse(new CouponsDataPackage(user)).thenAccept(pckg -> future.complete(pckg.getData())),
+				5L, TimeUnit.SECONDS
+		), throwable -> {
+			throwable.printStackTrace();
+			future.complete(null);
+		});
+		return future;
+	}
 }

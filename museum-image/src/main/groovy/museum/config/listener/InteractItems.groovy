@@ -23,6 +23,52 @@ on SADDLE use {
     player.performCommand 'home'
 }
 
+register 'sugar-treasure', {
+    item SUGAR
+    nbt.cost = 120
+    text """
+        §bСтранный белый песок §6+120\$
+
+        Хм... Что же это, мы уже
+        второй раз натыкаемся на него,
+        пока ученые не раскрыли его тайну...
+    """
+}
+
+register 'diamond-treasure', {
+    item DIAMOND
+    nbt.cost = 134
+    text """
+        §bДрагоценный минерал §6+134\$
+
+        Иногда его можно найти
+        на раскопках, стоит очень много!
+    """
+}
+
+register 'ghost-treasure', {
+    item GHAST_TEAR
+    nbt.cost = 67
+    text """
+        §fСлеза Боба §6+67\$
+
+        Ходят слухи, что она
+        вообще не из этого мира...
+    """
+}
+
+register 'arrow-treasure', {
+    item ARROW
+    nbt.cost = 46
+    text """
+        §eПервобытная стрела §6+46\$
+
+        Откуда она тут?!
+        Это еще предстоит узнать нашим
+        ученым из музея...
+    """
+}
+
 register 'emerald-treasure', {
     item EMERALD
     nbt.cost = 36

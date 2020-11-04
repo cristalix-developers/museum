@@ -38,7 +38,7 @@ Guis.register 'main', { player ->
         Опыт: $user.experience
         Опыта осталось: ${LevelSystem.formatExperience(user.experience)}
         Часов сыграно: ${user.timePlayed / 3_600_000}
-        Монет собрано: ${moneyFormatter.format(user.pickedCoinsCount)} 
+        Монет собрано: $user.pickedCoinsCount
         Кирка: $user.pickaxeType.name
         Раскопок: $user.excavationCount
         Фрагментов: ${user.skeletons.stream().mapToInt(s -> s.unlockedFragments.size()).sum()}
@@ -82,7 +82,7 @@ Guis.register 'main', { player ->
         Название: &e$museum.title
         Посещений: &b$museum.views
     
-        Доход: &a$museum.income
+        Доход: &a${moneyFormatter.format(museum.income)} 
         Витрин: &e${museum.getSubjects(SubjectType.SKELETON_CASE).size()}
     
         Создан &a${formatter.format(Duration.ofMillis(System.currentTimeMillis() - museum.creationDate.time))} назад

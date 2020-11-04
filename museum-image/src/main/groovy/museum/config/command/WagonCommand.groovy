@@ -76,7 +76,7 @@ registerCommand 'wagonbuy' handle {
 registerCommand 'go' handle {
     def user = App.app.getUser player.uniqueId
     def state = user.state
-    if (state instanceof Museum) {
+    if (state instanceof Museum && !user.grabbedArmorstand) {
         for (stall in state.getSubjects(SubjectType.STALL)) {
             if (stall.food.isEmpty() && stall.allocation) {
                 user.teleport(stall.allocation.origin + [0, 12, 0])

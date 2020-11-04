@@ -27,11 +27,11 @@ public class TreasureUtil {
 			if (item == null)
 				continue;
 			getTreasurePrice(item).ifPresent(price -> {
-				item.setAmount(item.getAmount() - 1);
-				user.depositMoneyWithBooster(price);
+				user.depositMoneyWithBooster(price * item.getAmount());
 				MessageUtil.find("treasure-item")
-						.set("cost", price)
+						.set("cost", price * item.getAmount())
 						.send(user);
+				item.setAmount(0);
 			});
 		}
 	}

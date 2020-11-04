@@ -3,6 +3,7 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.Player
 
 import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
@@ -21,7 +22,12 @@ on GOLDEN_CARROT use {
     Guis.open player, 'donate', player
 }
 
+static String modifyPrice(UUID user, int price) {
+    return "§b" + price + " кристаликов"
+}
+
 Guis.register 'donate', { player ->
+    def user = (Player) context
     title '§bВнутриигровые покупки'
     layout """
         -X-M-Z-Y-
@@ -58,7 +64,7 @@ Guis.register 'donate', { player ->
         item BEACON
         text """
         §bГлобальный бустер посетителей §6§lx3
-        §b149 кристаликов§f
+        ${modifyPrice(user.uniqueId, 149)}
         
         Общий бустер на §b1 час§f,
         в ТРИ раза больше посетителей!
@@ -71,7 +77,7 @@ Guis.register 'donate', { player ->
         item EXP_BOTTLE
         text """
         §bГлобальный бустер опыта §6§lx2
-        §b149 кристаликов§f
+        ${modifyPrice(user.uniqueId, 149)}
         
         Общий бустер на §b1 час§f,
         все получат в два раза больше опыта!
@@ -85,7 +91,7 @@ Guis.register 'donate', { player ->
         data 1
         text """
         §6Глобальный бустер денег §6§lx2 
-        §b199 кристаликов§f
+        ${modifyPrice(user.uniqueId, 199)}
         
         Общий бустер на §b1 час§f,
         все получат в два раза больше денег!
@@ -99,7 +105,7 @@ Guis.register 'donate', { player ->
         nbt.museum = 'parovoz'
         text """
         §6Стим-панк сборщик монет
-        §b249 кристаликов§f
+        ${modifyPrice(user.uniqueId, 249)}
         
         §bБыстрее всех§f! Собирает самые
         дальние монеты -§b лучший выбор
@@ -116,7 +122,7 @@ Guis.register 'donate', { player ->
         nbt.prison = '23feb'
         text """
         §bЛегендарная кирка
-        §b349 кристаликов§f
+        ${modifyPrice(user.uniqueId, 349)}
         
         Особая кирка, приносит 
         §b2 опыта за блок§f и

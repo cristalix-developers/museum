@@ -6,16 +6,17 @@ import museum.client.ClientSocket;
 import museum.museum.Coin;
 import museum.museum.Museum;
 import museum.museum.subject.*;
+import museum.packages.MuseumMetricsPackage;
 import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.ticker.Ticked;
-import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import ru.cristalix.core.realm.IRealmService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author func 30.06.2020
@@ -27,13 +28,16 @@ public class TickTimerHandler extends BukkitRunnable {
 	private final App app;
 	private final List<Ticked> ticked;
 	private final ClientSocket clientSocket;
-	private final static long AUTO_SAVE_PERIOD = 20 * 60 * 3L;
+	// Осторожно, если оно будет маленьким, счетчик не дойдет до Incomeble
+	private final static long AUTO_SAVE_PERIOD = 20 * 60L * 3;
 	private final PlayerDataManager dataManager;
 	private int counter = 1;
 
 	@Override
 	public void run() {
 		savePlayers();
+		if (counter % 50 == 0)
+			App.getApp().getClientSocket().write(getFreshMetrics());
 
 		// Вызов обработки тиков у всех побочных обработчиков
 		for (Ticked tickUnit : ticked)
@@ -48,17 +52,6 @@ public class TickTimerHandler extends BukkitRunnable {
 				continue;
 			for (Museum museum : user.getMuseums()) {
 				process(museum, user, currentTime);
-			}
-			if (counter % 160 != 0)
-				continue;
-			val tab = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, user.getPlayer().getHandle());
-			for (Player target : Bukkit.getOnlinePlayers()) {
-				if (target == player)
-					continue;
-				player.hidePlayer(app, target);
-				target.hidePlayer(app, player);
-				user.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, ((CraftPlayer) target).getHandle()));
-				((CraftPlayer) target).getHandle().playerConnection.sendPacket(tab);
 			}
 		}
 	}
@@ -94,5 +87,32 @@ public class TickTimerHandler extends BukkitRunnable {
 			}
 			return false;
 		});
+	}
+
+	private MuseumMetricsPackage getFreshMetrics() {
+		val tps = Bukkit.getTPS()[1];
+		val runtime = Runtime.getRuntime();
+		return new MuseumMetricsPackage(
+				IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName(),
+				Bukkit.getOnlinePlayers().size(),
+				Math.round(tps * 100F) / 100F,
+				runtime.freeMemory(),
+				runtime.totalMemory(),
+				runtime.maxMemory(),
+				PacketMetrics.METRICS.entrySet().stream().collect(Collectors.toMap(
+						entry -> entry.getKey().getName(),
+						entry -> {
+							val value = entry.getValue();
+							return new MuseumMetricsPackage.PacketMetric(
+									value.received.longValue(),
+									value.receivedBytes.longValue(),
+									value.sent.longValue(),
+									value.sentBytes.longValue(),
+									value.decompressedBytes.longValue(),
+									value.compressedBytes.longValue()
+							);
+						}
+				))
+		);
 	}
 }
