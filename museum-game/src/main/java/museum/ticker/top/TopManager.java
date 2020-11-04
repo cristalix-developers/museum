@@ -36,7 +36,7 @@ public class TopManager implements Ticked {
 			updateData();
 			data = GlobalSerializers.toJson(tops);
 		}
-		if ("{}".equals(data) || data.isEmpty())
+		if ("{}".equals(data) || data == null || data.isEmpty())
 			return;
 		val time = System.currentTimeMillis();
 		for (User user : app.getUsers()) {

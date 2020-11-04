@@ -83,10 +83,9 @@ public final class App extends JavaPlugin {
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 
 		String museumServiceHost = System.getenv("MUSEUM_SERVICE_HOST");
-		if (museumServiceHost == null) {
+		if (museumServiceHost == null || museumServiceHost.isEmpty()) {
 			System.out.println("No MUSEUM_SERVICE_HOST environment variable specified!");
-			Bukkit.shutdown();
-			return;
+			museumServiceHost = "127.0.0.1";
 		}
 
 		int museumServicePort;
@@ -94,15 +93,13 @@ public final class App extends JavaPlugin {
 			museumServicePort = Integer.parseInt(System.getenv("MUSEUM_SERVICE_PORT"));
 		} catch (NumberFormatException | NullPointerException exception) {
 			System.out.println("No MUSEUM_SERVICE_PORT environment variable specified!");
-			Bukkit.shutdown();
-			return;
+			museumServicePort = 14653;
 		}
 
 		String museumServicePassword = System.getenv("MUSEUM_SERVICE_PASSWORD");
 		if (museumServicePassword == null) {
 			System.out.println("No MUSEUM_SERVICE_PASSWORD environment variable specified!");
-			Bukkit.shutdown();
-			return;
+			museumServicePassword = "12345";
 		}
 
 		this.clientSocket = new ClientSocket(
