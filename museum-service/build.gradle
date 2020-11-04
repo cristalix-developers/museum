@@ -1,6 +1,6 @@
 dependencies {
-    compile "org.slf4j:slf4j-simple:1.7.30"
-    compile group: 'io.javalin', name: 'javalin', version: '3.11.2'
+    implementation 'org.slf4j:slf4j-simple:1.7.30'
+    implementation 'io.javalin:javalin:3.11.2'
     implementation project(":museum-commons")
     compileOnly 'org.mongodb:mongodb-driver-async:3.7.1'
     compileOnly files("../external/microservice-1.0.4.jar")
@@ -8,15 +8,15 @@ dependencies {
     compileOnly 'io.netty:netty-all:4.1.37.Final'
     compileOnly files("../external/waterfall-chat-1.0.jar")
 
-    testCompile project(":museum-commons")
-    testCompile 'org.mongodb:mongodb-driver-async:3.7.1'
-    testCompile files("../external/microservice-1.0.4.jar")
-    testCompile 'com.google.guava:guava:21.0'
-    testCompile 'io.netty:netty-all:4.1.37.Final'
-    testCompile files("../external/waterfall-chat-1.0.jar")
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
-    testCompile group: 'org.awaitility', name: 'awaitility', version: '4.0.3'
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
+    testImplementation project(":museum-commons")
+    testImplementation 'org.mongodb:mongodb-driver-async:3.7.1'
+    testImplementation files("../external/microservice-1.0.4.jar")
+    testImplementation 'com.google.guava:guava:21.0'
+    testImplementation 'io.netty:netty-all:4.1.37.Final'
+    testImplementation files("../external/waterfall-chat-1.0.jar")
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.0.3'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
 }
 
 tasks.withType(Test) {

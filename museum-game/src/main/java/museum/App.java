@@ -1,6 +1,7 @@
 package museum;
 
 import clepto.bukkit.B;
+import clepto.cristalix.Cristalix;
 import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
 import clepto.cristalix.WorldMeta;
@@ -80,11 +81,35 @@ public final class App extends JavaPlugin {
 		Managers.init();
 		clepto.bukkit.menu.Guis.init();
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
+
+		String museumServiceHost = System.getenv("MUSEUM_SERVICE_HOST");
+		if (museumServiceHost == null) {
+			System.out.println("No MUSEUM_SERVICE_HOST environment variable specified!");
+			Bukkit.shutdown();
+			return;
+		}
+
+		int museumServicePort;
+		try {
+			museumServicePort = Integer.parseInt(System.getenv("MUSEUM_SERVICE_PORT"));
+		} catch (NumberFormatException | NullPointerException exception) {
+			System.out.println("No MUSEUM_SERVICE_PORT environment variable specified!");
+			Bukkit.shutdown();
+			return;
+		}
+
+		String museumServicePassword = System.getenv("MUSEUM_SERVICE_PASSWORD");
+		if (museumServicePassword == null) {
+			System.out.println("No MUSEUM_SERVICE_PASSWORD environment variable specified!");
+			Bukkit.shutdown();
+			return;
+		}
+
 		this.clientSocket = new ClientSocket(
-				"148.251.1.9",
-				14653,
-				"gVatjN43AJnbFq36Fa",
-				IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName()
+				museumServiceHost,
+				museumServicePort,
+				museumServicePassword,
+				Cristalix.getRealmString()
 		);
 		this.clientSocket.connect();
 		this.clientSocket.registerHandler(BroadcastTitlePackage.class, pckg -> {
@@ -105,7 +130,7 @@ public final class App extends JavaPlugin {
 		core.unregisterService(IChatService.class);
 		core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
 		core.registerService(IScoreboardService.class, new ScoreboardService());
-		//core.registerService(ICouponsService.class, new BukkitCouponsService(core.getSocketClient(), ICommandService.get()));
+//		core.registerService(ICouponsService.class, new BukkitCouponsService(core.getSocketClient(), ICommandService.get()));
 
 		// Регистрация обработчика пакета конфига
 		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);

@@ -6,7 +6,8 @@ subprojects {
     targetCompatibility = sourceCompatibility = '1.8'
 
     repositories {
-        mavenLocal()
+        // MavenLocal is considered to be a bad practice
+        // mavenLocal()
         mavenCentral()
         maven {
             url "https://repo.implario.dev/public"

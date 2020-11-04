@@ -43,7 +43,8 @@ public class MuseumService {
 
 	public static final long DEFAULT_BOOSTER_TIME = TimeUnit.HOURS.toMillis(1L);
 	public static final int INCOME_MULTIPLIER = 10;
-	public static final String PASSWORD = System.getProperty("PASSWORD", "gVatjN43AJnbFq36Fa");
+	public static String PASSWORD;
+	@SuppressWarnings ("rawtypes")
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
 	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
@@ -73,11 +74,28 @@ public class MuseumService {
 
 	private static RealmsController realmsController;
 
-	public static void main(String[] args) {
+		public static void main(String[] args) throws InterruptedException {
+
+		int museumServicePort;
+		try {
+			museumServicePort = Integer.parseInt(System.getenv("MUSEUM_SERVICE_PORT"));
+		} catch (NumberFormatException | NullPointerException exception) {
+			System.out.println("No MUSEUM_SERVICE_PORT environment variable specified!");
+			Thread.sleep(1000);
+			return;
+		}
+
+		PASSWORD = System.getenv("MUSEUM_SERVICE_PASSWORD");
+		if (PASSWORD == null) {
+			System.out.println("No MUSEUM_SERVICE_PASSWORD environment variable specified!");
+			Thread.sleep(1000);
+			return;
+		}
+
 		MicroserviceBootstrap.bootstrap(new MicroServicePlatform(2));
 		CoreApi.get().registerService(IPermissionService.class, new PermissionService(ISocketClient.get()));
 
-		ServerSocket serverSocket = new ServerSocket(14653);
+		ServerSocket serverSocket = new ServerSocket(museumServicePort);
 		serverSocket.start();
 
 		String dbUrl = System.getenv("db_url");
@@ -196,7 +214,9 @@ public class MuseumService {
 			answer(channel, museumPackage);
 		}));
 
-		Javalin.create().get("/", ctx -> ctx.result(createMetrics())).start(14888);
+		try {
+			Javalin.create().get("/", ctx -> ctx.result(createMetrics())).start(Integer.parseInt(System.getenv("METRICS_PORT")));
+		} catch (NumberFormatException | NullPointerException ignored) {}
 
 		Thread consoleThread = new Thread(MuseumService::handleConsole);
 		consoleThread.setDaemon(true);
