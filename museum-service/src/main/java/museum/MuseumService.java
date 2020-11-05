@@ -31,6 +31,9 @@ import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.permissions.PermissionService;
 import ru.cristalix.core.realm.RealmInfo;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +49,7 @@ public class MuseumService {
 	public static String PASSWORD;
 	@SuppressWarnings ("rawtypes")
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
+
 	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
 		put(DonateType.GLOBAL_EXP_BOOSTER, globalBoosterPreAuthorize(BoosterType.EXP));
@@ -53,6 +57,7 @@ public class MuseumService {
 		put(DonateType.LOCAL_EXP_BOOSTER, localBoosterPreAuthorize(BoosterType.EXP));
 		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
 	}};
+
 	private static final Map<DonateType, BiConsumer<UserTransactionPackage, UserInfo>> TRANSACTION_POST_AUTHORIZE_MAP
 			= new HashMap<DonateType, BiConsumer<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.GLOBAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, true));
@@ -61,6 +66,7 @@ public class MuseumService {
 		put(DonateType.LOCAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, false));
 		put(DonateType.LOCAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, false));
 	}};
+
 	public static ConfigurationManager CONFIGURATION_MANAGER;
 
 	public static UserDataMongoAdapter userData;
@@ -251,6 +257,25 @@ public class MuseumService {
 					e.printStackTrace();
 				}
 
+			}
+			if (s.equals("dump")) {
+				try {
+					BufferedWriter writer = new BufferedWriter(new FileWriter("playerdump.json"));
+					System.out.println("dumping...");
+					userData.findAll().thenAccept(map -> {
+						try {
+							String s1 = GlobalSerializers.toJson(map);
+							System.out.println(s1);
+							writer.write(s1);
+							writer.flush();
+							writer.close();
+						} catch (IOException exception) {
+							exception.printStackTrace();
+						}
+					});
+				} catch (IOException exception) {
+					exception.printStackTrace();
+				}
 			}
 			if (args[0].equals("delete")) {
 				if (args.length < 2) System.out.println("Usage: delete [uuid]");

@@ -22,44 +22,44 @@ import java.util.stream.Collectors;
 
 public class UserDataMongoAdapter extends MongoAdapter<UserInfo> {
 
-    public UserDataMongoAdapter(MongoClient client, String dbName) {
-        super(client, dbName, "userData", UserInfo.class);
-    }
+	public UserDataMongoAdapter(MongoClient client, String dbName) {
+		super(client, dbName, "userData", UserInfo.class);
+	}
 
-    public CompletableFuture<List<PlayerTopEntry<Object>>> getTop(TopPackage.TopType topType, int limit) {
-        return makeRatingByField(topType.name().toLowerCase(), limit).thenApplyAsync(entries -> {
-            List<PlayerTopEntry<Object>> playerEntries = new ArrayList<>();
-            for (val userInfoObjectTopEntry : entries) {
-                PlayerTopEntry<Object> objectPlayerTopEntry = new PlayerTopEntry<>(userInfoObjectTopEntry.getKey(), userInfoObjectTopEntry.getValue());
-                playerEntries.add(objectPlayerTopEntry);
-            }
-            try {
-                List<UUID> uuids = new ArrayList<>();
-                for (TopEntry<UserInfo, Object> entry : entries) {
-                    UUID uuid = entry.getKey().getUuid();
-                    uuids.add(uuid);
-                }
-                List<GroupData> groups = ISocketClient.get()
-                        .<BulkGroupsPackage>writeAndAwaitResponse(new BulkGroupsPackage(uuids))
-                        .get(5L, TimeUnit.SECONDS)
-                        .getGroups();
-                Map<UUID, GroupData> map = groups.stream()
-                        .collect(Collectors.toMap(GroupData::getUuid, Function.identity()));
-                for (PlayerTopEntry<Object> playerEntry : playerEntries) {
-                    GroupData data = map.get(playerEntry.getKey().getUuid());
-                    playerEntry.setUserName(data.getUsername());
-                    playerEntry.setDisplayName(UtilCristalix.createDisplayName(data));
-                }
-            } catch(Exception ex) {
-                ex.printStackTrace();
-                // Oh shit
-                playerEntries.forEach(entry -> {
-                    entry.setUserName("ERROR");
-                    entry.setDisplayName("ERROR");
-                });
-            }
-            return playerEntries;
-        });
-    }
+	public CompletableFuture<List<PlayerTopEntry<Object>>> getTop(TopPackage.TopType topType, int limit) {
+		return makeRatingByField(topType.name().toLowerCase(), limit).thenApplyAsync(entries -> {
+			List<PlayerTopEntry<Object>> playerEntries = new ArrayList<>();
+			for (val userInfoObjectTopEntry : entries) {
+				PlayerTopEntry<Object> objectPlayerTopEntry = new PlayerTopEntry<>(userInfoObjectTopEntry.getKey(), userInfoObjectTopEntry.getValue());
+				playerEntries.add(objectPlayerTopEntry);
+			}
+			try {
+				List<UUID> uuids = new ArrayList<>();
+				for (TopEntry<UserInfo, Object> entry : entries) {
+					UUID uuid = entry.getKey().getUuid();
+					uuids.add(uuid);
+				}
+				List<GroupData> groups = ISocketClient.get()
+						.<BulkGroupsPackage>writeAndAwaitResponse(new BulkGroupsPackage(uuids))
+						.get(5L, TimeUnit.SECONDS)
+						.getGroups();
+				Map<UUID, GroupData> map = groups.stream()
+						.collect(Collectors.toMap(GroupData::getUuid, Function.identity()));
+				for (PlayerTopEntry<Object> playerEntry : playerEntries) {
+					GroupData data = map.get(playerEntry.getKey().getUuid());
+					playerEntry.setUserName(data.getUsername());
+					playerEntry.setDisplayName(UtilCristalix.createDisplayName(data));
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				// Oh shit
+				playerEntries.forEach(entry -> {
+					entry.setUserName("ERROR");
+					entry.setDisplayName("ERROR");
+				});
+			}
+			return playerEntries;
+		});
+	}
 
 }

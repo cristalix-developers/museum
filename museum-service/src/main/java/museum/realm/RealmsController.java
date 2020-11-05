@@ -37,7 +37,8 @@ public class RealmsController {
     }
 
     private CompletableFuture<List<RealmInfo>> fetchMuseumRealms() {
-        return ISocketClient.get().<AllRealmsPackage>writeAndAwaitResponse(new AllRealmsPackage()).thenApply(pckg -> Stream.of(pckg.getRealms()).filter(info -> info.getRealmId().getTypeName().equals("MUSM")).collect(Collectors.toList()));
+        return ISocketClient.get().<AllRealmsPackage>writeAndAwaitResponse(new AllRealmsPackage())
+				.thenApply(pckg -> Stream.of(pckg.getRealms()).filter(info -> info.getRealmId().getTypeName().equals("MUSM")).collect(Collectors.toList()));
     }
 
 }
