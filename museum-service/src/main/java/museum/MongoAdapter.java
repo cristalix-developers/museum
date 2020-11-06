@@ -19,6 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.mongodb.client.model.Aggregates.*;
+import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Projections.include;
+
 @Getter
 public class MongoAdapter<T extends Unique> {
 
@@ -103,20 +107,20 @@ public class MongoAdapter<T extends Unique> {
 			data.bulkWrite(session, models, this::handle);
 	}
 
-	public <V> CompletableFuture<List<TopEntry<T, V>>> makeRatingByField(String fieldName, int limit) {
+	public <V> CompletableFuture<List<TopEntry<T, V>>> aggregateTop(String critetion, int limit) {
 		val operations = Arrays.asList(
-				Aggregates.project(Projections.fields(
-						Projections.include(fieldName),
-						Projections.include("uuid"),
-						Projections.exclude("_id")
-				)), Aggregates.sort(Sorts.descending(fieldName)),
-				Aggregates.limit(limit)
-		);
+				project(fields(
+						include(critetion),
+						include("uuid"),
+						exclude("_id"))),
+				sort(Sorts.descending(critetion)),
+				limit(limit));
+
 		List<TopEntry<T, V>> entries = new ArrayList<>();
 		CompletableFuture<List<TopEntry<T, V>>> future = new CompletableFuture<>();
 		data.aggregate(operations).forEach(document -> {
 			T key = readDocument(document);
-			entries.add(new TopEntry<>(key, (V) document.get(fieldName)));
+			entries.add(new TopEntry<>(key, (V) document.get(critetion)));
 		}, (__, throwable) -> {
 			if (throwable != null) {
 				future.completeExceptionally(throwable);

@@ -123,7 +123,7 @@ public class User implements PlayerWrapper {
 	}
 
 	public double calcMultiplier(BoosterType type) {
-		info.getLocalBoosters().removeIf(BoosterInfo::hadExpire);
+		info.getLocalBoosters().removeIf(BoosterInfo::isExpired);
 
 		double sum = 1;
 		for (BoosterInfo booster : info.getLocalBoosters()) {

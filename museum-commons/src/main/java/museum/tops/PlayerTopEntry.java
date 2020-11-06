@@ -15,4 +15,8 @@ public class PlayerTopEntry<V> extends TopEntry<UserInfo, V> {
         super(userInfo, value);
     }
 
+	public PlayerTopEntry(TopEntry<UserInfo, V> topEntry) {
+    	this(topEntry.getKey(), topEntry.getValue());
+	}
+
 }

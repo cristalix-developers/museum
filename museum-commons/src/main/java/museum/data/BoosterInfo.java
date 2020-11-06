@@ -2,6 +2,7 @@ package museum.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import museum.boosters.BoosterType;
 import museum.utils.MultiTimeBar;
 import museum.utils.UtilTime;
@@ -10,8 +11,10 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class BoosterInfo implements Unique, MultiTimeBar.MultiBarInstance {
 
+	@EqualsAndHashCode.Include
 	private final UUID uuid;
 	private final UUID owner;
 	private final String ownerName;
@@ -35,7 +38,8 @@ public class BoosterInfo implements Unique, MultiTimeBar.MultiBarInstance {
 		return "§eБустер §a" + getType().getName() + " §eот §b" + ownerName + " §a(" + UtilTime.formatTime(until - System.currentTimeMillis(), false) + ") §b/thx";
 	}
 
-	public boolean hadExpire() {
-		return System.currentTimeMillis() < until;
+	public boolean isExpired() {
+		return System.currentTimeMillis() > until;
 	}
+
 }

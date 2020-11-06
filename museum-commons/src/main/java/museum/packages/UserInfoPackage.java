@@ -14,10 +14,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserInfoPackage extends MuseumPackage {
 
-	// request
 	private final UUID uuid;
 
-	// response
 	private UserInfo userInfo;
+
+	private Action action;
+
+	public enum Action {
+
+		DATA_SYNC,
+		DISCONNECT_SAVE,
+		DATA_REQUEST
+
+	}
 
 }

@@ -5,15 +5,22 @@ import com.mongodb.async.client.MongoClient;
 import com.mongodb.async.client.MongoClients;
 import io.javalin.Javalin;
 import io.netty.channel.Channel;
-import lombok.val;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import museum.boosters.BoosterType;
 import museum.configuration.ConfigurationManager;
 import museum.data.BoosterInfo;
+import museum.data.Unique;
 import museum.data.UserInfo;
-import museum.donate.DonateType;
+import museum.donate.BoosterService;
+import museum.donate.DonateService;
+import museum.donate.IBoosterService;
+import museum.donate.IDonateService;
 import museum.handlers.PackageHandler;
 import museum.packages.*;
 import museum.realm.RealmsController;
+import museum.service.user.IUserService;
+import museum.service.user.UserService;
 import museum.socket.ServerSocket;
 import museum.socket.ServerSocketHandler;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -21,8 +28,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.GlobalSerializers;
-import ru.cristalix.core.coupons.CouponData;
-import ru.cristalix.core.lib.Futures;
 import ru.cristalix.core.microservice.MicroServicePlatform;
 import ru.cristalix.core.microservice.MicroserviceBootstrap;
 import ru.cristalix.core.network.ISocketClient;
@@ -31,162 +36,109 @@ import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.permissions.PermissionService;
 import ru.cristalix.core.realm.RealmInfo;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
+@Getter
+@RequiredArgsConstructor
 public class MuseumService {
+
+	@Getter
+	private static MuseumService instance;
 
 	public static final long DEFAULT_BOOSTER_TIME = TimeUnit.HOURS.toMillis(1L);
 	public static final int INCOME_MULTIPLIER = 10;
-	public static String PASSWORD;
+	private final String password;
+	private final String databaseName;
+	private final String databaseUrl;
+
 	@SuppressWarnings ("rawtypes")
-	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
+	private final Map<Class<? extends MuseumPackage>, PackageHandler> handlerMap = new HashMap<>();
 
-	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
-		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
-		put(DonateType.GLOBAL_EXP_BOOSTER, globalBoosterPreAuthorize(BoosterType.EXP));
-		put(DonateType.GLOBAL_VILLAGER_BOOSTER, globalBoosterPreAuthorize(BoosterType.VILLAGER));
-		put(DonateType.LOCAL_EXP_BOOSTER, localBoosterPreAuthorize(BoosterType.EXP));
-		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
-	}};
+	//	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
+	//		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
+	//		put(DonateType.GLOBAL_EXP_BOOSTER, globalBoosterPreAuthorize(BoosterType.EXP));
+	//		put(DonateType.GLOBAL_VILLAGER_BOOSTER, globalBoosterPreAuthorize(BoosterType.VILLAGER));
+	//		put(DonateType.LOCAL_EXP_BOOSTER, localBoosterPreAuthorize(BoosterType.EXP));
+	//		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
+	//	}};
+	//
+	//	private static final Map<DonateType, BiConsumer<UserTransactionPackage, UserInfo>> TRANSACTION_POST_AUTHORIZE_MAP
+	//			= new HashMap<DonateType, BiConsumer<UserTransactionPackage, UserInfo>>() {{
+	//		put(DonateType.GLOBAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, true));
+	//		put(DonateType.GLOBAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, true));
+	//		put(DonateType.GLOBAL_VILLAGER_BOOSTER, boosterPostAuthorize(BoosterType.VILLAGER, true));
+	//		put(DonateType.LOCAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, false));
+	//		put(DonateType.LOCAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, false));
+	//	}};
 
-	private static final Map<DonateType, BiConsumer<UserTransactionPackage, UserInfo>> TRANSACTION_POST_AUTHORIZE_MAP
-			= new HashMap<DonateType, BiConsumer<UserTransactionPackage, UserInfo>>() {{
-		put(DonateType.GLOBAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, true));
-		put(DonateType.GLOBAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, true));
-		put(DonateType.GLOBAL_VILLAGER_BOOSTER, boosterPostAuthorize(BoosterType.VILLAGER, true));
-		put(DonateType.LOCAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, false));
-		put(DonateType.LOCAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, false));
-	}};
+	private ConfigurationManager configurationManager;
 
-	public static ConfigurationManager CONFIGURATION_MANAGER;
+	private MongoClient mongoClient;
+	private final IUserService playerService = new UserService(this);
+	private final IBoosterService boosterService = new BoosterService(this);
+	private final IDonateService donateService = new DonateService(this);
 
-	public static UserDataMongoAdapter userData;
-	public static MongoAdapter<BoosterInfo> globalBoosters;
+	private MongoAdapter<BoosterInfo> globalBoosters;
 
-	public static final Map<String, MuseumMetricsPackage> METRICS = Maps.newConcurrentMap();
-
-	public static List<Subservice> subservices = new ArrayList<>();
-
-	private static BoosterManager boosterManager;
+	private final Map<String, MuseumMetricsPackage> metrics = Maps.newConcurrentMap();
 
 	private static RealmsController realmsController;
 
-		public static void main(String[] args) throws InterruptedException {
+	private static String environment(String name) {
+		String value = System.getenv(name);
+		if (value != null) return value;
 
-		int museumServicePort;
-		try {
-			museumServicePort = Integer.parseInt(System.getenv("MUSEUM_SERVICE_PORT"));
-		} catch (NumberFormatException | NullPointerException exception) {
-			System.out.println("No MUSEUM_SERVICE_PORT environment variable specified!");
-			Thread.sleep(1000);
-			return;
-		}
+		throw new NoSuchElementException("No " + name + " environment variable specified!");
+	}
 
-		PASSWORD = System.getenv("MUSEUM_SERVICE_PASSWORD");
-		if (PASSWORD == null) {
-			System.out.println("No MUSEUM_SERVICE_PASSWORD environment variable specified!");
-			Thread.sleep(1000);
-			return;
-		}
+	public static void main(String[] args) {
+
+		int port = Integer.parseInt(environment("MUSEUM_SERVICE_PORT"));
+		String password = environment("MUSEUM_SERVICE_PASSWORD");
+		String dbUrl = environment("MUSEUM_DATABASE_URL");
+		String dbName = environment("MUSEUM_DATABASE_NAME");
+
+		instance = new MuseumService(password, dbUrl, dbName);
+		instance.start(port);
+
+	}
+
+	public <T extends Unique> MongoAdapter<T> createStorageAdapter(Class<T> type, String collection) {
+		if (mongoClient == null)
+			throw new IllegalStateException("MongoDB is not initialized yet.");
+		return new MongoAdapter<>(mongoClient, databaseName, collection, type);
+	}
+
+	public void start(int port) {
 
 		MicroserviceBootstrap.bootstrap(new MicroServicePlatform(2));
-		CoreApi.get().registerService(IPermissionService.class, new PermissionService(ISocketClient.get()));
+		CoreApi core = CoreApi.get();
 
-		ServerSocket serverSocket = new ServerSocket(museumServicePort);
+		core.registerService(IPermissionService.class, new PermissionService(ISocketClient.get()));
+
+		ServerSocket serverSocket = new ServerSocket(port);
 		serverSocket.start();
 
-		String dbUrl = System.getenv("db_url");
-		String dbName = System.getenv("db_data");
-		MongoClient client = MongoClients.create(dbUrl);
-		userData = new UserDataMongoAdapter(client, dbName);
-		globalBoosters = new MongoAdapter<>(client, dbName, "globalBoosters", BoosterInfo.class);
+		this.mongoClient = MongoClients.create(databaseUrl);
 
-		boosterManager = new BoosterManager();
-		subservices.add(boosterManager);
+		core.registerService(IUserService.class, new UserService(this));
+		core.registerService(IBoosterService.class, new BoosterService(this));
 
 		realmsController = new RealmsController();
 
-		CONFIGURATION_MANAGER = new ConfigurationManager("config.yml", "items.yml");
-		CONFIGURATION_MANAGER.init();
+		configurationManager = new ConfigurationManager("config.yml", "items.yml");
+		configurationManager.init();
 
-		registerHandler(MuseumMetricsPackage.class, (channel, source, pckg) -> {
-			System.out.println("Received metrics.");
-			METRICS.put(pckg.getServerName(), pckg);
-		});
-		registerHandler(UserInfoPackage.class, (channel, source, pckg) -> {
-			System.out.println("Received UserInfoPackage from " + source + " for " + pckg.getUuid().toString());
-
-			userData.find(pckg.getUuid()).thenAccept(info -> {
-						pckg.setUserInfo(info);
-                        answer(channel, pckg);
-					});
-		});
-		registerHandler(SaveUserPackage.class, (channel, source, pckg) -> {
-			System.out.println("Received SaveUserPackage from " + source + " for " + pckg.getUser().toString());
-			userData.save(pckg.getUserInfo());
+		registerHandler(MuseumMetricsPackage.class, (realm, pckg) -> {
+			metrics.put(pckg.getServerName(), pckg);
 		});
 
-		registerHandler(BulkSaveUserPackage.class, (channel, source, pckg) -> {
-			System.out.println("Received BulkSaveUserPackage from " + source);
-			userData.save(pckg.getPackages().stream().map(SaveUserPackage::getUserInfo).collect(Collectors.toList()));
-		});
-
-		registerHandler(UserTransactionPackage.class, (channel, source, pckg) -> {
-			System.out.println("Received UserTransactionPackage from " + source);
-			userData.find(pckg.getUser()).thenAccept(info -> {
-				val preHandler = TRANSACTION_PRE_AUTHORIZE_MAP.get(pckg.getDonate());
-				if (preHandler != null && !preHandler.test(pckg, info)) {
-					pckg.setResponse(UserTransactionPackage.TransactionResponse.INTERNAL_ERROR);
-					answer(channel, pckg);
-					return;
-				}
-				if (pckg.getDonate().isSave() && info.getDonates().contains(pckg.getDonate())) {
-					pckg.setResponse(UserTransactionPackage.TransactionResponse.ALREADY_BUYED);
-					answer(channel, pckg);
-					return;
-				}
-				findCoupon(pckg.getUser()).thenAccept(data -> {
-					int price = pckg.getDonate().getPrice();
-					if (data != null)
-						price = (int) data.priceWithDiscount(price);
-					// Делфику донат бесплатно бекдор взлом хак
-					if (pckg.getUser().equals(UUID.fromString("e7c13d3d-ac38-11e8-8374-1cb72caa35fd"))) {
-						Optional.ofNullable(TRANSACTION_POST_AUTHORIZE_MAP.get(pckg.getDonate())).ifPresent(consumer -> consumer.accept(pckg, info));
-						pckg.setResponse(UserTransactionPackage.TransactionResponse.OK);
-						answer(channel, pckg);
-					} else {
-						processInvoice(pckg.getUser(), price, pckg.getDonate().getName()).thenAccept(response -> {
-							UserTransactionPackage.TransactionResponse resp = UserTransactionPackage.TransactionResponse.OK;
-							if (response.getErrorMessage() != null) {
-								String err = response.getErrorMessage();
-								if (err.equalsIgnoreCase("Недостаточно средств на счету"))
-									resp = UserTransactionPackage.TransactionResponse.INSUFFICIENT_FUNDS;
-								else {
-									System.out.println(err);
-									resp = UserTransactionPackage.TransactionResponse.INTERNAL_ERROR;
-								}
-							}
-							if (resp == UserTransactionPackage.TransactionResponse.OK) {
-								Optional.ofNullable(TRANSACTION_POST_AUTHORIZE_MAP.get(pckg.getDonate())).ifPresent(consumer -> consumer.accept(pckg, info));
-							}
-							pckg.setResponse(resp);
-							answer(channel, pckg);
-						});
-
-					}
-				});
-			});
-		});
-		registerHandler(UserChatPackage.class, ((channel, serverName, museumPackage) -> {
+		registerHandler(UserChatPackage.class, ((realm, museumPackage) -> {
 			BroadcastMessagePackage messagePackage = new BroadcastMessagePackage(museumPackage.getJsonMessage());
 			ServerSocketHandler.broadcast(messagePackage);
 		}));
@@ -195,26 +147,26 @@ public class MuseumService {
 			ServerSocketHandler.broadcast(broadcastPackage);
 		}));
 		registerHandler(ThanksExecutePackage.class, ((channel, serverName, museumPackage) -> {
-			long boosters = boosterManager.executeThanks(museumPackage.getUser());
+			long boosters = boosterService.executeThanks(museumPackage.getUser());
 			userData.find(museumPackage.getUser()).thenAccept(data -> {
 				extra(museumPackage.getUser(), data.getIncome() * INCOME_MULTIPLIER * boosters);
 				museumPackage.setBoostersCount(boosters);
-				answer(channel, museumPackage);
+				send(channel, museumPackage);
 			});
 		}));
 		registerHandler(RequestConfigurationsPackage.class, ((channel, serverName, museumPackage) -> {
 			CONFIGURATION_MANAGER.fillRequest(museumPackage);
-			answer(channel, museumPackage);
+			send(channel, museumPackage);
 		}));
 		registerHandler(RequestGlobalBoostersPackage.class, ((channel, serverName, museumPackage) -> {
-			museumPackage.setBoosters(new ArrayList<>(boosterManager.getGlobalBoosters().values()));
-			answer(channel, museumPackage);
+			museumPackage.setBoosters(new ArrayList<>(boosterService.getGlobalBoosters().values()));
+			send(channel, museumPackage);
 		}));
 		registerHandler(TopPackage.class, ((channel, serverName, museumPackage) ->
 				userData.getTop(museumPackage.getTopType(), museumPackage.getLimit()).thenAccept(res -> {
-			museumPackage.setEntries(res);
-			answer(channel, museumPackage);
-		})));
+					museumPackage.setEntries(res);
+					send(channel, museumPackage);
+				})));
 		registerHandler(UserRequestJoinPackage.class, ((channel, serverName, museumPackage) -> {
 			Optional<RealmInfo> realm = realmsController.bestRealm();
 			boolean passed = false;
@@ -225,7 +177,7 @@ public class MuseumService {
 				ISocketClient.get().write(new TransferPlayerPackage(museumPackage.getUser(), realmInfo.getRealmId(), Collections.emptyMap()));
 			}
 			museumPackage.setPassed(passed);
-			answer(channel, museumPackage);
+			send(channel, museumPackage);
 		}));
 
 		try {
@@ -258,25 +210,6 @@ public class MuseumService {
 				}
 
 			}
-			if (s.equals("dump")) {
-				try {
-					BufferedWriter writer = new BufferedWriter(new FileWriter("playerdump.json"));
-					System.out.println("dumping...");
-					userData.findAll().thenAccept(map -> {
-						try {
-							String s1 = GlobalSerializers.toJson(map);
-							System.out.println(s1);
-							writer.write(s1);
-							writer.flush();
-							writer.close();
-						} catch (IOException exception) {
-							exception.printStackTrace();
-						}
-					});
-				} catch (IOException exception) {
-					exception.printStackTrace();
-				}
-			}
 			if (args[0].equals("delete")) {
 				if (args.length < 2) System.out.println("Usage: delete [uuid]");
 				else {
@@ -302,8 +235,8 @@ public class MuseumService {
 	 * @param handler handler
 	 * @param <T>     package type
 	 */
-	private static <T extends MuseumPackage> void registerHandler(Class<T> clazz, PackageHandler<T> handler) {
-		HANDLER_MAP.put(clazz, handler);
+	public <T extends MuseumPackage> void registerHandler(Class<T> clazz, PackageHandler<T> handler) {
+		handlerMap.put(clazz, handler);
 	}
 
 	/**
@@ -311,7 +244,7 @@ public class MuseumService {
 	 *
 	 * @param pckg package
 	 */
-	private static void answer(Channel channel, MuseumPackage pckg) {
+	public void send(Channel channel, MuseumPackage pckg) {
 		ServerSocketHandler.send(channel, pckg);
 	}
 
@@ -354,13 +287,7 @@ public class MuseumService {
 	 * @param fadeOut  Время затухания в тиках
 	 */
 	public static void alert(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-		ServerSocketHandler.broadcast(new BroadcastTitlePackage(new String[]{title, subTitle}, fadeIn, stay, fadeOut));
-	}
-
-	public static CompletableFuture<MoneyTransactionResponsePackage> processInvoice(UUID user, int price, String description) {
-		if (System.getenv("TRANSACTION_TEST") != null)
-			return CompletableFuture.completedFuture(new MoneyTransactionResponsePackage(null, null));
-		return ISocketClient.get().writeAndAwaitResponse(new MoneyTransactionRequestPackage(user, price, true, description));
+		ServerSocketHandler.broadcast(new BroadcastTitlePackage(new String[] {title, subTitle}, fadeIn, stay, fadeOut));
 	}
 
 	private static CompletableFuture<List<String>> wrapUuid(List<UUID> users) {
@@ -396,13 +323,13 @@ public class MuseumService {
 	}
 
 	private static BiPredicate<UserTransactionPackage, UserInfo> globalBoosterPreAuthorize(BoosterType type) {
-		return (pckg, info) -> !boosterManager.getGlobalBoosters().containsKey(type);
+		return (pckg, info) -> !boosterService.getGlobalBoosters().containsKey(type);
 	}
 
 	private static BiPredicate<UserTransactionPackage, UserInfo> localBoosterPreAuthorize(BoosterType type) {
 		return (pckg, info) -> {
 			try {
-				return boosterManager.receiveLocal(pckg.getUser()).get(2L, TimeUnit.SECONDS).stream().noneMatch(booster -> booster.getType() == type);
+				return boosterService.receiveLocal(pckg.getUser()).get(2L, TimeUnit.SECONDS).stream().noneMatch(booster -> booster.getType() == type);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				return false;
@@ -412,7 +339,7 @@ public class MuseumService {
 
 	private static BiConsumer<UserTransactionPackage, UserInfo> boosterPostAuthorize(BoosterType type, boolean global) {
 		return (pckg, info) -> wrapUuid(Collections.singletonList(pckg.getUser())).thenApply(list -> list.get(0)).thenAccept(userName -> {
-			boosterManager.push(BoosterInfo.defaultInstance(pckg.getUser(), userName, type, DEFAULT_BOOSTER_TIME, global));
+			boosterService.addGlobalBooster(BoosterInfo.defaultInstance(pckg.getUser(), userName, type, DEFAULT_BOOSTER_TIME, global));
 		});
 	}
 
@@ -452,15 +379,5 @@ public class MuseumService {
 		return builder.toString();
 	}
 
-	private static CompletableFuture<CouponData> findCoupon(UUID user) {
-		CompletableFuture<CouponData> future = new CompletableFuture<>();
-		Futures.fail(Futures.timeout(
-				ISocketClient.get().<CouponsDataPackage>writeAndAwaitResponse(new CouponsDataPackage(user)).thenAccept(pckg -> future.complete(pckg.getData())),
-				5L, TimeUnit.SECONDS
-		), throwable -> {
-			throwable.printStackTrace();
-			future.complete(null);
-		});
-		return future;
-	}
+
 }

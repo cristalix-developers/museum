@@ -8,23 +8,23 @@ import museum.tops.PlayerTopEntry;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode (callSuper = false)
 @RequiredArgsConstructor
 public class TopPackage extends MuseumPackage {
 
-    // request
-    private final TopType topType;
-    private final int limit;
+	// request
+	private final TopType topType;
+	private final int limit;
 
-    // response
-    private List<PlayerTopEntry<Object>> entries;
+	// response
+	private List<PlayerTopEntry<Object>> entries;
 
-    public enum TopType {
+	public enum TopType {
 
-        MONEY,
-        INCOME,
-        EXPERIENCE,;
+		MONEY,
+		INCOME,
+		EXPERIENCE
 
-    }
+	}
 
 }

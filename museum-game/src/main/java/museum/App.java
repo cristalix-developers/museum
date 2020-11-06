@@ -225,7 +225,7 @@ public final class App extends JavaPlugin {
 		return getUser(player.getUniqueId());
 	}
 
-	public CompletableFuture<UserTransactionPackage.TransactionResponse> processDonate(UUID user, DonateType donate) {
+	public CompletableFuture<String> processDonate(UUID user, DonateType donate) {
 		return clientSocket.writeAndAwaitResponse(new UserTransactionPackage(user, donate, null))
 				.thenApply(UserTransactionPackage::getResponse);
 	}

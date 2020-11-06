@@ -6,89 +6,82 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.util.AttributeKey;
+import lombok.RequiredArgsConstructor;
 import museum.MuseumService;
 import museum.packages.GreetingPackage;
 import museum.packages.MuseumPackage;
+import museum.realm.Realm;
 import museum.utils.UtilNetty;
-import ru.cristalix.core.CoreApi;
+import ru.cristalix.core.realm.RealmId;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
+@RequiredArgsConstructor
 public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
-	private static final AttributeKey<String> serverInfoKey = AttributeKey.newInstance("serverinfo");
+	private static final AttributeKey<Realm> realmKey = AttributeKey.newInstance("realm");
 
-	private static final Map<String, Channel> connectedChannels = new ConcurrentHashMap<>();
-
-	public static void broadcast(MuseumPackage pckg) {
-		connectedChannels.values().forEach(channel -> send(channel, UtilNetty.toFrame(pckg)));
-	}
-
-	public static void send(Channel channel, MuseumPackage pckg) {
-		send(channel, UtilNetty.toFrame(pckg));
-	}
-
-	public static void send(Channel channel, TextWebSocketFrame frame) {
-		channel.writeAndFlush(frame, channel.voidPromise());
-	}
+	private final ServerSocket serverSocket;
 
 	@Override
+	@SuppressWarnings ("unchecked")
 	protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) {
-		if (msg instanceof TextWebSocketFrame) {
-			MuseumPackage museumPackage = UtilNetty.readFrame((TextWebSocketFrame) msg);
-			Channel channel = ctx.channel();
-			if (museumPackage instanceof GreetingPackage) {
-				if (channel.hasAttr(serverInfoKey)) {
-					System.out.println("Some channel tries to authorize, but it already in system!");
-					return;
-				}
-				GreetingPackage pckg = (GreetingPackage) museumPackage;
-				if (connectedChannels.containsKey(pckg.getServerName())) {
-					System.out.println("Channel want to register as " + pckg.getServerName() + ", but this name already in use!");
-					ctx.close();
-					return;
-				}
-				if (!pckg.getPassword().equals(MuseumService.PASSWORD)) {
-					System.out.println("Channel provided bad password: " + pckg.getPassword());
-					if (channel.remoteAddress() instanceof InetSocketAddress) {
-						System.out.println(channel.remoteAddress().toString());
-					}
-					ctx.close();
-					return;
-				}
-				channel.attr(serverInfoKey).set(pckg.getServerName());
-				connectedChannels.put(pckg.getServerName(), channel);
-				CoreApi.get().getPlatform().getScheduler().runAsyncDelayed(() -> {
-					send(channel, MuseumService.CONFIGURATION_MANAGER.pckg());
-				}, 1L, TimeUnit.SECONDS);
-				System.out.println("Server authorized! " + pckg.getServerName());
-			} else {
-				if (!channel.hasAttr(serverInfoKey)) {
-					System.out.println("Some channel tries to send packet without authorization!");
-					if (channel.remoteAddress() instanceof InetSocketAddress) {
-						System.out.println(channel.remoteAddress().toString());
-					}
-					ctx.close();
-					return;
-				}
-				String info = channel.attr(serverInfoKey).get();
-				Optional.ofNullable(MuseumService.HANDLER_MAP.get(museumPackage.getClass()))
-						.ifPresent(handler -> handler.handle(channel, info, museumPackage));
+
+		if (!(msg instanceof TextWebSocketFrame)) return;
+
+		MuseumPackage museumPackage = UtilNetty.readFrame((TextWebSocketFrame) msg);
+		Channel channel = ctx.channel();
+		if (museumPackage instanceof GreetingPackage) {
+			if (channel.hasAttr(realmKey)) {
+				System.out.println("Some channel tries to authorize, but it already in system!");
+				return;
 			}
+			GreetingPackage packet = (GreetingPackage) museumPackage;
+			RealmId realmId = RealmId.of(packet.getServerName());
+
+			if (serverSocket.getConnectedChannels().containsKey(realmId)) {
+				System.out.println("Channel want to register as " + packet.getServerName() + ", but this name already in use!");
+				ctx.close();
+				return;
+			}
+			if (!packet.getPassword().equals(MuseumService.getInstance().getPassword())) {
+				System.out.println("Channel provided bad password: " + packet.getPassword());
+				if (channel.remoteAddress() instanceof InetSocketAddress) {
+					System.out.println(channel.remoteAddress().toString());
+				}
+				ctx.close();
+				return;
+			}
+			Realm realm = new Realm(serverSocket, channel, realmId);
+
+			channel.attr(realmKey).set(realm);
+
+			serverSocket.getConnectedChannels().put(realm.getId(), channel);
+			realm.send(MuseumService.getInstance().getConfigurationManager().pckg());
+			System.out.println("Server authorized! " + packet.getServerName());
+		} else {
+			if (!channel.hasAttr(realmKey)) {
+				System.out.println("Some channel tries to send packet without authorization!");
+				if (channel.remoteAddress() instanceof InetSocketAddress) {
+					System.out.println(channel.remoteAddress().toString());
+				}
+				ctx.close();
+				return;
+			}
+			Realm realm = channel.attr(realmKey).get();
+			Optional.ofNullable(MuseumService.getInstance().getHandlerMap().get(museumPackage.getClass()))
+					.ifPresent(handler -> handler.handle(realm, museumPackage));
 		}
 	}
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) {
 		Channel channel = ctx.channel();
-		if (channel.hasAttr(serverInfoKey)) {
-			String name = channel.attr(serverInfoKey).get();
-			connectedChannels.remove(name);
-			System.out.println("Server disconnected! " + name);
+		if (channel.hasAttr(realmKey)) {
+			Realm realm = channel.attr(realmKey).get();
+			serverSocket.getConnectedChannels().remove(realm.getId());
+			System.out.println("Server disconnected! " + realm);
 		}
 	}
 

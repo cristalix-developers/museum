@@ -2,6 +2,7 @@ package museum.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import museum.donate.DonateType;
 import ru.cristalix.core.math.V3;
 
@@ -9,10 +10,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class UserInfo implements Unique {
 
 	public final UUID uuid;
+	private final String name;
 
 	public long experience;
 	private double money;

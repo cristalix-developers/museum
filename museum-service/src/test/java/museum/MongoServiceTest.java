@@ -75,7 +75,7 @@ public class MongoServiceTest {
         dropFuture.join();
         List<UserInfo> generated = generateUserInfos(generate);
         pushAll(adapter, generated.stream().map(info -> Document.parse(GlobalSerializers.toJson(info))).collect(Collectors.toList())).join();
-        List<TopEntry<UserInfo, Object>> list = adapter.makeRatingByField(topType.name().toLowerCase(), limit).join();
+        List<TopEntry<UserInfo, Object>> list = adapter.aggregateTop(topType.name().toLowerCase(), limit).join();
         List<UUID> expected = generated.stream().sorted(Comparator.comparingDouble(valueExtractor).reversed()).map(UserInfo::getUuid).collect(Collectors.toList());
         deleteAll(adapter, expected).join();
         assertIterableEquals(

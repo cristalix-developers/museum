@@ -16,21 +16,11 @@ public class UserTransactionPackage extends MuseumPackage {
 	private DonateType donate;
 
 	// response
-	private TransactionResponse response;
+	private String response;
 
-	@AllArgsConstructor
-	@Getter
-	public enum TransactionResponse {
-
-		INTERNAL_ERROR("Невозможно приобрести в данный момент. Попробуйте чуть позже", false),
-		INSUFFICIENT_FUNDS("Недостаточно средств на счёте", false),
-		ALREADY_BUYED("У вас уже имеется этот донат", false),
-		OK("Успешная покупка! Спасибо за поддержку разработчиков режима :з", true),
-		;
-
-		private final String name;
-		private final boolean ok;
-
-	}
+//		INTERNAL_ERROR("Невозможно приобрести в данный момент. Попробуйте чуть позже", false),
+//		INSUFFICIENT_FUNDS("Недостаточно средств на счёте", false),
+//		ALREADY_BUYED("У вас уже имеется этот донат", false),
+//		OK("Успешная покупка! Спасибо за поддержку разработчиков режима :з", true),
 
 }
