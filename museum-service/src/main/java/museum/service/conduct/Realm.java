@@ -1,11 +1,11 @@
-package museum.realm;
+package museum.service.conduct;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import museum.packages.MuseumPackage;
-import museum.socket.ServerSocket;
+import museum.service.conduct.socket.ServerSocket;
 import museum.utils.UtilNetty;
 import ru.cristalix.core.realm.RealmId;
 

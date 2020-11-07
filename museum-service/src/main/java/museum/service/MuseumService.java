@@ -1,4 +1,4 @@
-package museum;
+package museum.service;
 
 import com.google.common.collect.Maps;
 import com.mongodb.async.client.MongoClient;
@@ -8,21 +8,24 @@ import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import museum.boosters.BoosterType;
-import museum.configuration.ConfigurationManager;
+import museum.service.conduct.IConductService;
+import museum.service.data.config.ConfigService;
+import museum.service.data.config.IConfigService;
 import museum.data.BoosterInfo;
 import museum.data.Unique;
 import museum.data.UserInfo;
-import museum.donate.BoosterService;
-import museum.donate.DonateService;
-import museum.donate.IBoosterService;
-import museum.donate.IDonateService;
-import museum.handlers.PackageHandler;
+import museum.service.data.MongoAdapter;
+import museum.service.donate.booster.BoosterService;
+import museum.service.donate.DonateService;
+import museum.service.donate.booster.IBoosterService;
+import museum.service.donate.IDonateService;
+import museum.service.conduct.PacketHandler;
 import museum.packages.*;
-import museum.realm.RealmsController;
+import museum.service.conduct.ConductService;
 import museum.service.user.IUserService;
 import museum.service.user.UserService;
-import museum.socket.ServerSocket;
-import museum.socket.ServerSocketHandler;
+import museum.service.conduct.socket.ServerSocket;
+import museum.service.conduct.socket.ServerSocketHandler;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -56,8 +59,6 @@ public class MuseumService {
 	private final String databaseName;
 	private final String databaseUrl;
 
-	@SuppressWarnings ("rawtypes")
-	private final Map<Class<? extends MuseumPackage>, PackageHandler> handlerMap = new HashMap<>();
 
 	//	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
 	//		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
@@ -76,18 +77,19 @@ public class MuseumService {
 	//		put(DonateType.LOCAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, false));
 	//	}};
 
-	private ConfigurationManager configurationManager;
 
 	private MongoClient mongoClient;
-	private final IUserService playerService = new UserService(this);
+	private final IConductService conductService = new ConductService(this);
+	private final IUserService userService = new UserService(this);
 	private final IBoosterService boosterService = new BoosterService(this);
-	private final IDonateService donateService = new DonateService(this);
+	private final IDonateService donateService = new DonateService(this, userService);
+	private final IConfigService configService = new ConfigService(this, "config.yml");
 
-	private MongoAdapter<BoosterInfo> globalBoosters;
+	private ServerSocket serverSocket;
 
 	private final Map<String, MuseumMetricsPackage> metrics = Maps.newConcurrentMap();
 
-	private static RealmsController realmsController;
+	private static ConductService realmsController;
 
 	private static String environment(String name) {
 		String value = System.getenv(name);
@@ -126,13 +128,14 @@ public class MuseumService {
 
 		this.mongoClient = MongoClients.create(databaseUrl);
 
-		core.registerService(IUserService.class, new UserService(this));
-		core.registerService(IBoosterService.class, new BoosterService(this));
+		core.registerService(IUserService.class, userService);
+		core.registerService(IBoosterService.class, boosterService);
+		core.registerService(IDonateService.class, donateService);
+		core.registerService(IConfigService.class, configService);
 
-		realmsController = new RealmsController();
 
-		configurationManager = new ConfigurationManager("config.yml", "items.yml");
-		configurationManager.init();
+
+		realmsController = new ConductService();
 
 		registerHandler(MuseumMetricsPackage.class, (realm, pckg) -> {
 			metrics.put(pckg.getServerName(), pckg);
@@ -145,14 +148,6 @@ public class MuseumService {
 		registerHandler(UserBroadcastPackage.class, ((channel, serverName, museumPackage) -> {
 			BroadcastTitlePackage broadcastPackage = new BroadcastTitlePackage(museumPackage.getData(), museumPackage.getFadeIn(), museumPackage.getStay(), museumPackage.getFadeOut());
 			ServerSocketHandler.broadcast(broadcastPackage);
-		}));
-		registerHandler(ThanksExecutePackage.class, ((channel, serverName, museumPackage) -> {
-			long boosters = boosterService.executeThanks(museumPackage.getUser());
-			userData.find(museumPackage.getUser()).thenAccept(data -> {
-				extra(museumPackage.getUser(), data.getIncome() * INCOME_MULTIPLIER * boosters);
-				museumPackage.setBoostersCount(boosters);
-				send(channel, museumPackage);
-			});
 		}));
 		registerHandler(RequestConfigurationsPackage.class, ((channel, serverName, museumPackage) -> {
 			CONFIGURATION_MANAGER.fillRequest(museumPackage);
@@ -167,18 +162,6 @@ public class MuseumService {
 					museumPackage.setEntries(res);
 					send(channel, museumPackage);
 				})));
-		registerHandler(UserRequestJoinPackage.class, ((channel, serverName, museumPackage) -> {
-			Optional<RealmInfo> realm = realmsController.bestRealm();
-			boolean passed = false;
-			if (realm.isPresent()) {
-				passed = true;
-				RealmInfo realmInfo = realm.get();
-				realmInfo.setCurrentPlayers(realmInfo.getCurrentPlayers() + 1);
-				ISocketClient.get().write(new TransferPlayerPackage(museumPackage.getUser(), realmInfo.getRealmId(), Collections.emptyMap()));
-			}
-			museumPackage.setPassed(passed);
-			send(channel, museumPackage);
-		}));
 
 		try {
 			Javalin.create().get("/", ctx -> ctx.result(createMetrics())).start(Integer.parseInt(System.getenv("METRICS_PORT")));
@@ -235,7 +218,7 @@ public class MuseumService {
 	 * @param handler handler
 	 * @param <T>     package type
 	 */
-	public <T extends MuseumPackage> void registerHandler(Class<T> clazz, PackageHandler<T> handler) {
+	public <T extends MuseumPackage> void registerHandler(Class<T> clazz, PacketHandler<T> handler) {
 		handlerMap.put(clazz, handler);
 	}
 
@@ -296,8 +279,8 @@ public class MuseumService {
 		return ISocketClient.get().<FillLauncherUserDataPackage>writeAndAwaitResponse(pc).thenApply(FillLauncherUserDataPackage::getUsernameList);
 	}
 
-	public static void extra(UUID user, Double sum) {
-		ServerSocketHandler.broadcast(new ExtraDepositUserPackage(user, sum));
+	public void extra(UUID uuid, Double sum) {
+		userService.getUser(uuid).getRealm();
 	}
 
 	public static void asyncExtra(UUID user, Function<UserInfo, Double> supplier) {

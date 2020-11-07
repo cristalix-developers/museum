@@ -1,4 +1,4 @@
-package museum.donate.type;
+package museum.service.donate;
 
 import museum.service.user.ServiceUser;
 

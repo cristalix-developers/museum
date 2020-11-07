@@ -1,9 +1,8 @@
 package museum;
 
 import clepto.bukkit.B;
-import clepto.cristalix.Cristalix;
-import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
+import clepto.cristalix.Cristalix;
 import clepto.cristalix.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
@@ -108,7 +107,6 @@ public final class App extends JavaPlugin {
 				museumServicePassword,
 				Cristalix.getRealmString()
 		);
-		this.clientSocket.connect();
 		this.clientSocket.registerHandler(BroadcastTitlePackage.class, pckg -> {
 			String[] data = pckg.getData();
 			Bukkit.getOnlinePlayers().forEach(pl -> pl.sendTitle(data[0], data[1], pckg.getFadeIn(), pckg.getStay(), pckg.getFadeOut()));
@@ -121,6 +119,9 @@ public final class App extends JavaPlugin {
 					.filter(Objects::nonNull)
 					.forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage())));
 		});
+		// Регистрация обработчика пакета конфига
+		this.clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
+		this.clientSocket.connect();
 
 		// Регистрация Core сервисов
 		val core = CoreApi.get();
@@ -129,10 +130,6 @@ public final class App extends JavaPlugin {
 		core.registerService(IScoreboardService.class, new ScoreboardService());
 //		core.registerService(ICouponsService.class, new BukkitCouponsService(core.getSocketClient(), ICommandService.get()));
 
-		// Регистрация обработчика пакета конфига
-		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
-
-		requestConfigurations();
 
 		// Определение groovy операций
 		RuntimeExtensionModules.modules.add(new SimpleExtensionModule("museum", "1") {
@@ -242,30 +239,8 @@ public final class App extends JavaPlugin {
 		return playerDataManager.getUsers();
 	}
 
-	private void requestConfigurations() {
-		try {
-			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage())
-					.get(3L, TimeUnit.SECONDS);
-			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getItemsData()));
-		} catch (Exception exception) {
-			exception.printStackTrace();
-			Bukkit.getLogger().severe("We can't receive museum configurations! Retry in 3sec");
-			try {
-				Thread.sleep(3000L);
-			} catch (InterruptedException interruptedException) {
-				interruptedException.printStackTrace();
-				Thread.currentThread().interrupt();
-			}
-			requestConfigurations();
-		}
-	}
-
 	private void fillConfigurations(ConfigurationsPackage pckg) {
-		YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
-		itemsConfig.getKeys(false)
-				.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
-
-		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
+		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getElements().get("config.yml")));
 	}
 
 	private void requestBoosters() {

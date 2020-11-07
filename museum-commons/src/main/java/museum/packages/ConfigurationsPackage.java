@@ -4,14 +4,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @RequiredArgsConstructor
 public class ConfigurationsPackage extends MuseumPackage {
 
-	// request
-	private final String configData, itemsData;
-
-	// no response
+	private final Map<String, String> elements;
 
 }

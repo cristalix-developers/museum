@@ -1,4 +1,4 @@
-package museum.socket;
+package museum.service.conduct.socket;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,16 +7,18 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.util.AttributeKey;
 import lombok.RequiredArgsConstructor;
-import museum.MuseumService;
+import lombok.extern.slf4j.Slf4j;
 import museum.packages.GreetingPackage;
 import museum.packages.MuseumPackage;
-import museum.realm.Realm;
+import museum.service.MuseumService;
+import museum.service.conduct.IConductService;
+import museum.service.conduct.Realm;
 import museum.utils.UtilNetty;
 import ru.cristalix.core.realm.RealmId;
 
 import java.net.InetSocketAddress;
-import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
@@ -25,30 +27,31 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 	private final ServerSocket serverSocket;
 
 	@Override
-	@SuppressWarnings ("unchecked")
 	protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) {
 
 		if (!(msg instanceof TextWebSocketFrame)) return;
+
+		IConductService conductService = serverSocket.getConductService();
 
 		MuseumPackage museumPackage = UtilNetty.readFrame((TextWebSocketFrame) msg);
 		Channel channel = ctx.channel();
 		if (museumPackage instanceof GreetingPackage) {
 			if (channel.hasAttr(realmKey)) {
-				System.out.println("Some channel tries to authorize, but it already in system!");
+				log.warn("Some channel tries to authorize, but it already in system!");
 				return;
 			}
 			GreetingPackage packet = (GreetingPackage) museumPackage;
 			RealmId realmId = RealmId.of(packet.getServerName());
 
-			if (serverSocket.getConnectedChannels().containsKey(realmId)) {
-				System.out.println("Channel want to register as " + packet.getServerName() + ", but this name already in use!");
+			if (conductService.getRealm(realmId) != null) {
+				log.warn("Channel wants to register as " + packet.getServerName() + ", but this name already in use!");
 				ctx.close();
 				return;
 			}
 			if (!packet.getPassword().equals(MuseumService.getInstance().getPassword())) {
-				System.out.println("Channel provided bad password: " + packet.getPassword());
+				log.warn("Channel provided bad password: " + packet.getPassword());
 				if (channel.remoteAddress() instanceof InetSocketAddress) {
-					System.out.println(channel.remoteAddress().toString());
+					log.warn(channel.remoteAddress().toString());
 				}
 				ctx.close();
 				return;
@@ -57,9 +60,10 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 
 			channel.attr(realmKey).set(realm);
 
-			serverSocket.getConnectedChannels().put(realm.getId(), channel);
-			realm.send(MuseumService.getInstance().getConfigurationManager().pckg());
-			System.out.println("Server authorized! " + packet.getServerName());
+			conductService.registerRealm(realm);
+
+			realm.send(MuseumService.getInstance().getConfigService().createBundle());
+			log.info("Server authorized! " + packet.getServerName());
 		} else {
 			if (!channel.hasAttr(realmKey)) {
 				System.out.println("Some channel tries to send packet without authorization!");
@@ -70,8 +74,8 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 				return;
 			}
 			Realm realm = channel.attr(realmKey).get();
-			Optional.ofNullable(MuseumService.getInstance().getHandlerMap().get(museumPackage.getClass()))
-					.ifPresent(handler -> handler.handle(realm, museumPackage));
+
+			conductService.handlePacket(realm, museumPackage);
 		}
 	}
 
@@ -80,7 +84,7 @@ public class ServerSocketHandler extends SimpleChannelInboundHandler<WebSocketFr
 		Channel channel = ctx.channel();
 		if (channel.hasAttr(realmKey)) {
 			Realm realm = channel.attr(realmKey).get();
-			serverSocket.getConnectedChannels().remove(realm.getId());
+			serverSocket.getConductService().unregisterRealm(realm);
 			System.out.println("Server disconnected! " + realm);
 		}
 	}

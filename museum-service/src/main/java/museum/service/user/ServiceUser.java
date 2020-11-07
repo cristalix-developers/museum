@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.ToString;
 import museum.data.UserInfo;
 import museum.packages.UserInfoPackage;
-import museum.realm.Realm;
+import museum.service.conduct.Realm;
 
 import java.util.UUID;
 

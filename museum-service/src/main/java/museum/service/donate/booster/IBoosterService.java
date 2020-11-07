@@ -1,4 +1,4 @@
-package museum.donate;
+package museum.service.donate.booster;
 
 import museum.data.BoosterInfo;
 import ru.cristalix.core.IService;

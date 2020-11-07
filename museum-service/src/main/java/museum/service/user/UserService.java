@@ -1,39 +1,40 @@
 package museum.service.user;
 
-import clepto.LoggerUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import museum.MongoAdapter;
-import museum.MuseumService;
 import museum.data.UserInfo;
-import museum.packages.*;
-import museum.realm.Realm;
+import museum.packages.BulkSaveUserPackage;
+import museum.packages.SaveUserPackage;
+import museum.packages.TopPackage;
+import museum.packages.UserInfoPackage;
+import museum.service.MuseumService;
+import museum.service.conduct.Realm;
+import museum.service.data.MongoAdapter;
 import museum.tops.PlayerTopEntry;
 import museum.utils.UtilCristalix;
 import ru.cristalix.core.network.ISocketClient;
 import ru.cristalix.core.network.packages.BulkGroupsPackage;
 import ru.cristalix.core.network.packages.GroupData;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static museum.packages.UserInfoPackage.Action.*;
 
+@Slf4j
 @RequiredArgsConstructor
 public class UserService implements IUserService {
 
 	private final MuseumService museumService;
-	private final Logger logger = LoggerUtils.simpleLogger("UserData");
-	{ logger.setLevel(Level.FINE); } // Debug
 
 	private final Map<UUID, ServiceUser> userMap = new ConcurrentHashMap<>();
 
@@ -59,6 +60,10 @@ public class UserService implements IUserService {
 		return userMap.get(uuid);
 	}
 
+	@Override
+	public Collection<? extends ServiceUser> getUsers() {
+		return userMap.values();
+	}
 
 	private void handleUserInfo(Realm realm, UserInfoPackage packet) {
 
@@ -83,11 +88,11 @@ public class UserService implements IUserService {
 			} else {
 				if (realm == user.getRealm()) {
 					user.disconnect("Что-то пошло не так. Бегом к разработчикам!");
-					logger.severe("Realm " + realm + " requested user info twice!");
+					log.error("Realm " + realm + " requested user info twice!");
 					return;
 				}
 
-				logger.fine("Realm " + realm + " requested data, asking " + user.getRealm() + " for a save");
+				log.info("Realm " + realm + " requested data, asking " + user.getRealm() + " for a save");
 				user.getRealm().send(new UserInfoPackage(uuid, null, DATA_REQUEST));
 				user.setTranferRealm(realm);
 				user.setTransferTime(System.currentTimeMillis());

@@ -1,4 +1,4 @@
-package museum;
+package museum.service.data;
 
 import com.mongodb.ClientSessionOptions;
 import com.mongodb.async.client.FindIterable;
@@ -11,6 +11,7 @@ import lombok.val;
 import museum.data.Unique;
 import museum.tops.TopEntry;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import ru.cristalix.core.GlobalSerializers;
 
 import java.util.*;
@@ -74,8 +75,13 @@ public class MongoAdapter<T extends Unique> {
 	}
 
 	public CompletableFuture<Map<UUID, T>> findAll() {
+		return findAll(null);
+	}
+
+	public CompletableFuture<Map<UUID, T>> findAll(Bson filter) {
 		CompletableFuture<Map<UUID, T>> future = new CompletableFuture<>();
 		FindIterable<Document> documentFindIterable = data.find(session);
+		if (filter != null) documentFindIterable.filter(filter);
 		Map<UUID, T> map = new ConcurrentHashMap<>();
 		documentFindIterable.forEach(document -> {
 			T object = readDocument(document);

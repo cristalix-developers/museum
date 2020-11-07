@@ -16,7 +16,7 @@ import java.util.UUID;
 @UtilityClass
 public class DefaultElements {
 
-	public static UserInfo createNewUserInfo(UUID userId) {
+	public static UserInfo createNewUserInfo(UUID userId, String username) {
 		MuseumPrototype proto = Managers.museum.getPrototype("main");
 		MuseumInfo startMuseum = new MuseumInfo(
 				proto.getAddress(),
@@ -27,6 +27,7 @@ public class DefaultElements {
 
 		UserInfo userInfo = new UserInfo(
 				userId,
+				username,
 				0,
 				1000.0,
 				0L,

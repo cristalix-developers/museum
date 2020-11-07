@@ -8,6 +8,7 @@ import com.mongodb.client.result.DeleteResult;
 import museum.data.PickaxeType;
 import museum.data.UserInfo;
 import museum.packages.TopPackage;
+import museum.service.data.MongoAdapter;
 import museum.tops.TopEntry;
 import org.awaitility.Awaitility;
 import org.bson.Document;

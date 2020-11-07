@@ -1,9 +1,9 @@
-package museum.donate;
+package museum.service.donate;
 
 import lombok.RequiredArgsConstructor;
-import museum.MuseumService;
-import museum.donate.type.Donate;
-import museum.donate.type.GlobalBoosterDonate;
+import museum.service.MuseumService;
+import museum.donate.DonateType;
+import museum.service.donate.booster.GlobalBoosterDonate;
 import museum.packages.UserTransactionPackage;
 import museum.service.user.IUserService;
 import museum.service.user.ServiceUser;
@@ -26,16 +26,15 @@ import static museum.donate.DonateType.*;
 @RequiredArgsConstructor
 public class DonateService implements IDonateService {
 
-	private final Map<DonateType, Donate> donateMap = new EnumMap<>(DonateType.class);
+	private final Map<DonateType, Donate> serviceDonateHandlers = new EnumMap<>(DonateType.class);
 	private final MuseumService museumService;
 	private final IUserService playerService;
 
 	{
 		// Глобальные бустеры
-		donateMap.put(GLOBAL_MONEY_BOOSTER, new GlobalBoosterDonate(COINS));
-		donateMap.put(GLOBAL_EXP_BOOSTER, new GlobalBoosterDonate(EXP));
-		donateMap.put(GLOBAL_VILLAGER_BOOSTER, new GlobalBoosterDonate(VILLAGER));
-
+		serviceDonateHandlers.put(GLOBAL_MONEY_BOOSTER, new GlobalBoosterDonate(COINS, 60 * 60));
+		serviceDonateHandlers.put(GLOBAL_EXP_BOOSTER, new GlobalBoosterDonate(EXP, 60 * 60));
+		serviceDonateHandlers.put(GLOBAL_VILLAGER_BOOSTER, new GlobalBoosterDonate(VILLAGER, 60 * 60));
 	}
 
 	@Override
@@ -58,12 +57,13 @@ public class DonateService implements IDonateService {
 		ServiceUser user = playerService.getUser(transaction.getUser());
 		DonateType type = transaction.getDonate();
 
-		Donate donate = donateMap.get(type);
+		Donate donate = serviceDonateHandlers.get(type);
 		if (donate == null)
 			return "donate-doesnt-exist";
 
-		if (!donate.accept(transaction))
-			return transaction.getResponse();
+		String rejectMessage = donate.accept(user);
+		if (rejectMessage != null)
+			return rejectMessage;
 
 		if (type.isSave() && user.getInfo().getDonates().contains(type))
 			return "donate-already-bought";

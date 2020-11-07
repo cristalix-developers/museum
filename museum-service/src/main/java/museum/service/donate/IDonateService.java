@@ -1,4 +1,4 @@
-package museum.donate;
+package museum.service.donate;
 
 import ru.cristalix.core.IService;
 

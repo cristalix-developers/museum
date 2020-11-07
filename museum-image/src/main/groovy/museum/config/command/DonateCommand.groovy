@@ -24,13 +24,12 @@ registerCommand 'proccessdonate' handle {
     try {
         donate = DonateType.valueOf(args[0]) as DonateType
     } catch (Exception ignored) {
-        ignored
         return
     }
 
-    App.app.processDonate(user.getUuid(), donate).thenAccept(transaction -> {
-        if (!transaction.ok) {
-            user.sendMessage(Formatting.error(transaction.name))
+    App.app.processDonate(user.getUuid(), donate).thenAccept(error -> {
+        if (error) {
+            user.sendMessage(Formatting.error(error))
             return
         }
         if (donate == DonateType.LEGENDARY_PICKAXE) {

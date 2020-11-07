@@ -1,9 +1,10 @@
-package museum.donate.type;
+package museum.service.donate.booster;
 
 import lombok.Data;
-import museum.MuseumService;
+import museum.service.MuseumService;
 import museum.boosters.BoosterType;
 import museum.data.BoosterInfo;
+import museum.service.donate.Donate;
 import museum.service.user.ServiceUser;
 
 @Data

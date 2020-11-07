@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import museum.data.BoosterInfo;
 
-import java.util.List;
+import java.util.Collection;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -13,7 +13,7 @@ import java.util.List;
 public class GlobalBoostersPackage extends MuseumPackage {
 
 	// request
-	private final List<BoosterInfo> boosters;
+	private final Collection<BoosterInfo> boosters;
 
 	// no response
 

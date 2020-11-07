@@ -44,7 +44,7 @@ public class PlayerDataManager implements Listener {
 	private final Map<UUID, User> userMap = Maps.newHashMap();
 	private final MultiTimeBar timeBar;
 	@Setter
-	private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
+	private Collection<BoosterInfo> globalBoosters = new ArrayList<>(0);
 	private final List<Prepare> prepares;
 
 	@SuppressWarnings("deprecation")
@@ -71,7 +71,7 @@ public class PlayerDataManager implements Listener {
 				UserInfoPackage userInfoPackage = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
 						.get(5L, TimeUnit.SECONDS);
 				UserInfo userInfo = userInfoPackage.getUserInfo();
-				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid);
+				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid, event.getPlayerName());
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 				userMap.put(uuid, new User(userInfo));
 			} catch (Exception ex) {
@@ -102,7 +102,7 @@ public class PlayerDataManager implements Listener {
 			UserInfoPackage userInfoPackage = app.getClientSocket().writeAndAwaitResponse(new UserInfoPackage(event.getUniqueId()))
 					.get(5L, TimeUnit.SECONDS);
 			UserInfo userInfo = userInfoPackage.getUserInfo();
-			if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(event.getUniqueId());
+			if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(event.getUniqueId(), event.getName());
 			if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 			User user = new User(userInfo);
 			userMap.put(event.getUniqueId(), user);
