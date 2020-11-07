@@ -70,6 +70,9 @@ public final class App extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		B.plugin = App.app = this;
+
+		B.events(new PhysicsDisabler());
+
 		// Загрузка мира
 		MapLoader.load(this);
 
@@ -152,9 +155,11 @@ public final class App extends JavaPlugin {
 			while (true) {
 				String line = reader.readLine();
 				if (line == null || line.isEmpty()) break;
-				Class<?> scriptClass = Class.forName(line);
-				if (!Script.class.isAssignableFrom(scriptClass)) continue;
-				readScript(scriptClass);
+				try {
+					Class<?> scriptClass = Class.forName(line);
+					if (!Script.class.isAssignableFrom(scriptClass)) continue;
+					readScript(scriptClass);
+				} catch (ClassNotFoundException ignored) {}
 			}
 		} catch (Exception exception) {
 			exception.printStackTrace();
