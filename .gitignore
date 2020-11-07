@@ -1,5 +1,4 @@
 .idea/*
-!.idea/vcs.xml
 out/
 build/
 .gradle/
