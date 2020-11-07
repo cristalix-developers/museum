@@ -64,9 +64,13 @@ public class BeforePacketHandler implements Prepare {
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 				if (packetObj instanceof PacketPlayInUseItem)
 					onItemUse(user, (PacketPlayInUseItem) packetObj);
-				else if (packetObj instanceof PacketPlayInBlockDig)
-					onDigging(user, (PacketPlayInBlockDig) packetObj);
-				else if (packetObj instanceof PacketPlayInSteerVehicle) {
+				else if (packetObj instanceof PacketPlayInBlockDig) {
+					val dig = (PacketPlayInBlockDig) packetObj;
+					// Если пакет о дропе предмета - дропнуть пакет
+					if (dig.c == DROP_ITEM || dig.c == DROP_ALL_ITEMS)
+						return;
+					onDigging(user, dig);
+				} else if (packetObj instanceof PacketPlayInSteerVehicle) {
 					// Если игрок на коллекторе и нажимает шифт, то скинуть его
 					val packet = (PacketPlayInSteerVehicle) packetObj;
 					if (packet.d) {
