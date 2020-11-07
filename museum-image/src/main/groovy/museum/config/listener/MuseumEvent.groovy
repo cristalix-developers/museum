@@ -13,7 +13,6 @@ import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import ru.cristalix.core.math.V3
-
 // todo delete this hardcode with requiredLabel
 def wagonLocation = new Location(App.app.getWorld(), 292, 87, -400)
 

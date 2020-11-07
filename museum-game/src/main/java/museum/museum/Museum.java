@@ -149,6 +149,8 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 	public void giveMenu(User user) {
 		val inventory = user.getInventory();
+		user.getPlayer().setItemOnCursor(null);
+		user.getPlayer().getOpenInventory().getTopInventory().clear();
 		inventory.clear();
 		inventory.setItem(0, menu);
 		inventory.setItem(4, visitorMenu);
