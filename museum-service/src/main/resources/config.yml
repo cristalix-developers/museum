@@ -2,6 +2,7 @@ serviceRealm: MUSS-1
 
 chat:
   messages:
+    claim-place: 'fineВы открыли §b%TITLE%§f, ваша награда §b%EXP%EXP§f'
     museum-not-found: 'errorТакой музей не найден.'
     no-spam: 'fineВаш музей прекрасен! Люди сами прийдут, ожидайте 䀈'
     stall-first: 'errorСперва отнесите груз в лавку. 㲓'

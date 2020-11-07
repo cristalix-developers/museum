@@ -14,6 +14,7 @@ import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
+import museum.excavation.PlacesMechanic;
 import museum.museum.Shop;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
@@ -184,7 +185,9 @@ public final class App extends JavaPlugin {
 				new GuiEvents()
 		);
 
+		// Инициализация NPC и точек сбора
 		WorkerUtil.init(this);
+		PlacesMechanic.init(this);
 
 		// Обработка каждого тика
 		new TickTimerHandler(this, Arrays.asList(

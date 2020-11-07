@@ -2,6 +2,7 @@
 package museum.config.listener
 
 import museum.App
+import museum.excavation.PlacesMechanic
 import museum.museum.Museum
 import museum.museum.map.SubjectType
 import museum.museum.subject.product.FoodProduct
@@ -11,6 +12,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import ru.cristalix.core.math.V3
 
 // todo delete this hardcode with requiredLabel
 def wagonLocation = new Location(App.app.getWorld(), 292, 87, -400)
@@ -35,6 +37,8 @@ on PlayerMoveEvent, {
 
     if (!user || !user.state)
         return
+
+    PlacesMechanic.handleMove user, new V3(to.x, to.y, to.z)
 
     if (user.state instanceof Museum) {
         def museum = user.state as Museum
