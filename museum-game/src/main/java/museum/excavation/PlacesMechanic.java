@@ -1,5 +1,6 @@
 package museum.excavation;
 
+import com.google.common.collect.Maps;
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import lombok.val;
@@ -9,8 +10,7 @@ import museum.util.MessageUtil;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class PlacesMechanic {
 
-	private static final List<Place> places = new ArrayList<>();
+	private static final Map<String, Place> places = Maps.newHashMap();
 
 	public static void init(App app) {
-		places.addAll(app.getMap().getLabels("place").stream()
+		places.putAll(app.getMap().getLabels("place").stream()
 				.map(place -> {
 					val tag = place.getTag();
 					val ss = tag.split("\\s+");
@@ -33,12 +33,15 @@ public class PlacesMechanic {
 							Integer.parseInt(ss[1]),
 							tag.substring(2 + ss[0].length() + ss[1].length())
 					);
-				}).collect(Collectors.toList())
-		);
+				}).collect(Collectors.toMap(Place::getTitle, place -> place)));
+	}
+
+	public static Place getPlaceByTitle(String title) {
+		return places.get(title);
 	}
 
 	public static void handleMove(User user, V3 to) {
-		for (Place place : places) {
+		for (Place place : places.values()) {
 			if (user.getClaimedPlaces().contains(place.getTitle()))
 				continue;
 			val v3 = place.getPlace();
@@ -55,7 +58,7 @@ public class PlacesMechanic {
 	}
 
 	@Data
-	static class Place {
+	public static class Place {
 		private final V3 place;
 		private final double radius;
 		private final int claimedExp;

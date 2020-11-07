@@ -55,6 +55,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	private final ItemStack backItem = Items.render("back").asBukkitMirror();
 	private final ItemStack visitorMenu = Items.render("visitor-menu").asBukkitMirror();
 	private final ItemStack donateMenu = Items.render("donate-menu").asBukkitMirror();
+	private final ItemStack placeMenu = Items.render("place-menu").asBukkitMirror();
 
 	private final CraftWorld world;
 	private double income;
@@ -154,6 +155,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		inventory.clear();
 		inventory.setItem(0, menu);
 		inventory.setItem(4, visitorMenu);
+		inventory.setItem(5, placeMenu);
 		inventory.setItem(8, donateMenu);
 	}
 

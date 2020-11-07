@@ -84,6 +84,11 @@ register 'visitor-menu', {
     text '§6Посмотреть музеи'
 }
 
+register 'place-menu', {
+    item COMPASS
+    text '§bГде я был?'
+}
+
 register 'goback', {
     item BARRIER
     text '§cВернуться'
