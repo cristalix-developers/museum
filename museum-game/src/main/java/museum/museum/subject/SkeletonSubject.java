@@ -38,7 +38,7 @@ public class SkeletonSubject extends Subject {
 		String[] ss = info.metadata.split(":");
 		try {
 			this.level = Integer.parseInt(ss[2]);
-			this.level = this.level >= 100 ? 100 : this.level;
+			this.level = this.level >= 50 ? 50 : this.level;
 		} catch (Exception exception) {
 			this.level = 1;
 		}
@@ -95,7 +95,7 @@ public class SkeletonSubject extends Subject {
 	public double getIncome() {
 		if (skeleton == null)
 			return 0;
-		return skeleton.getUnlockedFragments().size() * (double) skeleton.getPrototype().getPrice() / 500 * (level / 33F + 1);
+		return skeleton.getUnlockedFragments().size() * (double) skeleton.getPrototype().getPrice() / 400 * (level / 5F + 1);
 	}
 
 	public void setSkeleton(Skeleton skeleton) {

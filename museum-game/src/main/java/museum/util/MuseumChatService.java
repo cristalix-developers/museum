@@ -120,7 +120,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 				event -> event.setJoinMessage(null),
 				EventPriority.HIGH,
 				true
-									  );
+		);
 		eventExecutor.registerListener(
 				PlayerQuitEvent.class,
 				this,
@@ -129,7 +129,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 					setChatView(event.getPlayer().getUniqueId(), null);
 				},
 				EventPriority.NORMAL, false
-									  );
+		);
 	}
 
 	@Override

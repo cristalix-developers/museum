@@ -16,10 +16,14 @@ import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
 import ru.cristalix.core.formatting.Formatting
 
+import java.text.DecimalFormat
+
 import static clepto.bukkit.item.Items.items
 import static clepto.bukkit.item.Items.register
 import static museum.museum.subject.Allocation.Action.*
 import static org.bukkit.Material.*
+
+def num = new DecimalFormat('###,###,###,###,###,###.##')
 
 register 'lockedSkeleton', {
     item CLAY_BALL
@@ -137,7 +141,7 @@ Guis.register 'manipulator', { player ->
                         subject.updateSkeleton true
                         user.updateIncome()
                     }
-                    Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
+                    Guis.open(delegate, 'manipulator', subject.cachedInfo.uuid)
                 }
             }
         }
@@ -147,12 +151,12 @@ Guis.register 'manipulator', { player ->
         def rows = (Managers.skeleton.size() - 1) / 7 + 1
 
         def upgradeCost = 10000
-        def upgradePercent = 3
+        def upgradePercent = 20
 
         if (rows) {
             rows.times { gui.layout += '-OOOOOOO-' }
             gui.layout += '----P----'
-            if (subject.level < 100) {
+            if (subject.level < 50) {
                 button 'P' icon {
                     item CLAY_BALL
                     nbt.other = 'guild_invite'
@@ -231,8 +235,8 @@ Guis.register 'manipulator', { player ->
             data itemStack.durability
             text """
             §a$abstractSubject.prototype.title
-            §eДоход: §f$abstractSubject.income
-        """
+            §eДоход: §f${num.format(abstractSubject.income)}
+            """
         }
     }
 }
