@@ -51,13 +51,25 @@ public class MuseumCommands {
 		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
 		B.regCommand(this::cmdBuy, "buy");
+		B.regCommand(this::cmdPrefix, "prefix");
+	}
+
+	private String cmdPrefix(Player player, String[] args) {
+		if (player != null && !player.isOp()) return "§cНеизвестная команда.";
+		if (args.length < 2) return "§cИспользование: §e/prefix [Игрок] [Префикс]";
+		try {
+			User user = app.getUser(Bukkit.getPlayer(args[0]).getUniqueId());
+			user.setPrefix(args[1].replace('&', '§').replace('#', '¨'));
+			return "§aПрефикс изменён.";
+		} catch (NullPointerException ex) {
+			return "§cИгрок не найден.";
+		}
 	}
 
 	private String cmdRunTop(Player player, String[] args) {
-		if (player.isOp()) {
-			// Топы сами обновятся, потому что якобы "не обновлялись"
-			app.getUser(player).setLastTopUpdateTime(-1);
-		}
+		User user = app.getUser(player);
+		if (!player.isOp() && user.getLastTopUpdateTime() != 0) return null;
+		user.setLastTopUpdateTime(-1);
 		return null;
 	}
 
