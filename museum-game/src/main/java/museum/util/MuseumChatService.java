@@ -95,22 +95,24 @@ public final class MuseumChatService extends ChatService implements Listener {
 			}
 			val oldLegacy = legacy;
 			User user = App.getApp().getUser(uuid);
-			val builder = new ComponentBuilder(new TextComponent(user.getLevel() + "§8 ┃ "));
+			val builder = new ComponentBuilder(new TextComponent(""));
 			if (user.getPrefix() != null) builder.append(new TextComponent(user.getPrefix() + "§8 ┃ "));
+
 			event.setMessage(chatView.getFormattedComponent(uuid, context).thenCompose(message -> {
 				builder.append(message);
 				val future = permissionService.getNameColor(uuid);
 				return future.thenApply(nameColor -> {
 					if (nameColor != null) {
-						builder.append(TextComponent.fromLegacyText(nameColor + ' ' + Formatting.ARROW_SYMBOL + ' '));
+						builder.append("§8 ┃ §b" + user.getLevel())
+								.append(TextComponent.fromLegacyText("§8" + ' ' + Formatting.ARROW_SYMBOL + ' '));
 						return CompletableFuture.completedFuture(null);
 					}
 					return permissionService.getBestGroup(uuid).thenAccept(group -> {
-						builder.append(TextComponent.fromLegacyText(group.getNameColor() + ' ' + Formatting.ARROW_SYMBOL + ' '));
+						builder.append("§8 ┃ §b" + user.getLevel())
+								.append(TextComponent.fromLegacyText("§8" + ' ' + Formatting.ARROW_SYMBOL + ' '));
 					});
 				});
-			}).thenApply(future ->
-					chatView.format(uuid, oldLegacy).thenAccept(builder::append)).thenApply(__ -> builder.create()));
+			}).thenApply(future -> builder.append("§f" + oldLegacy)).thenApply(__ -> builder.create()));
 		}, EventPriority.LOW, true);
 		eventExecutor.registerListener(
 				PlayerJoinEvent.class,
@@ -118,7 +120,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 				event -> event.setJoinMessage(null),
 				EventPriority.HIGH,
 				true
-		);
+									  );
 		eventExecutor.registerListener(
 				PlayerQuitEvent.class,
 				this,
@@ -127,7 +129,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 					setChatView(event.getPlayer().getUniqueId(), null);
 				},
 				EventPriority.NORMAL, false
-		);
+									  );
 	}
 
 	@Override
