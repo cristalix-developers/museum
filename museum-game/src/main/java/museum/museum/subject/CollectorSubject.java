@@ -10,8 +10,8 @@ import museum.museum.Museum;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.CollectorSubjectPrototype;
 import museum.museum.map.SubjectPrototype;
-import museum.museum.subject.skeleton.AtomPiece;
-import museum.museum.subject.skeleton.V4;
+import museum.display.StandDisplayable;
+import museum.display.V5;
 import museum.player.User;
 import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
@@ -23,7 +23,7 @@ public class CollectorSubject extends Subject implements Incomeble {
 	@Getter
 	private final int id;
 	@Getter
-	private final AtomPiece piece;
+	private final StandDisplayable piece;
 	@Setter
 	private CollectorNavigator navigator;
 	@Getter
@@ -38,7 +38,7 @@ public class CollectorSubject extends Subject implements Incomeble {
 		armorStand.setCustomName(prototype.getTitle());
 		armorStand.setCustomNameVisible(true);
 		this.navigator = null;
-		this.piece = new AtomPiece(armorStand);
+		this.piece = new StandDisplayable(armorStand);
 		this.id = info.getMetadata() == null ? 0 : Integer.parseInt(info.getMetadata());
 		this.speed = (int) ((CollectorSubjectPrototype) prototype).getSpeed();
 		this.radius = ((CollectorSubjectPrototype) prototype).getRadius();
@@ -53,7 +53,7 @@ public class CollectorSubject extends Subject implements Incomeble {
 	@Override
 	public void setAllocation(Allocation allocation) {
 		super.setAllocation(allocation);
-		if (allocation != null) allocation.allocatePiece(piece, V4.fromLocation(this.getCollectorLocation()), false);
+		if (allocation != null) allocation.allocatePiece(piece, V5.fromLocation(this.getCollectorLocation()), false);
 	}
 
 	public void move(long iteration) {
@@ -63,7 +63,7 @@ public class CollectorSubject extends Subject implements Incomeble {
 		if (getAllocation().getState() instanceof Museum)
 			((Museum) getAllocation().getState()).getCoins()
 					.removeIf(coin -> coin.pickUp(owner, location, radius, piece.getStand().id));
-		getAllocation().allocatePiece(piece, V4.fromLocation(location), true);
+		getAllocation().allocatePiece(piece, V5.fromLocation(location), true);
 	}
 
 	public Location getCollectorLocation() {

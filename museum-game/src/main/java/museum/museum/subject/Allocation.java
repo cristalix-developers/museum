@@ -9,10 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import museum.App;
 import museum.museum.map.SubjectPrototype;
-import museum.museum.subject.skeleton.AtomPiece;
-import museum.museum.subject.skeleton.Displayable;
-import museum.museum.subject.skeleton.Piece;
-import museum.museum.subject.skeleton.V4;
+import museum.display.StandDisplayable;
+import museum.display.Displayable;
+import museum.display.Piece;
+import museum.display.V5;
 import museum.player.State;
 import museum.player.User;
 import museum.util.ChunkWriter;
@@ -35,7 +35,7 @@ public class Allocation {
 	private final Map<BlockPosition, IBlockData> blocks;
 	private final Collection<Packet<PacketListenerPlayOut>> updatePackets;
 	private final Collection<Packet<PacketListenerPlayOut>> removePackets;
-	private final Map<AtomPiece, V4> pieces = new HashMap<>();
+	private final Map<StandDisplayable, V5> pieces = new HashMap<>();
 	private final List<Displayable> displayables = new ArrayList<>();
 	private final State state;
 	private final List<Location> allocatedBlocks;
@@ -150,13 +150,13 @@ public class Allocation {
 		displayables.remove(displayable);
 	}
 
-	public void allocatePiece(Piece piece, V4 origin, boolean update) {
-		Map<AtomPiece, V4> freshPieces = new HashMap<>();
+	public void allocatePiece(Piece piece, V5 origin, boolean update) {
+		Map<StandDisplayable, V5> freshPieces = new HashMap<>();
 		piece.recursiveTraverse(freshPieces, origin);
 		if (update) {
 			List<Packet<PacketListenerPlayOut>> packets = new ArrayList<>();
 			freshPieces.forEach((atom, position) -> {
-				V4 existing = this.pieces.get(atom);
+				V5 existing = this.pieces.get(atom);
 				if (existing != null) atom.getUpdatePackets(packets, position);
 				else atom.getShowPackets(packets, position);
 			});
@@ -171,13 +171,13 @@ public class Allocation {
 	}
 
 	public void removePiece(Piece piece) {
-		Map<AtomPiece, V4> piecesToRemove = new HashMap<>();
-		piece.recursiveTraverse(piecesToRemove, new V4(0, 0, 0, 0));
+		Map<StandDisplayable, V5> piecesToRemove = new HashMap<>();
+		piece.recursiveTraverse(piecesToRemove, new V5(0, 0, 0, 0, 0));
 		int[] ids = new int[piecesToRemove.size()];
 		int i = 0;
-		for (AtomPiece atomPiece : piecesToRemove.keySet()) {
-			this.pieces.remove(atomPiece);
-			ids[i++] = atomPiece.getStand().id;
+		for (StandDisplayable standDisplayable : piecesToRemove.keySet()) {
+			this.pieces.remove(standDisplayable);
+			ids[i++] = standDisplayable.getStand().id;
 		}
 		PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(ids);
 		for (User user : state.getUsers())
@@ -230,7 +230,7 @@ public class Allocation {
 		HIDE_PIECES((allocation, buffer, chunk) -> {
 			int[] ids = new int[allocation.pieces.size()];
 			int i = 0;
-			for (AtomPiece piece : allocation.pieces.keySet()) ids[i++] = piece.getStand().id;
+			for (StandDisplayable piece : allocation.pieces.keySet()) ids[i++] = piece.getStand().id;
 			buffer.add(new PacketPlayOutEntityDestroy(ids));
 		}),
 		UPDATE_BLOCKS((allocation, buffer, chunk) -> buffer.addAll(allocation.updatePackets)),

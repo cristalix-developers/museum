@@ -9,11 +9,11 @@ import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
-import museum.museum.subject.skeleton.V4;
+import museum.display.V5;
 import museum.player.User;
 import museum.prototype.Managers;
 
-import static museum.museum.subject.skeleton.Piece.orientedOffset;
+import static museum.display.Piece.orientedOffset;
 
 /**
  * @author func 22.05.2020
@@ -23,13 +23,13 @@ import static museum.museum.subject.skeleton.Piece.orientedOffset;
 public class SkeletonSubject extends Subject {
 
 	private Skeleton skeleton;
-	private V4 skeletonLocation;
+	private V5 skeletonLocation;
 
 	public SkeletonSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
 
 		V3 origin = prototype.getRelativeOrigin();
-		this.skeletonLocation = V4.fromLocation(prototype.getBox().getMin()).add(origin.getX(), origin.getY(), origin.getZ());
+		this.skeletonLocation = V5.fromLocation(prototype.getBox().getMin()).add(origin.getX(), origin.getY(), origin.getZ());
 
 		if (info.metadata == null) return;
 
@@ -38,7 +38,7 @@ public class SkeletonSubject extends Subject {
 		SkeletonPrototype skeletonProto = Managers.skeleton.getPrototype(skeletonAddress);
 		if (skeletonProto == null) return;
 		this.skeleton = owner.getSkeletons().supply(skeletonProto);
-		this.skeletonLocation.rot = Float.parseFloat(ss[1]);
+		this.skeletonLocation.yaw = Float.parseFloat(ss[1]);
 	}
 
 	@Override
@@ -46,18 +46,18 @@ public class SkeletonSubject extends Subject {
 		super.setAllocation(allocation);
 		if (allocation == null) skeletonLocation = null;
 		else {
-			float rot = this.skeletonLocation == null ? 0 : this.skeletonLocation.rot;
+			float rot = this.skeletonLocation == null ? 0 : this.skeletonLocation.yaw;
 			Box box = prototype.getBox();
 			V3 o = prototype.getRelativeOrigin();
-			this.skeletonLocation = V4.fromLocation(box.transpose(
+			this.skeletonLocation = V5.fromLocation(box.transpose(
 					V3.of(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ()),
 					Orientation.values()[cachedInfo.getRotation().ordinal()],
 					V3.of(o.getX(), 0, o.getZ()),
 					(int) o.getX(),
 					(int) o.getY(),
 					(int) o.getZ()
-			));
-			this.skeletonLocation.setRot(rot);
+																 ));
+			this.skeletonLocation.setYaw(rot);
 
 			this.updateSkeleton(false);
 		}
@@ -67,7 +67,7 @@ public class SkeletonSubject extends Subject {
 		Allocation allocation = this.getAllocation();
 		this.updateInfo();
 		if (allocation == null || this.skeleton == null) return;
-		V4 absoluteLocation = V4.fromLocation(allocation.getOrigin()).add(this.skeletonLocation);
+		V5 absoluteLocation = V5.fromLocation(allocation.getOrigin()).add(this.skeletonLocation);
 		skeleton.getUnlockedFragments().forEach(fragment ->
 				allocation.allocatePiece(fragment, orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment)), sendUpdates));
 		if (owner.getState() == null)
@@ -80,7 +80,7 @@ public class SkeletonSubject extends Subject {
 		super.updateInfo();
 		if (skeleton == null) cachedInfo.metadata = null;
 		else
-			cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot);
+			cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.yaw);
 	}
 
 	@Override

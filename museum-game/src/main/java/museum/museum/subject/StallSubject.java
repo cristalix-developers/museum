@@ -8,7 +8,7 @@ import museum.data.SubjectInfo;
 import museum.museum.map.StallPrototype;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.product.FoodProduct;
-import museum.museum.subject.skeleton.V4;
+import museum.display.V5;
 import museum.player.User;
 import museum.util.MessageUtil;
 import museum.worker.NpcWorker;
@@ -96,6 +96,6 @@ public class StallSubject extends Subject implements Incomeble {
 	public void rotateCustomerHead() {
 		if (owner.getPlayer() == null)
 			return;
-		worker.update(owner, V4.fromLocation(owner.getLocation()));
+		worker.update(owner, V5.fromLocation(owner.getLocation()));
 	}
 }

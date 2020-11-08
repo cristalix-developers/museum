@@ -3,7 +3,7 @@ package museum.worker;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
-import museum.museum.subject.skeleton.V4;
+import museum.display.V5;
 import museum.player.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -48,7 +48,7 @@ public class WorkerUtil {
 			for (User user : app.getUsers()) {
 				if (user.getPlayer() == null)
 					continue;
-				val playerLoc = V4.fromLocation(user.getLocation());
+				val playerLoc = V5.fromLocation(user.getLocation());
 
 				for (NpcWorker worker : workers)
 					worker.update(user, playerLoc);

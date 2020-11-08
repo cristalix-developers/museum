@@ -2,6 +2,7 @@ package museum.museum.subject.skeleton;
 
 import lombok.Getter;
 import museum.data.SkeletonInfo;
+import museum.display.Fragment;
 import museum.player.User;
 import museum.prototype.Storable;
 

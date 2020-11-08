@@ -1,6 +1,10 @@
 package museum.museum.subject.skeleton;
 
 import lombok.Getter;
+import museum.display.Fragment;
+import museum.display.Piece;
+import museum.display.StandDisplayable;
+import museum.display.V5;
 import museum.prototype.Prototype;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand;
@@ -21,7 +25,7 @@ public class SkeletonPrototype implements Prototype, Piece {
 	private final String address;
 	private final Rarity rarity;
 	private final int price;
-	private final Map<Fragment, V4> childrenMap = new HashMap<>();
+	private final Map<Fragment, V5> childrenMap = new HashMap<>();
 
 	public SkeletonPrototype(String address, String title, Location worldOrigin, int size, Rarity rarity, List<ArmorStand> stands, int price) {
 		this.title = title;
@@ -41,16 +45,16 @@ public class SkeletonPrototype implements Prototype, Piece {
 						z += loc.z;
 					}
 					int amount = fragmentStands.size();
-					V4 fragmentOffset = new V4(x / amount, y / amount, z / amount, 0);
+					V5 fragmentOffset = new V5(x / amount, y / amount, z / amount, 0);
 					Fragment fragment = new Fragment(fragmentAddress);
 
 					for (ArmorStand stand : fragmentStands) {
-						AtomPiece piece = new AtomPiece(((CraftArmorStand) stand).getHandle());
-						V4 pieceOffset = V4.fromLocation(stand.getLocation().subtract(fragmentOffset.toVector()));
-						pieceOffset.setRot(stand.getLocation().getYaw());
+						StandDisplayable piece = new StandDisplayable(((CraftArmorStand) stand).getHandle());
+						V5 pieceOffset = V5.fromLocation(stand.getLocation().subtract(fragmentOffset.toVector()));
+						pieceOffset.setYaw(stand.getLocation().getYaw());
 						fragment.getChildrenMap().put(piece, pieceOffset);
 					}
-					this.childrenMap.put(fragment, V4.fromVector(fragmentOffset.toVector().subtract(worldOrigin.toVector())));
+					this.childrenMap.put(fragment, V5.fromVector(fragmentOffset.toVector().subtract(worldOrigin.toVector())));
 				});
 	}
 
@@ -58,7 +62,7 @@ public class SkeletonPrototype implements Prototype, Piece {
 		return childrenMap.keySet();
 	}
 
-	public V4 getOffset(Fragment fragment) {
+	public V5 getOffset(Fragment fragment) {
 		return this.childrenMap.get(fragment);
 	}
 

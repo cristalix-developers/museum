@@ -15,10 +15,10 @@ import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
 import museum.museum.subject.Subject;
-import museum.museum.subject.skeleton.Fragment;
+import museum.display.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
-import museum.museum.subject.skeleton.V4;
+import museum.display.V5;
 import museum.player.User;
 import museum.player.pickaxe.PickaxeType;
 import museum.prototype.Managers;
@@ -46,7 +46,7 @@ public class BeforePacketHandler implements Prepare {
 	public static final Prepare INSTANCE = new BeforePacketHandler();
 
 	public static final ItemStack EMERGENCY_STOP = Items.render("go-back-item").asBukkitMirror();
-	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
+	public static final V5 OFFSET = new V5(0, 0.03, 0, 4);
 	private static final ItemStack[] INTERACT_ITEMS = Items.items.keySet().stream()
 			.filter(closure -> closure.contains("treasure"))
 			.map(closure -> Items.render(closure).asBukkitMirror())
@@ -220,7 +220,7 @@ public class BeforePacketHandler implements Prepare {
 			user.giveExperience(1);
 			val fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
 
-			V4 location = new V4(position.getX(), position.getY() + 0.5, position.getZ(), (float) (Math.random() * 360 - 180));
+			V5 location = new V5(position.getX(), position.getY() + 0.5, position.getZ(), (float) (Math.random() * 360 - 180));
 
 			fragment.transpose(location).forEach((atom, origin) -> atom.show(user, origin));
 			animateFragments(user, fragment, location);
@@ -252,7 +252,7 @@ public class BeforePacketHandler implements Prepare {
 		}
 	}
 
-	private void animateFragments(User user, Fragment fragment, V4 location) {
+	private void animateFragments(User user, Fragment fragment, V5 location) {
 		Cycle.run(1, 60, tick -> {
 			if (tick == 59) fragment.transpose(OFFSET).keySet().forEach(piece -> piece.hide(user));
 			else fragment.transpose(location.add(OFFSET)).forEach((atom, origin) -> atom.update(user, origin));
