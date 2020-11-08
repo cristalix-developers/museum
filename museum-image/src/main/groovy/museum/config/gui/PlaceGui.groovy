@@ -3,15 +3,18 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import museum.misc.PlacesMechanic
-import org.bukkit.Material
 import org.bukkit.entity.Player
 
 import static museum.App.getApp
-import static org.bukkit.Material.CLAY_BALL
-import static org.bukkit.Material.COMPASS
+import static org.bukkit.Material.*
 
 on COMPASS use {
+    player.performCommand 'place'
+}
+
+registerCommand 'place' handle {
     Guis.open(player, 'place-gui', player)
+    return
 }
 
 Guis.register 'place-gui', {
@@ -29,7 +32,7 @@ Guis.register 'place-gui', {
 
     button MuseumGuis.background
     button 'X' icon {
-        item Material.DIAMOND
+        item DIAMOND
         text """§bМеста!
             
                 Гуляйте по картам и
@@ -42,7 +45,7 @@ Guis.register 'place-gui', {
         def place = PlacesMechanic.getPlaceByTitle it
         if (place) {
             button 'O' icon {
-                item Material.PAPER
+                item PAPER
                 text """§b${place.title}
             
                 Вы получили §6${place.claimedExp} EXP
