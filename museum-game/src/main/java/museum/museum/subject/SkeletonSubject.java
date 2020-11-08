@@ -38,6 +38,7 @@ public class SkeletonSubject extends Subject {
 		String[] ss = info.metadata.split(":");
 		try {
 			this.level = Integer.parseInt(ss[2]);
+			this.level = this.level >= 100 ? 100 : this.level;
 		} catch (Exception exception) {
 			this.level = 1;
 		}
