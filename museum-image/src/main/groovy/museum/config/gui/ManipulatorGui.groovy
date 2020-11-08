@@ -224,13 +224,15 @@ Guis.register 'manipulator', { player ->
         }
     }
 
-    button 'I' icon {
-        def itemStack = abstractSubject.prototype.icon
-        item itemStack.type
-        data itemStack.durability
-        text """
+    if (abstractSubject instanceof SkeletonSubject) {
+        button 'I' icon {
+            def itemStack = abstractSubject.prototype.icon
+            item itemStack.type
+            data itemStack.durability
+            text """
             §a$abstractSubject.prototype.title
             §eДоход: §f$abstractSubject.income
         """
+        }
     }
 }
