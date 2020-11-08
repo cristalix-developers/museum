@@ -27,6 +27,7 @@ public class DefaultElements {
 
 		UserInfo userInfo = new UserInfo(
 				userId,
+				null,
 				0,
 				1000.0,
 				0L,

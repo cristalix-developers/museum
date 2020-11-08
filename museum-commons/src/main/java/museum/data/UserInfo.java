@@ -14,6 +14,7 @@ public class UserInfo implements Unique {
 
 	public final UUID uuid;
 
+	public String prefix;
 	public long experience;
 	private double money;
 	private long timePlayed;

@@ -3,6 +3,7 @@ package museum.util;
 import lombok.val;
 import museum.App;
 import museum.packages.UserChatPackage;
+import museum.player.User;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -93,7 +94,9 @@ public final class MuseumChatService extends ChatService implements Listener {
 				if (ps != null) original.add(ps);
 			}
 			val oldLegacy = legacy;
-			val builder = new ComponentBuilder(new TextComponent("§7[§b" + App.getApp().getUser(uuid).getLevel() + "§7] "));
+			User user = App.getApp().getUser(uuid);
+			val builder = new ComponentBuilder(new TextComponent(user.getLevel() + "§8 ┃ "));
+			if (user.getPrefix() != null) builder.append(new TextComponent(user.getPrefix() + "§8 ┃ "));
 			event.setMessage(chatView.getFormattedComponent(uuid, context).thenCompose(message -> {
 				builder.append(message);
 				val future = permissionService.getNameColor(uuid);
