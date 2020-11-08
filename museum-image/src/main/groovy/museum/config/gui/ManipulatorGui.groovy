@@ -147,32 +147,42 @@ Guis.register 'manipulator', { player ->
         def rows = (Managers.skeleton.size() - 1) / 7 + 1
 
         def upgradeCost = 10000
-        def upgradePercent = 20
+        def upgradePercent = 3
 
         if (rows) {
             rows.times { gui.layout += '-OOOOOOO-' }
             gui.layout += '----P----'
-            button 'P' icon {
-                item CLAY_BALL
-                nbt.other = 'guild_invite'
-                text """
-                &aУлучшить витрину
+            if (subject.level < 100) {
+                button 'P' icon {
+                    item CLAY_BALL
+                    nbt.other = 'guild_invite'
+                    text """
+                    &aУлучшить витрину
 
-                &fЦена улучшения &a10'000 \$
+                    &fЦена улучшения &a10'000 \$
 
-                С каждым уровнем витрина 
-                приносит на &b$upgradePercent%▲&f больше дохода
-                &b${subject.level} &fуровень -> &b&l${subject.level + 1} уровень &a+${subject.level * upgradePercent}% ▲▲▲
-                """
-            } leftClick {
-                if (user.money >= upgradeCost) {
-                    user.money = user.money - upgradeCost
-                    subject.level = subject.level + 1
-                    user.sendMessage(Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
-                    Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
-                } else {
-                    MessageUtil.find('nomoney').send(user)
-                    closeInventory()
+                    С каждым уровнем витрина 
+                    приносит на &b$upgradePercent%▲&f больше дохода
+                    &b${subject.level} &fуровень -> &b&l${subject.level + 1} уровень &a+${subject.level * upgradePercent}% ▲▲▲
+                    """
+                } leftClick {
+                    if (user.money >= upgradeCost) {
+                        user.money = user.money - upgradeCost
+                        subject.level = subject.level + 1
+                        user.sendMessage(Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
+                        Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
+                    } else {
+                        MessageUtil.find('nomoney').send(user)
+                        closeInventory()
+                    }
+                }
+            } else {
+                button 'P' icon {
+                    item CLAY_BALL
+                    nbt.other = 'guild_invite'
+                    text """
+                    &7Витрина максимального уровня
+                    """
                 }
             }
         }
