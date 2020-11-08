@@ -2,7 +2,7 @@
 package museum.config.gui
 
 import clepto.bukkit.menu.Guis
-import museum.excavation.PlacesMechanic
+import museum.misc.PlacesMechanic
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
@@ -20,12 +20,24 @@ Guis.register 'place-gui', {
     title 'Где я был(а)?'
 
     layout """
+        ----X----
+        -OOOOOOO-
         -OOOOOOO-
         -OOOOOOO-
         -OOOOOOO-
     """
 
     button MuseumGuis.background
+    button 'X' icon {
+        item Material.DIAMOND
+        text """§bМеста!
+            
+                Гуляйте по картам и
+                находите интересные места,
+                за которые вы получаете §bопыт
+                для повышения уровня! 
+                """
+    }
     user.claimedPlaces.forEach {
         def place = PlacesMechanic.getPlaceByTitle it
         if (place) {

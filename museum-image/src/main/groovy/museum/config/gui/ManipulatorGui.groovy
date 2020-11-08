@@ -11,8 +11,10 @@ import museum.museum.subject.Subject
 import museum.museum.subject.product.FoodProduct
 import museum.museum.subject.skeleton.Skeleton
 import museum.prototype.Managers
+import museum.util.MessageUtil
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
+import ru.cristalix.core.formatting.Formatting
 
 import static clepto.bukkit.item.Items.items
 import static clepto.bukkit.item.Items.register
@@ -135,7 +137,7 @@ Guis.register 'manipulator', { player ->
                         subject.updateSkeleton true
                         user.updateIncome()
                     }
-                    Guis.open(delegate, 'manipulator', subject.cachedInfo.uuid)
+                    Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
                 }
             }
         }
@@ -144,9 +146,35 @@ Guis.register 'manipulator', { player ->
 
         def rows = (Managers.skeleton.size() - 1) / 7 + 1
 
+        def upgradeCost = 10000
+        def upgradePercent = 20
+
         if (rows) {
             rows.times { gui.layout += '-OOOOOOO-' }
-            gui.layout += '---------'
+            gui.layout += '----P----'
+            button 'P' icon {
+                item CLAY_BALL
+                nbt.other = 'guild_invite'
+                text """
+                &aУлучшить витрину
+
+                &fЦена улучшения &a10'000 \$
+
+                С каждым уровнем витрина 
+                приносит на &b$upgradePercent%▲&f больше дохода
+                &b${subject.level} &fуровень -> &b&l${subject.level + 1} уровень &a+${subject.level * upgradePercent}% ▲▲▲
+                """
+            } leftClick {
+                if (user.money >= upgradeCost) {
+                    user.money = user.money - upgradeCost
+                    subject.level = subject.level + 1
+                    user.sendMessage(Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
+                    Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
+                } else {
+                    MessageUtil.find('nomoney').send(user)
+                    closeInventory()
+                }
+            }
         }
     } else if (abstractSubject instanceof StallSubject) {
         if (abstractSubject.food.isEmpty()) {

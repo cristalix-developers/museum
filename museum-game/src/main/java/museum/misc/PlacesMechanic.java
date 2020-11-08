@@ -1,4 +1,4 @@
-package museum.excavation;
+package museum.misc;
 
 import com.google.common.collect.Maps;
 import lombok.Data;

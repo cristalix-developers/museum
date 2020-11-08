@@ -14,7 +14,7 @@ import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
-import museum.excavation.PlacesMechanic;
+import museum.misc.PlacesMechanic;
 import museum.museum.Shop;
 import museum.museum.map.SubjectType;
 import museum.packages.*;

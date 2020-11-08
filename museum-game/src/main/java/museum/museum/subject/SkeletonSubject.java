@@ -4,6 +4,7 @@ import clepto.bukkit.world.Box;
 import clepto.bukkit.world.Orientation;
 import clepto.math.V3;
 import lombok.Getter;
+import lombok.Setter;
 import museum.data.SubjectInfo;
 import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
@@ -24,6 +25,8 @@ public class SkeletonSubject extends Subject {
 
 	private Skeleton skeleton;
 	private V4 skeletonLocation;
+	@Setter
+	private int level = 1;
 
 	public SkeletonSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
@@ -32,8 +35,12 @@ public class SkeletonSubject extends Subject {
 		this.skeletonLocation = V4.fromLocation(prototype.getBox().getMin()).add(origin.getX(), origin.getY(), origin.getZ());
 
 		if (info.metadata == null) return;
-
 		String[] ss = info.metadata.split(":");
+		try {
+			this.level = Integer.parseInt(ss[2]);
+		} catch (Exception exception) {
+			this.level = 1;
+		}
 		String skeletonAddress = ss[0];
 		SkeletonPrototype skeletonProto = Managers.skeleton.getPrototype(skeletonAddress);
 		if (skeletonProto == null) return;
@@ -78,16 +85,16 @@ public class SkeletonSubject extends Subject {
 	@Override
 	public void updateInfo() {
 		super.updateInfo();
-		if (skeleton == null) cachedInfo.metadata = null;
+		if (skeleton == null) cachedInfo.metadata = "::" + level;
 		else
-			cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot);
+			cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot) + ":" + level;
 	}
 
 	@Override
 	public double getIncome() {
 		if (skeleton == null)
 			return 0;
-		return skeleton.getUnlockedFragments().size() * (double) skeleton.getPrototype().getPrice() / 300;
+		return skeleton.getUnlockedFragments().size() * (double) skeleton.getPrototype().getPrice() / 300 * level / 5;
 	}
 
 	public void setSkeleton(Skeleton skeleton) {

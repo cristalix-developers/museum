@@ -2,7 +2,7 @@
 package museum.config.listener
 
 import museum.App
-import museum.excavation.PlacesMechanic
+import museum.misc.PlacesMechanic
 import museum.museum.Museum
 import museum.museum.map.SubjectType
 import museum.museum.subject.product.FoodProduct

@@ -154,7 +154,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		user.getPlayer().getOpenInventory().getTopInventory().clear();
 		inventory.clear();
 		inventory.setItem(0, menu);
-		inventory.setItem(4, visitorMenu);
+		inventory.setItem(3, visitorMenu);
 		inventory.setItem(5, placeMenu);
 		inventory.setItem(8, donateMenu);
 	}
