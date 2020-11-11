@@ -28,6 +28,7 @@ public class UserInfo implements Unique {
 	private List<DonateType> donates;
 	private List<BoosterInfo> localBoosters;
 	private List<String> claimedPlaces;
+	private List<String> claimedRelics;
 	private double income;
 
 }

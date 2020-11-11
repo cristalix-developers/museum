@@ -91,6 +91,18 @@ register 'flint-treasure', {
     """
 }
 
+register 'sink-treasure', {
+    item CLAY_BALL
+    nbt.museum = 'sink'
+    nbt.cost = 74
+    text """
+        §aПервобытное орудие §6+74\$
+
+        Иногда его можно найти
+        на раскопках, стоит не много.
+    """
+}
+
 on PlayerInteractEvent, {
     if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR)
         return

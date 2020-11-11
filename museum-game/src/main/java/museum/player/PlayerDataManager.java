@@ -21,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -76,6 +75,7 @@ public class PlayerDataManager implements Listener {
 				// Добавление дефолтных значений, которых не было в самом начале
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 				if (userInfo.getClaimedPlaces() == null) userInfo.setClaimedPlaces(new ArrayList<>());
+				if (userInfo.getClaimedRelics() == null) userInfo.setClaimedRelics(new ArrayList<>());
 				userMap.put(uuid, new User(userInfo));
 			} catch (Exception ex) {
 				event.setCancelReason("Не удалось загрузить статистику о музее.");

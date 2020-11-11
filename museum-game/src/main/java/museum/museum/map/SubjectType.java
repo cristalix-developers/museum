@@ -13,6 +13,7 @@ public class SubjectType<T extends Subject> {
 	private static final List<SubjectType<?>> registry = new ArrayList<>();
 
 	public static SubjectType<SkeletonSubject> SKELETON_CASE;
+	public static SubjectType<RelicShowcaseSubject> RELIC_CASE;
 	public static SubjectType<Subject> DECORATION;
 	public static SubjectType<CollectorSubject> COLLECTOR;
 	public static SubjectType<MarkerSubject> MARKER;
@@ -30,6 +31,7 @@ public class SubjectType<T extends Subject> {
 
 	public static void init() {
 		SKELETON_CASE = new SubjectType<>("skeleton-case", SkeletonSubject::new);
+		RELIC_CASE = new SubjectType<>("relic-case", RelicShowcaseSubject::new);
 		DECORATION = new SubjectType<>("decoration", Subject::new);
 		COLLECTOR = new SubjectType<>("collector", CollectorSubject::new);
 		MARKER = new SubjectType<>("marker", MarkerSubject::new);

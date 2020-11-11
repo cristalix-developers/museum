@@ -1,9 +1,9 @@
 package museum;
 
 import clepto.bukkit.B;
-import clepto.cristalix.Cristalix;
 import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
+import clepto.cristalix.Cristalix;
 import clepto.cristalix.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
@@ -74,16 +74,9 @@ public final class App extends JavaPlugin {
 
 		B.events(new PhysicsDisabler());
 
-		// Загрузка мира
-		MapLoader.load(this);
-
 		// Добавление админ-команд
 		AdminCommand.init(this);
 
-		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
-		SubjectType.init();
-		Managers.init();
-		clepto.bukkit.menu.Guis.init();
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 
 		String museumServiceHost = System.getenv("MUSEUM_SERVICE_HOST");
@@ -165,6 +158,14 @@ public final class App extends JavaPlugin {
 		} catch (Exception exception) {
 			exception.printStackTrace();
 		}
+
+		// Загрузка мира
+		MapLoader.load(this);
+
+		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
+		SubjectType.init();
+		Managers.init();
+		clepto.bukkit.menu.Guis.init();
 
 		// Класс управляющий игроками
 		this.playerDataManager = new PlayerDataManager(this);

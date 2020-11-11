@@ -59,8 +59,8 @@ public class BoosterManager implements Subservice {
 		if (mustDeleted.isEmpty()) return;
 
 		mustDeleted.forEach(booster -> {
-			MuseumService.alert("§eБустер закончился!", "§b" + booster.getType().getName());
-			MuseumService.alertMessage("§f[§c!§f] Глобальный бустер §b" + booster.getType().getName() + " §fзакончился!");
+			MuseumService.alert("§fБустер закончился!", "§b" + booster.getType().getName());
+			MuseumService.alertMessage("§fГлобальный бустер §b" + booster.getType().getName() + " §fзакончился!");
 			globalBoosters.remove(booster.getType());
 			thanksMap.remove(booster.getUuid());
 		});

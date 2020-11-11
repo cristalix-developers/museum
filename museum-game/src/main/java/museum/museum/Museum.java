@@ -9,6 +9,7 @@ import museum.App;
 import museum.boosters.BoosterType;
 import museum.client_conversation.ClientPacket;
 import museum.data.MuseumInfo;
+import museum.misc.Relic;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectType;
@@ -123,10 +124,13 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		if (this.owner != user) {
 			inventory.setItem(8, backItem);
 			cachedInfo.views++;
-		} else
+		} else {
 			for (Subject subject : user.getSubjects())
 				if (!subject.isAllocated())
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
+			for (Relic relic : user.getRelics())
+				inventory.addItem(relic.getRelic());
+		}
 
 		if (user.getGrabbedArmorstand() == null)
 			player.setAllowFlight(true);

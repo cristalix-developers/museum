@@ -7,6 +7,7 @@ import lombok.experimental.Delegate;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.data.*;
+import museum.misc.Relic;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectPrototype;
@@ -28,6 +29,8 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.spigotmc.AsyncCatcher;
 import ru.cristalix.core.util.UtilV3;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -41,7 +44,7 @@ public class User implements PlayerWrapper {
 			= new Registry<>(this, Managers.skeleton, SkeletonInfo::new, Skeleton::new);
 	private final Registry<SubjectInfo, SubjectPrototype, Subject> subjects
 			= new Registry<>(this, Managers.subject, SubjectInfo::generateNew, SubjectPrototype::provide);
-
+	private final List<Relic> relics;
 	private CraftPlayer player;
 	private PlayerConnection connection;
 	private Location lastLocation;
@@ -58,6 +61,12 @@ public class User implements PlayerWrapper {
 		this.skeletons.importInfos(info.getSkeletonInfos());
 		this.subjects.importInfos(info.getSubjectInfos());
 		this.museums.importInfos(info.getMuseumInfos());
+		List<Relic> list = new ArrayList<>();
+		for (String address : info.getClaimedRelics()) {
+			Relic relic = new Relic(address);
+			list.add(relic);
+		}
+		this.relics = list;
 
 		if (info.getLastPosition() != null)
 			this.lastLocation = UtilV3.toLocation(info.getLastPosition(), App.getApp().getWorld());

@@ -1,6 +1,7 @@
 package museum.excavation;
 
 import lombok.Data;
+import museum.misc.Relic;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.prototype.Prototype;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
@@ -22,5 +23,6 @@ public class ExcavationPrototype implements Prototype {
 	private final List<PacketPlayOutMapChunk> packets;
 	private final ItemStack icon;
 	private final ItemStack[] pallette;
+	private final Relic[] relics;
 
 }

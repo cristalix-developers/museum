@@ -195,11 +195,18 @@ public class BeforePacketHandler implements Prepare {
 	@SuppressWarnings("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
-			if (user.getPlayer() == null)
+			if (user.getPlayer() == null || !(user.getState() instanceof Excavation))
 				return;
 			// С некоторым шансом может выпасть интерактивая вещь
 			if (Vector.random.nextFloat() > .95)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
+			// С некоторым шансом может выпасть реликвия
+			if (Vector.random.nextFloat() > .95) {
+				val randomRelic = ListUtils.random(((Excavation) user.getState()).getPrototype().getRelics());
+				user.getPlayer().getInventory().addItem(randomRelic.getRelic());
+				user.getRelics().add(randomRelic);
+				user.sendMessage("ура");
+			}
 			// Перебрать все кирки и эффекты на них
 			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
@@ -216,10 +223,9 @@ public class BeforePacketHandler implements Prepare {
 		ExcavationPrototype prototype = ((Excavation) user.getState()).getPrototype();
 		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 
-		val luckyBuffer = user.getLocation().getY() / 100;
-		val bingo = luckyBuffer / proto.getRarity().getRareScale() / 10;
+		val bingo = proto.getRarity().getRareScale() / 400;
 
-		if (bingo > Vector.random.nextDouble()) {
+		if (bingo < Vector.random.nextDouble()) {
 			// Если повезло, то будет проиграна анимация и тд
 			user.giveExperience(1);
 			val fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));

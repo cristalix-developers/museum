@@ -7,6 +7,42 @@ import museum.museum.subject.skeleton.Skeleton
 import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
 
+register 'relic-yantar', {
+    item CLAY_BALL
+    nbt.museum = 'yantar'
+    text """&6Янтарь
+    """
+}
+
+
+register 'relic-tooth', {
+    item CLAY_BALL
+    nbt.museum = 'tooth'
+    text """&6Зуб мегаладона
+    """
+}
+
+register 'relic-anubis', {
+    item CLAY_BALL
+    nbt.museum = 'anubisstick'
+    text """&6Орудие Анубиса
+    """
+}
+
+register 'relic-pot', {
+    item CLAY_BALL
+    nbt.museum = 'pot'
+    text """&6Древний горшок
+    """
+}
+
+register 'relic-shield', {
+    item CLAY_BALL
+    nbt.museum = 'shieldofruin'
+    text """&6Щит война Древнего Египта
+    """
+}
+
 register 'skeleton', {
 
     item BONE

@@ -5,6 +5,7 @@ import museum.App
 import museum.config.command.WagonConfig
 import museum.museum.map.SkeletonSubjectPrototype
 import museum.museum.subject.Allocation
+import museum.museum.subject.RelicShowcaseSubject
 import museum.museum.subject.SkeletonSubject
 import museum.museum.subject.StallSubject
 import museum.museum.subject.Subject
@@ -69,6 +70,32 @@ Guis.register 'manipulator', { player ->
     title abstractSubject.prototype.title
 
     def gui = delegate
+
+    if (abstractSubject instanceof RelicShowcaseSubject) {
+        gui.layout = 'XXXXOXXXE'
+        button 'X' icon {
+            item STAINED_GLASS_PANE
+            text '&fВставьте реликвию'
+        } fillAvailable()
+        button 'O' icon {
+            item FIRE
+        } leftClick {
+            println 'хай'
+        }
+        button 'E' icon {
+            item BARRIER
+            text '&cУбрать витрину'
+        } leftClick {
+            def allocation = abstractSubject.allocation
+            if (!allocation) return
+            allocation.perform PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES, DESTROY_DISPLAYABLE
+            abstractSubject.allocation = null
+
+            inventory.addItem SubjectLogoUtil.encodeSubjectToItemStack(abstractSubject)
+            closeInventory()
+        }
+        return
+    }
 
     gui.layout = '--C-I-D--'
     button MuseumGuis.background
