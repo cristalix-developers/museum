@@ -27,7 +27,7 @@ public class AtomPiece implements Displayable, Piece {
 
 		this.packetSpawn = new PacketPlayOutSpawnEntity(as, 78);
 		this.packetMetadata = new PacketPlayOutEntityMetadata(as.getId(), as.getDataWatcher(), false);
-		this.packetDestroy = new PacketPlayOutEntityDestroy(as.getId());
+		this.packetDestroy = new PacketPlayOutEntityDestroy(new int[] {as.getId()});
 		List<PacketPlayOutEntityEquipment> list = new ArrayList<>();
 		for (EnumItemSlot slot : EnumItemSlot.values()) {
 			ItemStack item = as.getEquipment(slot);

@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
 
@@ -99,7 +100,7 @@ public class PlayerDataManager implements Listener {
 	}
 
 	@EventHandler
-	public void onPreLogin(AsyncPlayerPreLoginEvent event) {
+	public void onSpawn(PlayerSpawnLocationEvent event) {
 		event.setSpawnLocation(Managers.museum.getPrototype("main").getSpawn());
 	}
 

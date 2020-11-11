@@ -29,7 +29,7 @@ public class Coin {
 	}
 
 	public void remove(PlayerConnection connection) {
-		connection.sendPacket(new PacketPlayOutEntityDestroy(entityItem.getId()));
+		connection.sendPacket(new PacketPlayOutEntityDestroy(new int[] {entityItem.getId()}));
 	}
 
 	public void create(PlayerConnection connection) {
@@ -68,7 +68,7 @@ public class Coin {
 		user.depositMoneyWithBooster(money);
 
 		B.postpone(30, () -> {
-			connection.sendPacket(new PacketPlayOutEntityDestroy(message.getId()));
+			connection.sendPacket(new PacketPlayOutEntityDestroy(new int[] {message.getId()}));
 			remove(connection);
 		});
 		return true;
