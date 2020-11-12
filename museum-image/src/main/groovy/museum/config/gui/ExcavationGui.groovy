@@ -1,6 +1,6 @@
 package museum.config.gui
 
-import clepto.bukkit.command.Commands
+
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
@@ -57,9 +57,4 @@ Guis.register 'excavation', { player ->
     } leftClick {
         performCommand("gui main")
     }
-}
-
-Commands.registerCommand('item') handle {
-    player.getInventory().addItem(Items.render(args[0]).asBukkitMirror())
-    message Items.render(args[0])
 }

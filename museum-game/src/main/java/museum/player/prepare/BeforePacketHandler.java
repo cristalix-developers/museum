@@ -12,8 +12,10 @@ import museum.App;
 import museum.PacketMetrics;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
+import museum.misc.Relic;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
+import museum.museum.subject.RelicShowcaseSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
@@ -28,6 +30,7 @@ import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -64,9 +67,13 @@ public class BeforePacketHandler implements Prepare {
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 				if (packetObj instanceof PacketPlayInUseItem)
 					onItemUse(user, (PacketPlayInUseItem) packetObj);
-				else if (packetObj instanceof PacketPlayInBlockDig)
-					onDigging(user, (PacketPlayInBlockDig) packetObj);
-				else if (packetObj instanceof PacketPlayInSteerVehicle) {
+				else if (packetObj instanceof PacketPlayInBlockDig) {
+					val dig = (PacketPlayInBlockDig) packetObj;
+					// Если пакет о дропе предмета - дропнуть пакет
+					if (dig.c == DROP_ITEM || dig.c == DROP_ALL_ITEMS)
+						return;
+					onDigging(user, dig);
+				} else if (packetObj instanceof PacketPlayInSteerVehicle) {
 					// Если игрок на коллекторе и нажимает шифт, то скинуть его
 					val packet = (PacketPlayInSteerVehicle) packetObj;
 					if (packet.d) {
@@ -114,6 +121,34 @@ public class BeforePacketHandler implements Prepare {
 		for (Subject subject : museum.getSubjects()) {
 			for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
 				if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
+					// Если это витрина для реликвий и в руке реликвия - поставить
+					if (subject instanceof RelicShowcaseSubject) {
+						val itemInHand = user.getPlayer().getItemInHand();
+						if (itemInHand != null && itemInHand.hasItemMeta()) {
+							val nmsItem = CraftItemStack.asNMSCopy(itemInHand);
+							if (nmsItem.tag != null && nmsItem.tag.hasKeyOfType("relic", 8)) {
+								val relicStand = (RelicShowcaseSubject) subject;
+								if (relicStand.getRelic() == null) {
+									for (Relic currentRelic : user.getRelics()) {
+										if (currentRelic.getUuid().toString().equals(nmsItem.tag.getString("relic-uuid"))) {
+											user.getPlayer().setItemInHand(null);
+											user.getRelics().remove(currentRelic);
+											relicStand.setRelic(currentRelic);
+											relicStand.updateRelic();
+											relicStand.getAllocation().perform(Allocation.Action.SPAWN_PIECES);
+											MessageUtil.find("relic-placed")
+													.set("title", currentRelic.getRelic().getItemMeta().getDisplayName())
+													.send(user);
+											return;
+										}
+									}
+								} else {
+									MessageUtil.find("relic-in-hand").send(user);
+								}
+								return;
+							}
+						}
+					}
 					openManipulator(user, museum, packet, subject);
 					break;
 				}
@@ -191,11 +226,25 @@ public class BeforePacketHandler implements Prepare {
 	@SuppressWarnings("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		MinecraftServer.getServer().postToMainThread(() -> {
-			if (user.getPlayer() == null)
+			if (user.getPlayer() == null || !(user.getState() instanceof Excavation))
 				return;
 			// С некоторым шансом может выпасть интерактивая вещь
 			if (Vector.random.nextFloat() > .95)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
+			// С некоторым шансом может выпасть реликвия
+			if (Vector.random.nextFloat() > .992) {
+				val relics = ((Excavation) user.getState()).getPrototype().getRelics();
+				if (relics != null && relics.length > 0) {
+					val randomRelic = new Relic(
+							ListUtils.random(((Excavation) user.getState()).getPrototype().getRelics()).getPrototypeAddress()
+					);
+					user.getPlayer().getInventory().addItem(randomRelic.getRelic());
+					user.getRelics().add(randomRelic);
+					MessageUtil.find("relic-find")
+							.set("title", randomRelic.getRelic().getItemMeta().getDisplayName())
+							.send(user);
+				}
+			}
 			// Перебрать все кирки и эффекты на них
 			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
 			for (PickaxeType pickaxeType : PickaxeType.values()) {
@@ -212,10 +261,10 @@ public class BeforePacketHandler implements Prepare {
 		ExcavationPrototype prototype = ((Excavation) user.getState()).getPrototype();
 		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 
-		val luckyBuffer = user.getLocation().getY() / 100;
-		val bingo = luckyBuffer / proto.getRarity().getRareScale() / 10;
+		val bingo = proto.getRarity().getRareScale() / 300D;
+		val randomValue = Math.random();
 
-		if (bingo > Vector.random.nextDouble()) {
+		if (bingo > randomValue) {
 			// Если повезло, то будет проиграна анимация и тд
 			user.giveExperience(1);
 			val fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));

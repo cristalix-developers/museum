@@ -119,6 +119,7 @@ public class MongoServiceTest {
 
     UserInfo generateUserInfo() {
         return new UserInfo(UUID.randomUUID(),
+                null,
                 RANDOM.nextInt(1000000),
                 RANDOM.nextInt(1000000),
                 RANDOM.nextInt(1000000),
@@ -129,6 +130,8 @@ public class MongoServiceTest {
                 RANDOM.nextInt(100),
                 RANDOM.nextInt(1000000),
                 new V3(0, 0, 0),
+                Collections.emptyList(),
+                Collections.emptyList(),
                 Collections.emptyList(),
                 Collections.emptyList(),
                 RANDOM.nextInt(1000000)

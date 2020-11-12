@@ -110,6 +110,8 @@ Guis.register 'donate', { player ->
         §bБыстрее всех§f! Собирает самые
         дальние монеты -§b лучший выбор
         среди коллекторов.
+
+        §7Не остается после вайпа
         """
     } leftClick {
         performCommand("proccessdonate STEAM_PUNK_COLLECTOR")
@@ -128,6 +130,8 @@ Guis.register 'donate', { player ->
         §b2 опыта за блок§f и
         вскапывает §bбольше всех 
         других! 
+
+        §7Не остается после вайпа
         """
     } leftClick {
         performCommand("proccessdonate LEGENDARY_PICKAXE")

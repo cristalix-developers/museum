@@ -4,8 +4,9 @@ project.ext.mavenUri = "$nmsMavenUri $cristalixMavenUri"
 apply from: 'mavenAuth.gradle'
 
 dependencies {
-    compileOnly 'bottle:bottle-minecraft:1.0.4'
+//    compileOnly 'bottle:bottle-minecraft:1.0.4'
     compileOnly 'bottle:bottle-libs:1.0'
+    compileOnly 'cristalix:dark-paper:20.11.10'
     compileOnly 'org.codehaus.groovy:groovy:3.0.5-aug'
     compileOnly 'cristalix:bukkit-core:20.10.31'
     implementation project(':museum-commons')

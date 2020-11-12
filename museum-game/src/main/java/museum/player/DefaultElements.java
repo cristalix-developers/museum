@@ -27,6 +27,7 @@ public class DefaultElements {
 
 		UserInfo userInfo = new UserInfo(
 				userId,
+				null,
 				0,
 				1000.0,
 				0L,
@@ -37,6 +38,8 @@ public class DefaultElements {
 				0,
 				0,
 				null,
+				new ArrayList<>(),
+				new ArrayList<>(),
 				new ArrayList<>(),
 				new ArrayList<>(),
 				0

@@ -9,6 +9,7 @@ import museum.App;
 import museum.boosters.BoosterType;
 import museum.client_conversation.ClientPacket;
 import museum.data.MuseumInfo;
+import museum.misc.Relic;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectType;
@@ -55,6 +56,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	private final ItemStack backItem = Items.render("back").asBukkitMirror();
 	private final ItemStack visitorMenu = Items.render("visitor-menu").asBukkitMirror();
 	private final ItemStack donateMenu = Items.render("donate-menu").asBukkitMirror();
+	private final ItemStack placeMenu = Items.render("place-menu").asBukkitMirror();
 
 	private final CraftWorld world;
 	private double income;
@@ -122,10 +124,13 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		if (this.owner != user) {
 			inventory.setItem(8, backItem);
 			cachedInfo.views++;
-		} else
+		} else {
 			for (Subject subject : user.getSubjects())
 				if (!subject.isAllocated())
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
+			for (Relic relic : user.getRelics())
+				inventory.addItem(relic.getRelic());
+		}
 
 		if (user.getGrabbedArmorstand() == null)
 			player.setAllowFlight(true);
@@ -149,9 +154,12 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 	public void giveMenu(User user) {
 		val inventory = user.getInventory();
+		user.getPlayer().setItemOnCursor(null);
+		user.getPlayer().getOpenInventory().getTopInventory().clear();
 		inventory.clear();
 		inventory.setItem(0, menu);
-		inventory.setItem(4, visitorMenu);
+		inventory.setItem(3, visitorMenu);
+		inventory.setItem(5, placeMenu);
 		inventory.setItem(8, donateMenu);
 	}
 

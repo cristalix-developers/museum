@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
 import museum.player.User;
+import org.bukkit.Bukkit;
 import ru.cristalix.core.formatting.Formatting;
 
 import java.text.DecimalFormat;
@@ -39,6 +40,10 @@ public class MessageUtil {
 
 		public Message(String locator) {
 			val message = App.getApp().getConfig().getString("chat.messages." + locator);
+			if (message == null) {
+				Bukkit.getLogger().warning("Message not found \"" + locator + "\"");
+				return;
+			}
 			if (message.startsWith("error"))
 				text = Formatting.error(message.substring(5));
 			else if (message.startsWith("fine"))

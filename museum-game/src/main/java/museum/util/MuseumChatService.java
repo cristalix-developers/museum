@@ -3,6 +3,7 @@ package museum.util;
 import lombok.val;
 import museum.App;
 import museum.packages.UserChatPackage;
+import museum.player.User;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -93,21 +94,25 @@ public final class MuseumChatService extends ChatService implements Listener {
 				if (ps != null) original.add(ps);
 			}
 			val oldLegacy = legacy;
-			val builder = new ComponentBuilder(new TextComponent("§7[§b" + App.getApp().getUser(uuid).getLevel() + "§7] "));
+			User user = App.getApp().getUser(uuid);
+			val builder = new ComponentBuilder(new TextComponent(""));
+			if (user.getPrefix() != null) builder.append(new TextComponent(user.getPrefix() + "§8 ┃ "));
+
 			event.setMessage(chatView.getFormattedComponent(uuid, context).thenCompose(message -> {
 				builder.append(message);
 				val future = permissionService.getNameColor(uuid);
 				return future.thenApply(nameColor -> {
 					if (nameColor != null) {
-						builder.append(TextComponent.fromLegacyText(nameColor + ' ' + Formatting.ARROW_SYMBOL + ' '));
+						builder.append("§8 ┃ §b" + user.getLevel())
+								.append(TextComponent.fromLegacyText("§8" + ' ' + Formatting.ARROW_SYMBOL + ' '));
 						return CompletableFuture.completedFuture(null);
 					}
 					return permissionService.getBestGroup(uuid).thenAccept(group -> {
-						builder.append(TextComponent.fromLegacyText(group.getNameColor() + ' ' + Formatting.ARROW_SYMBOL + ' '));
+						builder.append("§8 ┃ §b" + user.getLevel())
+								.append(TextComponent.fromLegacyText("§8" + ' ' + Formatting.ARROW_SYMBOL + ' '));
 					});
 				});
-			}).thenApply(future ->
-					chatView.format(uuid, oldLegacy).thenAccept(builder::append)).thenApply(__ -> builder.create()));
+			}).thenApply(future -> builder.append(TextComponent.fromLegacyText("§f" + oldLegacy))).thenApply(__ -> builder.create()));
 		}, EventPriority.LOW, true);
 		eventExecutor.registerListener(
 				PlayerJoinEvent.class,

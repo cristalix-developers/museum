@@ -49,7 +49,7 @@ public class NpcWorker implements Displayable {
 
 		this.npcEntity = new EntityPlayer(
 				((CraftServer) Bukkit.getServer()).getServer(),
-				location,
+				(WorldServer) App.getApp().getNMSWorld(),
 				gameProfile,
 				new PlayerInteractManager(App.getApp().getNMSWorld())
 		);
@@ -91,7 +91,7 @@ public class NpcWorker implements Displayable {
 
 	@Override
 	public void getHidePackets(Collection<Packet<PacketListenerPlayOut>> buffer) {
-		buffer.add(new PacketPlayOutEntityDestroy(npcEntity.id));
+		buffer.add(new PacketPlayOutEntityDestroy(new int[] {npcEntity.id}));
 	}
 
 	@Override

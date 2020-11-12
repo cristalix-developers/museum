@@ -75,6 +75,8 @@ public class TickTimerHandler extends BukkitRunnable {
 				((FountainSubject) subject).throwWater();
 			else if (counter % 5 == 0 && subject instanceof StallSubject)
 				((StallSubject) subject).rotateCustomerHead();
+			else if (counter % 3 == 0 && subject instanceof RelicShowcaseSubject)
+				((RelicShowcaseSubject) subject).rotate();
 			// Если постройка может приносить доход, попробовать
 			if (subject instanceof Incomeble) // else добавлять не нужно
 				((Incomeble) subject).handle(counter);

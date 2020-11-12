@@ -67,7 +67,7 @@ public class FountainSubject extends Subject {
 		// Создание пакетов
 		spawn = new PacketPlayOutSpawnEntity(entity, 70, Block.getCombinedId(entity.block));
 		metadata = new PacketPlayOutEntityMetadata(entity.id, entity.getDataWatcher(), true);
-		destroy = new PacketPlayOutEntityDestroy(entity.id);
+		destroy = new PacketPlayOutEntityDestroy(new int[]{entity.id});
 	}
 
 	public void throwWater() {

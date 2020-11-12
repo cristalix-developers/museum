@@ -11,6 +11,7 @@ import museum.data.BoosterInfo;
 import museum.data.UserInfo;
 import museum.packages.*;
 import museum.player.prepare.*;
+import museum.prototype.Managers;
 import museum.utils.MultiTimeBar;
 import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
 import org.bukkit.Bukkit;
@@ -20,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -72,7 +72,10 @@ public class PlayerDataManager implements Listener {
 						.get(5L, TimeUnit.SECONDS);
 				UserInfo userInfo = userInfoPackage.getUserInfo();
 				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid);
+				// Добавление дефолтных значений, которых не было в самом начале
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
+				if (userInfo.getClaimedPlaces() == null) userInfo.setClaimedPlaces(new ArrayList<>());
+				if (userInfo.getClaimedRelics() == null) userInfo.setClaimedRelics(new ArrayList<>());
 				userMap.put(uuid, new User(userInfo));
 			} catch (Exception ex) {
 				event.setCancelReason("Не удалось загрузить статистику о музее.");
@@ -97,28 +100,8 @@ public class PlayerDataManager implements Listener {
 	}
 
 	@EventHandler
-	public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-		try {
-			UserInfoPackage userInfoPackage = app.getClientSocket().writeAndAwaitResponse(new UserInfoPackage(event.getUniqueId()))
-					.get(5L, TimeUnit.SECONDS);
-			UserInfo userInfo = userInfoPackage.getUserInfo();
-			if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(event.getUniqueId());
-			if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
-			User user = new User(userInfo);
-			userMap.put(event.getUniqueId(), user);
-
-			event.setSpawnLocation(user.getLastLocation());
-		} catch (Exception exception) {
-			exception.printStackTrace();
-		}
-	}
-
-	@EventHandler
-	public void onSpawn(PlayerSpawnLocationEvent e) {
-		val user = app.getUser(e.getPlayer());
-		if (user == null)
-			return;
-		e.setSpawnLocation(user.getLastLocation());
+	public void onSpawn(PlayerSpawnLocationEvent event) {
+		event.setSpawnLocation(Managers.museum.getPrototype("main").getSpawn());
 	}
 
 	@EventHandler

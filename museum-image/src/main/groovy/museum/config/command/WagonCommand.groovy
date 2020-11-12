@@ -43,6 +43,8 @@ on PlayerQuitEvent, EventPriority.LOWEST, {
 registerCommand 'wagon' handle {
     def user = App.app.getUser sender as CraftPlayer
     if (playerOrderedWagon.contains user.uuid) {
+        if ((292 - user.location.x)**2 + (87 - user.location.y)**2 + (-400 - user.location.z)**2 > 25)
+            return
         // Выдача коробки игроку
         def stand = new LocalArmorStand(user.player)
         stand.equip EnumItemSlot.HEAD, new ItemStack(Material.CHEST)

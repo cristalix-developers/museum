@@ -16,7 +16,6 @@ import static org.bukkit.Material.*
 
 def formatter = TimeFormatter.builder() accuracy 500 build()
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
-def levelFormatter = new DecimalFormat('###,###,###,###,###,###.##')
 
 Guis.register 'main', { player ->
     def user = App.app.getUser((Player) player)

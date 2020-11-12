@@ -36,4 +36,5 @@ registerCommand 'pm' handle {
         }
         return "&bСообщение объемом &f&l$dataLength&b байт было отправлено. &f㜗"
     }
+    return null
 }

@@ -7,8 +7,82 @@ import museum.museum.subject.skeleton.Skeleton
 import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
 
-register 'skeleton', {
+register 'relic-yantar', {
+    item CLAY_BALL
+    nbt.price = 36
+    nbt.relic = 'yantar'
+    nbt.museum = 'yantar'
+    text """&aЯнтарь
 
+    &eДоход оценивается в 36\$
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+
+register 'relic-tooth', {
+    item CLAY_BALL
+    nbt.price = 10
+    nbt.relic = 'tooth'
+    nbt.museum = 'tooth'
+    text """&aЗуб мегаладона
+
+    &eДоход оценивается в 10\$
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'relic-anubis', {
+    item CLAY_BALL
+    nbt.price = 12
+    nbt.relic = 'anubis'
+    nbt.museum = 'anubisstick'
+    text """&aОрудие Анубиса
+
+    &eДоход оценивается в 12\$
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'relic-pot', {
+    item CLAY_BALL
+    nbt.price = 7
+    nbt.relic = 'pot'
+    nbt.museum = 'pot'
+    text """&aДревний горшок
+
+    &eДоход оценивается в 7\$
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'relic-shield', {
+    item CLAY_BALL
+    nbt.price = 10
+    nbt.museum = 'shieldofruin'
+    text """&6Щит война Древнего Египта
+
+    Стоимость 
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'skeleton', {
     item BONE
     def skeleton = (Skeleton) context
     text "§f» Скелет §b$skeleton.prototype.title §f«"
@@ -82,6 +156,12 @@ register 'menu', {
 register 'visitor-menu', {
     item WOOD_DOOR
     text '§6Посмотреть музеи'
+}
+
+register 'place-menu', {
+    item CLAY_BALL
+    nbt.other = 'achievements_lock'
+    text '§bГде я был?'
 }
 
 register 'goback', {

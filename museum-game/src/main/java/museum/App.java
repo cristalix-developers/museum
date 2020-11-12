@@ -1,9 +1,9 @@
 package museum;
 
 import clepto.bukkit.B;
-import clepto.cristalix.Cristalix;
 import clepto.bukkit.Lemonade;
 import clepto.bukkit.gui.GuiEvents;
+import clepto.cristalix.Cristalix;
 import clepto.cristalix.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
@@ -14,6 +14,7 @@ import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
+import museum.misc.PlacesMechanic;
 import museum.museum.Shop;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
@@ -70,16 +71,12 @@ public final class App extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		B.plugin = App.app = this;
-		// Загрузка мира
-		MapLoader.load(this);
+
+		B.events(new PhysicsDisabler());
 
 		// Добавление админ-команд
 		AdminCommand.init(this);
 
-		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
-		SubjectType.init();
-		Managers.init();
-		clepto.bukkit.menu.Guis.init();
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 
 		String museumServiceHost = System.getenv("MUSEUM_SERVICE_HOST");
@@ -152,13 +149,23 @@ public final class App extends JavaPlugin {
 			while (true) {
 				String line = reader.readLine();
 				if (line == null || line.isEmpty()) break;
-				Class<?> scriptClass = Class.forName(line);
-				if (!Script.class.isAssignableFrom(scriptClass)) continue;
-				readScript(scriptClass);
+				try {
+					Class<?> scriptClass = Class.forName(line);
+					if (!Script.class.isAssignableFrom(scriptClass)) continue;
+					readScript(scriptClass);
+				} catch (ClassNotFoundException ignored) {}
 			}
 		} catch (Exception exception) {
 			exception.printStackTrace();
 		}
+
+		// Загрузка мира
+		MapLoader.load(this);
+
+		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
+		SubjectType.init();
+		Managers.init();
+		clepto.bukkit.menu.Guis.init();
 
 		// Класс управляющий игроками
 		this.playerDataManager = new PlayerDataManager(this);
@@ -179,7 +186,9 @@ public final class App extends JavaPlugin {
 				new GuiEvents()
 		);
 
+		// Инициализация NPC и точек сбора
 		WorkerUtil.init(this);
+		PlacesMechanic.init(this);
 
 		// Обработка каждого тика
 		new TickTimerHandler(this, Arrays.asList(
