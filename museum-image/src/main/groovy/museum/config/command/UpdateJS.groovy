@@ -8,8 +8,6 @@ import museum.util.SendScriptUtil
 import ru.cristalix.core.display.messages.JavaScriptMessage
 
 registerCommand 'u' handle {
-    if (!player.op)
-        return null
     def fileName = args.length > 0 ? args[0] : "js"
     if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\") || fileName.contains(":"))
         return "&cНедопустимое имя файла."

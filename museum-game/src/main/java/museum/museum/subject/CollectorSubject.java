@@ -80,7 +80,7 @@ public class CollectorSubject extends Subject implements Incomeble {
 	public void handle(double... args) {
 		if (args[0] % (60 * 20L) != 0)
 			return;
-		val income = 1.7 * Math.random() * (owner.getIncome() + 20);
+		val income = .7 * Math.random() * owner.getIncome() + owner.getIncome();
 		MessageUtil.find("collector-income")
 				.set("income", MessageUtil.toMoneyFormat(income))
 				.send(owner);
