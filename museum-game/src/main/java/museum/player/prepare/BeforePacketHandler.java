@@ -129,14 +129,19 @@ public class BeforePacketHandler implements Prepare {
 							if (nmsItem.tag != null && nmsItem.tag.hasKeyOfType("relic", 8)) {
 								val relicStand = (RelicShowcaseSubject) subject;
 								if (relicStand.getRelic() == null) {
-									user.getPlayer().setItemInHand(null);
-									val relic = new Relic(nmsItem.tag.getString("relic"));
-									relicStand.setRelic(relic);
-									relicStand.updateRelic();
-									relicStand.getAllocation().perform(Allocation.Action.SPAWN_PIECES);
-									MessageUtil.find("relic-placed")
-											.set("title", relic.getRelic().getItemMeta().getDisplayName())
-											.send(user);
+									for (Relic currentRelic : user.getRelics()) {
+										if (currentRelic.getUuid().toString().equals(nmsItem.tag.getString("relic-uuid"))) {
+											user.getPlayer().setItemInHand(null);
+											user.getRelics().remove(currentRelic);
+											relicStand.setRelic(currentRelic);
+											relicStand.updateRelic();
+											relicStand.getAllocation().perform(Allocation.Action.SPAWN_PIECES);
+											MessageUtil.find("relic-placed")
+													.set("title", currentRelic.getRelic().getItemMeta().getDisplayName())
+													.send(user);
+											return;
+										}
+									}
 								} else {
 									MessageUtil.find("relic-in-hand").send(user);
 								}
@@ -227,7 +232,7 @@ public class BeforePacketHandler implements Prepare {
 			if (Vector.random.nextFloat() > .95)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 			// С некоторым шансом может выпасть реликвия
-			if (Vector.random.nextFloat() > .995) {
+			if (Vector.random.nextFloat() > .992) {
 				val relics = ((Excavation) user.getState()).getPrototype().getRelics();
 				if (relics != null && relics.length > 0) {
 					val randomRelic = new Relic(

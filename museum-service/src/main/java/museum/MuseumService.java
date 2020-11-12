@@ -44,7 +44,7 @@ public class MuseumService {
 	public static final long DEFAULT_BOOSTER_TIME = TimeUnit.HOURS.toMillis(1L);
 	public static final int INCOME_MULTIPLIER = 10;
 	public static String PASSWORD;
-	@SuppressWarnings ("rawtypes")
+	@SuppressWarnings("rawtypes")
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
 	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
@@ -74,8 +74,7 @@ public class MuseumService {
 
 	private static RealmsController realmsController;
 
-		public static void main(String[] args) throws InterruptedException {
-
+	public static void main(String[] args) throws InterruptedException {
 		int museumServicePort;
 		try {
 			museumServicePort = Integer.parseInt(System.getenv("MUSEUM_SERVICE_PORT"));
@@ -120,9 +119,9 @@ public class MuseumService {
 			System.out.println("Received UserInfoPackage from " + source + " for " + pckg.getUuid().toString());
 
 			userData.find(pckg.getUuid()).thenAccept(info -> {
-						pckg.setUserInfo(info);
-                        answer(channel, pckg);
-					});
+				pckg.setUserInfo(info);
+				answer(channel, pckg);
+			});
 		});
 		registerHandler(SaveUserPackage.class, (channel, source, pckg) -> {
 			System.out.println("Received SaveUserPackage from " + source + " for " + pckg.getUser().toString());
@@ -206,9 +205,9 @@ public class MuseumService {
 		}));
 		registerHandler(TopPackage.class, ((channel, serverName, museumPackage) ->
 				userData.getTop(museumPackage.getTopType(), museumPackage.getLimit()).thenAccept(res -> {
-			museumPackage.setEntries(res);
-			answer(channel, museumPackage);
-		})));
+					museumPackage.setEntries(res);
+					answer(channel, museumPackage);
+				})));
 		registerHandler(UserRequestJoinPackage.class, ((channel, serverName, museumPackage) -> {
 			Optional<RealmInfo> realm = realmsController.bestRealm();
 			boolean passed = false;
@@ -224,7 +223,8 @@ public class MuseumService {
 
 		try {
 			Javalin.create().get("/", ctx -> ctx.result(createMetrics())).start(Integer.parseInt(System.getenv("METRICS_PORT")));
-		} catch (NumberFormatException | NullPointerException ignored) {}
+		} catch (NumberFormatException | NullPointerException ignored) {
+		}
 
 		Thread consoleThread = new Thread(MuseumService::handleConsole);
 		consoleThread.setDaemon(true);

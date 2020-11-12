@@ -124,6 +124,12 @@ public class User implements PlayerWrapper {
 		info.museumInfos = museums.getData();
 		info.skeletonInfos = skeletons.getData();
 		info.subjectInfos = subjects.getData();
+		List<String> list = new ArrayList<>();
+		for (Relic relic : relics) {
+			String prototypeAddress = relic.getPrototypeAddress();
+			list.add(prototypeAddress);
+		}
+		info.setClaimedRelics(list);
 		return info;
 	}
 
