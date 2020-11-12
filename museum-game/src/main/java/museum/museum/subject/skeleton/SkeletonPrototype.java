@@ -1,7 +1,9 @@
 package museum.museum.subject.skeleton;
 
 import lombok.Getter;
+import lombok.val;
 import museum.prototype.Prototype;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand;
 import org.bukkit.entity.ArmorStand;
@@ -31,8 +33,14 @@ public class SkeletonPrototype implements Prototype, Piece {
 		this.price = price;
 
 		stands.stream()
-				.collect(groupingBy(as -> as.getCustomName() == null ? "???" : as.getCustomName()))
-				.forEach((fragmentAddress, fragmentStands) -> {
+				.collect(groupingBy(as -> {
+					if (as.getCustomName() == null) {
+						val pos = as.getLocation();
+						Bukkit.getLogger().warning("Bone names warn on " + pos.getX() + " " + pos.getY() + " " + pos.getZ());
+						return "???";
+					}
+					return as.getCustomName() == null ? "???" : as.getCustomName();
+				})).forEach((fragmentAddress, fragmentStands) -> {
 					double x = 0, y = 0, z = 0;
 					for (ArmorStand stand : fragmentStands) {
 						Location loc = stand.getLocation();

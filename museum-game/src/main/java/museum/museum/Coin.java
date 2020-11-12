@@ -18,7 +18,7 @@ public class Coin {
 
 	public static final ItemStack COIN_ITEM = clepto.bukkit.item.Items.render("coin");
 	public static final int MAX_COIN_AMOUNT = 20;
-	public static final int SECONDS_LIVE = 20;
+	public static final int SECONDS_LIVE = 40;
 	private final EntityItem entityItem;
 	@Getter
 	private final long timestamp;

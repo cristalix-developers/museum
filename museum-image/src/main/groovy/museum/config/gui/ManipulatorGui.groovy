@@ -1,14 +1,12 @@
 package museum.config.gui
 
+
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.config.command.WagonConfig
+import museum.museum.Museum
 import museum.museum.map.SkeletonSubjectPrototype
-import museum.museum.subject.Allocation
-import museum.museum.subject.RelicShowcaseSubject
-import museum.museum.subject.SkeletonSubject
-import museum.museum.subject.StallSubject
-import museum.museum.subject.Subject
+import museum.museum.subject.*
 import museum.museum.subject.product.FoodProduct
 import museum.museum.subject.skeleton.Skeleton
 import museum.prototype.Managers
@@ -73,14 +71,27 @@ Guis.register 'manipulator', { player ->
 
     if (abstractSubject instanceof RelicShowcaseSubject) {
         gui.layout = 'XXXXOXXXE'
+        def subject = (RelicShowcaseSubject) abstractSubject
+
         button 'X' icon {
             item STAINED_GLASS_PANE
-            text '&fВставьте реликвию'
+            text '&7Вставьте реликвию'
         } fillAvailable()
-        button 'O' icon {
-            item FIRE
-        } leftClick {
-            println 'хай'
+        if (subject.relic) {
+            button 'O' icon {
+                apply items['relic-' + subject.relic.prototypeAddress]
+                text ''
+                text '&7Нажмите чтобы снять'
+            } leftClick {
+                closeInventory()
+                // Так выглядит паранойя
+                def subjectRelic = subject.relic
+                subject.setRelic(null)
+                user.getInventory().addItem(subjectRelic.relic)
+                subject.updateRelic()
+                ((Museum) user.state).updateIncrease()
+                MessageUtil.find 'relic-tacked' send user
+            }
         }
         button 'E' icon {
             item BARRIER

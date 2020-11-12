@@ -2,6 +2,10 @@ serviceRealm: MUSS-1
 
 chat:
   messages:
+    relic-placed: 'fineВы поместили §6%TITLE%§f.'
+    relic-in-hand: 'errorНа витрине уже есть реликвия.'
+    relic-tacked: 'fineРеликвия снята с витрины.'
+    relic-find: 'fineВы нашли реликвию §6%TITLE%§f.'
     claim-place: 'fineВы открыли §b%TITLE%§f, ваша награда §b%EXP%EXP§f'
     museum-not-found: 'errorТакой музей не найден.'
     no-spam: 'fineВаш музей прекрасен! Люди сами прийдут, ожидайте 䀈'

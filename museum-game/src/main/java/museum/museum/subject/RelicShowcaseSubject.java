@@ -1,11 +1,17 @@
 package museum.museum.subject;
 
 import lombok.Getter;
+import museum.App;
 import museum.data.SubjectInfo;
 import museum.misc.Relic;
 import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
+import museum.museum.subject.skeleton.AtomPiece;
+import museum.museum.subject.skeleton.V4;
 import museum.player.User;
+import net.minecraft.server.v1_12_R1.EntityArmorStand;
+import net.minecraft.server.v1_12_R1.EnumItemSlot;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 
 /**
  * @author func 11.11.2020
@@ -15,6 +21,9 @@ import museum.player.User;
 public class RelicShowcaseSubject extends Subject {
 
 	private Relic relic;
+	private AtomPiece piece;
+	private V4 absoluteLocation;
+	private int counter = 0;
 
 	public RelicShowcaseSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
@@ -24,9 +33,7 @@ public class RelicShowcaseSubject extends Subject {
 	@Override
 	public void setAllocation(Allocation allocation) {
 		super.setAllocation(allocation);
-		if (allocation == null)
-			relic = null;
-		else {
+		if (allocation != null) {
 			this.updateRelic();
 		}
 	}
@@ -34,14 +41,39 @@ public class RelicShowcaseSubject extends Subject {
 	public void updateRelic() {
 		Allocation allocation = this.getAllocation();
 		this.updateInfo();
-		if (allocation == null || this.relic == null)
+		if (allocation == null)
 			return;
-		/*V4 absoluteLocation = V4.fromLocation(allocation.getOrigin()).add(this.re);
-		skeleton.getUnlockedFragments().forEach(fragment ->
-				allocation.allocatePiece(fragment, orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment)), sendUpdates));*/
+		if (relic == null) {
+			if (piece != null)
+				allocation.removePiece(piece);
+			return;
+		}
+		absoluteLocation = V4.fromLocation(allocation.getOrigin()).clone().add(.5, .08, .5);
+		EntityArmorStand armorStand = new EntityArmorStand(App.getApp().getNMSWorld());
+		// todo: добавить кеширование предметов, а то они одни и теже
+		armorStand.setSlot(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(relic.getRelic()));
+		armorStand.setCustomName(prototype.getTitle());
+		armorStand.setCustomNameVisible(true);
+		this.piece = new AtomPiece(armorStand);
+		allocation.allocatePiece(piece, absoluteLocation, false);
 		if (owner.getState() == null)
 			return;
 		((Museum) owner.getState()).updateIncrease();
+	}
+
+	public void rotate() {
+		if (relic == null || !isAllocated())
+			return;
+
+		counter++;
+
+		if (counter > 10)
+			counter = 0;
+
+		absoluteLocation.add(0, Integer.signum(counter - 5) * 0.03, 0);
+		absoluteLocation.add(0, 0, 0, 10);
+		getAllocation().allocatePiece(piece, absoluteLocation, true);
+		getAllocation().perform(Allocation.Action.UPDATE_PIECES);
 	}
 
 	@Override
@@ -52,7 +84,7 @@ public class RelicShowcaseSubject extends Subject {
 
 	@Override
 	public double getIncome() {
-		if (relic == null)
+		if (relic == null || !isAllocated())
 			return 0;
 		return relic.getPrice();
 	}

@@ -53,7 +53,8 @@ public class CollectorSubject extends Subject implements Incomeble {
 	@Override
 	public void setAllocation(Allocation allocation) {
 		super.setAllocation(allocation);
-		if (allocation != null) allocation.allocatePiece(piece, V4.fromLocation(this.getCollectorLocation()), false);
+		if (allocation != null)
+			allocation.allocatePiece(piece, V4.fromLocation(this.getCollectorLocation()), false);
 	}
 
 	public void move(long iteration) {
@@ -79,7 +80,7 @@ public class CollectorSubject extends Subject implements Incomeble {
 	public void handle(double... args) {
 		if (args[0] % (60 * 20L) != 0)
 			return;
-		val income = (Math.random() * prototype.getPrice() / 5000) + 20;
+		val income = 1.7 * Math.random() * (owner.getIncome() + 20);
 		MessageUtil.find("collector-income")
 				.set("income", MessageUtil.toMoneyFormat(income))
 				.send(owner);

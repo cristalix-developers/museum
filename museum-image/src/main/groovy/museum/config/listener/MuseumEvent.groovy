@@ -64,7 +64,7 @@ on PlayerMoveEvent, {
                     user.sendMessage("§e§lИтого: $summary\$")
                 }
             })
-        } else if ((292 - to.x)**2 + (87 - to.y)**2 + (-400 - to.z**2) < 25) {
+        } else if ((292 - to.x)**2 + (87 - to.y)**2 + (-400 - to.z)**2 < 25) {
             user.performCommand 'wagon'
         }
     }

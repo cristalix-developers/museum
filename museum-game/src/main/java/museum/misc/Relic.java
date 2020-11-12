@@ -3,7 +3,6 @@ package museum.misc;
 import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.val;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
@@ -23,9 +22,7 @@ public class Relic {
 	public Relic(String prototypeAddress) {
 		this.prototypeAddress = prototypeAddress;
 		val item = Items.render("relic-" + prototypeAddress);
-		val nbt = new NBTTagCompound();
-		nbt.setString("relic-uuid", uuid.toString());
-		item.setTag(nbt);
+		item.tag.setString("relic-uuid", uuid.toString());
 		this.relic = item.asBukkitMirror();
 		this.price = item.tag.getInt("price");
 	}

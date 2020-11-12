@@ -18,7 +18,8 @@ Items.register 'pickaxe-template', {
             'minecraft:concrete_powder',
             'minecraft:concrete',
             'minecraft:stained_hardened_clay',
-            'minecraft:snow'
+            'minecraft:snow',
+            'minecraft:red_sandstone'
     ]
     nbt.HideFlags = 63
 }
