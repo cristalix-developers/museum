@@ -71,10 +71,11 @@ register 'relic-pot', {
 register 'relic-shield', {
     item CLAY_BALL
     nbt.price = 10
+    nbt.relic = 'shield'
     nbt.museum = 'shieldofruin'
     text """&6Щит война Древнего Египта
 
-    Стоимость 
+    &eДоход оценивается в 10\$
 
     &7Поставьте реликвию на витрину для
     &7реликвий, которую вы можете купить
