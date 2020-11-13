@@ -2,6 +2,7 @@ serviceRealm: MUSS-1
 
 chat:
   messages:
+    relic-sell: 'fineВы продали перекупщику реликвию за §6%PRICE%$&f!'
     relic-placed: 'fineВы поместили §6%TITLE%§f.'
     relic-in-hand: 'errorНа витрине уже есть реликвия.'
     relic-tacked: 'fineРеликвия снята с витрины.'

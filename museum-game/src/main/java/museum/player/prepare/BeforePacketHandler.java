@@ -232,7 +232,7 @@ public class BeforePacketHandler implements Prepare {
 			if (Vector.random.nextFloat() > .95)
 				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 			// С некоторым шансом может выпасть реликвия
-			if (Vector.random.nextFloat() > .992) {
+			if (Vector.random.nextFloat() > .997) {
 				val relics = ((Excavation) user.getState()).getPrototype().getRelics();
 				if (relics != null && relics.length > 0) {
 					val randomRelic = new Relic(
