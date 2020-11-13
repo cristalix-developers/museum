@@ -112,7 +112,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 								.append(TextComponent.fromLegacyText("§8" + ' ' + Formatting.ARROW_SYMBOL + ' '));
 					});
 				});
-			}).thenApply(future -> builder.append("§f" + oldLegacy)).thenApply(__ -> builder.create()));
+			}).thenApply(future -> builder.append(TextComponent.fromLegacyText("§f" + oldLegacy))).thenApply(__ -> builder.create()));
 		}, EventPriority.LOW, true);
 		eventExecutor.registerListener(
 				PlayerJoinEvent.class,
