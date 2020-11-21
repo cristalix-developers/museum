@@ -149,6 +149,11 @@ Guis.register 'manipulator', { player ->
             else if (skeleton.prototype.size > (subject.prototype as SkeletonSubjectPrototype).size) key = 'tooBigSkeleton'
             else if (skeleton == subject.skeleton) key = 'alreadyPlacedSkeleton'
             else key = 'availableSkeleton'
+
+            def placedOn = user.museums.get(Managers.museum.getPrototype('main')).getSubjects(SubjectType.SKELETON_CASE).find {
+                it.skeleton && it.skeleton == skeleton
+            }
+
             button 'O' icon {
                 if (skeleton != null) {
                     context skeleton
@@ -156,13 +161,13 @@ Guis.register 'manipulator', { player ->
                     text '§f'
                 }
                 apply items[key]
-                if (key == 'availableSkeleton') {
-                    if (user.museums.get(Managers.museum.getPrototype('main')).getSubjects(SubjectType.SKELETON_CASE).find {
-                        it.skeleton?.prototype == skeleton.prototype
-                    }) nbt.color = 0xAAAAAA
+                if (key == 'availableSkeleton' && placedOn) {
+                    nbt.color = 0xAAAAAA
+                    text "§cУже стоит на другой витрине"
                 }
             } leftClick {
                 if (key == 'availableSkeleton' || key == 'alreadyPlacedSkeleton') {
+                    if (placedOn) return
                     Skeleton previousSkeleton = subject.skeleton
                     Allocation allocation = subject.allocation
                     if (allocation) {
