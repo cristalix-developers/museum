@@ -36,7 +36,7 @@ register 'lockedSkeleton', {
 
 register 'emptySkeleton', {
     item BONE
-    nbt.color = 0x000000
+    nbt.color = 0xAAAAAA
     text """
         &7Нужно собрать как минимум 3 фрагмента,
         &7Чтобы выставить скелет в музей.
@@ -44,7 +44,7 @@ register 'emptySkeleton', {
 }
 
 register 'tooBigSkeleton', {
-    nbt.color = 0x000000
+    nbt.color = 0xAAAAAA
     text '&7Этот скелет слишком большой для этой витрины'
 }
 
