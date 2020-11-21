@@ -48,12 +48,12 @@ register 'tooBigSkeleton', {
     text '&7Этот скелет слишком большой для этой витрины'
 }
 
-register 'currentSkeleton', {
+register 'alreadyPlacedSkeleton', {
     nbt.color = 0xAAAAAA
     text '&cЭтот скелет уже стоит на другой витрине'
 }
 
-register 'alreadyPlacedSkeleton', {
+register 'currentSkeleton', {
     nbt.glow_color = 0x55FF55
     text '&eНажмите, чтобы убрать скелет со стенда'
 }
