@@ -48,7 +48,7 @@ register 'tooBigSkeleton', {
 }
 
 register 'alreadyPlacedSkeleton', {
-    nbt.color = 0x55FF55
+    nbt.glow_color = 0x55FF55
     text '&eНажмите, чтобы убрать скелет со стенда'
 }
 
