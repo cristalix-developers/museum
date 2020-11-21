@@ -48,7 +48,7 @@ register 'tooBigSkeleton', {
     text '&7Этот скелет слишком большой для этой витрины'
 }
 
-register 'currrentSkeleton', {
+register 'currentSkeleton', {
     nbt.color = 0xAAAAAA
     text '&cЭтот скелет уже стоит на другой витрине'
 }
