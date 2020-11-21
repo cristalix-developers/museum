@@ -21,6 +21,7 @@ import java.text.DecimalFormat
 
 import static clepto.bukkit.item.Items.items
 import static clepto.bukkit.item.Items.register
+import static museum.museum.map.SubjectType.SKELETON_CASE
 import static museum.museum.subject.Allocation.Action.*
 import static org.bukkit.Material.*
 
@@ -47,13 +48,17 @@ register 'tooBigSkeleton', {
     text '&7Этот скелет слишком большой для этой витрины'
 }
 
+register 'currrentSkeleton', {
+    nbt.color = 0xAAAAAA
+    text '&cЭтот скелет уже стоит на другой витрине'
+}
+
 register 'alreadyPlacedSkeleton', {
     nbt.glow_color = 0x55FF55
     text '&eНажмите, чтобы убрать скелет со стенда'
 }
 
 register 'availableSkeleton', {
-//    nbt.color = 0xAAAAAA
     text '&aНажмите, чтобы поставить скелет на стенд'
 }
 
@@ -142,17 +147,20 @@ Guis.register 'manipulator', { player ->
         def subject = (SkeletonSubject) abstractSubject
 
         for (it in Managers.skeleton.toSorted({ a, b -> (a.title <=> b.title) })) {
+
             def skeleton = user.skeletons.get it
+
+            def placedOn = user.museums.get(Managers.museum.getPrototype('main')).getSubjects(SKELETON_CASE)
+                    .find {it.skeleton && it.skeleton == skeleton}
+
             String key
             if (!skeleton) key = 'lockedSkeleton'
             else if (skeleton.unlockedFragments.size() < 3) key = 'emptySkeleton'
             else if (skeleton.prototype.size > (subject.prototype as SkeletonSubjectPrototype).size) key = 'tooBigSkeleton'
-            else if (skeleton == subject.skeleton) key = 'alreadyPlacedSkeleton'
+            else if (skeleton == subject.skeleton) key = 'currentSkeleton'
+            else if (skeleton == placedOn?.skeleton) key = 'alreadyPlacedSkeleton'
             else key = 'availableSkeleton'
 
-            def placedOn = user.museums.get(Managers.museum.getPrototype('main')).getSubjects(SubjectType.SKELETON_CASE).find {
-                it.skeleton && it.skeleton == skeleton
-            }
 
             button 'O' icon {
                 if (skeleton != null) {
@@ -161,13 +169,8 @@ Guis.register 'manipulator', { player ->
                     text '§f'
                 }
                 apply items[key]
-                if (key == 'availableSkeleton' && placedOn) {
-                    nbt.color = 0xAAAAAA
-                    text "§cУже стоит на другой витрине"
-                }
             } leftClick {
-                if (key == 'availableSkeleton' && placedOn) return
-                if (key == 'availableSkeleton' || key == 'alreadyPlacedSkeleton') {
+                if (key == 'availableSkeleton' || key == 'currentSkeleton') {
                     Skeleton previousSkeleton = subject.skeleton
                     Allocation allocation = subject.allocation
                     if (allocation) {
