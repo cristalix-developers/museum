@@ -1,5 +1,10 @@
 serviceRealm: MUSS-1
 
+npc-skin:
+  excavation: ''
+  shop: ''
+  sell: ''
+
 chat:
   messages:
     relic-sell: 'fineВы продали перекупщику реликвию за §6%PRICE%$&f!'

@@ -1,5 +1,6 @@
 package museum;
 
+import clepto.bukkit.B;
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -29,7 +30,7 @@ public class PhysicsDisabler implements Listener {
 	@EventHandler
 	public void disable(EntityDismountEvent event) {
 		if (event.dismounted.getType() == EntityType.BAT)
-			event.dismounted.remove();
+			B.postpone(1, () -> event.dismounted.remove());
 	}
 
 	@EventHandler

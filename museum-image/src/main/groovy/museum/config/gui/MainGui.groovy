@@ -135,7 +135,7 @@ Guis.register 'main', { player ->
         Меняйте режим так, как нравится глазам!
         """
     } leftClick {
-        user.getPlayer().setPlayerTime(user.getPlayer().getPlayerTime() == 18000 ? 6000 : 18000, false)
+        user.player.setPlayerTime user.player.playerTime + 12000, false
         closeInventory()
     }
 }

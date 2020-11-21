@@ -75,19 +75,22 @@ public class BeforePacketHandler implements Prepare {
 					onDigging(user, dig);
 				} else if (packetObj instanceof PacketPlayInSteerVehicle) {
 					// Если игрок на коллекторе и нажимает шифт, то скинуть его
-					val packet = (PacketPlayInSteerVehicle) packetObj;
-					if (packet.d) {
-						if (user.getRiding() != null) {
-							user.getRiding().passengers.clear();
-							val dismount = new PacketPlayOutMount(user.getRiding());
-							user.getState().getUsers().forEach(viewer -> viewer.sendPacket(dismount));
-							user.setRiding(null);
-						}
-					}
+					onUnmount(user, (PacketPlayInSteerVehicle) packetObj);
 				}
 				super.channelRead(channelHandlerContext, packetObj);
 			}
 		});
+	}
+
+	private void onUnmount(User user, PacketPlayInSteerVehicle packet) {
+		if (packet.d) {
+			if (user.getRiding() != null) {
+				user.getRiding().passengers.clear();
+				val dismount = new PacketPlayOutMount(user.getRiding());
+				user.getState().getUsers().forEach(viewer -> viewer.sendPacket(dismount));
+				user.setRiding(null);
+			}
+		}
 	}
 
 	private void onDigging(User user, PacketPlayInBlockDig packet) {
@@ -127,28 +130,11 @@ public class BeforePacketHandler implements Prepare {
 						if (itemInHand != null && itemInHand.hasItemMeta()) {
 							val nmsItem = CraftItemStack.asNMSCopy(itemInHand);
 							if (nmsItem.tag != null && nmsItem.tag.hasKeyOfType("relic", 8)) {
-								val relicStand = (RelicShowcaseSubject) subject;
-								if (relicStand.getRelic() == null) {
-									for (Relic currentRelic : user.getRelics()) {
-										if (currentRelic.getUuid().toString().equals(nmsItem.tag.getString("relic-uuid"))) {
-											user.getPlayer().setItemInHand(null);
-											user.getRelics().remove(currentRelic);
-											relicStand.setRelic(currentRelic);
-											relicStand.updateRelic();
-											relicStand.getAllocation().perform(Allocation.Action.SPAWN_PIECES);
-											MessageUtil.find("relic-placed")
-													.set("title", currentRelic.getRelic().getItemMeta().getDisplayName())
-													.send(user);
-											return;
-										}
-									}
-								} else {
-									MessageUtil.find("relic-in-hand").send(user);
-								}
-								return;
+								placeRelic(user, (RelicShowcaseSubject) subject, nmsItem);
 							}
 						}
 					}
+					// Открыть манипулятор 
 					openManipulator(user, museum, packet, subject);
 					break;
 				}
@@ -156,6 +142,27 @@ public class BeforePacketHandler implements Prepare {
 		}
 		BlockPosition blockPos = new BlockPosition(packet.a);
 		B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, museum, blockPos));
+	}
+
+	private void placeRelic(User user, RelicShowcaseSubject stand, net.minecraft.server.v1_12_R1.ItemStack item) {
+		if (stand.getRelic() == null) {
+			for (Relic currentRelic : user.getRelics()) {
+				if (currentRelic.getUuid().toString().equals(item.tag.getString("relic-uuid"))) {
+					user.getPlayer().setItemInHand(null);
+					user.getRelics().remove(currentRelic);
+					stand.setRelic(currentRelic);
+					stand.updateRelic();
+					stand.getAllocation().perform(Allocation.Action.SPAWN_PIECES);
+					MessageUtil.find("relic-placed")
+							.set("title", currentRelic.getRelic().getItemMeta().getDisplayName())
+							.send(user);
+					return;
+				}
+			}
+		} else {
+			MessageUtil.find("relic-in-hand").send(user);
+		}
+		return;
 	}
 
 	private void openManipulator(User user, Museum museum, PacketPlayInUseItem packet, Subject subject) {

@@ -121,6 +121,7 @@ public class User implements PlayerWrapper {
 	}
 
 	public UserInfo generateUserInfo() {
+		updateIncome();
 		info.museumInfos = museums.getData();
 		info.skeletonInfos = skeletons.getData();
 		info.subjectInfos = subjects.getData();

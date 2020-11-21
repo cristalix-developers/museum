@@ -113,6 +113,9 @@ public class MuseumCommands {
 	private String cmdVisit(Player sender, String[] args) {
 		val user = app.getUser(sender);
 
+		if (!sender.isOp())
+			return null;
+
 		if (args.length <= 1)
 			return "§cИспользование: §f/museum visit [Игрок] [Музей]";
 
@@ -152,26 +155,19 @@ public class MuseumCommands {
 			return PLAYER_OFFLINE_MESSAGE;
 		}
 
-		double price;
-
-		try {
-			price = Double.parseDouble(args[1]);
-		} catch (Exception ignored) {
-			return null;
-		}
-
 		val state = owner.getState();
 
 		if (state instanceof Museum) {
-			if (visitor.getMoney() <= price)
+			val museum = (Museum) state;
+			if (visitor.getMoney() <= museum.getIncome() / 2)
 				return NO_MONEY_MESSAGE;
 
-			visitor.setMoney(visitor.getMoney() - price);
-			owner.setMoney(owner.getMoney() + price);
+			visitor.setMoney(visitor.getMoney() - museum.getIncome() / 2);
+			owner.setMoney(owner.getMoney() + museum.getIncome() / 2);
 			visitor.setState(state);
 			MessageUtil.find("traveler")
 					.set("visitor", visitor.getName())
-					.set("price", MessageUtil.toMoneyFormat(price))
+					.set("price", MessageUtil.toMoneyFormat(museum.getIncome() / 2))
 					.send(owner);
 		}
 		return null;
