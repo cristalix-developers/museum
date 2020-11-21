@@ -19,16 +19,14 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class WorkerUtil {
 
-	// todo: remove that shit in future
+	private final static String defaultSkin = App.getApp().getConfig().getString("npc-skin.default");
 	public static final NpcWorker STALL_WORKER_TEMPLATE = new NpcWorker(
 			new Location(App.getApp().getWorld(), 0, 0, 0),
-			"http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27",
+			defaultSkin,
 			"Работница лавки",
 			User::getExperience
 	);
 	private static final List<NpcWorker> workers = new ArrayList<>();
-	private final String defaultSkin =
-			"http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27";
 
 	public void init(App app) {
 		// Формат таблички: .p simplenpc <Имя жителя> </команда>

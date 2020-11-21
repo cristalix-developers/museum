@@ -134,7 +134,7 @@ public class BeforePacketHandler implements Prepare {
 							}
 						}
 					}
-					// Открыть манипулятор 
+					// Открыть манипулятор
 					openManipulator(user, museum, packet, subject);
 					break;
 				}
