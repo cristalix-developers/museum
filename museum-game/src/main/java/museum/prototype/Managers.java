@@ -199,9 +199,6 @@ public class Managers {
 			val icon = getUnderItem(box.requireLabel("icon"));
 			Items.register("excavation-" + address, CraftItemStack.asNMSCopy(icon));
 
-			System.out.println(box.getCenter());
-			System.out.println(box.requireLabel("required-level").getTagInt());
-
 			return new ExcavationPrototype(
 					address, skeletonPrototypes,
 					LocationUtil.resetLabelRotation(box.requireLabel("spawn"), 0),

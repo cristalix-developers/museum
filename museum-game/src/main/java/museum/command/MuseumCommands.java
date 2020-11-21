@@ -149,7 +149,7 @@ public class MuseumCommands {
 		val visitor = app.getUser(sender);
 		val owner = app.getUser(Bukkit.getPlayer(args[0]));
 
-		if (args.length < 2)
+		if (args.length != 1)
 			return null;
 		if (owner == null || !owner.getPlayer().isOnline() || owner.getState() == null || owner.equals(visitor)) {
 			return PLAYER_OFFLINE_MESSAGE;

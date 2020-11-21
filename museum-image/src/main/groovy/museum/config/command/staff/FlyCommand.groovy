@@ -7,7 +7,7 @@ def app = App.app
 
 registerCommand 'fly' handle {
     def user = app.getUser(player.uniqueId)
-    if (user.prefix.replaceAll('(§[0-9a-fk-rA-FK-R]|¨[0-9a-f]{6})', '') == 'LS') {
+    if (user.prefix.contains 'LS') {
         user.player.allowFlight = true
         user.player.flying = true
     }
