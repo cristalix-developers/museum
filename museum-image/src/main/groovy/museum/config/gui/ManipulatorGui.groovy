@@ -166,8 +166,8 @@ Guis.register 'manipulator', { player ->
                     text "§cУже стоит на другой витрине"
                 }
             } leftClick {
+                if (key == 'availableSkeleton' && placedOn) return
                 if (key == 'availableSkeleton' || key == 'alreadyPlacedSkeleton') {
-                    if (placedOn) return
                     Skeleton previousSkeleton = subject.skeleton
                     Allocation allocation = subject.allocation
                     if (allocation) {
