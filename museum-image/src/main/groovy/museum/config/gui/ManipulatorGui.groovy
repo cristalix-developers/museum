@@ -157,7 +157,7 @@ Guis.register 'manipulator', { player ->
                 if (key == 'availableSkeleton') {
                     if (user.museums.get(Managers.museum.getPrototype('main')).getSubjects(SubjectType.SKELETON_CASE).find {
                         it.skeleton?.prototype == skeleton.prototype
-                    }) nbt.color = 0xFF55FF
+                    }) nbt.color = 0xAA0000
                 }
             } leftClick {
                 if (key == 'availableSkeleton' || key == 'alreadyPlacedSkeleton') {
