@@ -6,6 +6,7 @@ import museum.App
 import museum.config.command.WagonConfig
 import museum.museum.Museum
 import museum.museum.map.SkeletonSubjectPrototype
+import museum.museum.map.SubjectType
 import museum.museum.subject.*
 import museum.museum.subject.product.FoodProduct
 import museum.museum.subject.skeleton.Skeleton
@@ -32,8 +33,8 @@ register 'lockedSkeleton', {
 }
 
 register 'emptySkeleton', {
-    item CLAY_BALL
-    nbt.other = 'tochka'
+    item BONE
+    nbt.color = 0x505050
     text """
         &7Нужно собрать как минимум 3 фрагмента,
         &7Чтобы выставить скелет в музей.
@@ -153,6 +154,11 @@ Guis.register 'manipulator', { player ->
                     text '§f'
                 }
                 apply items[key]
+                if (key == 'availableSkeleton') {
+                    if (user.museums.get(Managers.museum.getPrototype('main')).getSubjects(SubjectType.SKELETON_CASE).find {
+                        it.skeleton?.prototype == skeleton.prototype
+                    }) nbt.color = 0xFF55FF
+                }
             } leftClick {
                 if (key == 'availableSkeleton' || key == 'alreadyPlacedSkeleton') {
                     Skeleton previousSkeleton = subject.skeleton
