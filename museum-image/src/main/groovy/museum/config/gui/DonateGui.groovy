@@ -5,22 +5,7 @@ import clepto.bukkit.menu.Guis
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 
-import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
-
-register 'donate-menu', {
-    item GOLDEN_CARROT
-    text """
-        >> §bВнутриигровые покупки §f<<
-        
-        Тут вы можете купить,
-        интересные вещи...
-    """
-}
-
-on GOLDEN_CARROT use {
-    Guis.open player, 'donate', player
-}
 
 static String modifyPrice(UUID user, int price) {
     return "§b" + price + " кристаликов"

@@ -1,6 +1,6 @@
 package museum.config.gui
 
-import clepto.bukkit.menu.Guis
+
 import clepto.humanize.TimeFormatter
 import museum.App
 import museum.config.command.WagonConfig
@@ -12,21 +12,37 @@ import org.bukkit.entity.Player
 import java.text.DecimalFormat
 import java.time.Duration
 
+import static clepto.bukkit.menu.Guis.open
+import static clepto.bukkit.menu.Guis.register
 import static org.bukkit.Material.*
 
 def formatter = TimeFormatter.builder() accuracy 500 build()
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
 
-Guis.register 'main', { player ->
+register 'main', { player ->
     def user = App.app.getUser((Player) player)
 
     title 'Главное меню'
     layout """
         F--SMT--S
-        -H--O--J-
+        -H--O--JP
     """
 
     button MuseumGuis.background
+
+    button 'P' icon {
+        item GOLDEN_CARROT
+        text """
+        >> §bВнутриигровые покупки §f<<
+        
+        Тут вы можете купить,
+        интересные вещи...
+        """
+    } leftClick {
+        closeInventory()
+        open(player, 'donate', player)
+    }
+
     button 'F' icon {
         item PAPER
         text """

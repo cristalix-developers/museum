@@ -11,7 +11,7 @@ static def getIfLS(CommandContext context) {
     if (context.args.length == 0)
         return null
     def user = App.app.getUser(context.player.uniqueId)
-    if (user.prefix.replaceAll('(§[0-9a-fk-rA-FK-R]|¨[0-9a-f]{6})', '') == 'LS')
+    if (user.prefix.contains 'LS')
         return user
     return null
 }
