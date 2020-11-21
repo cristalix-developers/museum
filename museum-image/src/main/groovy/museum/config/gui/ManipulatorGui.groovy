@@ -13,6 +13,7 @@ import museum.museum.subject.skeleton.Skeleton
 import museum.prototype.Managers
 import museum.util.MessageUtil
 import museum.util.SubjectLogoUtil
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import ru.cristalix.core.formatting.Formatting
 
@@ -34,7 +35,7 @@ register 'lockedSkeleton', {
 
 register 'emptySkeleton', {
     item BONE
-    nbt.color = 0x505050
+    nbt.color = 0x000000
     text """
         &7Нужно собрать как минимум 3 фрагмента,
         &7Чтобы выставить скелет в музей.
@@ -42,16 +43,17 @@ register 'emptySkeleton', {
 }
 
 register 'tooBigSkeleton', {
-    nbt.color = 0x505050
+    nbt.color = 0x000000
     text '&7Этот скелет слишком большой для этой витрины'
 }
 
 register 'alreadyPlacedSkeleton', {
+    nbt.color = 0x55FF55
     text '&eНажмите, чтобы убрать скелет со стенда'
 }
 
 register 'availableSkeleton', {
-    nbt.color = 0xAAAAAA
+//    nbt.color = 0xAAAAAA
     text '&aНажмите, чтобы поставить скелет на стенд'
 }
 
@@ -157,7 +159,7 @@ Guis.register 'manipulator', { player ->
                 if (key == 'availableSkeleton') {
                     if (user.museums.get(Managers.museum.getPrototype('main')).getSubjects(SubjectType.SKELETON_CASE).find {
                         it.skeleton?.prototype == skeleton.prototype
-                    }) nbt.color = 0xAA0000
+                    }) nbt.color = 0xAAAAAA
                 }
             } leftClick {
                 if (key == 'availableSkeleton' || key == 'alreadyPlacedSkeleton') {
