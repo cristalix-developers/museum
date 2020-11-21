@@ -30,5 +30,6 @@ public class UserInfo implements Unique {
 	private List<String> claimedPlaces;
 	private List<String> claimedRelics;
 	private double income;
+	private boolean darkTheme;
 
 }

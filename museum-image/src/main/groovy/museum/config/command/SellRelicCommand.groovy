@@ -6,7 +6,7 @@ import museum.misc.Relic
 import museum.util.MessageUtil
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 
-registerCommand 'sellrelic' handle {
+registerCommand 'sell' handle {
     def item = player.itemInHand
     if (item && item.itemMeta) {
         def nmsItem = CraftItemStack.asNMSCopy item

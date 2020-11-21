@@ -120,6 +120,7 @@ public class PlayerDataManager implements Listener {
 
 		player.setGameMode(GameMode.ADVENTURE);
 		user.setState(user.getState()); // Загрузка музея
+		player.setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, false);
 
 		B.postpone(1, () -> {
 			// Отправка таба

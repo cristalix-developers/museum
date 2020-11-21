@@ -36,7 +36,7 @@ public class WorkerUtil {
 					String[] ss = label.getTag().split("\\s+");
 					String skin = ss.length > 0 ? app.getConfig().getString("npc-skin." + ss[0]) : defaultSkin;
 
-					return new NpcWorker(label, skin, "", user -> {
+					return new NpcWorker(label.clone().add(.5, 0, .5), skin, "", user -> {
 						if (ss.length < 2)
 							return;
 						if (ss[1].startsWith("/"))

@@ -135,7 +135,8 @@ Guis.register 'main', { player ->
         Меняйте режим так, как нравится глазам!
         """
     } leftClick {
-        user.player.setPlayerTime user.player.playerTime + 12000, false
+        user.player.setPlayerTime(user.info.darkTheme ? 12000 : 21000, true)
+        user.info.darkTheme = !user.info.darkTheme
         closeInventory()
     }
 }
