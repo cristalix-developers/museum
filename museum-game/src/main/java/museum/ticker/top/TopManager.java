@@ -52,7 +52,6 @@ public class TopManager implements Ticked, Listener {
 	}
 
 	public void updateData() {
-		System.out.println("good");
 		for (TopPackage.TopType type : TopPackage.TopType.values()) {
 			app.getClientSocket().writeAndAwaitResponse(new TopPackage(type, DATA_COUNT))
 					.thenAcceptAsync(pkg -> tops.put(type, pkg.getEntries().stream()

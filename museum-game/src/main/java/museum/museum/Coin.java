@@ -10,6 +10,8 @@ import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 
+import java.util.Set;
+
 /**
  * @author func 08.06.2020
  * @project Museum
@@ -26,6 +28,15 @@ public class Coin {
 	public Coin(double x, double y, double z) {
 		entityItem = new EntityItem(App.getApp().getNMSWorld(), x, y, z, COIN_ITEM);
 		timestamp = System.currentTimeMillis();
+	}
+
+	public static void bulkRemove(PlayerConnection connection, Set<Coin> coins) {
+		int[] idsToRemove = new int[coins.size()];
+		val coinsIterator = coins.iterator();
+		for (int i = 0; i < idsToRemove.length; i++) {
+			idsToRemove[i] = coinsIterator.next().entityItem.getId();
+		}
+		connection.sendPacket(new PacketPlayOutEntityDestroy(idsToRemove));
 	}
 
 	public void remove(PlayerConnection connection) {
