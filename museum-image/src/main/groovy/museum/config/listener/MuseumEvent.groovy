@@ -46,7 +46,7 @@ on PlayerMoveEvent, {
             // Попытка снять груз возле лавки
             museum.getSubjects(SubjectType.STALL).forEach(stall -> {
                 // Если игрок находится к лавке в радиусе 5 блоков
-                if (stall.allocation.origin.distanceSquared(to) < 25) {
+                if (stall.allocation.origin.distanceSquared(to) < 55) {
                     user.grabbedArmorstand.remove()
                     user.grabbedArmorstand = null
                     user.player.allowFlight = true

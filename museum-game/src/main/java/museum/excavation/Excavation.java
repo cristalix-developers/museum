@@ -42,7 +42,7 @@ public class Excavation implements State {
 		for (val item : prototype.getPallette())
 			inventory.addItem(item);
 
-		user.teleport(prototype.getSpawn());
+		user.teleport(prototype.getSpawn().clone().add(0, 2, 0));
 		user.getPlayer().sendTitle("§6Прибытие!", prototype.getTitle());
 
 		MessageUtil.find("visitexcavation")

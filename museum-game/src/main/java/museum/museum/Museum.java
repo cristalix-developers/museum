@@ -55,7 +55,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	private final ItemStack menu = Items.render("menu").asBukkitMirror();
 	private final ItemStack backItem = Items.render("back").asBukkitMirror();
 	private final ItemStack visitorMenu = Items.render("visitor-menu").asBukkitMirror();
-	private final ItemStack donateMenu = Items.render("donate-menu").asBukkitMirror();
 	private final ItemStack placeMenu = Items.render("place-menu").asBukkitMirror();
 
 	private final CraftWorld world;
@@ -160,7 +159,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		inventory.setItem(0, menu);
 		inventory.setItem(3, visitorMenu);
 		inventory.setItem(5, placeMenu);
-		inventory.setItem(8, donateMenu);
 	}
 
 	@Override
@@ -169,7 +167,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		user.setLastLocation(user.getLocation());
 		user.setLastPosition(UtilV3.fromVector(user.getLocation().toVector()));
 
-		coins.forEach(coin -> coin.remove(user.getConnection()));
+		Coin.bulkRemove(user.getConnection(), coins);
 		coins.clear();
 	}
 

@@ -11,30 +11,39 @@ import static museum.App.getApp
 import static org.bukkit.Material.CLAY_BALL
 import static org.bukkit.Material.DIAMOND
 
+def placeOnPage = 35
+
 on PlayerInteractEvent, {
     if (item && item.type == CLAY_BALL) {
         def nmsItem = CraftItemStack.asNMSCopy(item)
         if (nmsItem.tag && nmsItem.tag.hasKeyOfType('other', 8))
             if (nmsItem.tag.getString('other') == 'achievements_lock')
-                player.performCommand 'place'
+                Guis.open(player, 'place-gui', player)
     }
 }
 
-registerCommand 'place' handle {
-    Guis.open(player, 'place-gui', player)
-    return
-}
-
 Guis.register 'place-gui', {
-    def user = app.getUser((Player) context)
+    def page
+    def user
 
-    title 'Где я был(а)?'
+    if (context instanceof Player) {
+        page = 0
+        user = app.getUser((Player) context)
+    } else {
+        def tuple = context as Tuple2
+        page = tuple.v2 as Integer
+        user = app.getUser((Player) tuple.v1)
+    }
+
+    def maxPages = user.claimedPlaces.size() / placeOnPage
+
+    title 'Где я был? Страница ' + (1+page)
 
     layout """
         ----X----
         -OOOOOOO-
         -OOOOOOO-
-        -OOOOOOO-
+        ${page > 0 ? 'B' : '-'}OOOOOOO${page < maxPages ? 'N' : '-'}
         -OOOOOOO-
         -OOOOOOO-
     """
@@ -50,16 +59,32 @@ Guis.register 'place-gui', {
                 для повышения уровня! 
                 """
     }
-    user.claimedPlaces.forEach {
-        def place = PlacesMechanic.getPlaceByTitle it
-        if (place) {
-            button 'O' icon {
-                item CLAY_BALL
-                nbt.other = 'access'
-                text """§b${place.title}
+    button 'N' icon {
+        item CLAY_BALL
+        text '§bВперед'
+        nbt.other = 'arrow_right'
+    } leftClick {
+        Guis.open(player, 'place-gui', new Tuple2(player, ++page))
+    }
+    button 'B' icon {
+        item CLAY_BALL
+        text '§bНазад'
+        nbt.other = 'arrow_left'
+    } leftClick {
+        Guis.open(player, 'place-gui', new Tuple2(player, --page))
+    }
+    if (page * placeOnPage < user.claimedPlaces.size()) {
+        user.claimedPlaces.collect().drop(page * placeOnPage).forEach {
+            def place = PlacesMechanic.getPlaceByTitle it
+            if (place) {
+                button 'O' icon {
+                    item CLAY_BALL
+                    nbt.other = 'access'
+                    text """§b${place.title}
             
                 Вы получили §6${place.claimedExp} EXP
                 """
+                }
             }
         }
     }

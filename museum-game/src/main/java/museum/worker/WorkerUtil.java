@@ -19,16 +19,14 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class WorkerUtil {
 
-	// todo: remove that shit in future
+	private final static String defaultSkin = App.getApp().getConfig().getString("npc-skin.default");
 	public static final NpcWorker STALL_WORKER_TEMPLATE = new NpcWorker(
 			new Location(App.getApp().getWorld(), 0, 0, 0),
-			"http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27",
+			defaultSkin,
 			"Работница лавки",
-			null
+			User::getExperience
 	);
 	private static final List<NpcWorker> workers = new ArrayList<>();
-	private final String test =
-			"http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27";
 
 	public void init(App app) {
 		// Формат таблички: .p simplenpc <Имя жителя> </команда>
@@ -36,7 +34,9 @@ public class WorkerUtil {
 				.stream()
 				.map(label -> {
 					String[] ss = label.getTag().split("\\s+");
-					return new NpcWorker(label, test, ss[0], user -> {
+					String skin = ss.length > 0 ? app.getConfig().getString("npc-skin." + ss[0]) : defaultSkin;
+
+					return new NpcWorker(label.clone().add(.5, 0, .5), skin, "", user -> {
 						if (ss.length < 2)
 							return;
 						if (ss[1].startsWith("/"))

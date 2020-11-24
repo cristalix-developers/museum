@@ -11,6 +11,7 @@ import static org.bukkit.Material.*
 
 Items.register 'pickaxe-template', {
     nbt.CanDestroy = [
+            'minecraft:stained_glass',
             'minecraft:dirt',
             'minecraft:sand',
             'minecraft:soul_sand',
