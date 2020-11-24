@@ -21,7 +21,7 @@ registerCommand 'tpshow' handle {
     if (user) {
         def player = Bukkit.getPlayer args[0]
         if (player && player.online) {
-            user.player.showPlayer player
+            user.player.showPlayer App.app, player
             user.teleport player.location
         }
     }
