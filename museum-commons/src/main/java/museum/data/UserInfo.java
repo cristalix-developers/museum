@@ -2,7 +2,7 @@ package museum.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import museum.donate.DonateType;
+import museum.data.model.Model;
 import ru.cristalix.core.math.V3;
 
 import java.util.List;
@@ -15,21 +15,20 @@ public class UserInfo implements Unique {
 	public final UUID uuid;
 
 	public String prefix;
+	private int rank;
+	private boolean darkTheme;
+
 	public long experience;
 	private double money;
+	private double income;
 	private long timePlayed;
-	private PickaxeType pickaxeType;
-	public List<MuseumInfo> museumInfos;
-	public List<SubjectInfo> subjectInfos;
-	public List<SkeletonInfo> skeletonInfos;
-	private int excavationCount;
 	private long pickedCoinsCount;
+	private int excavationCount;
+
 	private V3 lastPosition;
-	private List<DonateType> donates;
+
+	private final List<Model> models;
 	private List<BoosterInfo> localBoosters;
 	private List<String> claimedPlaces;
-	private List<String> claimedRelics;
-	private double income;
-	private boolean darkTheme;
 
 }

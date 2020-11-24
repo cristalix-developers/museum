@@ -7,6 +7,10 @@ import lombok.experimental.Delegate;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.data.*;
+import museum.data.model.Model;
+import museum.data.model.MuseumModel;
+import museum.data.model.SkeletonModel;
+import museum.data.model.SubjectModel;
 import museum.misc.Relic;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
@@ -29,21 +33,21 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.spigotmc.AsyncCatcher;
 import ru.cristalix.core.util.UtilV3;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 public class User implements PlayerWrapper {
 
 	@Delegate
 	private final UserInfo info;
-	private final Registry<MuseumInfo, MuseumPrototype, Museum> museums
-			= new Registry<>(this, Managers.museum, MuseumInfo::new, Museum::new);
-	private final Registry<SkeletonInfo, SkeletonPrototype, Skeleton> skeletons
-			= new Registry<>(this, Managers.skeleton, SkeletonInfo::new, Skeleton::new);
-	private final Registry<SubjectInfo, SubjectPrototype, Subject> subjects
-			= new Registry<>(this, Managers.subject, SubjectInfo::generateNew, SubjectPrototype::provide);
+
+	private final Map<UUID, Model> model = new HashMap<>();
+	private final Registry<MuseumModel, MuseumPrototype, Museum> museums
+			= new Registry<>(this, Managers.museum, MuseumModel::new, Museum::new);
+	private final Registry<SkeletonModel, SkeletonPrototype, Skeleton> skeletons
+			= new Registry<>(this, Managers.skeleton, SkeletonModel::new, Skeleton::new);
+	private final Registry<SubjectModel, SubjectPrototype, Subject> subjects
+			= new Registry<>(this, Managers.subject, SubjectModel::generateNew, SubjectPrototype::provide);
 	private final List<Relic> relics;
 	private CraftPlayer player;
 	private PlayerConnection connection;
@@ -58,8 +62,8 @@ public class User implements PlayerWrapper {
 		this.enterTime = System.currentTimeMillis();
 		this.info = info;
 
-		this.skeletons.importInfos(info.getSkeletonInfos());
-		this.subjects.importInfos(info.getSubjectInfos());
+		this.skeletons.importInfos(info.getSkeletonItems());
+		this.subjects.importInfos(info.getSubjectItems());
 		this.museums.importInfos(info.getMuseumInfos());
 		List<Relic> list = new ArrayList<>();
 		for (String address : info.getClaimedRelics()) {
@@ -123,8 +127,8 @@ public class User implements PlayerWrapper {
 	public UserInfo generateUserInfo() {
 		updateIncome();
 		info.museumInfos = museums.getData();
-		info.skeletonInfos = skeletons.getData();
-		info.subjectInfos = subjects.getData();
+		info.skeletonItems = skeletons.getData();
+		info.subjectItems = subjects.getData();
 		List<String> list = new ArrayList<>();
 		for (Relic relic : relics) {
 			String prototypeAddress = relic.getPrototypeAddress();

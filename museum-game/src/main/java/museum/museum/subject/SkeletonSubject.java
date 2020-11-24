@@ -5,7 +5,7 @@ import clepto.bukkit.world.Orientation;
 import clepto.math.V3;
 import lombok.Getter;
 import lombok.Setter;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.Skeleton;
@@ -28,7 +28,7 @@ public class SkeletonSubject extends Subject {
 	@Setter
 	private int level = 1;
 
-	public SkeletonSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
+	public SkeletonSubject(SubjectPrototype prototype, SubjectModel info, User owner) {
 		super(prototype, info, owner);
 
 		V3 origin = prototype.getRelativeOrigin();

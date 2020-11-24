@@ -4,7 +4,7 @@ package museum.config.command
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.data.PickaxeType
-import museum.data.SubjectInfo
+import museum.data.item.SubjectModel
 import museum.donate.DonateType
 import museum.museum.Museum
 import museum.museum.subject.CollectorSubject
@@ -40,7 +40,7 @@ registerCommand 'proccessdonate' handle {
         } else if (donate == DonateType.STEAM_PUNK_COLLECTOR) {
             def subject = new CollectorSubject(
                     Managers.subject.getPrototype('punk-collector'),
-                    new SubjectInfo(UUID.randomUUID(), 'punk-collector'),
+                    new SubjectModel(UUID.randomUUID(), 'punk-collector'),
                     user
             )
             user.getSubjects().add(subject)

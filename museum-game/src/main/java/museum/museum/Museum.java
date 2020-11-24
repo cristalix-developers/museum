@@ -8,7 +8,7 @@ import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client_conversation.ClientPacket;
-import museum.data.MuseumInfo;
+import museum.data.model.MuseumModel;
 import museum.misc.Relic;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.MuseumPrototype;
@@ -49,7 +49,7 @@ import static museum.museum.subject.Allocation.Action.*;
  */
 @Setter
 @Getter
-public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements State {
+public class Museum extends Storable<MuseumModel, MuseumPrototype> implements State {
 
 	// todo: Надо их кешировать, а то музеев много
 	private final ItemStack menu = Items.render("menu").asBukkitMirror();
@@ -62,7 +62,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	private String title;
 	private Set<Coin> coins = ConcurrentHashMap.newKeySet();
 
-	public Museum(MuseumPrototype prototype, MuseumInfo info, User owner) {
+	public Museum(MuseumPrototype prototype, MuseumModel info, User owner) {
 		super(prototype, info, owner);
 		this.world = App.getApp().getWorld();
 		this.title = info.title;

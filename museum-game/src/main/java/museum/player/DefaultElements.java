@@ -1,55 +1,52 @@
 package museum.player;
 
 import lombok.experimental.UtilityClass;
-import museum.data.MuseumInfo;
-import museum.data.PickaxeType;
-import museum.data.SubjectInfo;
+import museum.data.model.Model;
+import museum.data.model.MuseumModel;
+import museum.data.model.SubjectModel;
 import museum.data.UserInfo;
 import museum.museum.map.MuseumPrototype;
 import museum.prototype.Managers;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 @UtilityClass
 public class DefaultElements {
 
-	public static UserInfo createNewUserInfo(UUID userId) {
+	public static UserInfo createNewUserInfo(UUID id, String name) {
 		MuseumPrototype proto = Managers.museum.getPrototype("main");
-		MuseumInfo startMuseum = new MuseumInfo(
+		MuseumModel startMuseum = new MuseumModel(
+				UUID.randomUUID(),
 				proto.getAddress(),
-				"Музей археологии",
 				new Date(),
+				"Музей имени " + name,
 				0
 		);
 
-		UserInfo userInfo = new UserInfo(
-				userId,
+		List<Model> models = new ArrayList<>();
+
+		models.add(startMuseum);
+
+		for (SubjectModel defaultSubject : proto.getDefaultSubjects()) {
+			models.add(defaultSubject.duplicate());
+		}
+
+		return new UserInfo(
+				id,
 				null,
+				0,
+				false,
 				0,
 				1000.0,
-				0L,
-				PickaxeType.DEFAULT,
-				Collections.singletonList(startMuseum),
-				new ArrayList<>(),
-				new ArrayList<>(),
+				0,
+				0,
 				0,
 				0,
 				null,
+				models,
 				new ArrayList<>(),
-				new ArrayList<>(),
-				new ArrayList<>(),
-				new ArrayList<>(),
-				0,
-				false
+				new ArrayList<>()
 		);
-
-		for (SubjectInfo subject : proto.getDefaultSubjects())
-			userInfo.getSubjectInfos().add(subject.duplicate());
-
-		return userInfo;
 	}
 
 }

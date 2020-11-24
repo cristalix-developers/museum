@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import lombok.val;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.museum.map.StallPrototype;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.product.FoodProduct;
@@ -30,7 +30,7 @@ public class StallSubject extends Subject implements Incomeble {
 	private final Map<FoodProduct, Integer> food;
 	private final NpcWorker worker;
 
-	public StallSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
+	public StallSubject(SubjectPrototype prototype, SubjectModel info, User owner) {
 		super(prototype, info, owner);
 		if (info.metadata == null)
 			food = Maps.newHashMap();

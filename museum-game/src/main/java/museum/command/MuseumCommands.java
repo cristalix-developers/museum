@@ -4,7 +4,7 @@ import clepto.bukkit.B;
 import lombok.val;
 import museum.App;
 import museum.data.PickaxeType;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.museum.Museum;
@@ -102,7 +102,7 @@ public class MuseumCommands {
 
 		user.setMoney(user.getMoney() - prototype.getPrice());
 		// new Subject() писать нельзя - так как нужный класс (CollectorSubject...) не уточнет, и все сломается
-		user.getSubjects().add(prototype.provide(new SubjectInfo(
+		user.getSubjects().add(prototype.provide(new SubjectModel(
 				UUID.randomUUID(),
 				prototype.getAddress()
 		), user));

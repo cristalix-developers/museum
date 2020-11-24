@@ -1,7 +1,7 @@
 package museum.museum.subject;
 
 import lombok.Getter;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.museum.map.SubjectPrototype;
 import museum.player.User;
 import museum.prototype.Storable;
@@ -13,12 +13,12 @@ import ru.cristalix.core.util.UtilV3;
  * @project Museum
  */
 @Getter
-public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
+public class Subject extends Storable<SubjectModel, SubjectPrototype> {
 
 	private Allocation allocation;
 	private SubjectPrototype.SubjectDataForClient dataForClient;
 
-	public Subject(SubjectPrototype prototype, SubjectInfo info, User owner) {
+	public Subject(SubjectPrototype prototype, SubjectModel info, User owner) {
 		super(prototype, info, owner);
 	}
 

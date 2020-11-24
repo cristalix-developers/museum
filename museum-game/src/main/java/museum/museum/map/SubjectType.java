@@ -1,7 +1,7 @@
 package museum.museum.map;
 
 import clepto.bukkit.world.WorldConfigurationException;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.museum.subject.*;
 import museum.player.User;
 
@@ -47,12 +47,12 @@ public class SubjectType<T extends Subject> {
 		throw new WorldConfigurationException("Subject type '" + query + "' is not a valid type.");
 	}
 
-	public Subject provide(SubjectPrototype prototype, SubjectInfo info, User user) {
+	public Subject provide(SubjectPrototype prototype, SubjectModel info, User user) {
 		return provider.provide(prototype, info, user);
 	}
 
 	@FunctionalInterface
 	public interface Provider {
-		Subject provide(SubjectPrototype prototype, SubjectInfo info, User user);
+		Subject provide(SubjectPrototype prototype, SubjectModel info, User user);
 	}
 }

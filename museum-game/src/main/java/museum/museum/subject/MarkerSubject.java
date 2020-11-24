@@ -2,7 +2,7 @@ package museum.museum.subject;
 
 import lombok.Getter;
 import museum.App;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.museum.map.SubjectPrototype;
 import museum.player.User;
 import org.bukkit.Location;
@@ -15,7 +15,7 @@ public class MarkerSubject extends Subject {
 	@Getter
 	private final int collectorId;
 
-	public MarkerSubject(SubjectPrototype prototype, SubjectInfo info, User user) {
+	public MarkerSubject(SubjectPrototype prototype, SubjectModel info, User user) {
 		super(prototype, info, user);
 		// ToDo: Fix markers
 		this.location = info.getLocation() == null ? null : UtilV3.toLocation(info.getLocation().clone().add(0.5, 0, 0.5), App.getApp().getWorld());

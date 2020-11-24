@@ -1,7 +1,7 @@
 package museum.prototype;
 
 import lombok.RequiredArgsConstructor;
-import museum.data.Info;
+import museum.data.model.Model;
 import museum.player.User;
 import org.bukkit.Bukkit;
 import ru.cristalix.core.account.IAccountService;
@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class Registry<I extends Info, P extends Prototype, S extends Storable<I, P>> implements Collection<S> {
+public class Registry<I extends Model, P extends Prototype, S extends Storable<I, P>> implements Collection<S> {
 
 	private final User owner;
 	private final PrototypeManager<P> manager;
@@ -24,7 +24,7 @@ public class Registry<I extends Info, P extends Prototype, S extends Storable<I,
 	}
 
 	public void importInfo(I info) {
-		P prototype = manager.getPrototype(info.getPrototypeAddress());
+		P prototype = manager.getPrototype(info.getAddress());
 		if (prototype == null) {
 			Bukkit.getLogger().warning(owner.getUuid() + " (" + IAccountService.get().getNameByUuid(owner.getUuid()) +
 					") had an illegal " + manager.getName() + " element, removing it.");

@@ -2,7 +2,7 @@ package museum.museum.subject;
 
 import clepto.bukkit.B;
 import lombok.val;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.museum.Museum;
 import museum.museum.map.FountainPrototype;
 import museum.museum.map.SubjectPrototype;
@@ -29,7 +29,7 @@ public class FountainSubject extends Subject {
 
 	private Location spawnLocation;
 
-	public FountainSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
+	public FountainSubject(SubjectPrototype prototype, SubjectModel info, User owner) {
 		super(prototype, info, owner);
 	}
 

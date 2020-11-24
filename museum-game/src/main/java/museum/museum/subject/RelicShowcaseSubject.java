@@ -2,7 +2,7 @@ package museum.museum.subject;
 
 import lombok.Getter;
 import museum.App;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.misc.Relic;
 import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
@@ -25,7 +25,7 @@ public class RelicShowcaseSubject extends Subject {
 	private V4 absoluteLocation;
 	private int counter = 0;
 
-	public RelicShowcaseSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
+	public RelicShowcaseSubject(SubjectPrototype prototype, SubjectModel info, User owner) {
 		super(prototype, info, owner);
 		this.relic = info.metadata != null && !info.metadata.isEmpty() ? new Relic(info.metadata) : null;
 	}

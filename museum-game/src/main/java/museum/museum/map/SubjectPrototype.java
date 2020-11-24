@@ -4,7 +4,7 @@ import clepto.bukkit.world.Box;
 import clepto.math.V3;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.museum.subject.Subject;
 import museum.player.User;
 import museum.prototype.Prototype;
@@ -30,7 +30,7 @@ public class SubjectPrototype implements Prototype {
 	private final Material able;
 	private final SubjectDataForClient dataForClient;
 
-	public Subject provide(SubjectInfo info, User owner) {
+	public Subject provide(SubjectModel info, User owner) {
 		return type.provide(this, info, owner);
 	}
 

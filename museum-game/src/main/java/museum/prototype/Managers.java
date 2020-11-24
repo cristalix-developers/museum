@@ -7,7 +7,7 @@ import clepto.bukkit.world.Label;
 import clepto.bukkit.world.WorldConfigurationException;
 import lombok.experimental.UtilityClass;
 import lombok.val;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.excavation.ExcavationPrototype;
 import museum.misc.Relic;
 import museum.museum.map.*;
@@ -112,14 +112,14 @@ public class Managers {
 
 		museum = new PrototypeManager<>("museum", (address, box) -> {
 			box.expandVert();
-			List<SubjectInfo> defaultInfos = new ArrayList<>();
+			List<SubjectModel> defaultInfos = new ArrayList<>();
 			for (Label label : box.getLabels("default")) {
 				String[] tag = label.getTag().split(" ");
 				SubjectPrototype prototype = subject.getPrototype(tag[0]);
 				if (prototype == null)
 					throw new WorldConfigurationException("Illegal default subject '" + tag[0] + "' in museum " +
 							address + " on " + label.getCoords());
-				defaultInfos.add(new SubjectInfo(new UUID(0, 0), prototype.getAddress(), UtilV3.fromVector(label.toVector()), D2.PX, tag.length > 1 ? tag[1] : null, -1, Color.LIME));
+				defaultInfos.add(new SubjectModel(new UUID(0, 0), prototype.getAddress(), UtilV3.fromVector(label.toVector()), D2.PX, tag.length > 1 ? tag[1] : null, -1, Color.LIME));
 			}
 			return new MuseumPrototype(address, box, box.requireLabel("spawn"), defaultInfos);
 		});

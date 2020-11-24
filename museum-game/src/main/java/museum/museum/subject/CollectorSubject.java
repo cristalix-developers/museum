@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import museum.App;
-import museum.data.SubjectInfo;
+import museum.data.model.SubjectModel;
 import museum.museum.Museum;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.CollectorSubjectPrototype;
@@ -30,7 +30,7 @@ public class CollectorSubject extends Subject implements Incomeble {
 	private final double radius;
 	private final int speed;
 
-	public CollectorSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
+	public CollectorSubject(SubjectPrototype prototype, SubjectModel info, User owner) {
 		super(prototype, info, owner);
 		EntityArmorStand armorStand = new EntityArmorStand(App.getApp().getNMSWorld());
 		// todo: добавить кеширование предметов, а то они одни и теже
