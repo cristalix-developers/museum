@@ -27,11 +27,6 @@ public class PreparePlayerBrain implements Prepare {
 
 	private final List<Label> dots;
 	private final List<Title> titles = new ArrayList<>();
-	private final String endMessage = "§f[§aВНИМАНИЕ§f]\n" +
-			"§6У входа §fв музей вас ждет §6Михаэль,\n" +
-			"§fон может устроить §6раскопки!\n" +
-			"§6Внутри музея, Ангелина §fможет показать вам\n" +
-			"§6постройки §fдля кастомизации музея.\n";
 
 	public PreparePlayerBrain() {
 		dots = App.getApp().getMap().getLabels("guide");
@@ -68,7 +63,8 @@ public class PreparePlayerBrain implements Prepare {
 					return;
 				}
 				if (iteration >= titles.size()) {
-					player.sendMessage(endMessage);
+					if (user.getExperience() >= EXPERIENCE)
+						player.teleport(dots.get(dots.size() - 1).toCenterLocation());
 					user.giveExperience(EXPERIENCE);
 					((Museum) user.getState()).giveMenu(user);
 					exit();
