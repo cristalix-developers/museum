@@ -9,8 +9,8 @@ public enum PickaxeType {
 
 	DEFAULT("любительская", 0),
 	PROFESSIONAL("профессиональная", 30000),
-	PRESTIGE("престижная", 200000),
-	LEGENDARY("легендарная", 5000000);
+	PRESTIGE("престижная", 2000000),
+	LEGENDARY("легендарная", 50000000);
 
 	private final String name;
 	private final double price;

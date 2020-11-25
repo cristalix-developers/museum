@@ -12,6 +12,7 @@ import museum.App;
 import museum.PacketMetrics;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
+import museum.international.International;
 import museum.misc.Relic;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
@@ -50,6 +51,7 @@ public class BeforePacketHandler implements Prepare {
 
 	public static final ItemStack EMERGENCY_STOP = Items.render("go-back-item").asBukkitMirror();
 	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
+	public static final BlockPosition DUMMY = new BlockPosition(0, 0, 0);
 	private static final ItemStack[] INTERACT_ITEMS = Items.items.keySet().stream()
 			.filter(closure -> closure.contains("treasure"))
 			.map(closure -> Items.render(closure).asBukkitMirror())
@@ -57,7 +59,6 @@ public class BeforePacketHandler implements Prepare {
 	private static final ItemStack AIR_ITEM = ru.cristalix.core.item.Items.builder()
 			.type(Material.AIR)
 			.build();
-	private static final BlockPosition DUMMY = new BlockPosition(0, 0, 0);
 
 	@Override
 	public void execute(User user, App app) {
@@ -94,8 +95,10 @@ public class BeforePacketHandler implements Prepare {
 	}
 
 	private void onDigging(User user, PacketPlayInBlockDig packet) {
-		boolean valid = user.getState() instanceof Excavation && isAir(user, packet.a);
-		if (packet.c == STOP_DESTROY_BLOCK && valid) {
+		val state = user.getState();
+		if (state instanceof International) {
+			((International) state).acceptBlockBreak(user, packet);
+		} else if (packet.c == STOP_DESTROY_BLOCK && state instanceof Excavation && isAir(user, packet.a)) {
 			if (tryReturnPlayer(user, false))
 				return;
 			acceptedBreak(user, packet);
@@ -111,8 +114,16 @@ public class BeforePacketHandler implements Prepare {
 
 			if (user.getState() instanceof Museum)
 				acceptMuseumClick(user, packet);
-			else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP))
-				tryReturnPlayer(user, true);
+			else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP)) {
+				if (user.getState() instanceof International) {
+					B.postpone(10, () -> user.setState(user.getLastMuseum() == null ?
+							user.getMuseums().get(Managers.museum.getPrototype("main")) :
+							user.getLastMuseum()
+					));
+				} else {
+					tryReturnPlayer(user, true);
+				}
+			}
 			packet.a = DUMMY;
 		} else if (packet.c == EnumHand.OFF_HAND)
 			packet.a = DUMMY;
@@ -140,8 +151,7 @@ public class BeforePacketHandler implements Prepare {
 				}
 			}
 		}
-		BlockPosition blockPos = new BlockPosition(packet.a);
-		B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, museum, blockPos));
+		B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, museum, packet.a));
 	}
 
 	private void placeRelic(User user, RelicShowcaseSubject stand, net.minecraft.server.v1_12_R1.ItemStack item) {
@@ -162,7 +172,6 @@ public class BeforePacketHandler implements Prepare {
 		} else {
 			MessageUtil.find("relic-in-hand").send(user);
 		}
-		return;
 	}
 
 	private void openManipulator(User user, Museum museum, PacketPlayInUseItem packet, Subject subject) {
@@ -175,7 +184,7 @@ public class BeforePacketHandler implements Prepare {
 		});
 	}
 
-	private void acceptSubjectPlace(User user, Museum museum, BlockPosition a) {
+	private void acceptSubjectPlace(User user, Museum museum, BlockPosition position) {
 		if (museum == null || museum.getOwner() != user) return;
 
 		val item = user.getInventory().getItemInMainHand();
@@ -184,7 +193,7 @@ public class BeforePacketHandler implements Prepare {
 		if (subject == null)
 			return;
 
-		val location = new Location(App.getApp().getWorld(), a.getX(), a.getY(), a.getZ());
+		val location = new Location(App.getApp().getWorld(), position.getX(), position.getY(), position.getZ());
 
 		if (subject.getPrototype().getAble() != location.getBlock().getType()) {
 			MessageUtil.find("cannot-place").send(user);

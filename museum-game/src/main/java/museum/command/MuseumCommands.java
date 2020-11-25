@@ -17,6 +17,7 @@ import museum.museum.subject.skeleton.Skeleton;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
+import museum.util.CrystalUtil;
 import museum.util.MessageUtil;
 import museum.util.VirtualSign;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -310,10 +311,14 @@ public class MuseumCommands {
 
 		player.closeInventory();
 
-		if (prototype.getPrice() > user.getMoney())
+		val crystalPrice = CrystalUtil.convertMoney2Cristal(prototype.getPrice());
+		if (CrystalUtil.convertMoney2Cristal(prototype.getPrice()) <= user.getCrystal()) {
+			user.setCrystal(user.getCrystal() - crystalPrice);
+		} else if (prototype.getPrice() > user.getMoney()) {
 			return NO_MONEY_MESSAGE;
-
-		user.setMoney(user.getMoney() - prototype.getPrice());
+		} else {
+			user.setMoney(user.getMoney() - prototype.getPrice());
+		}
 		user.setState(new Excavation(prototype, prototype.getHitCount()));
 
 		return null;

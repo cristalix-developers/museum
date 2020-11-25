@@ -7,6 +7,17 @@ import museum.museum.subject.skeleton.Skeleton
 import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
 
+register 'crystal', {
+    item CLAY_BALL
+    nbt.museum = 'crystal_pink'
+    text """&bКристалл
+
+    Очень ценится в международных 
+    кругах, за него можно отправится
+    в экспедиции без денег.
+    """
+}
+
 register 'relic-yantar', {
     item CLAY_BALL
     nbt.price = 36

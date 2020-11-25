@@ -6,10 +6,8 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
 import museum.player.State;
-import net.minecraft.server.v1_12_R1.Chunk;
-import net.minecraft.server.v1_12_R1.EntityPlayer;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
-import ru.cristalix.ChunkInterceptor;
+import net.minecraft.server.v1_12_R1.World;
 import ru.cristalix.core.map.BukkitWorldLoader;
 import ru.cristalix.core.map.MapListDataItem;
 
@@ -22,37 +20,39 @@ import java.util.concurrent.ExecutionException;
 @UtilityClass
 public class MapLoader {
 
-	public void load(App app) {
+	public WorldMeta load(String map) {
 		// Загрузка карты с сервера BUIL-1
-		MapListDataItem mapInfo = Cristalix.mapService().getLatestMapByGameTypeAndMapName("Museum", "prod1")
+		MapListDataItem mapInfo = Cristalix.mapService().getLatestMapByGameTypeAndMapName("Museum", map)
 				.orElseThrow(() -> new RuntimeException("Map Museum/release wasn't found in the MapService"));
 
+		WorldMeta meta;
 		try {
-			app.setMap(new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get()));
+			meta = new WorldMeta(Cristalix.mapService().loadMap(mapInfo.getLatest(), BukkitWorldLoader.INSTANCE).get());
 		} catch (InterruptedException | ExecutionException exception) {
 			exception.printStackTrace();
 			Thread.currentThread().interrupt();
+			return null;
 		}
 
-		val world = app.getWorld();
-		// Инжектим блоки в чанки (patched paper)
-		app.getNMSWorld().chunkInterceptor = new ChunkInterceptor() {
-			@Override
-			public PacketPlayOutMapChunk provideChunkPacket(Chunk chunk, int flags, EntityPlayer receiver) {
-				val user = app.getUser(receiver.getUniqueID());
-				if (user == null)
-					return new PacketPlayOutMapChunk(chunk, flags);
-				State state = user.getState();
-				if (state == null)
-					return new PacketPlayOutMapChunk(chunk, flags);
-				val worldChunk = app.getNMSWorld().getChunkAt(chunk.locX, chunk.locZ);
-				ChunkWriter chunkWriter = new ChunkWriter(worldChunk);
-				state.rewriteChunk(user, chunkWriter);
-				return chunkWriter.build(flags);
-			}
-		};
+		val world = meta.getWorld();
 		world.setGameRuleValue("mobGriefing", "false");
 		world.setGameRuleValue("doTileDrops", "false");
+		return meta;
+	}
 
+	public void interceptChunkWriter(App app, World world) {
+		// Инжектим блоки в чанки (patched paper)
+		world.chunkInterceptor = (chunk, flags, receiver) -> {
+			val user = app.getUser(receiver.getUniqueID());
+			if (user == null)
+				return new PacketPlayOutMapChunk(chunk, flags);
+			State state = user.getState();
+			if (state == null)
+				return new PacketPlayOutMapChunk(chunk, flags);
+			val worldChunk = world.getChunkAt(chunk.locX, chunk.locZ);
+			ChunkWriter chunkWriter = new ChunkWriter(worldChunk);
+			state.rewriteChunk(user, chunkWriter);
+			return chunkWriter.build(flags);
+		};
 	}
 }

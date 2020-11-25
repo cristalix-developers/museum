@@ -20,7 +20,8 @@ public class PrepareScoreBoard implements Prepare {
 	public static void addUserInfo(SimpleBoardObjective objective, User user) {
 		objective.startGroup("Игрок")
 				.record("Уровень", () -> LevelSystem.formatExperience(user.getExperience()))
-				.record("Баланс", () -> "§a" + MessageUtil.toMoneyFormat(user.getMoney()));
+				.record("Баланс", () -> "§a" + MessageUtil.toMoneyFormat(user.getMoney()))
+				.record("Кристаллы", () -> "§b" + user.getInfo().getCrystal() + "§f㦶");
 	}
 
 	public static void addServerInfo(SimpleBoardObjective objective) {
