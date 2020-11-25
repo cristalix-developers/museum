@@ -171,6 +171,16 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		coins.clear();
 	}
 
+	@Override
+	public boolean playerVisible() {
+		return false;
+	}
+
+	@Override
+	public boolean nightVision() {
+		return true;
+	}
+
 	public void updateIncrease() {
 		double[] i = {.1};
 		iterateSubjects(s -> i[0] += s.getIncome());

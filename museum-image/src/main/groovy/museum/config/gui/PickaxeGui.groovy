@@ -22,6 +22,7 @@ Items.register 'pickaxe-template', {
             'minecraft:snow',
             'minecraft:red_sandstone'
     ]
+    nbt.Unbreakable = 1
     nbt.HideFlags = 63
 }
 

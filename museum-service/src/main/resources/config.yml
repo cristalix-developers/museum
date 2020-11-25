@@ -8,6 +8,7 @@ npc-skin:
 
 chat:
   messages:
+    leave-crystal: 'fine§dКристаллы §fвместе с вами, они видны на скорборде.'
     stand-sell: 'fineВы продали перекупщику постройку за §6%PRICE%$&f!'
     relic-sell: 'fineВы продали перекупщику реликвию за §6%PRICE%$&f!'
     relic-placed: 'fineВы поместили §6%TITLE%§f.'

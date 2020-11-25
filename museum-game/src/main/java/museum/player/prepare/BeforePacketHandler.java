@@ -67,13 +67,13 @@ public class BeforePacketHandler implements Prepare {
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
 				if (packetObj instanceof PacketPlayInUseItem)
-					onItemUse(user, (PacketPlayInUseItem) packetObj);
+					MinecraftServer.SERVER.postToMainThread(() -> onItemUse(user, (PacketPlayInUseItem) packetObj));
 				else if (packetObj instanceof PacketPlayInBlockDig) {
 					val dig = (PacketPlayInBlockDig) packetObj;
 					// Если пакет о дропе предмета - дропнуть пакет
 					if (dig.c == DROP_ITEM || dig.c == DROP_ALL_ITEMS)
 						return;
-					onDigging(user, dig);
+					MinecraftServer.SERVER.postToMainThread(() -> onDigging(user, dig));
 				} else if (packetObj instanceof PacketPlayInSteerVehicle) {
 					// Если игрок на коллекторе и нажимает шифт, то скинуть его
 					onUnmount(user, (PacketPlayInSteerVehicle) packetObj);
@@ -151,7 +151,7 @@ public class BeforePacketHandler implements Prepare {
 				}
 			}
 		}
-		B.run(() -> BeforePacketHandler.this.acceptSubjectPlace(user, museum, packet.a));
+		BeforePacketHandler.this.acceptSubjectPlace(user, museum, packet.a);
 	}
 
 	private void placeRelic(User user, RelicShowcaseSubject stand, net.minecraft.server.v1_12_R1.ItemStack item) {
@@ -241,36 +241,34 @@ public class BeforePacketHandler implements Prepare {
 
 	@SuppressWarnings("deprecation")
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
-		MinecraftServer.getServer().postToMainThread(() -> {
-			if (user.getPlayer() == null || !(user.getState() instanceof Excavation))
-				return;
-			// С некоторым шансом может выпасть интерактивая вещь
-			if (Vector.random.nextFloat() > .95)
-				user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
-			// С некоторым шансом может выпасть реликвия
-			if (Vector.random.nextFloat() > .997) {
-				val relics = ((Excavation) user.getState()).getPrototype().getRelics();
-				if (relics != null && relics.length > 0) {
-					val randomRelic = new Relic(
-							ListUtils.random(((Excavation) user.getState()).getPrototype().getRelics()).getPrototypeAddress()
-					);
-					user.getPlayer().getInventory().addItem(randomRelic.getRelic());
-					user.getRelics().add(randomRelic);
-					MessageUtil.find("relic-find")
-							.set("title", randomRelic.getRelic().getItemMeta().getDisplayName())
-							.send(user);
-				}
+		if (user.getPlayer() == null || !(user.getState() instanceof Excavation))
+			return;
+		// С некоторым шансом может выпасть интерактивая вещь
+		if (Vector.random.nextFloat() > .95)
+			user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
+		// С некоторым шансом может выпасть реликвия
+		if (Vector.random.nextFloat() > .997) {
+			val relics = ((Excavation) user.getState()).getPrototype().getRelics();
+			if (relics != null && relics.length > 0) {
+				val randomRelic = new Relic(
+						ListUtils.random(((Excavation) user.getState()).getPrototype().getRelics()).getPrototypeAddress()
+				);
+				user.getPlayer().getInventory().addItem(randomRelic.getRelic());
+				user.getRelics().add(randomRelic);
+				MessageUtil.find("relic-find")
+						.set("title", randomRelic.getRelic().getItemMeta().getDisplayName())
+						.send(user);
 			}
-			// Перебрать все кирки и эффекты на них
-			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
-			for (PickaxeType pickaxeType : PickaxeType.values()) {
-				if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
-					List<BlockPosition> positions = pickaxeType.getPickaxe().dig(user, packet.a);
-					if (positions != null)
-						positions.forEach(position -> generateFragments(user, position));
-				}
+		}
+		// Перебрать все кирки и эффекты на них
+		user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
+		for (PickaxeType pickaxeType : PickaxeType.values()) {
+			if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
+				List<BlockPosition> positions = pickaxeType.getPickaxe().dig(user, packet.a);
+				if (positions != null)
+					positions.forEach(position -> generateFragments(user, position));
 			}
-		});
+		}
 	}
 
 	private void generateFragments(User user, BlockPosition position) {

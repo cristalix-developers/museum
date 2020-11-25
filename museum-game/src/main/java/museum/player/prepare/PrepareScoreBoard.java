@@ -21,7 +21,7 @@ public class PrepareScoreBoard implements Prepare {
 		objective.startGroup("Игрок")
 				.record("Уровень", () -> LevelSystem.formatExperience(user.getExperience()))
 				.record("Баланс", () -> "§a" + MessageUtil.toMoneyFormat(user.getMoney()))
-				.record("Кристаллы", () -> "§b" + user.getInfo().getCrystal() + "§f㦶");
+				.record("Кристаллы", () -> "§d" + user.getInfo().getCrystal() + "§f㦶");
 	}
 
 	public static void addServerInfo(SimpleBoardObjective objective) {

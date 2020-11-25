@@ -70,9 +70,9 @@ Guis.register 'sell-menu', {
     button 'F' icon {
         item CLAY_BALL
         nbt.museum = 'crystal_pink'
-        text """§fПродать §bкристаталл §fза §e${MessageUtil.toMoneyFormat(CrystalUtil.convertCrystal2Money(1))}
+        text """§fПродать §d㦶 §fза §e${MessageUtil.toMoneyFormat(CrystalUtil.convertCrystal2Money(1))}
         
-        §7У вас §b${user.getCrystal()} кристалла(ов)
+        §7У вас §d${user.getCrystal()} 㦶
         """
     } leftClick {
         if (user.getCrystal() < 1)
@@ -89,9 +89,9 @@ Guis.register 'sell-menu', {
         item CLAY_BALL
         nbt.museum = 'crystal_pink'
         amount smallCrystal
-        text """§fПродать §b${smallCrystal} кристаталлов §fза §e${MessageUtil.toMoneyFormat(CrystalUtil.convertCrystal2Money(smallCrystal + 1))}
+        text """§fПродать §d${smallCrystal} 㦶 §fза §e${MessageUtil.toMoneyFormat(CrystalUtil.convertCrystal2Money(smallCrystal + 1))}
         
-        §7У вас §b${user.getCrystal()} кристалла(ов)
+        §7У вас §d${user.getCrystal()} 㦶
         """
     } leftClick {
         if (user.getCrystal() < smallCrystal)
@@ -104,9 +104,9 @@ Guis.register 'sell-menu', {
         item CLAY_BALL
         nbt.museum = 'crystal_pink'
         amount bigCrystal
-        text """§fПродать §b${bigCrystal} кристаталлов §fза §e${MessageUtil.toMoneyFormat(CrystalUtil.convertCrystal2Money(bigCrystal + 4))}
+        text """§fПродать §d${bigCrystal} 㦶 §fза §e${MessageUtil.toMoneyFormat(CrystalUtil.convertCrystal2Money(bigCrystal + 4))}
         
-        §7У вас §b${user.getCrystal()} кристалла(ов)
+        §7У вас §d${user.getCrystal()} 㦶
         """
     } leftClick {
         if (user.getCrystal() < bigCrystal)

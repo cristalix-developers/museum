@@ -7,6 +7,13 @@ import museum.museum.subject.skeleton.Skeleton
 import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
 
+register 'hook', {
+    item FISHING_ROD
+    text '&eКрюк'
+    nbt.Unbreakable = 1
+}
+
+
 register 'crystal', {
     item CLAY_BALL
     nbt.museum = 'crystal_pink'
@@ -18,14 +25,48 @@ register 'crystal', {
     """
 }
 
+register 'relic-totem', {
+    item CLAY_BALL
+    nbt.price = 14
+    nbt.relic = 'totem'
+    nbt.museum = 'totem'
+    text """&aТотем Майя
+
+    &eДоход оценивается в 14\$
+    
+    Можно продать перекупщику 
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'relic-shap', {
+    item CLAY_BALL
+    nbt.price = 12
+    nbt.relic = 'shap'
+    nbt.museum = 'shap'
+    text """&aМаска война Майя
+
+    &eДоход оценивается в 12\$
+    
+    Можно продать перекупщику 
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
 register 'relic-yantar', {
     item CLAY_BALL
-    nbt.price = 36
+    nbt.price = 20
     nbt.relic = 'yantar'
     nbt.museum = 'yantar'
     text """&aЯнтарь
 
-    &eДоход оценивается в 36\$
+    &eДоход оценивается в 20\$
     
     Можно продать перекупщику 
 
@@ -92,7 +133,7 @@ register 'relic-shield', {
     nbt.price = 10
     nbt.relic = 'shield'
     nbt.museum = 'shieldofruin'
-    text """&6Щит война Древнего Египта
+    text """&aЩит война Древнего Египта
 
     &eДоход оценивается в 10\$
         
