@@ -2,9 +2,6 @@ import * as gui from '@cristalix/client-api';
 import * as easing from '@cristalix/client-api/lib/easing';
 
 (function(plugin: any) {
-
-	gui.register(plugin);
-
 	var priceText = gui.text({
 		text: 'Цена: §aМнога $$$',
 		y: 36,
@@ -37,8 +34,6 @@ import * as easing from '@cristalix/client-api/lib/easing';
 
 	System.currentTimeMillis();
 
-	ChatExtensions.printChatMessage('Hello, world.');
-	
 	box.enabled = false;
 
 	gui.overlay.push(box)
@@ -61,7 +56,6 @@ import * as easing from '@cristalix/client-api/lib/easing';
 
 	PluginMessages.on(plugin, 'shop', (bb: ByteBuf) => {
 		var data = UtilNetty.readString(bb, 65536);
-		ChatExtensions.printChatMessage("museum:shop " + data);
 		subjects = JSON.parse(data);
 	});
 

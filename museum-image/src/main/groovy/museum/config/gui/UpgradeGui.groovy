@@ -50,7 +50,7 @@ register 'tools', { player ->
 
 register 'rod', { player ->
     def user = App.app.getUser((Player) player)
-
+    def cost = 300 * 10**(user.info.hookLevel-1)
     title 'Улучшение крюка'
     layout '----S---X'
     button MuseumGuis.background
@@ -66,15 +66,14 @@ register 'rod', { player ->
             text """
             &eКрюк УР. ${user.info.hookLevel + 1} 
 
-            Купить за &d${user.info.hookLevel * 500 * 10**(user.info.hookLevel-1)}㦶
+            Купить за &d${cost}㦶
             """
             nbt.Unbreakable = 1
         }
     } leftClick {
-        def updateCost = user.info.hookLevel * 500 * 10**user.info.hookLevel
-        if (user.crystal < updateCost)
+        if (user.crystal < cost)
             return MessageUtil.get('nocrystal')
-        user.crystal -= updateCost
+        user.crystal -= cost
         user.info.hookLevel = user.info.hookLevel + 1
         closeInventory()
         return MessageUtil.find('buy-hook').set('level', user.info.hookLevel).text

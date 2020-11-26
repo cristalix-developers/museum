@@ -1,8 +1,6 @@
 import * as gui from '@cristalix/client-api';
 
 (function(plugin: any) {
-	gui.register(plugin);
-
 	let text = gui.text({
 		text: '',
 		y: -50,

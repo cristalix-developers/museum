@@ -11,8 +11,6 @@ import * as gui from '@cristalix/client-api';
 		}
 	});
 
-	gui.register(plugin);
-
 	const title = gui.rect({
 		color: {a: 0.5, r: 0, g: 1, b: 0},
 		align: {x: 0.015, y: 0.03},
@@ -39,7 +37,7 @@ import * as gui from '@cristalix/client-api';
 		"§fгруз у желтой метки и несите в лавку.",
 		"",
 		"§f- Магазин построек §b§l/shop",
-		"§f- '§b§lJ§f' - §bскрыть/показать §fэто окно"
+		"§fНажмите '§b§lJ§f' - §bскрыть/показать §fэто окно"
 	]) {
 		title.children.push(gui.text({
 			text: entry,

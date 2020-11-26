@@ -78,7 +78,7 @@ public class CrystalExcavation implements International {
 		val userHook = hook.clone();
 		val hookMeta = userHook.getItemMeta();
 		val hookLevel = user.getInfo().getHookLevel();
-		if (hookLevel > 0)
+		if (hookLevel > 1)
 			hookMeta.addEnchant(Enchantment.LURE, hookLevel - 1, true);
 		hookMeta.setDisplayName(hookMeta.getDisplayName() + " §fУР. " + hookLevel);
 		userHook.setItemMeta(hookMeta);

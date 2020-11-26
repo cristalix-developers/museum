@@ -37,7 +37,6 @@ public class PrepareClientScripts implements Prepare {
 
 	// holo
 
-
 	@Override
 	public void execute(User user, App app) {
 		Cristalix.displayService().sendScripts(user.getUuid(), scriptsMessage);
