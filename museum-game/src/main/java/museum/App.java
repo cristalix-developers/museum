@@ -7,13 +7,13 @@ import clepto.cristalix.Cristalix;
 import clepto.cristalix.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.val;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
+import museum.international.CrystalExcavation;
 import museum.misc.PlacesMechanic;
 import museum.museum.Shop;
 import museum.museum.map.SubjectType;
@@ -62,8 +62,8 @@ public final class App extends JavaPlugin {
 	private PlayerDataManager playerDataManager;
 	private TopManager topManager;
 	private ClientSocket clientSocket;
-	@Setter
 	private WorldMeta map;
+	private CrystalExcavation crystalExcavation;
 	private YamlConfiguration configuration;
 
 	private Shop shop;
@@ -159,8 +159,11 @@ public final class App extends JavaPlugin {
 			exception.printStackTrace();
 		}
 
-		// Загрузка мира
-		MapLoader.load(this);
+		// Загрузка основного мира
+		map = MapLoader.load("prod1");
+		MapLoader.interceptChunkWriter(this, getNMSWorld());
+		// Загрузка международной кристальной экспедиции
+		crystalExcavation = new CrystalExcavation();
 
 		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
 		SubjectType.init();

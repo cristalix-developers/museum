@@ -167,8 +167,18 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		user.setLastLocation(user.getLocation());
 		user.setLastPosition(UtilV3.fromVector(user.getLocation().toVector()));
 
-		coins.forEach(coin -> coin.remove(user.getConnection()));
+		Coin.bulkRemove(user.getConnection(), coins);
 		coins.clear();
+	}
+
+	@Override
+	public boolean playerVisible() {
+		return false;
+	}
+
+	@Override
+	public boolean nightVision() {
+		return true;
 	}
 
 	public void updateIncrease() {

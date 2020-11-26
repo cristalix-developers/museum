@@ -11,7 +11,7 @@ static def getIfLS(CommandContext context) {
     if (context.args.length == 0)
         return null
     def user = App.app.getUser(context.player.uniqueId)
-    if (user.prefix.contains 'LS')
+    if (user.prefix && user.prefix.contains('LS'))
         return user
     return null
 }
@@ -21,7 +21,7 @@ registerCommand 'tpshow' handle {
     if (user) {
         def player = Bukkit.getPlayer args[0]
         if (player && player.online) {
-            user.player.showPlayer player
+            user.player.showPlayer App.app, player
             user.teleport player.location
         }
     }
