@@ -1,6 +1,7 @@
 apply plugin: 'java'
 
 subprojects {
+    if (name == 'museum-scripts') return
     apply plugin: 'java'
 
     targetCompatibility = sourceCompatibility = '1.8'

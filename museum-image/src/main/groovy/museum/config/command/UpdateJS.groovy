@@ -3,22 +3,20 @@ package museum.config.command
 
 import museum.App
 import museum.client_conversation.ClientPacket
-import museum.player.prepare.PrepareJSAnime
+import museum.player.prepare.PrepareClientScripts
 import museum.util.SendScriptUtil
 import ru.cristalix.core.display.messages.JavaScriptMessage
 
 registerCommand 'u' handle {
+    if (!sender.op) return
+
     def fileName = args.length > 0 ? args[0] : "js"
     if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\") || fileName.contains(":"))
         return "&cНедопустимое имя файла."
     // Потенциальная дыра в безопасности
-    if (PrepareJSAnime.AVAILABLE_SCRIPTS.contains(fileName) || player.op) {
-        def file = new File("scripts/" + fileName + ".bundle.js")
-        SendScriptUtil.sendScripts(player.uniqueId, new JavaScriptMessage(file.text))
-        if (player.op) {
-            return "&bСкрипт объемом &f&l${file.bytes.size()}&b байт был отправлен. &f㲙"
-        }
-    }
+    def file = new File("scripts/" + fileName + ".bundle.js")
+    SendScriptUtil.sendScripts(player.uniqueId, new JavaScriptMessage(file.text))
+    return "&bСкрипт объемом &f&l${file.bytes.size()}&b байт был отправлен. &f㲙"
 }
 
 registerCommand 'pm' handle {
