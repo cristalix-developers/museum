@@ -33,7 +33,7 @@ chat:
     box-taken: 'fineОтнесите продукты в лавку и продажи начнутся! 㜋'
     collector-income: 'fineСборщик монет собрал §e%INCOME%§f валюты 㜰'
     sell-product: 'fineПродуктовая лавка продала §b%TITLE%§f, прибыль §e+%COST%$ §f㶇'
-    wagon-buy: 'fineГруз доставляют к желтой метке слева от входа в музей. Заберите его. 㟴'
+    wagon-buy: 'fineГруз доставляют к фургону слева от входа в музей. Заберите его. 㟴'
     traveler: 'fine§b%VISITOR%§f посетил(а) ваш музей, прибыль §6+%PRICE% §f㤢'
     museum-teleported: 'fine§b%VISITOR%§f принял ваше предложение. И посетил ваш музей. 㜗'
     not-in-museum: 'errorВы не в музее... 㬏'
