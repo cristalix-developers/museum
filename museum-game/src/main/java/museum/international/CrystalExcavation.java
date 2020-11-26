@@ -5,15 +5,19 @@ import clepto.bukkit.groovy.Do;
 import clepto.bukkit.item.Items;
 import clepto.cristalix.WorldMeta;
 import lombok.val;
+import museum.App;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
 import museum.util.MapLoader;
 import museum.util.MessageUtil;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
@@ -37,8 +41,12 @@ public class CrystalExcavation implements International {
 	public CrystalExcavation() {
 		load();
 		worldMeta = tempWorld;
-		// Каждые 100 минут, выгружать игроков в третий мир и отгружать второй мир, затем третий мир становится вторым
-		Do.every(100).minutes(() -> {
+
+		TextComponent message = new TextComponent("§cВНИМАНИЕ! §bНачались международные раскопки. §f[§bОтправиться в путь§f]");
+		message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/crystal "));
+
+		// Каждые 180 минут, выгружать игроков в третий мир и отгружать второй мир, затем третий мир становится вторым
+		Do.every(180).minutes(() -> {
 			load();
 			for (Player player : worldMeta.getWorld().getPlayers()) {
 				val location = player.getLocation();
@@ -47,6 +55,9 @@ public class CrystalExcavation implements International {
 			}
 			Bukkit.unloadWorld(worldMeta.getWorld(), false);
 			worldMeta = tempWorld;
+			for (User user : App.getApp().getUsers())
+				if (user.getPlayer() != null)
+					user.getPlayer().sendMessage(message);
 		});
 	}
 
@@ -64,7 +75,15 @@ public class CrystalExcavation implements International {
 		val inventory = user.getInventory();
 		inventory.clear();
 		// Предметы кешируются
-		inventory.addItem(Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror(), hook);
+		val userHook = hook.clone();
+		val hookMeta = userHook.getItemMeta();
+		val hookLevel = user.getInfo().getHookLevel();
+		if (hookLevel > 0)
+			hookMeta.addEnchant(Enchantment.LURE, hookLevel - 1, true);
+		hookMeta.setDisplayName(hookMeta.getDisplayName() + " §fУР. " + hookLevel);
+		userHook.setItemMeta(hookMeta);
+
+		inventory.addItem(Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror(), userHook);
 		inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
 		user.getPlayer().sendTitle("Прибытие!", "§bдобывайте кристаллы");

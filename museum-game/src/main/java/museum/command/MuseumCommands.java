@@ -34,6 +34,7 @@ public class MuseumCommands {
 
 	private final App app;
 	public static final String NO_MONEY_MESSAGE = MessageUtil.get("nomoney");
+	private static final String NO_CRYSTAL_MESSAGE = MessageUtil.get("nocrystal");
 	private static final String PLAYER_OFFLINE_MESSAGE = MessageUtil.get("playeroffline");
 
 	public MuseumCommands(App app) {
@@ -291,8 +292,8 @@ public class MuseumCommands {
 
 	private String cmdExcavation(Player player, String[] args) {
 		User user = this.app.getUser(player);
-		if (args.length == 0)
-			return "/excavation <место>";
+		if (args.length < 2)
+			return "/excavation <место> <left/right>";
 		ExcavationPrototype prototype;
 		try {
 			prototype = Managers.excavation.getPrototype(args[0]);
@@ -309,18 +310,19 @@ public class MuseumCommands {
 		if (user.getGrabbedArmorstand() != null)
 			return MessageUtil.get("stall-first");
 
-		player.closeInventory();
-
-		val crystalPrice = CrystalUtil.convertMoney2Cristal(prototype.getPrice());
-		if (CrystalUtil.convertMoney2Cristal(prototype.getPrice()) <= user.getCrystal()) {
-			user.setCrystal(user.getCrystal() - crystalPrice);
-		} else if (prototype.getPrice() > user.getMoney()) {
-			return NO_MONEY_MESSAGE;
-		} else {
+		if ("left".equals(args[1])) {
+			if (prototype.getPrice() > user.getMoney())
+				return NO_MONEY_MESSAGE;
 			user.setMoney(user.getMoney() - prototype.getPrice());
+		} else if ("right".equals(args[1])) {
+			val crystalPrice = CrystalUtil.convertMoney2Cristal(prototype.getPrice());
+			if (CrystalUtil.convertMoney2Cristal(prototype.getPrice()) <= user.getCrystal())
+				user.setCrystal(user.getCrystal() - crystalPrice);
+			else
+				return NO_CRYSTAL_MESSAGE;
 		}
+		player.closeInventory();
 		user.setState(new Excavation(prototype, prototype.getHitCount()));
-
 		return null;
 	}
 

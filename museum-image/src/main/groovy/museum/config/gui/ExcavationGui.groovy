@@ -27,7 +27,7 @@ Guis.register 'excavation', { player ->
             button 'O' icon {
                 apply Items.items['excavation-' + excavation.address]
                 text """
-                §e$excavation.title §6${moneyFormatter.format(excavation.price)} §7| §d${CrystalUtil.convertMoney2Cristal(excavation.price)} 㦶
+                §e$excavation.title §6${moneyFormatter.format(excavation.price)} §7[ЛКМ] | §d${CrystalUtil.convertMoney2Cristal(excavation.price)} 㦶 §7[ПКМ]
 
                 Минимальный уровень: §b$excavation.requiredLevel
                 Кол-во ударов: §e$excavation.hitCount
@@ -41,7 +41,10 @@ Guis.register 'excavation', { player ->
                 }
             } leftClick {
                 closeInventory()
-                performCommand 'excavation ' + excavation.address
+                performCommand 'excavation ' + excavation.address + ' left'
+            } rightClick {
+                closeInventory()
+                performCommand 'excavation ' + excavation.address + ' right'
             }
         } else {
             button 'O' icon {

@@ -9,11 +9,11 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class CrystalUtil {
 
-	public double convertCrystal2Money(int crystal) {
-		return crystal * 1.7;
+	public double convertCrystal2Money(long crystal) {
+		return crystal * 4.1;
 	}
 
 	public int convertMoney2Cristal(double money) {
-		return (int) (money / 1.7);
+		return (int) (money / 4.1);
 	}
 }

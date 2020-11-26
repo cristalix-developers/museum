@@ -8,6 +8,9 @@ npc-skin:
 
 chat:
   messages:
+    buy-hook: 'fiveВы улучшили крюк до §b%LEVEL% УР.§f!'
+    sell-crystal: 'fineВы продали §d%CRYSTAL% кристалл(ов) §fза §e%MONEY%§f. 㱺'
+    fishing: 'fineВы поймали рыбу! §b+%EXP% опыта. §f㜗'
     leave-crystal: 'fine§dКристаллы §fвместе с вами, они видны на скорборде.'
     stand-sell: 'fineВы продали перекупщику постройку за §6%PRICE%$&f!'
     relic-sell: 'fineВы продали перекупщику реликвию за §6%PRICE%$&f!'
@@ -52,6 +55,7 @@ chat:
     standlocked: 'errorВы не можете выбрать экспонат, он занят другой витриной. 㜿'
     standplaced: 'fineЭкспонат поставлен на витрину! 㱺'
     nomoney: 'errorУ вас не достаточно средств. 㬏'
+    nocrystal: 'errorУ вас не достаточно кристаллов. 㬏'
     finally-buy: 'fineВы приобрели новую постройку! 䀷'
     newpickaxe: 'fineВы приобрели новое снаряжение! 㦶'
     newcollector: 'fineВы приобрели %NAME% коллектор!'

@@ -70,6 +70,7 @@ public class PlayerDataManager implements Listener {
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 				if (userInfo.getClaimedPlaces() == null) userInfo.setClaimedPlaces(new ArrayList<>());
 				if (userInfo.getClaimedRelics() == null) userInfo.setClaimedRelics(new ArrayList<>());
+				if (userInfo.getHookLevel() < 1) userInfo.setHookLevel(1);
 				userMap.put(uuid, new User(userInfo));
 			} catch (Exception ex) {
 				event.setCancelReason("Не удалось загрузить статистику о музее.");

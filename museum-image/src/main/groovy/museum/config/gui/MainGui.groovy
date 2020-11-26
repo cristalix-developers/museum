@@ -76,14 +76,13 @@ register 'main', { player ->
     button 'S' icon {
         item GOLD_PICKAXE
         text """
-        §bКирки
-
-        Приобретите новую кирку,
-        и разгадайте тайны песка...
+        §bИнструменты
+        
+        Улучшайте ваше снаряжение.
         """
         nbt.HideFlags = 63
     } leftClick {
-        performCommand('gui pickaxe')
+        performCommand('gui tools')
     }
 
     button 'M' icon {

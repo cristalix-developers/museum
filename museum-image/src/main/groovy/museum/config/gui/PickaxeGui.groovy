@@ -98,6 +98,6 @@ Guis.register 'pickaxe', { player ->
         item BARRIER
         text '§cНазад'
     } leftClick {
-        performCommand("gui main")
+        performCommand("gui tools")
     }
 }

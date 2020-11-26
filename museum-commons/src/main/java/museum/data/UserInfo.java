@@ -32,5 +32,6 @@ public class UserInfo implements Unique {
 	private double income;
 	private boolean darkTheme;
 	private long crystal;
+	private int hookLevel;
 
 }
