@@ -3,6 +3,7 @@ package museum.config.gui
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.util.MessageUtil
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 
@@ -88,7 +89,7 @@ Guis.register 'pickaxe', { player ->
         } else {
             apply items[user.pickaxeType.next.name().toLowerCase()]
             text ''
-            text "Цена: $user.pickaxeType.next.price"
+            text "Цена: ${MessageUtil.toMoneyFormat(user.pickaxeType.next.price)}"
         }
     } leftClick {
         performCommand'pickaxe'
