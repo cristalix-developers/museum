@@ -1,6 +1,6 @@
 rootProject.name = 'museum'
+include 'museum-scripts'
+include 'museum-image'
 include 'museum-game'
 include 'museum-service'
 include 'museum-commons'
-include 'museum-image'
-
