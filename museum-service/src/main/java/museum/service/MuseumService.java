@@ -81,15 +81,13 @@ public class MuseumService {
 	private MongoClient mongoClient;
 	private final IConductService conductService = new ConductService(this);
 	private final IUserService userService = new UserService(this);
-	private final IBoosterService boosterService = new BoosterService(this);
+	private final IBoosterService boosterService = new BoosterService(this, conductService);
 	private final IDonateService donateService = new DonateService(this, userService);
 	private final IConfigService configService = new ConfigService(this, "config.yml");
 
 	private ServerSocket serverSocket;
 
 	private final Map<String, MuseumMetricsPackage> metrics = Maps.newConcurrentMap();
-
-	private static ConductService realmsController;
 
 	private static String environment(String name) {
 		String value = System.getenv(name);
@@ -122,8 +120,9 @@ public class MuseumService {
 		CoreApi core = CoreApi.get();
 
 		core.registerService(IPermissionService.class, new PermissionService(ISocketClient.get()));
+		core.registerService(IConductService.class, conductService);
 
-		ServerSocket serverSocket = new ServerSocket(port);
+		ServerSocket serverSocket = new ServerSocket(conductService, port);
 		serverSocket.start();
 
 		this.mongoClient = MongoClients.create(databaseUrl);
@@ -134,30 +133,23 @@ public class MuseumService {
 		core.registerService(IConfigService.class, configService);
 
 
-
-		realmsController = new ConductService();
-
-		registerHandler(MuseumMetricsPackage.class, (realm, pckg) -> {
-			metrics.put(pckg.getServerName(), pckg);
+		conductService.registerHandler(MuseumMetricsPackage.class, (realm, packet) -> {
+			metrics.put(packet.getServerName(), packet);
 		});
 
-		registerHandler(UserChatPackage.class, ((realm, museumPackage) -> {
-			BroadcastMessagePackage messagePackage = new BroadcastMessagePackage(museumPackage.getJsonMessage());
-			ServerSocketHandler.broadcast(messagePackage);
+		conductService.registerHandler(UserChatPackage.class, ((realm, packet) -> {
+			conductService.broadcast(new BroadcastMessagePackage(packet.getJsonMessage()));
 		}));
-		registerHandler(UserBroadcastPackage.class, ((channel, serverName, museumPackage) -> {
-			BroadcastTitlePackage broadcastPackage = new BroadcastTitlePackage(museumPackage.getData(), museumPackage.getFadeIn(), museumPackage.getStay(), museumPackage.getFadeOut());
-			ServerSocketHandler.broadcast(broadcastPackage);
+
+		conductService.registerHandler(UserBroadcastPackage.class, ((realm, packet) -> {
+			conductService.broadcast(new BroadcastTitlePackage(packet.getData(), packet.getFadeIn(), packet.getStay(), packet.getFadeOut()));
 		}));
-		registerHandler(RequestConfigurationsPackage.class, ((channel, serverName, museumPackage) -> {
-			CONFIGURATION_MANAGER.fillRequest(museumPackage);
-			send(channel, museumPackage);
+
+		conductService.registerHandler(RequestGlobalBoostersPackage.class, ((realm, packet) -> {
+			packet.setBoosters(new ArrayList<>(boosterService.getGlobalBoosters()));
+			realm.send(packet);
 		}));
-		registerHandler(RequestGlobalBoostersPackage.class, ((channel, serverName, museumPackage) -> {
-			museumPackage.setBoosters(new ArrayList<>(boosterService.getGlobalBoosters().values()));
-			send(channel, museumPackage);
-		}));
-		registerHandler(TopPackage.class, ((channel, serverName, museumPackage) ->
+		conductService.registerHandler(TopPackage.class, ((realm, museumPackage) ->
 				userData.getTop(museumPackage.getTopType(), museumPackage.getLimit()).thenAccept(res -> {
 					museumPackage.setEntries(res);
 					send(channel, museumPackage);
@@ -209,26 +201,6 @@ public class MuseumService {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Register handler to package type
-	 *
-	 * @param clazz   class of package
-	 * @param handler handler
-	 * @param <T>     package type
-	 */
-	public <T extends MuseumPackage> void registerHandler(Class<T> clazz, PacketHandler<T> handler) {
-		handlerMap.put(clazz, handler);
-	}
-
-	/**
-	 * Send package to socket
-	 *
-	 * @param pckg package
-	 */
-	public void send(Channel channel, MuseumPackage pckg) {
-		ServerSocketHandler.send(channel, pckg);
 	}
 
 	/**
@@ -327,29 +299,29 @@ public class MuseumService {
 	}
 
 	private static String createMetrics() {
-		Map<String, MuseumMetricsPackage.PacketMetric> metrics = Maps.newHashMap();
+		Map<String, MuseumMetricsPackage> metrics = Maps.newHashMap();
 		StringBuilder builder = new StringBuilder();
-		METRICS.forEach((source, data) -> {
+		metrics.forEach((source, data) -> {
 			builder.append("online{realm=\"").append(source).append("\"} ").append(data.getOnline()).append("\n");
 			builder.append("tps{realm=\"").append(source).append("\"} ").append(data.getTps()).append("\n");
 			builder.append("free_memory{realm=\"").append(source).append("\"} ").append(data.getFreeMemory()).append("\n");
 			builder.append("allocated_memory{realm=\"").append(source).append("\"} ").append(data.getAllocatedMemory()).append("\n");
 			builder.append("total_memory{realm=\"").append(source).append("\"} ").append(data.getTotalMemory()).append("\n");
 
-			data.getMetrics().forEach((key, value) -> {
-				metrics.compute(key, (__, old) -> {
-					if (old != null) {
-						old.setCompressedBytes(old.getCompressedBytes() + value.getCompressedBytes());
-						old.setDecompressedBytes(old.getDecompressedBytes() + value.getDecompressedBytes());
-						old.setReceived(old.getReceived() + value.getReceived());
-						old.setReceivedBytes(old.getReceivedBytes() + value.getReceivedBytes());
-						old.setSent(old.getSent() + value.getSent());
-						old.setSentBytes(old.getSentBytes() + value.getSentBytes());
-						return old;
-					}
-					return value.clone();
-				});
-			});
+//			data.getMetrics().forEach((key, value) -> {
+//				metrics.compute(key, (__, old) -> {
+//					if (old != null) {
+//						old.setCompressedBytes(old.getCompressedBytes() + value.getCompressedBytes());
+//						old.setDecompressedBytes(old.getDecompressedBytes() + value.getDecompressedBytes());
+//						old.setReceived(old.getReceived() + value.getReceived());
+//						old.setReceivedBytes(old.getReceivedBytes() + value.getReceivedBytes());
+//						old.setSent(old.getSent() + value.getSent());
+//						old.setSentBytes(old.getSentBytes() + value.getSentBytes());
+//						return old;
+//					}
+//					return value.clone();
+//				});
+//			});
 		});
 		metrics.forEach((key, value) -> {
 			builder.append("compressed_bytes{packet=\"").append(key).append("\"} ").append(value.getCompressedBytes()).append("\n");
