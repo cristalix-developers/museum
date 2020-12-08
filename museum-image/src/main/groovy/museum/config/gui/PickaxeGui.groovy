@@ -3,6 +3,7 @@ package museum.config.gui
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.util.MessageUtil
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 
@@ -11,6 +12,7 @@ import static org.bukkit.Material.*
 
 Items.register 'pickaxe-template', {
     nbt.CanDestroy = [
+            'minecraft:stained_glass',
             'minecraft:dirt',
             'minecraft:sand',
             'minecraft:soul_sand',
@@ -18,8 +20,10 @@ Items.register 'pickaxe-template', {
             'minecraft:concrete_powder',
             'minecraft:concrete',
             'minecraft:stained_hardened_clay',
-            'minecraft:snow'
+            'minecraft:snow',
+            'minecraft:red_sandstone'
     ]
+    nbt.Unbreakable = 1
     nbt.HideFlags = 63
 }
 
@@ -85,7 +89,7 @@ Guis.register 'pickaxe', { player ->
         } else {
             apply items[user.pickaxeType.next.name().toLowerCase()]
             text ''
-            text "Цена: $user.pickaxeType.next.price"
+            text "Цена: ${MessageUtil.toMoneyFormat(user.pickaxeType.next.price)}"
         }
     } leftClick {
         performCommand'pickaxe'
@@ -95,6 +99,6 @@ Guis.register 'pickaxe', { player ->
         item BARRIER
         text '§cНазад'
     } leftClick {
-        performCommand("gui main")
+        performCommand("gui tools")
     }
 }

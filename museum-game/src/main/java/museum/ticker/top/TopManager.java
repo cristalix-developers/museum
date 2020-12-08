@@ -1,5 +1,6 @@
 package museum.ticker.top;
 
+import clepto.bukkit.B;
 import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -9,6 +10,7 @@ import museum.packages.TopPackage;
 import museum.player.User;
 import museum.ticker.Ticked;
 import museum.tops.TopEntry;
+import org.bukkit.event.Listener;
 import ru.cristalix.core.GlobalSerializers;
 
 import java.util.List;
@@ -20,9 +22,9 @@ import java.util.stream.Collectors;
  * @project museum
  */
 @RequiredArgsConstructor
-public class TopManager implements Ticked {
+public class TopManager implements Ticked, Listener {
 
-	private static final int UPDATE_SECONDS = 120;
+	private static final int UPDATE_SECONDS = 20;
 	private static final int DATA_COUNT = 15;
 	private final App app;
 	private final Map<TopPackage.TopType, List<TopEntry<String, Object>>> tops = Maps.newConcurrentMap();
@@ -36,13 +38,15 @@ public class TopManager implements Ticked {
 			updateData();
 			data = GlobalSerializers.toJson(tops);
 		}
-		if ("{}".equals(data) || data == null || data.isEmpty())
+		if ("{}".equals(data) || data == null)
 			return;
 		val time = System.currentTimeMillis();
 		for (User user : app.getUsers()) {
-			if (user.getConnection() != null && time - user.getLastTopUpdateTime() > UPDATE_SECONDS * 1000) {
+			if (user.getConnection() == null || user.getLastTopUpdateTime() == 0)
+				continue;
+			if (time - user.getLastTopUpdateTime() > UPDATE_SECONDS * 1000) {
 				user.setLastTopUpdateTime(time);
-				updatePacket.send(user, data);
+				B.postpone(10, () -> updatePacket.send(user, data));
 			}
 		}
 	}
@@ -51,13 +55,10 @@ public class TopManager implements Ticked {
 		for (TopPackage.TopType type : TopPackage.TopType.values()) {
 			app.getClientSocket().writeAndAwaitResponse(new TopPackage(type, DATA_COUNT))
 					.thenAcceptAsync(pkg -> tops.put(type, pkg.getEntries().stream()
-							.map(entry -> {
-								System.out.println(entry.getUserName() + " " + entry.getValue());
-								return new TopEntry<>(
-										entry.getDisplayName(),
-										entry.getValue()
-								);
-							}).collect(Collectors.toList())
+							.map(entry -> new TopEntry<>(
+									entry.getDisplayName(),
+									entry.getValue()
+							)).collect(Collectors.toList())
 					));
 		}
 	}

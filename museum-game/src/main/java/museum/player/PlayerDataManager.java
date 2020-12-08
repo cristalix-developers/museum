@@ -11,6 +11,7 @@ import museum.data.BoosterInfo;
 import museum.data.UserInfo;
 import museum.packages.*;
 import museum.player.prepare.*;
+import museum.prototype.Managers;
 import museum.utils.MultiTimeBar;
 import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
 import org.bukkit.Bukkit;
@@ -20,12 +21,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
@@ -36,10 +34,6 @@ import java.util.stream.Collectors;
 
 public class PlayerDataManager implements Listener {
 
-	public static final PotionEffect NIGHT_VISION = new PotionEffect(
-			PotionEffectType.NIGHT_VISION,
-			999999, 10, false, false
-	);
 	private final App app;
 	private final Map<UUID, User> userMap = Maps.newHashMap();
 	private final MultiTimeBar timeBar;
@@ -53,7 +47,7 @@ public class PlayerDataManager implements Listener {
 
 		prepares = Arrays.asList(
 				BeforePacketHandler.INSTANCE,
-				PrepareJSAnime.INSTANCE,
+				PrepareClientScripts.INSTANCE,
 				new PrepareScoreBoard(),
 				PrepareTop.INSTANCE,
 				PrepareShopBlocks.INSTANCE,
@@ -71,8 +65,13 @@ public class PlayerDataManager implements Listener {
 				UserInfoPackage userInfoPackage = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
 						.get(5L, TimeUnit.SECONDS);
 				UserInfo userInfo = userInfoPackage.getUserInfo();
+				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid);
+				// Добавление дефолтных значений, которых не было в самом начале
 				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid, event.getPlayerName());
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
+				if (userInfo.getClaimedPlaces() == null) userInfo.setClaimedPlaces(new ArrayList<>());
+				if (userInfo.getClaimedRelics() == null) userInfo.setClaimedRelics(new ArrayList<>());
+				if (userInfo.getHookLevel() < 1) userInfo.setHookLevel(1);
 				userMap.put(uuid, new User(userInfo));
 			} catch (Exception ex) {
 				event.setCancelReason("Не удалось загрузить статистику о музее.");
@@ -119,6 +118,8 @@ public class PlayerDataManager implements Listener {
 		if (user == null)
 			return;
 		e.setSpawnLocation(user.getLastLocation());
+	public void onSpawn(PlayerSpawnLocationEvent event) {
+		event.setSpawnLocation(Managers.museum.getPrototype("main").getSpawn());
 	}
 
 	@EventHandler
@@ -133,25 +134,11 @@ public class PlayerDataManager implements Listener {
 		user.setConnection(player.getHandle().playerConnection);
 		user.setPlayer(player);
 
-		player.addPotionEffect(NIGHT_VISION);
-
 		player.setGameMode(GameMode.ADVENTURE);
 		user.setState(user.getState()); // Загрузка музея
+		player.setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, false);
 
-		B.postpone(1, () -> {
-			// Отправка таба
-			val show = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, user.getPlayer().getHandle());
-			// Скрытие игроков
-			for (Player current : Bukkit.getOnlinePlayers()) {
-				if (current == null)
-					continue;
-				player.hidePlayer(app, current.getPlayer());
-				user.getConnection().sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, ((CraftPlayer) current).getHandle()));
-				current.hidePlayer(app, player);
-				((CraftPlayer) current).getHandle().playerConnection.sendPacket(show);
-			}
-			prepares.forEach(prepare -> prepare.execute(user, app));
-		});
+		B.postpone(1, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
 
 		event.setJoinMessage(null);
 	}

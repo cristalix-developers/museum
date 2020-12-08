@@ -3,6 +3,7 @@ package museum.config.listener
 
 import clepto.bukkit.menu.Guis
 import museum.excavation.Excavation
+import museum.international.International
 import museum.util.TreasureUtil
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
@@ -20,6 +21,8 @@ on WOOD_DOOR use {
 }
 
 on SADDLE use {
+    if (app.getUser(player).state instanceof International)
+        return
     player.performCommand 'home'
 }
 
@@ -27,7 +30,7 @@ register 'sugar-treasure', {
     item SUGAR
     nbt.cost = 120
     text """
-        §bСтранный белый песок §6+120\$
+        §eСтранный белый песок §6+120\$
 
         Хм... Что же это, мы уже
         второй раз натыкаемся на него,
@@ -39,7 +42,7 @@ register 'diamond-treasure', {
     item DIAMOND
     nbt.cost = 134
     text """
-        §bДрагоценный минерал §6+134\$
+        §eДрагоценный минерал §6+134\$
 
         Иногда его можно найти
         на раскопках, стоит очень много!
@@ -50,7 +53,7 @@ register 'ghost-treasure', {
     item GHAST_TEAR
     nbt.cost = 67
     text """
-        §fСлеза Боба §6+67\$
+        §eСлеза Боба §6+67\$
 
         Ходят слухи, что она
         вообще не из этого мира...
@@ -73,7 +76,7 @@ register 'emerald-treasure', {
     item EMERALD
     nbt.cost = 36
     text """
-        §aДрагоценный камень §6+36\$
+        §eДрагоценный камень §6+36\$
 
         Иногда его можно найти
         на раскопках, стоит не много.
@@ -84,10 +87,22 @@ register 'flint-treasure', {
     item FLINT
     nbt.cost = 74
     text """
-        §aПервобытное орудие §6+74\$
+        §eПервобытное орудие §6+74\$
 
         Иногда его можно найти
         на раскопках, стоит не много.
+    """
+}
+
+register 'sink-treasure', {
+    item CLAY_BALL
+    nbt.museum = 'sink'
+    nbt.cost = 225
+    text """
+        §eДревняя раковина §6+225\$
+
+        Древняя раковина, свидетельствует
+        о мире до появления млекопитающих...
     """
 }
 

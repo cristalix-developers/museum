@@ -17,6 +17,7 @@ import museum.museum.subject.skeleton.Skeleton;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
+import museum.util.CrystalUtil;
 import museum.util.MessageUtil;
 import museum.util.VirtualSign;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -33,6 +34,7 @@ public class MuseumCommands {
 
 	private final App app;
 	public static final String NO_MONEY_MESSAGE = MessageUtil.get("nomoney");
+	private static final String NO_CRYSTAL_MESSAGE = MessageUtil.get("nocrystal");
 	private static final String PLAYER_OFFLINE_MESSAGE = MessageUtil.get("playeroffline");
 
 	public MuseumCommands(App app) {
@@ -51,13 +53,25 @@ public class MuseumCommands {
 		B.regCommand(this::cmdTravel, "travel");
 		B.regCommand(this::cmdVisit, "visit", "museum");
 		B.regCommand(this::cmdBuy, "buy");
+		B.regCommand(this::cmdPrefix, "prefix");
+	}
+
+	private String cmdPrefix(Player player, String[] args) {
+		if (player != null && !player.isOp()) return "§cНеизвестная команда.";
+		if (args.length < 2) return "§cИспользование: §e/prefix [Игрок] [Префикс]";
+		try {
+			User user = app.getUser(Bukkit.getPlayer(args[0]).getUniqueId());
+			user.setPrefix(args[1].replace('&', '§').replace('#', '¨'));
+			return "§aПрефикс изменён.";
+		} catch (NullPointerException ex) {
+			return "§cИгрок не найден.";
+		}
 	}
 
 	private String cmdRunTop(Player player, String[] args) {
-		if (player.isOp()) {
-			// Топы сами обновятся, потому что якобы "не обновлялись"
-			app.getUser(player).setLastTopUpdateTime(-1);
-		}
+		User user = app.getUser(player);
+		if (!player.isOp() && user.getLastTopUpdateTime() != 0) return null;
+		user.setLastTopUpdateTime(-1);
 		return null;
 	}
 
@@ -101,6 +115,9 @@ public class MuseumCommands {
 	private String cmdVisit(Player sender, String[] args) {
 		val user = app.getUser(sender);
 
+		if (!sender.isOp())
+			return null;
+
 		if (args.length <= 1)
 			return "§cИспользование: §f/museum visit [Игрок] [Музей]";
 
@@ -134,32 +151,25 @@ public class MuseumCommands {
 		val visitor = app.getUser(sender);
 		val owner = app.getUser(Bukkit.getPlayer(args[0]));
 
-		if (args.length < 2)
+		if (args.length != 1)
 			return null;
 		if (owner == null || !owner.getPlayer().isOnline() || owner.getState() == null || owner.equals(visitor)) {
 			return PLAYER_OFFLINE_MESSAGE;
 		}
 
-		double price;
-
-		try {
-			price = Double.parseDouble(args[1]);
-		} catch (Exception ignored) {
-			return null;
-		}
-
 		val state = owner.getState();
 
 		if (state instanceof Museum) {
-			if (visitor.getMoney() <= price)
+			val museum = (Museum) state;
+			if (visitor.getMoney() <= museum.getIncome() / 2)
 				return NO_MONEY_MESSAGE;
 
-			visitor.setMoney(visitor.getMoney() - price);
-			owner.setMoney(owner.getMoney() + price);
+			visitor.setMoney(visitor.getMoney() - museum.getIncome() / 2);
+			owner.setMoney(owner.getMoney() + museum.getIncome() / 2);
 			visitor.setState(state);
 			MessageUtil.find("traveler")
 					.set("visitor", visitor.getName())
-					.set("price", MessageUtil.toMoneyFormat(price))
+					.set("price", MessageUtil.toMoneyFormat(museum.getIncome() / 2))
 					.send(owner);
 		}
 		return null;
@@ -282,8 +292,8 @@ public class MuseumCommands {
 
 	private String cmdExcavation(Player player, String[] args) {
 		User user = this.app.getUser(player);
-		if (args.length == 0)
-			return "/excavation <место>";
+		if (args.length < 2)
+			return "/excavation <место> <left/right>";
 		ExcavationPrototype prototype;
 		try {
 			prototype = Managers.excavation.getPrototype(args[0]);
@@ -300,14 +310,19 @@ public class MuseumCommands {
 		if (user.getGrabbedArmorstand() != null)
 			return MessageUtil.get("stall-first");
 
+		if ("left".equals(args[1])) {
+			if (prototype.getPrice() > user.getMoney())
+				return NO_MONEY_MESSAGE;
+			user.setMoney(user.getMoney() - prototype.getPrice());
+		} else if ("right".equals(args[1])) {
+			val crystalPrice = CrystalUtil.convertMoney2Cristal(prototype.getPrice());
+			if (CrystalUtil.convertMoney2Cristal(prototype.getPrice()) <= user.getCrystal())
+				user.setCrystal(user.getCrystal() - crystalPrice);
+			else
+				return NO_CRYSTAL_MESSAGE;
+		}
 		player.closeInventory();
-
-		if (prototype.getPrice() > user.getMoney())
-			return NO_MONEY_MESSAGE;
-
-		user.setMoney(user.getMoney() - prototype.getPrice());
 		user.setState(new Excavation(prototype, prototype.getHitCount()));
-
 		return null;
 	}
 

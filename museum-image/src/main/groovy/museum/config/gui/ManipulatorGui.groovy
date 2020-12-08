@@ -1,23 +1,31 @@
 package museum.config.gui
 
+
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.config.command.WagonConfig
+import museum.museum.Museum
 import museum.museum.map.SkeletonSubjectPrototype
-import museum.museum.subject.Allocation
-import museum.museum.subject.SkeletonSubject
-import museum.museum.subject.StallSubject
-import museum.museum.subject.Subject
+import museum.museum.map.SubjectType
+import museum.museum.subject.*
 import museum.museum.subject.product.FoodProduct
 import museum.museum.subject.skeleton.Skeleton
 import museum.prototype.Managers
+import museum.util.MessageUtil
 import museum.util.SubjectLogoUtil
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
+import ru.cristalix.core.formatting.Formatting
+
+import java.text.DecimalFormat
 
 import static clepto.bukkit.item.Items.items
 import static clepto.bukkit.item.Items.register
+import static museum.museum.map.SubjectType.SKELETON_CASE
 import static museum.museum.subject.Allocation.Action.*
 import static org.bukkit.Material.*
+
+def num = new DecimalFormat('###,###,###,###,###,###.##')
 
 register 'lockedSkeleton', {
     item CLAY_BALL
@@ -27,8 +35,8 @@ register 'lockedSkeleton', {
 }
 
 register 'emptySkeleton', {
-    item CLAY_BALL
-    nbt.other = 'tochka'
+    item BONE
+    nbt.color = 0xAAAAAA
     text """
         &7Нужно собрать как минимум 3 фрагмента,
         &7Чтобы выставить скелет в музей.
@@ -36,16 +44,21 @@ register 'emptySkeleton', {
 }
 
 register 'tooBigSkeleton', {
-    nbt.color = 0x505050
+    nbt.color = 0xAAAAAA
     text '&7Этот скелет слишком большой для этой витрины'
 }
 
 register 'alreadyPlacedSkeleton', {
+    nbt.color = 0xAAAAAA
+    text '&cЭтот скелет уже стоит на другой витрине'
+}
+
+register 'currentSkeleton', {
+    nbt.glow_color = 0x55FF55
     text '&eНажмите, чтобы убрать скелет со стенда'
 }
 
 register 'availableSkeleton', {
-    nbt.color = 0xAAAAAA
     text '&aНажмите, чтобы поставить скелет на стенд'
 }
 
@@ -63,6 +76,46 @@ Guis.register 'manipulator', { player ->
     title abstractSubject.prototype.title
 
     def gui = delegate
+
+    if (abstractSubject instanceof RelicShowcaseSubject) {
+        gui.layout = 'XXXXOXXXE'
+        def subject = (RelicShowcaseSubject) abstractSubject
+
+        button 'X' icon {
+            item STAINED_GLASS_PANE
+            text '&7Вставьте реликвию'
+        } fillAvailable()
+        if (subject.relic) {
+            button 'O' icon {
+                apply items['relic-' + subject.relic.prototypeAddress]
+                text ''
+                text '&7Нажмите чтобы снять'
+            } leftClick {
+                closeInventory()
+                // Так выглядит паранойя
+                def subjectRelic = subject.relic
+                subject.setRelic(null)
+                user.getInventory().addItem(subjectRelic.relic)
+                user.relics.add(subjectRelic)
+                subject.updateRelic()
+                ((Museum) user.state).updateIncrease()
+                MessageUtil.find 'relic-tacked' send user
+            }
+        }
+        button 'E' icon {
+            item BARRIER
+            text '&cУбрать витрину'
+        } leftClick {
+            def allocation = abstractSubject.allocation
+            if (!allocation) return
+            allocation.perform PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES, DESTROY_DISPLAYABLE
+            abstractSubject.allocation = null
+
+            inventory.addItem SubjectLogoUtil.encodeSubjectToItemStack(abstractSubject)
+            closeInventory()
+        }
+        return
+    }
 
     gui.layout = '--C-I-D--'
     button MuseumGuis.background
@@ -94,13 +147,21 @@ Guis.register 'manipulator', { player ->
         def subject = (SkeletonSubject) abstractSubject
 
         for (it in Managers.skeleton.toSorted({ a, b -> (a.title <=> b.title) })) {
+
             def skeleton = user.skeletons.get it
+
+            def placedOn = user.museums.get(Managers.museum.getPrototype('main')).getSubjects(SKELETON_CASE)
+                    .find {it.skeleton && it.skeleton == skeleton}
+
             String key
             if (!skeleton) key = 'lockedSkeleton'
             else if (skeleton.unlockedFragments.size() < 3) key = 'emptySkeleton'
             else if (skeleton.prototype.size > (subject.prototype as SkeletonSubjectPrototype).size) key = 'tooBigSkeleton'
-            else if (skeleton == subject.skeleton) key = 'alreadyPlacedSkeleton'
+            else if (skeleton == subject.skeleton) key = 'currentSkeleton'
+            else if (skeleton == placedOn?.skeleton) key = 'alreadyPlacedSkeleton'
             else key = 'availableSkeleton'
+
+
             button 'O' icon {
                 if (skeleton != null) {
                     context skeleton
@@ -109,7 +170,7 @@ Guis.register 'manipulator', { player ->
                 }
                 apply items[key]
             } leftClick {
-                if (key == 'availableSkeleton' || key == 'alreadyPlacedSkeleton') {
+                if (key == 'availableSkeleton' || key == 'currentSkeleton') {
                     Skeleton previousSkeleton = subject.skeleton
                     Allocation allocation = subject.allocation
                     if (allocation) {
@@ -144,9 +205,45 @@ Guis.register 'manipulator', { player ->
 
         def rows = (Managers.skeleton.size() - 1) / 7 + 1
 
+        def upgradeCost = 10000
+        def upgradePercent = 20
+
         if (rows) {
             rows.times { gui.layout += '-OOOOOOO-' }
-            gui.layout += '---------'
+            gui.layout += '----P----'
+            if (subject.level < 50) {
+                button 'P' icon {
+                    item CLAY_BALL
+                    nbt.other = 'guild_invite'
+                    text """
+                    &aУлучшить витрину
+
+                    &fЦена улучшения &a10'000 \$
+
+                    С каждым уровнем витрина 
+                    приносит на &b$upgradePercent%▲&f больше дохода
+                    &b${subject.level} &fуровень -> &b&l${subject.level + 1} уровень &a+${subject.level * upgradePercent}% ▲▲▲
+                    """
+                } leftClick {
+                    if (user.money >= upgradeCost) {
+                        user.money = user.money - upgradeCost
+                        subject.level = subject.level + 1
+                        user.sendMessage(Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
+                        Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
+                    } else {
+                        MessageUtil.find('nomoney').send(user)
+                        closeInventory()
+                    }
+                }
+            } else {
+                button 'P' icon {
+                    item CLAY_BALL
+                    nbt.other = 'guild_invite'
+                    text """
+                    &7Витрина максимального уровня
+                    """
+                }
+            }
         }
     } else if (abstractSubject instanceof StallSubject) {
         if (abstractSubject.food.isEmpty()) {
@@ -186,13 +283,15 @@ Guis.register 'manipulator', { player ->
         }
     }
 
-    button 'I' icon {
-        def itemStack = abstractSubject.prototype.icon
-        item itemStack.type
-        data itemStack.durability
-        text """
+    if (abstractSubject instanceof SkeletonSubject) {
+        button 'I' icon {
+            def itemStack = abstractSubject.prototype.icon
+            item itemStack.type
+            data itemStack.durability
+            text """
             §a$abstractSubject.prototype.title
-            §eДоход: §f$abstractSubject.income
-        """
+            §eДоход: §f${num.format(abstractSubject.income)}
+            """
+        }
     }
 }

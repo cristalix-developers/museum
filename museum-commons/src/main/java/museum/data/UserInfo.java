@@ -17,6 +17,7 @@ public class UserInfo implements Unique {
 	public final UUID uuid;
 	private final String name;
 
+	public String prefix;
 	public long experience;
 	private double money;
 	private long timePlayed;
@@ -29,6 +30,11 @@ public class UserInfo implements Unique {
 	private V3 lastPosition;
 	private List<DonateType> donates;
 	private List<BoosterInfo> localBoosters;
+	private List<String> claimedPlaces;
+	private List<String> claimedRelics;
 	private double income;
+	private boolean darkTheme;
+	private long crystal;
+	private int hookLevel;
 
 }

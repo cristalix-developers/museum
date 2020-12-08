@@ -7,8 +7,145 @@ import museum.museum.subject.skeleton.Skeleton
 import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
 
-register 'skeleton', {
+register 'hook', {
+    item FISHING_ROD
+    text '&eКрюк'
+    nbt.Unbreakable = 1
+}
 
+
+register 'crystal', {
+    item CLAY_BALL
+    nbt.museum = 'crystal_pink'
+    text """&bКристалл
+
+    Очень ценится в международных 
+    кругах, за него можно отправится
+    в экспедиции без денег.
+    """
+}
+
+register 'relic-totem', {
+    item CLAY_BALL
+    nbt.price = 14
+    nbt.relic = 'totem'
+    nbt.museum = 'totem'
+    text """&aТотем Майя
+
+    &eДоход оценивается в 14\$
+    
+    Можно продать перекупщику 
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'relic-shap', {
+    item CLAY_BALL
+    nbt.price = 12
+    nbt.relic = 'shap'
+    nbt.museum = 'shap'
+    text """&aМаска война Майя
+
+    &eДоход оценивается в 12\$
+    
+    Можно продать перекупщику 
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'relic-yantar', {
+    item CLAY_BALL
+    nbt.price = 20
+    nbt.relic = 'yantar'
+    nbt.museum = 'yantar'
+    text """&aЯнтарь
+
+    &eДоход оценивается в 20\$
+    
+    Можно продать перекупщику 
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+
+register 'relic-tooth', {
+    item CLAY_BALL
+    nbt.price = 10
+    nbt.relic = 'tooth'
+    nbt.museum = 'tooth'
+    text """&aЗуб мегалодона
+
+    &eДоход оценивается в 10\$
+        
+    Можно продать перекупщику 
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'relic-anubis', {
+    item CLAY_BALL
+    nbt.price = 12
+    nbt.relic = 'anubis'
+    nbt.museum = 'anubisstick'
+    text """&aОрудие Анубиса
+
+    &eДоход оценивается в 12\$
+        
+    Можно продать перекупщику 
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'relic-pot', {
+    item CLAY_BALL
+    nbt.price = 7
+    nbt.relic = 'pot'
+    nbt.museum = 'pot'
+    text """&aДревний горшок
+
+    &eДоход оценивается в 7\$
+        
+    Можно продать перекупщику 
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'relic-shield', {
+    item CLAY_BALL
+    nbt.price = 10
+    nbt.relic = 'shield'
+    nbt.museum = 'shieldofruin'
+    text """&aЩит война Древнего Египта
+
+    &eДоход оценивается в 10\$
+        
+    Можно продать перекупщику 
+
+    &7Поставьте реликвию на витрину для
+    &7реликвий, которую вы можете купить
+    &7в магазине построек.
+    """
+}
+
+register 'skeleton', {
     item BONE
     def skeleton = (Skeleton) context
     text "§f» Скелет §b$skeleton.prototype.title §f«"
@@ -82,6 +219,12 @@ register 'menu', {
 register 'visitor-menu', {
     item WOOD_DOOR
     text '§6Посмотреть музеи'
+}
+
+register 'place-menu', {
+    item CLAY_BALL
+    nbt.other = 'achievements_lock'
+    text '§bГде я был?'
 }
 
 register 'goback', {

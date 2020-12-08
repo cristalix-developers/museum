@@ -37,12 +37,10 @@ public class Excavation implements State {
 
 		inventory.clear();
 		inventory.addItem(Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror());
+		inventory.addItem(prototype.getPallette());
 		inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
-		for (val item : prototype.getPallette())
-			inventory.addItem(item);
-
-		user.teleport(prototype.getSpawn());
+		user.teleport(prototype.getSpawn().clone().add(0, 4, 0));
 		user.getPlayer().sendTitle("§6Прибытие!", prototype.getTitle());
 
 		MessageUtil.find("visitexcavation")
@@ -53,6 +51,16 @@ public class Excavation implements State {
 	@Override
 	public void leaveState(User user) {
 		TreasureUtil.sellAll(user);
+	}
+
+	@Override
+	public boolean playerVisible() {
+		return false;
+	}
+
+	@Override
+	public boolean nightVision() {
+		return true;
 	}
 
 	@Override

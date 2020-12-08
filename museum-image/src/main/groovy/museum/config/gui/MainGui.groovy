@@ -1,6 +1,6 @@
 package museum.config.gui
 
-import clepto.bukkit.menu.Guis
+
 import clepto.humanize.TimeFormatter
 import museum.App
 import museum.config.command.WagonConfig
@@ -12,22 +12,37 @@ import org.bukkit.entity.Player
 import java.text.DecimalFormat
 import java.time.Duration
 
+import static clepto.bukkit.menu.Guis.open
+import static clepto.bukkit.menu.Guis.register
 import static org.bukkit.Material.*
 
 def formatter = TimeFormatter.builder() accuracy 500 build()
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
-def levelFormatter = new DecimalFormat('###,###,###,###,###,###.##')
 
-Guis.register 'main', { player ->
+register 'main', { player ->
     def user = App.app.getUser((Player) player)
 
     title 'Главное меню'
     layout """
         F--SMT--S
-        -H--O--J-
+        -H--O--JP
     """
 
     button MuseumGuis.background
+
+    button 'P' icon {
+        item GOLDEN_CARROT
+        text """
+        >> §bВнутриигровые покупки §f<<
+        
+        Тут вы можете купить,
+        интересные вещи...
+        """
+    } leftClick {
+        closeInventory()
+        open(player, 'donate', player)
+    }
+
     button 'F' icon {
         item PAPER
         text """
@@ -61,14 +76,13 @@ Guis.register 'main', { player ->
     button 'S' icon {
         item GOLD_PICKAXE
         text """
-        §bКирки
-
-        Приобретите новую кирку,
-        и разгадайте тайны песка...
+        §bИнструменты
+        
+        Улучшайте ваше снаряжение.
         """
         nbt.HideFlags = 63
     } leftClick {
-        performCommand('gui pickaxe')
+        performCommand('gui tools')
     }
 
     button 'M' icon {
@@ -136,7 +150,8 @@ Guis.register 'main', { player ->
         Меняйте режим так, как нравится глазам!
         """
     } leftClick {
-        user.getPlayer().setPlayerTime(user.getPlayer().getPlayerTime() == 18000 ? 6000 : 18000, false)
+        user.player.setPlayerTime(user.info.darkTheme ? 12000 : 21000, true)
+        user.info.darkTheme = !user.info.darkTheme
         closeInventory()
     }
 }

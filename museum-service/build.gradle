@@ -3,17 +3,17 @@ dependencies {
     implementation 'io.javalin:javalin:3.11.2'
     implementation project(":museum-commons")
     compileOnly 'org.mongodb:mongodb-driver-async:3.7.1'
-    compileOnly files("../external/microservice-1.0.4.jar")
+    compileOnly 'cristalix:microservice:20.11.04'
     compileOnly 'com.google.guava:guava:21.0'
     compileOnly 'io.netty:netty-all:4.1.37.Final'
-    compileOnly files("../external/waterfall-chat-1.0.jar")
+    compileOnly 'cristalix:waterfall-chat:1.0'
 
     testImplementation project(":museum-commons")
     testImplementation 'org.mongodb:mongodb-driver-async:3.7.1'
-    testImplementation files("../external/microservice-1.0.4.jar")
+    testImplementation 'cristalix:microservice:20.11.04'
     testImplementation 'com.google.guava:guava:21.0'
     testImplementation 'io.netty:netty-all:4.1.37.Final'
-    testImplementation files("../external/waterfall-chat-1.0.jar")
+    testImplementation 'cristalix:waterfall-chat:1.0'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.0.3'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'

@@ -10,6 +10,8 @@ import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 
+import java.util.Set;
+
 /**
  * @author func 08.06.2020
  * @project Museum
@@ -18,7 +20,7 @@ public class Coin {
 
 	public static final ItemStack COIN_ITEM = clepto.bukkit.item.Items.render("coin");
 	public static final int MAX_COIN_AMOUNT = 20;
-	public static final int SECONDS_LIVE = 20;
+	public static final int SECONDS_LIVE = 40;
 	private final EntityItem entityItem;
 	@Getter
 	private final long timestamp;
@@ -28,8 +30,17 @@ public class Coin {
 		timestamp = System.currentTimeMillis();
 	}
 
+	public static void bulkRemove(PlayerConnection connection, Set<Coin> coins) {
+		int[] idsToRemove = new int[coins.size()];
+		val coinsIterator = coins.iterator();
+		for (int i = 0; i < idsToRemove.length; i++) {
+			idsToRemove[i] = coinsIterator.next().entityItem.getId();
+		}
+		connection.sendPacket(new PacketPlayOutEntityDestroy(idsToRemove));
+	}
+
 	public void remove(PlayerConnection connection) {
-		connection.sendPacket(new PacketPlayOutEntityDestroy(entityItem.getId()));
+		connection.sendPacket(new PacketPlayOutEntityDestroy(new int[] {entityItem.getId()}));
 	}
 
 	public void create(PlayerConnection connection) {
@@ -68,7 +79,7 @@ public class Coin {
 		user.depositMoneyWithBooster(money);
 
 		B.postpone(30, () -> {
-			connection.sendPacket(new PacketPlayOutEntityDestroy(message.getId()));
+			connection.sendPacket(new PacketPlayOutEntityDestroy(new int[] {message.getId()}));
 			remove(connection);
 		});
 		return true;

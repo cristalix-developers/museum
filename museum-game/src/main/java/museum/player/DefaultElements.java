@@ -28,8 +28,9 @@ public class DefaultElements {
 		UserInfo userInfo = new UserInfo(
 				userId,
 				username,
+				null,
 				0,
-				1000.0,
+				700.0,
 				0L,
 				PickaxeType.DEFAULT,
 				Collections.singletonList(startMuseum),
@@ -40,7 +41,12 @@ public class DefaultElements {
 				null,
 				new ArrayList<>(),
 				new ArrayList<>(),
-				0
+				new ArrayList<>(),
+				new ArrayList<>(),
+				0,
+				false,
+				0,
+				1
 		);
 
 		for (SubjectInfo subject : proto.getDefaultSubjects())

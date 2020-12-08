@@ -1,6 +1,7 @@
 apply plugin: 'java'
 
 subprojects {
+    if (name == 'museum-scripts') return
     apply plugin: 'java'
 
     targetCompatibility = sourceCompatibility = '1.8'
@@ -13,6 +14,9 @@ subprojects {
             url "https://repo.implario.dev/public"
         }
     }
+
+    project.ext.mavenUri = "$nmsMavenUri $cristalixMavenUri"
+    apply from: '../mavenAuth.gradle'
 
     compileJava.options.encoding 'UTF-8'
 

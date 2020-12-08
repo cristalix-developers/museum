@@ -38,4 +38,14 @@ public class Shop implements State {
 	@Override
 	public void leaveState(User user) {
 	}
+
+	@Override
+	public boolean playerVisible() {
+		return true;
+	}
+
+	@Override
+	public boolean nightVision() {
+		return true;
+	}
 }

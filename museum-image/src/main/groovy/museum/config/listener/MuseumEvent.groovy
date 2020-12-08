@@ -2,18 +2,16 @@
 package museum.config.listener
 
 import museum.App
+import museum.misc.PlacesMechanic
 import museum.museum.Museum
 import museum.museum.map.SubjectType
 import museum.museum.subject.product.FoodProduct
 import museum.util.MessageUtil
-import org.bukkit.Location
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerMoveEvent
-
-// todo delete this hardcode with requiredLabel
-def wagonLocation = new Location(App.app.getWorld(), 292, 87, -400)
+import ru.cristalix.core.math.V3
 
 on InventoryOpenEvent, {
     def type = inventory.type
@@ -36,6 +34,8 @@ on PlayerMoveEvent, {
     if (!user || !user.state)
         return
 
+    PlacesMechanic.handleMove user, new V3(to.x, to.y, to.z)
+
     if (user.state instanceof Museum) {
         def museum = user.state as Museum
         if (museum.owner != user)
@@ -46,7 +46,7 @@ on PlayerMoveEvent, {
             // Попытка снять груз возле лавки
             museum.getSubjects(SubjectType.STALL).forEach(stall -> {
                 // Если игрок находится к лавке в радиусе 5 блоков
-                if (stall.allocation.origin.distanceSquared(to) < 25) {
+                if (stall.allocation.origin.distanceSquared(to) < 55) {
                     user.grabbedArmorstand.remove()
                     user.grabbedArmorstand = null
                     user.player.allowFlight = true
@@ -64,7 +64,7 @@ on PlayerMoveEvent, {
                     user.sendMessage("§e§lИтого: $summary\$")
                 }
             })
-        } else if (wagonLocation.distanceSquared(to) < 25) {
+        } else if ((292 - to.x)**2 + (87 - to.y)**2 + (-400 - to.z)**2 < 25) {
             user.performCommand 'wagon'
         }
     }
