@@ -6,24 +6,29 @@ plugins {
 import de.undercouch.gradle.tasks.download.Download
 
 task downloadScripts(type: Download) {
+    def scriptFile = new File(projectDir, 'src/holotables.ts')
+    onlyIf { !scriptFile.exists() }
+    quiet true
     src 'https://raw.githubusercontent.com/DelfikPro/cristalix-client-api/stable/examples/holotables.ts'
-    dest new File(projectDir, 'src/holotables.ts')
+    dest scriptFile
 }
 
 task compileScripts(type: NpxTask) {
 
     dependsOn downloadScripts
 
-    command = 'webpack-cli'
+    command = 'cristalix-bundler'
+    args = ['src']
 
     inputs.dir(file('src'))
             .withPropertyName('src')
             .withPathSensitivity(PathSensitivity.RELATIVE)
 
-    inputs.files('package.json', 'package-lock.json', 'webpack.config.js', 'tsconfig.json')
+    inputs.files('package.json', 'package-lock.json')
             .withPropertyName('configFiles')
             .withPathSensitivity(PathSensitivity.RELATIVE)
 
     outputs.dir(buildDir)
             .withPropertyName('bundle')
+
 }

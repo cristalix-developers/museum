@@ -15,6 +15,9 @@ subprojects {
         }
     }
 
+    project.ext.mavenUri = "$nmsMavenUri $cristalixMavenUri"
+    apply from: '../mavenAuth.gradle'
+
     compileJava.options.encoding 'UTF-8'
 
     tasks.withType(JavaCompile) {

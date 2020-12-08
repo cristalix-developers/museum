@@ -1,13 +1,10 @@
 apply plugin: 'groovy'
 
-project.ext.mavenUri = "$nmsMavenUri $cristalixMavenUri"
-apply from: 'mavenAuth.gradle'
-
 dependencies {
     compileOnly 'bottle:bottle-libs:1.0'
-    compileOnly 'cristalix:dark-paper:20.11.10'
+    compileOnly 'cristalix:dark-paper:20.11.11'
     compileOnly 'org.codehaus.groovy:groovy:3.0.5-aug'
-    compileOnly 'cristalix:bukkit-core:20.10.31'
+    compileOnly 'cristalix:bukkit-core:20.11.11'
     implementation project(':museum-commons')
     implementation 'clepto:clepto-bukkit:3.2.8'
     implementation 'clepto:clepto-cristalix:3.0.0'
