@@ -50,7 +50,14 @@ register 'tools', { player ->
 
 register 'rod', { player ->
     def user = App.app.getUser((Player) player)
-    def cost = 300 * 10**(user.info.hookLevel-1)
+    def cost
+    switch (user.info.hookLevel - 1) {
+        case 0: cost = 300; break
+        case 1: cost = 1000; break
+        case 2: cost = 3000; break
+        case 3: cost = 10000; break
+    }
+
     title 'Улучшение крюка'
     layout '----S---X'
     button MuseumGuis.background
