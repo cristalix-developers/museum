@@ -65,7 +65,7 @@ Items.register 'prestige', {
 Items.register 'legendary', {
     item DIAMOND_PICKAXE
     apply items['pickaxe-template']
-    enchant(Enchantment.DIG_SPEED, 1)
+    enchant(Enchantment.DIG_SPEED, 2)
     nbt.prison = '23feb'
     text """
     §b§lЛегендарная кирка

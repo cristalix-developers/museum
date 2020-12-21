@@ -1,19 +1,16 @@
 package museum.config.gui
 
-
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.config.command.WagonConfig
 import museum.museum.Museum
 import museum.museum.map.SkeletonSubjectPrototype
-import museum.museum.map.SubjectType
 import museum.museum.subject.*
 import museum.museum.subject.product.FoodProduct
 import museum.museum.subject.skeleton.Skeleton
 import museum.prototype.Managers
 import museum.util.MessageUtil
 import museum.util.SubjectLogoUtil
-import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import ru.cristalix.core.formatting.Formatting
 
@@ -36,7 +33,7 @@ register 'lockedSkeleton', {
 
 register 'emptySkeleton', {
     item BONE
-    nbt.color = 0xAAAAAA
+    nbt.color = 0xFFAAAAAA
     text """
         &7Нужно собрать как минимум 3 фрагмента,
         &7Чтобы выставить скелет в музей.
@@ -44,17 +41,17 @@ register 'emptySkeleton', {
 }
 
 register 'tooBigSkeleton', {
-    nbt.color = 0xAAAAAA
+    nbt.color = 0xFFAAAAAA
     text '&7Этот скелет слишком большой для этой витрины'
 }
 
 register 'alreadyPlacedSkeleton', {
-    nbt.color = 0xAAAAAA
+    nbt.color = 0xFFAAAAAA
     text '&cЭтот скелет уже стоит на другой витрине'
 }
 
 register 'currentSkeleton', {
-    nbt.glow_color = 0x55FF55
+    nbt.glow_color = 0xFF55FF55
     text '&eНажмите, чтобы убрать скелет со стенда'
 }
 

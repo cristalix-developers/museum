@@ -45,8 +45,8 @@ public class CrystalExcavation implements International {
 		TextComponent message = new TextComponent("§cВНИМАНИЕ! §bНачались международные раскопки. §f[§bОтправиться в путь§f]");
 		message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/crystal "));
 
-		// Каждые 180 минут, выгружать игроков в третий мир и отгружать второй мир, затем третий мир становится вторым
-		Do.every(180).minutes(() -> {
+		// Каждые 360 минут, выгружать игроков в третий мир и отгружать второй мир, затем третий мир становится вторым
+		Do.every(360).minutes(() -> {
 			load();
 			for (Player player : worldMeta.getWorld().getPlayers()) {
 				val location = player.getLocation();
