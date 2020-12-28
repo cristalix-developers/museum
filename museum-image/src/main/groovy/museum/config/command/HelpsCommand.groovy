@@ -12,22 +12,10 @@ registerCommand 'helps' handle {
 Guis.register 'helps', {
     title 'Часто задаваемые вопросы'
     layout """
-        XX--X--X-
+        -X--X--X-
         X-X-X-X-X
         -X--X--X-
         """
-    button 'X' icon {
-        item PAPER
-        text """&bЧто нового?
-
-        Международные экспедиции (/crystal).
-        Улучшения крюка.
-        Добавлены 2 новые реликвии
-        на раскопке Майя.
-        Исправлены ошибки.
-        Редизайн меню.
-        """
-    }
     button 'X' icon {
         item PAPER
         text """&bЧто нужно делать в режиме Музей?

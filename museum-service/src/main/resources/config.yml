@@ -17,9 +17,9 @@ npc:
     command: 'sell'
     skin: 'http://textures.minecraft.net/texture/e839df4ab41baefb1c09761220ffa9a128af2c96044aedc621db033d6d7'
   default:
-    title: ''
-    hint: ''
-    command: ''
+    title: ' '
+    hint: ' '
+    command: ' '
     skin: 'http://textures.minecraft.net/texture/c11558ed09d7d1a94255f78d98c122f4d1c649430a8b005711baadf305f7c'
 
 chat:

