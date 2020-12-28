@@ -52,7 +52,7 @@ Items.register 'professional', {
 Items.register 'prestige', {
     item GOLD_PICKAXE
     apply items['pickaxe-template']
-    enchant(Enchantment.DIG_SPEED, 2)
+    enchant(Enchantment.DIG_SPEED, 1)
     text """
     §bПрестижная кирка
 
@@ -78,13 +78,19 @@ Guis.register 'pickaxe', { player ->
     def user = App.app.getUser((Player) player)
 
     title 'Улучшение кирки'
-    layout '----F---X'
+    layout """
+        ----F----
+        ---------
+        --I-H-K--
+        --I-H-K--
+        --I-H-K--
+        ----X----
+    """
     button MuseumGuis.background
     button 'F' icon {
         if (user.pickaxeType.next == null) {
             item CLAY_BALL
             nbt.other = 'tochka'
-            text.clear()
             text '§8У вас наилучшая кирка.'
         } else {
             apply items[user.pickaxeType.next.name().toLowerCase()]
@@ -92,7 +98,80 @@ Guis.register 'pickaxe', { player ->
             text "Цена: ${MessageUtil.toMoneyFormat(user.pickaxeType.next.price)}"
         }
     } leftClick {
-        performCommand'pickaxe'
+        performCommand 'pickaxe'
+    }
+
+    for (double i = 1; i <= 1.2; i = i + 0.1) {
+        def cost = i * 10000d
+        if (i <= user.info.extraChance) {
+            button 'K' icon {
+                item CLAY_BALL
+                nbt.other = 'tochka'
+                text '§8Данная прокачка уже получена.'
+            }
+        } else {
+            button 'K' icon {
+                item BOOK
+                text "§b+10% к удаче обнаружния кости"
+                text ""
+                text "Купить за §e$cost\$"
+            } leftClick {
+                if (user.money > cost) {
+                    user.money = user.money - cost
+                    user.info.extraChance = user.info.extraChance + 0.1
+                    closeInventory()
+                }
+            }
+        }
+    }
+    for (int i = 1; i <= 3; i++) {
+        def cost = i * 5000
+        if (i <= user.info.extraSpeed) {
+            button 'H' icon {
+                item CLAY_BALL
+                nbt.other = 'tochka'
+                text '§8Данная прокачка уже получена.'
+            }
+        } else {
+            button 'H' icon {
+                item EXP_BOTTLE
+                amount i
+                text "§b+1 эффективности кирки"
+                text ""
+                text "Купить за §e$cost\$"
+            } leftClick {
+                if (user.money > cost) {
+                    user.money = user.money - cost
+                    user.info.extraSpeed = user.info.extraSpeed + 1
+                    closeInventory()
+                }
+            }
+        }
+    }
+
+    for (int i = 1; i <= 3; i++) {
+        def cost = i * 1000
+        if (i * 5 <= user.info.extraBreak) {
+            button 'I' icon {
+                item CLAY_BALL
+                nbt.other = 'tochka'
+                text '§8Данная прокачка уже получена.'
+            }
+        } else {
+            button 'I' icon {
+                item STONE
+                amount i * 5
+                text "§b${i * 5} дополнлительных удара(ов)"
+                text ""
+                text "Купить за §e$cost\$"
+            } leftClick {
+                if (user.money > cost) {
+                    user.money = user.money - cost
+                    user.info.extraBreak = user.info.extraBreak + 5
+                    closeInventory()
+                }
+            }
+        }
     }
 
     button 'X' icon {

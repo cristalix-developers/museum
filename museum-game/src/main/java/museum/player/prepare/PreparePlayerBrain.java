@@ -62,7 +62,7 @@ public class PreparePlayerBrain implements Prepare {
 					exit();
 					return;
 				}
-				if (iteration >= titles.size()) {
+				if (iteration >= titles.size() - 1) {
 					if (user.getExperience() >= EXPERIENCE)
 						player.teleport(dots.get(dots.size() - 1).toCenterLocation());
 					user.giveExperience(EXPERIENCE);

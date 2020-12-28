@@ -66,7 +66,8 @@ public class PhysicsDisabler implements Listener {
 
 	@EventHandler
 	public void disable(BlockBreakEvent event) {
-		event.setCancelled(true);
+		if (event.getPlayer().getWorld().equals(App.getApp().getWorld()))
+			event.setCancelled(true);
 	}
 
 	@EventHandler
