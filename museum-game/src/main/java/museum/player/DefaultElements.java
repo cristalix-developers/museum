@@ -45,6 +45,9 @@ public class DefaultElements {
 				0,
 				false,
 				0,
+				1,
+				0,
+				0,
 				1
 		);
 

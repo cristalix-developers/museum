@@ -275,7 +275,7 @@ public class BeforePacketHandler implements Prepare {
 		ExcavationPrototype prototype = ((Excavation) user.getState()).getPrototype();
 		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 
-		val bingo = proto.getRarity().getRareScale() / 300D;
+		val bingo = proto.getRarity().getRareScale() * user.getInfo().getExtraChance() / 300D;
 		val randomValue = Math.random();
 
 		if (bingo > randomValue) {

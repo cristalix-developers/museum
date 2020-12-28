@@ -33,5 +33,8 @@ public class UserInfo implements Unique {
 	private boolean darkTheme;
 	private long crystal;
 	private int hookLevel;
+	private int extraSpeed;
+	private int extraBreak;
+	private double extraChance;
 
 }

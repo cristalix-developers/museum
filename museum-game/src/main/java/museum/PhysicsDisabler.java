@@ -65,6 +65,11 @@ public class PhysicsDisabler implements Listener {
 	}
 
 	@EventHandler
+	public void disable(BlockBreakEvent event) {
+		event.setCancelled(true);
+	}
+
+	@EventHandler
 	public void disable(BlockGrowEvent event) {
 		event.setCancelled(true);
 	}

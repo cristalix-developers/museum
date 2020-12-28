@@ -13,6 +13,7 @@ import museum.util.TreasureUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
@@ -36,7 +37,13 @@ public class Excavation implements State {
 		val inventory = player.getInventory();
 
 		inventory.clear();
-		inventory.addItem(Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror());
+
+		val pickaxe = Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror();
+		val meta = pickaxe.getItemMeta();
+		meta.addEnchant(Enchantment.DIG_SPEED, meta.getEnchantLevel(Enchantment.DIG_SPEED) + user.getInfo().getExtraSpeed(), true);
+		pickaxe.setItemMeta(meta);
+		inventory.addItem(pickaxe);
+
 		inventory.addItem(prototype.getPallette());
 		inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
@@ -46,6 +53,8 @@ public class Excavation implements State {
 		MessageUtil.find("visitexcavation")
 				.set("title", prototype.getTitle())
 				.send(user);
+
+		hitsLeft += user.getInfo().getExtraBreak();
 	}
 
 	@Override
