@@ -1,5 +1,4 @@
 import * as gui from '@cristalix/client-api';
-import * as easing from '@cristalix/client-api/lib/easing';
 
 (function(plugin: any) {
 	var priceText = gui.text({

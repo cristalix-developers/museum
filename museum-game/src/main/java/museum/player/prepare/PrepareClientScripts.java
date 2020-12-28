@@ -23,7 +23,7 @@ public class PrepareClientScripts implements Prepare {
 
 	public PrepareClientScripts() {
 		try {
-			InputStream resource = B.plugin.getResource("museum.bundle.js");
+			InputStream resource = B.plugin.getResource("clientcode.bundle.js");
 
 			String jsCode = new BufferedReader(new InputStreamReader(resource))
 					.lines()
@@ -34,8 +34,6 @@ public class PrepareClientScripts implements Prepare {
 			throw new RuntimeException(exception);
 		}
 	}
-
-	// holo
 
 	@Override
 	public void execute(User user, App app) {

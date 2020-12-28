@@ -4,40 +4,38 @@ import * as gui from '@cristalix/client-api';
 	let show = true;
 
 	Events.on(plugin, 'key_press', (e: KeyPressEvent) => {
-		if (e.key === Keyboard.KEY_J) {
+		if (e.key === Keyboard.KEY_N) {
 			show = !show
 			title.enabled = show;
 			background.enabled = show;
+		} else if (e.key === Keyboard.KEY_M) {
+			ChatExtensions.sendChatMessage("/gui excavation")
+		} else if (e.key === Keyboard.KEY_H) {
+			ChatExtensions.sendChatMessage("/helps")
 		}
 	});
 
 	const title = gui.rect({
 		color: {a: 0.5, r: 0, g: 1, b: 0},
-		align: {x: 0.015, y: 0.03},
+		align: {x: 0.01, y: 0.4},
 	});
+
 	const background = gui.rect({
-        width: 235,
-        height: 165,
+		width: 195,
+		height: 80,
+		align: {x: 0, y: 0.39},
         color: {a: 0.6, r: 0, g: 0, b: 0},
     });
 
 	let yScale = 0;
 	for (let entry of [
-		"§eНаходите останки динозавров на ",
-		"§eраскопках, ставьте/окрашивайте фонтаны",
-		"§eи витрины §f(§bПКМ§f)§e, взлетите!",
-		"§eПосетители кидают монеты, собирайте их.",
+		"§fГорячие клавиши",
 		"",
-		"§6Как начать раскопки?",
-		"§bМеню §f-> §bЭкспедиции §f-> §bОстров Бриз",
-		"§fКол-во ударов ограничено!",
-		"§fЛавка продает еду (перед музеем),",
-		"§fно еда кончается, поэтому",
-		"§fзаказывайте продукты в меню, забирайте",
-		"§fгруз у желтой метки и несите в лавку.",
+		"§b§lM§f - §bкарта мира §f㸾",
+		"§b§lN§f - §bскрыть/показать §fэто окно 㱬",
+		"§b§lH§f - §bответы §fна разные вопросы 㗒",
 		"",
-		"§f- Магазин построек §b§l/shop",
-		"§fНажмите '§b§lJ§f' - §bскрыть/показать §fэто окно"
+		"§bСчастливого Нового года! §f㶅"
 	]) {
 		title.children.push(gui.text({
 			text: entry,

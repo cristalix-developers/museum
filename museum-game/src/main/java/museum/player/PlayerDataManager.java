@@ -60,6 +60,13 @@ public class PlayerDataManager implements Listener {
 		api.bus().register(this, AccountEvent.Load.class, event -> {
 			if (event.isCancelled())
 				return;
+			////////////////ДО ВАЙПА
+			if (!event.getUuid().toString().equals("307264a1-2c69-11e8-b5ea-1cb72caa35fd")) {
+				event.setCancelReason("Вайп в 10 утра :), а пока тех. работы и печеньки.");
+				event.setCancelled(true);
+				return;
+			}
+			///////////////////////////////
 			val uuid = event.getUuid();
 			try {
 				UserInfoPackage userInfoPackage = client.writeAndAwaitResponse(new UserInfoPackage(uuid))
@@ -68,9 +75,6 @@ public class PlayerDataManager implements Listener {
 				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid);
 				// Добавление дефолтных значений, которых не было в самом начале
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
-				if (userInfo.getClaimedPlaces() == null) userInfo.setClaimedPlaces(new ArrayList<>());
-				if (userInfo.getClaimedRelics() == null) userInfo.setClaimedRelics(new ArrayList<>());
-				if (userInfo.getHookLevel() < 1) userInfo.setHookLevel(1);
 				userMap.put(uuid, new User(userInfo));
 			} catch (Exception ex) {
 				event.setCancelReason("Не удалось загрузить статистику о музее.");
