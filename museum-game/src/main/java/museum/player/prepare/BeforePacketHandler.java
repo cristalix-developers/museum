@@ -260,8 +260,11 @@ public class BeforePacketHandler implements Prepare {
 						.send(user);
 			}
 		}
+		Excavation excavation = (Excavation) user.getState();
+		if (Math.abs(user.getLevel() - excavation.getPrototype().getRequiredLevel()) < 60 || excavation.getPrototype().getRequiredLevel() > 149) {
+			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
+		}
 		// Перебрать все кирки и эффекты на них
-		user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
 		for (PickaxeType pickaxeType : PickaxeType.values()) {
 			if (pickaxeType.ordinal() <= user.getPickaxeType().ordinal()) {
 				List<BlockPosition> positions = pickaxeType.getPickaxe().dig(user, packet.a);
@@ -275,7 +278,8 @@ public class BeforePacketHandler implements Prepare {
 		ExcavationPrototype prototype = ((Excavation) user.getState()).getPrototype();
 		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 
-		val bingo = proto.getRarity().getRareScale() * user.getInfo().getExtraChance() / 300D;
+		val playerChance = user.getInfo().getExtraChance() > 1 ? user.getInfo().getExtraChance() : 1;
+		val bingo = proto.getRarity().getRareScale() * playerChance / 300D;
 		val randomValue = Math.random();
 
 		if (bingo > randomValue) {
