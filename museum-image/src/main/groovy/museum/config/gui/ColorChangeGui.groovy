@@ -36,7 +36,7 @@ Guis.register 'colorChange', { player ->
         button 'C' icon {
             item Material.CONCRETE
             data color.woolData
-            text """Выбрать $color.chatColor${color.teamName.replace('ые', 'ый').replace('ие', 'ий')} &fцвет"""
+            text '''Выбрать $color.chatColor${color.teamName.replace('ые', 'ый').replace('ие', 'ий')} &fцвет'''
         } leftClick {
             subject.cachedInfo.color = color
             if (allocation) {
