@@ -8,6 +8,7 @@ import lombok.experimental.Delegate;
 import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
+import museum.client_conversation.ClientPacket;
 import museum.data.*;
 import museum.misc.Relic;
 import museum.museum.Museum;
@@ -157,10 +158,15 @@ public class User implements PlayerWrapper {
 					if (user.getPlayer() != null)
 						user.getPlayer().sendMessage(message);
 			}
-			MessageUtil.find("levelup")
-					.set("level", newLevel)
-					.set("exp", LevelSystem.getRequiredExperience(newLevel) - getExperience())
-					.send(this);
+			if (newLevel > 49) {
+				ClientPacket.sendTopTitle(this, "㿸 Вы достигли §b" + newLevel + " уровня§f, ваша награда §6§l1`000$§f");
+				setMoney(getMoney() + 1000);
+			} else {
+				MessageUtil.find("levelup")
+						.set("level", newLevel)
+						.set("exp", LevelSystem.getRequiredExperience(newLevel) - getExperience())
+						.send(this);
+			}
 		}
 	}
 

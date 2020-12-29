@@ -11,7 +11,7 @@ import museum.player.User;
 public class PrepareTop implements Prepare {
 	public static final Prepare INSTANCE = new PrepareTop();
 
-	private final ClientPacket<String> packet = new ClientPacket<>("top-create");
+	private final ClientPacket packet = new ClientPacket("top-create");
 
 	@Override
 	public void execute(User user, App app) {

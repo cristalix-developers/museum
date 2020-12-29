@@ -36,5 +36,6 @@ public class UserInfo implements Unique {
 	private int extraSpeed;
 	private int extraBreak;
 	private double extraChance;
+	private long lastTimeRewardClaim;
 
 }

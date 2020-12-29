@@ -111,6 +111,7 @@ public class CrystalExcavation implements International {
 			if (canBeBroken(packet.a)) {
 				user.getInventory().addItem(crystal);
 				user.setCrystal(user.getCrystal() + 1);
+				BeforePacketHandler.DROP_CHANNEL.send(user, "§l+1 §d㦶");
 			}
 		} else if (packet.c == PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK) {
 			if (!canBeBroken(packet.a)) {

@@ -10,6 +10,8 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.val;
 import museum.App;
 import museum.PacketMetrics;
+import museum.boosters.BoosterType;
+import museum.client_conversation.ClientPacket;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.international.International;
@@ -52,6 +54,7 @@ public class BeforePacketHandler implements Prepare {
 	public static final ItemStack EMERGENCY_STOP = Items.render("go-back-item").asBukkitMirror();
 	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
 	public static final BlockPosition DUMMY = new BlockPosition(0, 0, 0);
+	public static final ClientPacket DROP_CHANNEL = new ClientPacket("museumcursor");
 	private static final ItemStack[] INTERACT_ITEMS = Items.items.keySet().stream()
 			.filter(closure -> closure.contains("treasure"))
 			.map(closure -> Items.render(closure).asBukkitMirror())
@@ -297,23 +300,13 @@ public class BeforePacketHandler implements Prepare {
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
 				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0) / 30;
-
-				String value = String.format("%.2f$", prize);
-
-				MessageUtil.find("findcopy")
-						.set("name", fragment.getAddress())
-						.set("cost", value)
-						.send(user);
-
-				user.getPlayer().sendTitle("§6Находка!", "§e+" + value);
-
+				DROP_CHANNEL.send(user, String.format("%s §6§l+%.2f$", fragment.getAddress(), prize * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)));
 				user.depositMoneyWithBooster(prize);
 			} else {
 				MessageUtil.find("findfragment")
 						.set("name", fragment.getAddress())
 						.send(user);
-				user.getPlayer().sendTitle("§l§6Находка!", "§eобнаружен новый фрагмент");
-
+				DROP_CHANNEL.send(user, "§lNEW! §b" + fragment.getAddress() + " §f㦶");
 				skeleton.getUnlockedFragments().add(fragment);
 			}
 		}

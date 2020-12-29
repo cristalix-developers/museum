@@ -3,7 +3,6 @@ package museum.config.command
 
 import museum.App
 import museum.client_conversation.ClientPacket
-import museum.player.prepare.PrepareClientScripts
 import museum.util.SendScriptUtil
 import ru.cristalix.core.display.messages.JavaScriptMessage
 
@@ -26,11 +25,11 @@ registerCommand 'pm' handle {
         def dataLength = 0
         if (args.length == 1) {
             dataLength = args[0].bytes.length
-            new ClientPacket<String>('disable').send App.app.getUser(player), args[0]
+            new ClientPacket('disable').send App.app.getUser(player), args[0]
         } else if (args.length >= 2) {
             def data = args.drop(1).join(' ')
             dataLength = data.bytes.length
-            new ClientPacket<String>(args[0]).send App.app.getUser(player), data
+            new ClientPacket(args[0]).send App.app.getUser(player), data
         }
         return "&bСообщение объемом &f&l$dataLength&b байт было отправлено. &f㜗"
     }

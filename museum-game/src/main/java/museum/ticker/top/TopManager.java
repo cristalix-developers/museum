@@ -30,7 +30,7 @@ public class TopManager implements Ticked, Listener {
 	private final Map<TopPackage.TopType, List<TopEntry<String, Object>>> tops = Maps.newConcurrentMap();
 
 	private String data;
-	private final ClientPacket<String> updatePacket = new ClientPacket<>("top-update");
+	private final ClientPacket updatePacket = new ClientPacket("top-update");
 
 	@Override
 	public void tick(int... args) {

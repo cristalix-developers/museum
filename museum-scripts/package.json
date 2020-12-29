@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@cristalix/bundler": "^1.0.8",
-    "@cristalix/client-api": "^2.0.13",
-    "webpack": "^5.11.0"
+    "@cristalix/client-api": "^2.1.6",
+    "webpack": "^5.11.1"
   }
 }

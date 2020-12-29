@@ -15,7 +15,7 @@ public class PrepareShopBlocks implements Prepare {
 
 	public static final Prepare INSTANCE = new PrepareShopBlocks();
 
-	private final ClientPacket<String> packet = new ClientPacket<>("shop");
+	private final ClientPacket packet = new ClientPacket("shop");
 	private String dataForClients;
 
 	@Override

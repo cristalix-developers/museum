@@ -142,7 +142,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				subject.getAllocation().perform(user, SPAWN_PIECES);
 				subject.getAllocation().perform(user, SPAWN_DISPLAYABLE);
 			}
-			new ClientPacket<String>("museumsubjects").send(user, GlobalSerializers.toJson(user.getSubjects().stream()
+			new ClientPacket("museumsubjects").send(user, GlobalSerializers.toJson(user.getSubjects().stream()
 					.filter(Subject::isAllocated)
 					.map(Subject::getDataForClient)
 					.filter(Objects::nonNull)

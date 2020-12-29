@@ -61,7 +61,7 @@ import * as gui from '@cristalix/client-api';
 	var activeSubject: Subject = null;
 
 	Events.on(plugin, 'game_loop', (event) => {
-		let pos = Player.getTargetBlockPos(5);
+		let pos = minecraft.getMouseOver().getBlockPos();
 		let x = pos.getX();
 		let y = pos.getY();
 		let z = pos.getZ();
