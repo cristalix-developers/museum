@@ -1,14 +1,10 @@
 apply plugin: 'groovy'
 
-project.ext.mavenUri = "$nmsMavenUri $cristalixMavenUri"
-apply from: 'mavenAuth.gradle'
-
 dependencies {
-//    compileOnly 'bottle:bottle-minecraft:1.0.4'
     compileOnly 'bottle:bottle-libs:1.0'
-    compileOnly 'cristalix:dark-paper:20.11.10'
+    compileOnly 'cristalix:dark-paper:20.11.11'
     compileOnly 'org.codehaus.groovy:groovy:3.0.5-aug'
-    compileOnly 'cristalix:bukkit-core:20.10.31'
+    compileOnly 'cristalix:bukkit-core:20.11.11'
     implementation project(':museum-commons')
     implementation 'clepto:clepto-bukkit:3.2.8'
     implementation 'clepto:clepto-cristalix:3.0.0'
@@ -17,5 +13,15 @@ dependencies {
 ext.bukkitPlugin = [mainClass: 'museum.App', dependencies: 'CoreAPI']
 apply from: 'bukkitPlugin.gradle'
 
-(tasks['bukkitPlugin'] as Jar).with project(':museum-image').tasks['jar'] as Jar
-tasks['build'].dependsOn 'bukkitPlugin'
+evaluationDependsOn ':museum-scripts'
+
+def bukkitPluginTask = tasks.bukkitPlugin
+def scriptsTask = project(':museum-scripts').tasks.compileScripts
+def imageTask = project(':museum-image').tasks.jar
+
+bukkitPluginTask.dependsOn scriptsTask, imageTask
+
+bukkitPluginTask.with imageTask as Jar
+bukkitPluginTask.from scriptsTask.outputs
+
+tasks.build.dependsOn bukkitPluginTask

@@ -135,7 +135,13 @@ public class MongoServiceTest {
                 Collections.emptyList(),
                 Collections.emptyList(),
                 RANDOM.nextInt(1000000),
-                false
+                false,
+                0,
+                1,
+                0,
+                0,
+                1,
+                -1
         );
     }
 }

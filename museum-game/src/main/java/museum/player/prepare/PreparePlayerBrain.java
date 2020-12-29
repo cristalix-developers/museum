@@ -1,9 +1,12 @@
 package museum.player.prepare;
 
+import clepto.bukkit.B;
 import clepto.bukkit.Cycle;
 import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
+import lombok.val;
 import museum.App;
+import museum.client_conversation.ClientPacket;
 import museum.museum.Museum;
 import museum.player.User;
 import museum.util.LocationUtil;
@@ -24,6 +27,7 @@ public class PreparePlayerBrain implements Prepare {
 
 	public static final Prepare INSTANCE = new PreparePlayerBrain();
 	public static final int EXPERIENCE = 3;
+	public static final long REWARD_DELAY_HOURS = 18;
 
 	private final List<Label> dots;
 	private final List<Title> titles = new ArrayList<>();
@@ -34,7 +38,7 @@ public class PreparePlayerBrain implements Prepare {
 		// При next след. текст становится на второе место
 		Stream.of(
 				"Привет! 䀈", "Это.nextТвой. Музей. 㸾", "Заполняйnextвитрины 㜤",
-				"Раскапывайnextдинозавров 㿿", "Собирай монеты 㜰", "Кастомизируй 㟡",
+				"Раскапывайnextдинозавров 㿿", "Находи секреты 㜰", "Кастомизируй 㟡",
 				"Играй сnextдрузьями 㭿", "Удачи! 㲺"
 		).map(line -> {
 			if (line.contains("next")) {
@@ -54,15 +58,28 @@ public class PreparePlayerBrain implements Prepare {
 	public void execute(User user, App app) {
 		final CraftPlayer player = user.getPlayer();
 
-		if (player.hasPlayedBefore() || user.getExperience() >= EXPERIENCE)
+		if (player.hasPlayedBefore() || user.getExperience() >= EXPERIENCE) {
+			val now = System.currentTimeMillis() / 1000;
+			B.postpone(15 * 20, () -> {
+				if ((now - user.getInfo().getLastTimeRewardClaim()) > REWARD_DELAY_HOURS * 3600) {
+					user.getInfo().setLastTimeRewardClaim(now);
+					ClientPacket.sendTopTitle(user, "§aВаша ежедневная награда §6§l10`000$§f, §b§l15 опыта§f, §d20㦶");
+					user.setMoney(user.getMoney() + 10000);
+					user.giveExperience(15);
+					user.setCrystal(user.getCrystal() + 20);
+				} else {
+					ClientPacket.sendTopTitle(user, "С наступающим §bНовым Годом§f, приятной игры! 㗩");
+				}
+			});
 			return;
+		}
 
 		Cycle.run(5 * 20, titles.size(), iteration -> {
 				if (!player.isOnline()) {
 					exit();
 					return;
 				}
-				if (iteration >= titles.size()) {
+				if (iteration >= titles.size() - 1) {
 					if (user.getExperience() >= EXPERIENCE)
 						player.teleport(dots.get(dots.size() - 1).toCenterLocation());
 					user.giveExperience(EXPERIENCE);

@@ -45,11 +45,6 @@ public class PhysicsDisabler implements Listener {
 	}
 
 	@EventHandler
-	public void disable(BlockBreakEvent event) {
-		event.setCancelled(true);
-	}
-
-	@EventHandler
 	public void disable(FoodLevelChangeEvent event) {
 		event.setFoodLevel(20);
 	}
@@ -67,6 +62,12 @@ public class PhysicsDisabler implements Listener {
 	@EventHandler
 	public void disable(BlockSpreadEvent event) {
 		event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void disable(BlockBreakEvent event) {
+		if (event.getPlayer().getWorld().equals(App.getApp().getWorld()))
+			event.setCancelled(true);
 	}
 
 	@EventHandler

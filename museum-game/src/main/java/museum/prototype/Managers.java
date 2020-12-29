@@ -63,7 +63,7 @@ public class Managers {
 				builder = FountainPrototype.builder().source(box.requireLabel("source"));
 
 			else if (type == SubjectType.STALL) {
-				val npc = WorkerUtil.STALL_WORKER_TEMPLATE;
+				val npc = WorkerUtil.STALL_WORKER_TEMPLATE.get();
 				val npcSpawn = box.requireLabel("npc").toCenterLocation();
 				npc.setLocation(npcSpawn);
 				builder = StallPrototype.builder()

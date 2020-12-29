@@ -7,9 +7,13 @@ import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -19,8 +23,8 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class WorkerUtil {
 
-	private final static String defaultSkin = App.getApp().getConfig().getString("npc-skin.default");
-	public static final NpcWorker STALL_WORKER_TEMPLATE = new NpcWorker(
+	private final static String defaultSkin = App.getApp().getConfig().getString("npc.default.skin");
+	public static final Supplier<NpcWorker> STALL_WORKER_TEMPLATE = () -> new NpcWorker(
 			new Location(App.getApp().getWorld(), 0, 0, 0),
 			defaultSkin,
 			"Работница лавки",
@@ -33,15 +37,26 @@ public class WorkerUtil {
 		workers.addAll(app.getMap().getLabels("simplenpc")
 				.stream()
 				.map(label -> {
-					String[] ss = label.getTag().split("\\s+");
-					String skin = ss.length > 0 ? app.getConfig().getString("npc-skin." + ss[0]) : defaultSkin;
-
-					return new NpcWorker(label.clone().add(.5, 0, .5), skin, "", user -> {
-						if (ss.length < 2)
-							return;
-						if (ss[1].startsWith("/"))
-							user.performCommand(label.getTag().substring(ss[0].length() + 2));
-					});
+					ConfigurationSection data = app.getConfig().getConfigurationSection("npc." + label.getTag().split("\\s+")[0]);
+					if (data == null) {
+						return STALL_WORKER_TEMPLATE.get();
+					} else {
+						val hint = (ArmorStand) label.world.spawnEntity(
+								label.clone().add(.5, 2.1, .5),
+								EntityType.ARMOR_STAND
+						);
+						hint.setGravity(false);
+						hint.setCustomName(data.getString("hint"));
+						hint.setMarker(true);
+						hint.setVisible(false);
+						hint.setCustomNameVisible(true);
+						return new NpcWorker(
+								label.clone().add(.5, 0, .5),
+								data.getString("skin"),
+								data.getString("title"),
+								user -> user.performCommand(data.getString("command"))
+						);
+					}
 				}).collect(Collectors.toList()));
 		// Поворот голов фантомных игроков
 		Bukkit.getScheduler().runTaskTimerAsynchronously(app, () -> {
