@@ -1,23 +1,45 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.gui
 
+
 import clepto.bukkit.menu.Guis
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
+import ru.cristalix.core.coupons.ICouponsService
 
 import static org.bukkit.Material.*
 
 static String modifyPrice(UUID user, int price) {
-    return "§b" + price + " кристаликов"
+    return (ICouponsService.get().haveActiveCoupon(user) ?
+            "§7§m$price§b ${ICouponsService.get().priceWithDiscountInt(user, price)}" : ("§b" + price)) + " кристаликов"
 }
 
 Guis.register 'donate', { player ->
-    def user = (Player) context
+    def user = (Player) player
     title '§bВнутриигровые покупки'
     layout """
+        ----X----
         -X-M-Z-Y-
         ----J----
     """
+
+    button 'X' icon {
+        item END_CRYSTAL
+        text """
+        §bСлучайный префикс
+         ${modifyPrice(user.uniqueId, 79)}
+        
+        §7Получите случайный префикс!
+        
+        Если такой префикс уже был?
+        - §eВы получите §6§l50`000\$
+
+        Каждое §dпятое §fоткрытие §dгарантирует
+        §6редкий §fили §dэпичный §fпрефикс
+        """
+    } leftClick {
+        performCommand("proccessdonate PREFIX_CASE")
+    }
 /*
     button 'D' icon {
         item GOLDEN_APPLE

@@ -5,7 +5,7 @@ import clepto.bukkit.menu.Guis
 import museum.App
 import museum.config.gui.MuseumGuis
 import museum.misc.Relic
-import museum.museum.subject.CollectorSubject
+import museum.player.User
 import museum.util.CrystalUtil
 import museum.util.MessageUtil
 import museum.util.SubjectLogoUtil
@@ -20,13 +20,11 @@ registerCommand 'sell' handle {
         def user = App.app.getUser player
         def subject = SubjectLogoUtil.decodeItemStackToSubject(user, user.getInventory().getItemInHand())
         if (subject) {
-            if (subject instanceof CollectorSubject)
-                return null
             user.getInventory().setItemInHand(null)
             user.subjects.remove(subject)
-            user.money = user.money + subject.prototype.price
+            user.money = user.money + subject.prototype.price * 0.6
             return MessageUtil.find('stand-sell')
-                    .set('price', subject.prototype.price)
+                    .set('price', subject.prototype.price * 0.6)
                     .getText()
         }
         def nmsItem = CraftItemStack.asNMSCopy item
@@ -47,8 +45,8 @@ registerCommand 'sell' handle {
     }
 }
 
-String crystal2Money(long crystal) {
-    return "§e${MessageUtil.toMoneyFormat(CrystalUtil.convertCrystal2Money(crystal))}"
+static String crystal2Money(User user, long crystal) {
+    return "§e${MessageUtil.toMoneyFormat(CrystalUtil.convertCrystal2Money(user, crystal))}"
 }
 
 Guis.register 'sell-menu', {
@@ -67,18 +65,18 @@ Guis.register 'sell-menu', {
         """
         button 'M' icon {
             item MINECART
-            text """§fПродать §d${user.crystal}㦶 §fза ${crystal2Money(user.crystal)}
+            text """§fПродать §d${user.crystal}㦶 §fза ${crystal2Money(user, user.crystal)}
         
             Продать все ваши кристаллы.
             """
         } leftClick {
             def temp = user.crystal
             user.crystal = 0
-            user.money = user.money + CrystalUtil.convertCrystal2Money(temp)
+            user.money = user.money + CrystalUtil.convertCrystal2Money(user, temp)
             Guis.open(player, 'sell-menu', player)
             MessageUtil.find('sell-crystal')
                     .set('crystal', temp)
-                    .set('money', crystal2Money(temp))
+                    .set('money', crystal2Money(user, temp))
                     .send(user)
         }
     }
@@ -89,14 +87,14 @@ Guis.register 'sell-menu', {
 
         В этом меню вы продаете
         §bкристаллы§f, чтобы продать
-        реликвию или постройку, возьмите
+        реликвию или постройку (с вычетом §c§l40%§f), возьмите
         ее в руку и нажмите на меня снова.
         """
     }
     button 'F' icon {
         item CLAY_BALL
         nbt.museum = 'crystal_pink'
-        text """§fПродать §d㦶 §fза  ${crystal2Money(1)}
+        text """§fПродать §d㦶 §fза  ${crystal2Money(user, 1)}
         
         §7У вас §d${user.getCrystal()}㦶
         """
@@ -104,11 +102,11 @@ Guis.register 'sell-menu', {
         if (user.getCrystal() < 1)
             return
         user.crystal = user.crystal - 1
-        user.money = user.money + CrystalUtil.convertCrystal2Money(1)
+        user.money = user.money + CrystalUtil.convertCrystal2Money(user, 1)
         Guis.open(player, 'sell-menu', player)
         MessageUtil.find('sell-crystal')
                 .set('crystal', 1)
-                .set('money', crystal2Money(1))
+                .set('money', crystal2Money(user, 1))
                 .send(user)
     }
 
@@ -119,7 +117,7 @@ Guis.register 'sell-menu', {
         item CLAY_BALL
         nbt.museum = 'crystal_pink'
         amount smallCrystal
-        text """§fПродать §d${smallCrystal}㦶 §fза ${crystal2Money(smallCrystal + 1)}
+        text """§fПродать §d${smallCrystal}㦶 §fза ${crystal2Money(user, smallCrystal + 1)}
         §7У вас §d${user.getCrystal()}㦶
 
         §eВыгода 11%
@@ -128,18 +126,18 @@ Guis.register 'sell-menu', {
         if (user.getCrystal() < smallCrystal)
             return
         user.crystal = user.crystal - smallCrystal
-        user.money = user.money + CrystalUtil.convertCrystal2Money(smallCrystal + 1)
+        user.money = user.money + CrystalUtil.convertCrystal2Money(user, smallCrystal + 1)
         Guis.open(player, 'sell-menu', player)
         MessageUtil.find('sell-crystal')
                 .set('crystal', smallCrystal)
-                .set('money', crystal2Money(smallCrystal + 1))
+                .set('money', crystal2Money(user, smallCrystal + 1))
                 .send(user)
     }
     button 'T' icon {
         item CLAY_BALL
         nbt.museum = 'crystal_pink'
         amount bigCrystal
-        text """§fПродать §d${bigCrystal}㦶 §fза ${crystal2Money(bigCrystal + 12)}
+        text """§fПродать §d${bigCrystal}㦶 §fза ${crystal2Money(user, bigCrystal + 12)}
         §7У вас §d${user.getCrystal()}㦶
 
         §eВыгода 20%
@@ -148,11 +146,11 @@ Guis.register 'sell-menu', {
         if (user.getCrystal() < bigCrystal)
             return
         user.crystal = user.crystal - bigCrystal
-        user.money = user.money + CrystalUtil.convertCrystal2Money(bigCrystal + 12)
+        user.money = user.money + CrystalUtil.convertCrystal2Money(user, bigCrystal + 12)
         Guis.open(player, 'sell-menu', player)
         MessageUtil.find('sell-crystal')
                 .set('crystal', bigCrystal)
-                .set('money', crystal2Money(bigCrystal + 12))
+                .set('money', crystal2Money(user, bigCrystal + 12))
                 .send(user)
     }
 }

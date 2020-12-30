@@ -264,8 +264,15 @@ public class BeforePacketHandler implements Prepare {
 			}
 		}
 		Excavation excavation = (Excavation) user.getState();
-		if (Math.abs(user.getLevel() - excavation.getPrototype().getRequiredLevel()) < 60 || excavation.getPrototype().getRequiredLevel() > 149) {
-			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
+		if (Math.abs(user.getLevel() - excavation.getPrototype().getRequiredLevel()) < 70 || excavation.getPrototype().getRequiredLevel() > 149) {
+
+			// Бонусы получения опыта
+			int extra = 0;
+			// Если у игрока есть префикс сердечко - шанс получить один опыт
+			if (user.getPrefix() != null && user.getPrefix().equals("䂋") && Math.random() < .10)
+				extra = 1;
+
+			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience() + extra);
 		}
 		// Перебрать все кирки и эффекты на них
 		for (PickaxeType pickaxeType : PickaxeType.values()) {

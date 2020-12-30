@@ -67,6 +67,7 @@ public class PlayerDataManager implements Listener {
 				UserInfo userInfo = userInfoPackage.getUserInfo();
 				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid);
 				// Добавление дефолтных значений, которых не было в самом начале
+				if (userInfo.getPrefixes() == null) userInfo.setPrefixes(new ArrayList<>());
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 				userMap.put(uuid, new User(userInfo));
 			} catch (Exception ex) {

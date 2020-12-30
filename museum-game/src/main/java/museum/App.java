@@ -25,7 +25,6 @@ import museum.ticker.detail.FountainHandler;
 import museum.ticker.detail.WayParticleHandler;
 import museum.ticker.top.TopManager;
 import museum.util.MapLoader;
-import museum.util.MessageUtil;
 import museum.util.MuseumChatService;
 import museum.visitor.VisitorHandler;
 import museum.worker.WorkerUtil;
@@ -41,6 +40,9 @@ import org.codehaus.groovy.runtime.m12n.RuntimeExtensionModules;
 import org.codehaus.groovy.runtime.m12n.SimpleExtensionModule;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
+import ru.cristalix.core.command.ICommandService;
+import ru.cristalix.core.coupons.BukkitCouponsService;
+import ru.cristalix.core.coupons.ICouponsService;
 import ru.cristalix.core.permissions.IPermissionService;
 import ru.cristalix.core.realm.IRealmService;
 import ru.cristalix.core.realm.RealmStatus;
@@ -125,7 +127,7 @@ public final class App extends JavaPlugin {
 		core.unregisterService(IChatService.class);
 		core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
 		core.registerService(IScoreboardService.class, new ScoreboardService());
-//		core.registerService(ICouponsService.class, new BukkitCouponsService(core.getSocketClient(), ICommandService.get()));
+		core.registerService(ICouponsService.class, new BukkitCouponsService(core.getSocketClient(), ICommandService.get()));
 
 		// Регистрация обработчика пакета конфига
 		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
