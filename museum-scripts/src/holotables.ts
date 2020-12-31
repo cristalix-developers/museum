@@ -1,5 +1,6 @@
 import * as gui from '@cristalix/client-api';
 import * as easing from '@cristalix/client-api/lib/easing';
+import {disableAnimations, enableAnimations} from "@cristalix/client-api";
 
 type TopEntry = {
 
@@ -9,7 +10,6 @@ type TopEntry = {
 };
 
 (function(plugin: any) {
-
     const pushMatrix = GL11.glPushMatrix;
     const popMatrix = GL11.glPopMatrix;
     const translate = GL11.glTranslatef;
@@ -81,7 +81,6 @@ type TopEntry = {
         readonly entity: gui.Box;
 
         scroll: number = 0;
-
 
         constructor(readonly address: string, data: TopData) {
             this.boardWidth = data.boardWidth || 200;
@@ -185,8 +184,6 @@ type TopEntry = {
             depthMask(true);
 
             popMatrix();
-
-
         }
 
         updateData(topData: TopEntry[]): void {
@@ -384,9 +381,11 @@ type TopEntry = {
     });
 
     Events.on(plugin, 'render_pass_ticks', (event: RenderPassEvent) => {
+        disableAnimations()
         for (let top of tops) {
             top.render(event.partialTicks);
         }
+        enableAnimations()
     });
 
 

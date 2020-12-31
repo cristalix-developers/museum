@@ -1,12 +1,18 @@
 package museum.misc;
 
 import com.google.common.collect.Maps;
+import io.netty.buffer.Unpooled;
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
 import museum.player.User;
 import museum.util.MessageUtil;
+import net.minecraft.server.v1_12_R1.PacketDataSerializer;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
+import ru.cristalix.core.internal.BukkitInternals;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
 
@@ -21,6 +27,7 @@ import java.util.stream.Collectors;
 public class PlacesMechanic {
 
 	private static final Map<String, Place> places = Maps.newHashMap();
+	private static final net.minecraft.server.v1_12_R1.ItemStack REWARD_CHEST = CraftItemStack.asNMSCopy(new ItemStack(Material.CHEST));
 
 	public static void init(App app) {
 		places.putAll(app.getMap().getLabels("place").stream()
@@ -46,13 +53,22 @@ public class PlacesMechanic {
 				continue;
 			val v3 = place.getPlace();
 			if (v3.distanceSquared(to) < place.getRadius() * place.getRadius()) {
-				user.giveExperience(place.getClaimedExp());
 				user.getClaimedPlaces().add(place.getTitle());
+				if (place.title.contains("WOW!")) {
+					// Выбор подарка, пока он только один, поэтому и награда такая
+					val buf = Unpooled.buffer();
+					new PacketDataSerializer(buf).writeItem(REWARD_CHEST);
+					BukkitInternals.internals().sendPluginMessage(user.getPlayer(), "opencase", buf);
+					user.setMoney(user.getMoney() + 100000);
+					break;
+				}
+				user.giveExperience(place.getClaimedExp());
 				MessageUtil.find("claim-place")
 						.set("title", place.getTitle())
 						.set("exp", place.getClaimedExp())
 						.send(user);
 				user.getPlayer().sendTitle("Найдено место!", "§b+" + place.getClaimedExp() + "EXP");
+				break;
 			}
 		}
 	}

@@ -174,7 +174,7 @@ Guis.register 'prefixes', {
             Бонус: §cотсутствует
             """
         } leftClick {
-            if (args.length < 1 || (user.prefix && user.prefix.contains('LS')))
+            if (user.prefix && user.prefix.contains('LS'))
                 return
             boolean flag = true
             for (def line in user.info.prefixes) {
