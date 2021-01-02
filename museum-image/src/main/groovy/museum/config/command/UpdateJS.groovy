@@ -1,8 +1,10 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.command
 
-
+import museum.App
+import museum.client_conversation.ScriptTransfer
 import museum.util.SendScriptUtil
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import ru.cristalix.core.display.messages.JavaScriptMessage
 
 registerCommand 'u' handle {
@@ -15,4 +17,20 @@ registerCommand 'u' handle {
     def file = new File("scripts/" + fileName + ".bundle.js")
     SendScriptUtil.sendScripts(player.uniqueId, new JavaScriptMessage(file.text))
     return "&bСкрипт объемом &f&l${file.bytes.size()}&b байт был отправлен. &f㲙"
+}
+
+registerCommand 'pm' handle {
+    if (player.op) {
+        if (args.length < 3)
+            return "&cИспользование: &e/pm [item/str/int/off] [Канал] [Сообщение]"
+        if (args[0] == 'item') {
+            new ScriptTransfer().item(CraftItemStack.asNMSCopy(player.inventory.itemInHand)).send(args[1], App.app.getUser(player))
+        } else if (args[0] == 'str') {
+            new ScriptTransfer().string(args.drop(2).join(' ')).send(args[1], App.app.getUser(player))
+        } else if (args[0] == 'int') {
+            new ScriptTransfer().integer(args.drop(2).join(' ') as Integer).send(args[1], App.app.getUser(player))
+        }
+        return "&bСообщение было отправлено. &f㜗"
+    }
+    return null
 }
