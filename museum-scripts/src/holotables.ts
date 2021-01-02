@@ -43,7 +43,6 @@ type TopEntry = {
     };
 
     class Top {
-
         // Размеры большого квадрата
         readonly offset: number;
 
@@ -155,7 +154,6 @@ type TopEntry = {
             });
         }
 
-
         render(partialTicks: number): void {
             pushMatrix();
 
@@ -172,7 +170,6 @@ type TopEntry = {
             // Относительный поворот
             rotate(this.yaw, 0, 1, 0);
             this.updateCulling();
-
 
             // GL11.glDepthFunc(GL11.GL_LESS);
 
@@ -248,13 +245,6 @@ type TopEntry = {
                             }),
                         ]
                     })]
-                    // Тот квадратик, тот что под головой - пустое место
-                    // rect({
-                    // 	color: color,
-                    // 	width: offset,
-                    // 	height: offset - (spacing + lineHeight) * 2,
-                    // 	y: lineHeight + spacing
-                    // })
                 }));
             }
 
@@ -335,36 +325,7 @@ type TopEntry = {
 
     }
 
-    // let testTop = new Top('test', {x: 0, y: 100, z: 0, yaw: 45});
-    let tops: Top[] = [
-        // testTop
-    ];
-    // testTop.updateData([
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // 	{key: 'test' + Math.random() * 10000, value: Math.random() * 1000000},
-    // ]);
+    let tops: Top[] = [];
 
     Events.on(plugin, 'game_tick_pre', () => {
         let dwheel = Mouse.getDWheel();
@@ -410,6 +371,4 @@ type TopEntry = {
             tops.push(new Top(key, data[key]));
         }
     });
-
-
 })(plugin);

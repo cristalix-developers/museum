@@ -8,18 +8,19 @@ import * as easing from '@cristalix/client-api/lib/easing';
 
     PluginMessages.on(plugin, 'museumcast', (bb: ByteBuf) => {
         message.text = UtilNetty.readString(bb, 65536);
-        startTime = System.currentTimeMillis()
+        startTime = System.currentTimeMillis(),
         show = true;
     });
 
     const message = gui.text({
-        align: {x: 0.035, y: 0.75},
-        scale: 1.3
+        align: {x: 0.5, y: 0.75},
+		origin: gui.CENTER,
+        scale: 1.3,
     });
 
     const menu = gui.rect({
         width: 370,
-        height: 75,
+        height: 0,
         align: {x: 0.5, y: 0},
         origin: {x: 0.5, y: 0.5},
         color: {a: 0.6, r: 0, g: 0, b: 0},

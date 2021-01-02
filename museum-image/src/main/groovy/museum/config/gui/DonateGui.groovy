@@ -40,32 +40,6 @@ Guis.register 'donate', { player ->
     } leftClick {
         performCommand("proccessdonate PREFIX_CASE")
     }
-/*
-    button 'D' icon {
-        item GOLDEN_APPLE
-        text """
-        §bЛокальный бустер денег §6§lx2
-        §b99 кристальков§f
-        
-        Бустер только для тебя на §b1 час§f,
-        получаете в два раза больше денег!
-        """
-    } leftClick {
-        performCommand("proccessdonate LOCAL_MONEY_BOOSTER")
-    }
-
-    button 'N' icon {
-        item EXP_BOTTLE
-        text """
-        §bЛокальный бустер опыта §6§lx2
-        §b99 кристаликов§f
-        
-        Бустер только для тебя на §b1 час§f,
-        получаете в два раза больше опыта!
-        """
-    } leftClick {
-        performCommand("proccessdonate LOCAL_EXP_BOOSTER")
-    }*/
 
     button 'J' icon {
         item BEACON

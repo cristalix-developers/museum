@@ -6,7 +6,7 @@ import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
 import lombok.val;
 import museum.App;
-import museum.client_conversation.ClientPacket;
+import museum.client_conversation.AnimationUtil;
 import museum.museum.Museum;
 import museum.player.User;
 import museum.util.LocationUtil;
@@ -70,12 +70,16 @@ public class PreparePlayerBrain implements Prepare {
 					if (user.getPrefix() != null && user.getPrefix().equals("㧥"))
 						dailyReward = dailyReward + 20000;
 
-					ClientPacket.sendTopTitle(user, "§aВаша ежедневная награда §6§l" + MessageUtil.toMoneyFormat(dailyReward) + "§f, §b§l15 опыта§f, §d20㦶");
+					AnimationUtil.topTitle(
+							user,
+							"§aВаша ежедневная награда §6§l%s§f, §b§l15 опыта§f, §d20㦶",
+							MessageUtil.toMoneyFormat(dailyReward)
+					);
 					user.setMoney(user.getMoney() + dailyReward);
 					user.giveExperience(15);
 					user.setCrystal(user.getCrystal() + 20);
 				} else {
-					ClientPacket.sendTopTitle(user, "С наступающим §bНовым Годом§f, приятной игры! 㗩");
+					AnimationUtil.topTitle(user, "Добро пожаловать в ваш §bМузей§f! 㗩");
 				}
 			});
 			return;

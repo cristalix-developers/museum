@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import museum.App;
-import museum.client_conversation.ClientPacket;
+import museum.client_conversation.ScriptTransfer;
 import museum.packages.TopPackage;
 import museum.player.User;
 import museum.ticker.Ticked;
@@ -30,7 +30,6 @@ public class TopManager implements Ticked, Listener {
 	private final Map<TopPackage.TopType, List<TopEntry<String, Object>>> tops = Maps.newConcurrentMap();
 
 	private String data;
-	private final ClientPacket updatePacket = new ClientPacket("top-update");
 
 	@Override
 	public void tick(int... args) {
@@ -46,7 +45,10 @@ public class TopManager implements Ticked, Listener {
 				continue;
 			if (time - user.getLastTopUpdateTime() > UPDATE_SECONDS * 1000) {
 				user.setLastTopUpdateTime(time);
-				B.postpone(10, () -> updatePacket.send(user, data));
+				B.postpone(10, () -> new ScriptTransfer()
+						.string(data)
+						.send("top-update", user)
+				);
 			}
 		}
 	}

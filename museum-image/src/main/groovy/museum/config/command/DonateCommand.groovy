@@ -4,13 +4,14 @@ package museum.config.command
 import clepto.ListUtils
 import clepto.bukkit.menu.Guis
 import museum.App
-import museum.client_conversation.ClientPacket
+import museum.client_conversation.AnimationUtil
 import museum.data.PickaxeType
 import museum.data.SubjectInfo
 import museum.donate.DonateType
 import museum.museum.Museum
 import museum.museum.subject.CollectorSubject
 import museum.packages.SaveUserPackage
+import museum.player.User
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
@@ -50,9 +51,9 @@ registerCommand 'prefixes' handle {
 }
 
 def prefixes = [
-        new Prefix('䂋', 'Любовь', 3, '§l10% §fполучить §b1 доп. опыт §fза блок'),
-        new Prefix('㧥', 'Бывший бомж', 3, '§fдополнительно §620`000\$ §eк ежедневной награде'),
-        new Prefix('㕐', '§bПопаду на луну', 3, '§eудвоенная §fцена продажи §d㦶'),
+        new Prefix('䂋', 'Любовь', 3, '§l40% §fполучить +§b1 опыт'),
+        new Prefix('㧥', 'Бывший бомж', 3, '§f+§620`000\$ §e ежедневной награды'),
+        new Prefix('㕐', '§bПопаду на луну', 3, '§ex2 §fцена продажи §d㦶'),
         new Prefix('㫐', 'Dead inside', 2),
         new Prefix('㕄', 'Радуга', 2),
         new Prefix('㗤', '§eЦирк', 2),
@@ -71,6 +72,10 @@ def prefixes = [
         new Prefix('㛳', 'АУ', 1),
         new Prefix('㗯', 'Люблю музыку', 1),
 ]
+
+def openCase(User opener) {
+
+}
 
 Guis.register 'prefixes', {
     if (!(context instanceof Player))
@@ -114,7 +119,7 @@ Guis.register 'prefixes', {
                 if (prefix.contains(randomPrefix.prefix)) {
                     flag = false
                     user.money = user.money + 50000
-                    ClientPacket.sendTopTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
+                    AnimationUtil.topTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
                     break
                 }
             }
@@ -122,7 +127,7 @@ Guis.register 'prefixes', {
             if (flag) {
                 user.info.prefixes.add(randomPrefix.prefix)
                 user.prefix = randomPrefix.prefix
-                ClientPacket.sendTopTitle user, "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
+                AnimationUtil.topTitle user, "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
             }
             user.prefixChestOpened = user.prefixChestOpened + 1
             closeInventory()
@@ -135,7 +140,7 @@ Guis.register 'prefixes', {
         button 'E' icon {
             item EMERALD
             text """[ ${prefix.prefix} §f] ${prefix.title} ${have ? '§aВЫБРАТЬ' : ''}
-        §7Можно получить только из 'Случайный префикс'
+        §7Выпадает из 'Случайный префикс'
 
         Редкость: §dэпический
         Бонус: ${prefix.bonus}
@@ -151,7 +156,7 @@ Guis.register 'prefixes', {
         button 'R' icon {
             item GOLD_INGOT
             text """[ ${prefix.prefix} §f] ${prefix.title} ${have ? '§aВЫБРАТЬ' : ''}
-        §7Можно получить только из 'Случайный префикс'
+        §7Выпадает из 'Случайный префикс'
 
         Редкость: §bредкий
         Бонус: §cотсутствует
@@ -225,7 +230,7 @@ registerCommand 'proccessdonate' handle {
                 if (prefix.contains(randomPrefix.prefix)) {
                     flag = false
                     user.money = user.money + 50000
-                    ClientPacket.sendTopTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
+                    AnimationUtil.topTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
                     break
                 }
             }
@@ -233,13 +238,13 @@ registerCommand 'proccessdonate' handle {
             if (flag) {
                 user.info.prefixes.add(randomPrefix.prefix)
                 user.prefix = randomPrefix.prefix
-                ClientPacket.sendTopTitle user, "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
+                AnimationUtil.topTitle user, "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
             }
             user.prefixChestOpened = user.prefixChestOpened + 1
         } else if (donate == DonateType.LEGENDARY_PICKAXE) {
             user.pickaxeType = PickaxeType.LEGENDARY
             user.donates.add(donate as DonateType)
-            ClientPacket.sendTopTitle user, "Вы купили §bлегендарную кирку§f! Спасибо за поддержку. 㶅"
+            AnimationUtil.topTitle user, "Вы купили §bлегендарную кирку§f! Спасибо за поддержку. 㶅"
         } else if (donate == DonateType.STEAM_PUNK_COLLECTOR) {
             def subject = new CollectorSubject(
                     Managers.subject.getPrototype('punk-collector'),
@@ -247,20 +252,14 @@ registerCommand 'proccessdonate' handle {
                     user
             )
             user.getSubjects().add(subject)
-            ClientPacket.sendTopTitle user, "Вы купили §6сборщик монет§f! Спасибо за поддержку. 㶅"
+            AnimationUtil.topTitle user, "Вы купили §6сборщик монет§f! Спасибо за поддержку. 㶅"
             if (user.state instanceof Museum) {
                 user.getInventory().addItem SubjectLogoUtil.encodeSubjectToItemStack(subject)
             } else {
                 user.sendMessage(Formatting.fine("Что бы получить его, перейдите в музей."))
             }
             user.donates.add(donate as DonateType)
-        } /*else if (donate == DonateType.LOCAL_MONEY_BOOSTER) {
-            user.addLocalBooster(BoosterType.COINS)
-            user.sendMessage(Formatting.fine("Вы купили §6локальный бустер денег§f! Спасибо за поддержку режима. 㶅"))
-        } else if (donate == DonateType.LOCAL_EXP_BOOSTER) {
-            user.addLocalBooster(BoosterType.EXP)
-            user.sendMessage(Formatting.fine("Вы купили §6локальный бустер опыта§f! Спасибо за поддержку режима. 㶅"))
-        }*/
+        }
         App.app.clientSocket.write(new SaveUserPackage(user.getUuid(), user.generateUserInfo()))
     })
     return

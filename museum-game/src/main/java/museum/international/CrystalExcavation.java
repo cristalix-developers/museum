@@ -6,6 +6,7 @@ import clepto.bukkit.item.Items;
 import clepto.cristalix.WorldMeta;
 import lombok.val;
 import museum.App;
+import museum.client_conversation.AnimationUtil;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
 import museum.util.MapLoader;
@@ -111,7 +112,7 @@ public class CrystalExcavation implements International {
 			if (canBeBroken(packet.a)) {
 				user.getInventory().addItem(crystal);
 				user.setCrystal(user.getCrystal() + 1);
-				BeforePacketHandler.DROP_CHANNEL.send(user, "§l+1 §d㦶");
+				AnimationUtil.cursorHighlight(user, "§l+1 §d㦶");
 			}
 		} else if (packet.c == PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK) {
 			if (!canBeBroken(packet.a)) {

@@ -2,6 +2,7 @@
 package museum.config.command
 
 import museum.App
+import museum.client_conversation.AnimationUtil
 import museum.player.prepare.BeforePacketHandler
 import museum.util.MessageUtil
 import org.bukkit.Bukkit
@@ -16,7 +17,7 @@ registerCommand 'congr' handle {
             MessageUtil.find 'lonely' send App.app.getUser(sender as CraftPlayer)
         else {
             MessageUtil.find 'congr-send' send App.app.getUser(sender as CraftPlayer)
-            BeforePacketHandler.DROP_CHANNEL.send(App.app.getUser(victim), sender.player.name + ' ' + (Math.random() > 0.5f ? '䂋' : '㜑'));
+            AnimationUtil.cursorHighlight(App.app.getUser(victim), sender.player.name + ' ' + (Math.random() > 0.5f ? '䂋' : '㜑'))
         }
     }
 }

@@ -33,7 +33,7 @@ import * as easing from '@cristalix/client-api/lib/easing';
         message.r.transit(
             0.2,
             3300,
-            easing.none
+            easing.inSin
         );
         menu.children.push(message);
     });
