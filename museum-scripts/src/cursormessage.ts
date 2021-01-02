@@ -27,13 +27,13 @@ import * as easing from '@cristalix/client-api/lib/easing';
             3400,
             easing.bothSin,
             () => {
-                menu.children.shift();
+                menu.children.splice(0,2);
             }
         );
         message.r.transit(
             0.2,
             3300,
-            easing.inSin
+            easing.inElastic
         );
         menu.children.push(message);
     });

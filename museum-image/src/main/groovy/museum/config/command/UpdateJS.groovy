@@ -5,7 +5,11 @@ import museum.App
 import museum.client_conversation.ScriptTransfer
 import museum.util.SendScriptUtil
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.inventory.ItemStack
 import ru.cristalix.core.display.messages.JavaScriptMessage
+
+import static org.bukkit.Material.BOW
+import static org.bukkit.Material.IRON_SWORD
 
 registerCommand 'u' handle {
     if (!sender.op) return
@@ -22,7 +26,7 @@ registerCommand 'u' handle {
 registerCommand 'pm' handle {
     if (player.op) {
         if (args.length < 3)
-            return "&cИспользование: &e/pm [item/str/int/off] [Канал] [Сообщение]"
+            return "&cИспользование: &e/pm [item/str/int] [Канал] [Сообщение]"
         if (args[0] == 'item') {
             new ScriptTransfer().item(CraftItemStack.asNMSCopy(player.inventory.itemInHand)).send(args[1], App.app.getUser(player))
         } else if (args[0] == 'str') {
@@ -33,4 +37,11 @@ registerCommand 'pm' handle {
         return "&bСообщение было отправлено. &f㜗"
     }
     return null
+}
+
+registerCommand 'end' handle {
+    new ScriptTransfer()
+            .item(CraftItemStack.asNMSCopy(new ItemStack(IRON_SWORD)))
+            .item(CraftItemStack.asNMSCopy(new ItemStack(BOW)))
+            .send('func:gameend', App.app.getUser(player))
 }

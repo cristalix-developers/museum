@@ -271,7 +271,7 @@ public class BeforePacketHandler implements Prepare {
 		val excavationLvl = excavation.getPrototype().getRequiredLevel();
 		val userLevel = user.getLevel();
 
-		if (Math.abs(userLevel - excavationLvl) < 70 || (userLevel > 210 && excavationLvl > 210)) {
+		if (Math.abs(userLevel - excavationLvl) < 70 || (userLevel > 210 && excavationLvl > 210) || (userLevel < 250 && excavationLvl > 149)) {
 			// Бонусы получения опыта
 			int extra = 0;
 			// Если у игрока есть префикс сердечко - шанс получить один опыт
