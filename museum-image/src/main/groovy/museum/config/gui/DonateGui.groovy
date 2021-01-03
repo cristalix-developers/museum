@@ -1,17 +1,14 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.gui
 
-
 import clepto.bukkit.menu.Guis
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
-import ru.cristalix.core.coupons.ICouponsService
 
 import static org.bukkit.Material.*
 
 static String modifyPrice(UUID user, int price) {
-    return (ICouponsService.get().haveActiveCoupon(user) ?
-            "§7§m$price§b ${ICouponsService.get().priceWithDiscountInt(user, price)}" : ("§b" + price)) + " кристаликов"
+    return "§b" + price + " кристаликов"
 }
 
 Guis.register 'donate', { player ->
