@@ -50,7 +50,7 @@ public class MultiTimeBar {
 		if (chance > 1) chance = 1;
 		if (chance < 0) chance = 0;
 		bar.setPercent(chance);
-		bar.setTitle(current.getTitle());
+		bar.setTitle(current.getTitle() );
 		bar.setColor(Color.values()[currentInt.get()]);
 		bar.update();
 	}
