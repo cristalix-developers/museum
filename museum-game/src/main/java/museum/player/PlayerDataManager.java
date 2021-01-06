@@ -101,7 +101,8 @@ public class PlayerDataManager implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		val player = (CraftPlayer) event.getPlayer();
 
-		player.setWalkSpeed(.33F);
+		player.setResourcePack("", "");
+		player.setWalkSpeed(.35F);
 
 		timeBar.onJoin(player.getUniqueId());
 		val user = userMap.get(player.getUniqueId());

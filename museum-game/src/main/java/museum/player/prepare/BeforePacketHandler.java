@@ -27,6 +27,7 @@ import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.player.pickaxe.PickaxeType;
 import museum.prototype.Managers;
+import museum.util.LevelSystem;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
 import net.minecraft.server.v1_12_R1.*;
@@ -266,12 +267,9 @@ public class BeforePacketHandler implements Prepare {
 			}
 		}
 		Excavation excavation = (Excavation) user.getState();
-		// Если разница в уровне раскопок и игрока различаются более чем на 70,
-		// опыт не выдавать, но если лвл больше 210 - выдавать только за >210 lvl раскопки
 		val excavationLvl = excavation.getPrototype().getRequiredLevel();
-		val userLevel = user.getLevel();
 
-		if (Math.abs(userLevel - excavationLvl) < 70 || (userLevel > 210 && excavationLvl > 210) || (userLevel < 400 && excavationLvl > 149)) {
+		if (LevelSystem.acceptGiveExp(user, excavationLvl)) {
 			// Бонусы получения опыта
 			int extra = 0;
 			// Если у игрока есть префикс сердечко - шанс получить один опыт

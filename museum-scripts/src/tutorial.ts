@@ -38,7 +38,7 @@ import * as gui from '@cristalix/client-api';
 		"§b§lH§f - §bответы §fна разные вопросы 㗒",
 		"§b§lG§f - §fменю префиксов 䁿",
 		"",
-		"§bПриятной игры в новом году! §f㶅"
+		"§bПод елкой подарочек! §f㶅"
 	]) {
 		title.children.push(gui.text({
 			text: entry,

@@ -1,6 +1,8 @@
 package museum.util;
 
 import lombok.experimental.UtilityClass;
+import lombok.val;
+import museum.player.User;
 
 @UtilityClass
 public class LevelSystem {
@@ -18,5 +20,10 @@ public class LevelSystem {
 	public String formatExperience(long experience) {
 		int level = getLevel(experience);
 		return String.format(LEVEL_FORMAT, level, experience, getRequiredExperience(level));
+	}
+
+	public static boolean acceptGiveExp(User user, int excavationLvl) {
+		val userLevel = user.getLevel();
+		return Math.abs(userLevel - excavationLvl) < 65 || (userLevel > 210 && excavationLvl > 210) || (userLevel < 400 && excavationLvl > 149);
 	}
 }

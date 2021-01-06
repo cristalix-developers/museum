@@ -71,7 +71,6 @@ public final class App extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		B.plugin = App.app = this;
-
 		B.events(new PhysicsDisabler());
 
 		// Добавление админ-команд
