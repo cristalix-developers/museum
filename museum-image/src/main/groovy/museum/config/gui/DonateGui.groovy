@@ -12,38 +12,31 @@ static String modifyPrice(UUID user, int price) {
 }
 
 Guis.register 'donate', { player ->
-    def user = (Player) context
+    def user = (Player) player
     title '§bВнутриигровые покупки'
     layout """
+        ----X----
         -X-M-Z-Y-
         ----J----
     """
-/*
-    button 'D' icon {
-        item GOLDEN_APPLE
-        text """
-        §bЛокальный бустер денег §6§lx2
-        §b99 кристальков§f
-        
-        Бустер только для тебя на §b1 час§f,
-        получаете в два раза больше денег!
-        """
-    } leftClick {
-        performCommand("proccessdonate LOCAL_MONEY_BOOSTER")
-    }
 
-    button 'N' icon {
-        item EXP_BOTTLE
+    button 'X' icon {
+        item END_CRYSTAL
         text """
-        §bЛокальный бустер опыта §6§lx2
-        §b99 кристаликов§f
+        §bСлучайный префикс
+         ${modifyPrice(user.uniqueId, 79)}
         
-        Бустер только для тебя на §b1 час§f,
-        получаете в два раза больше опыта!
+        §7Получите случайный префикс!
+        
+        Если такой префикс уже был?
+        - §eВы получите §6§l50`000\$
+
+        Каждое §dпятое §fоткрытие §dгарантирует
+        §6редкий §fили §dэпичный §fпрефикс
         """
     } leftClick {
-        performCommand("proccessdonate LOCAL_EXP_BOOSTER")
-    }*/
+        performCommand("proccessdonate PREFIX_CASE")
+    }
 
     button 'J' icon {
         item BEACON

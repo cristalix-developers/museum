@@ -1,7 +1,7 @@
 package museum.player.prepare;
 
 import museum.App;
-import museum.client_conversation.ClientPacket;
+import museum.client_conversation.ScriptTransfer;
 import museum.museum.map.SubjectPrototype;
 import museum.player.User;
 import museum.prototype.Managers;
@@ -15,7 +15,6 @@ public class PrepareShopBlocks implements Prepare {
 
 	public static final Prepare INSTANCE = new PrepareShopBlocks();
 
-	private final ClientPacket packet = new ClientPacket("shop");
 	private String dataForClients;
 
 	@Override
@@ -27,6 +26,6 @@ public class PrepareShopBlocks implements Prepare {
 							.toArray(SubjectPrototype.SubjectDataForClient[]::new)
 			);
 		}
-		packet.send(user, dataForClients);
+		new ScriptTransfer().string(dataForClients).send("shop", user);
 	}
 }

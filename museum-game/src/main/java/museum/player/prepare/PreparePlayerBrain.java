@@ -6,10 +6,11 @@ import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
 import lombok.val;
 import museum.App;
-import museum.client_conversation.ClientPacket;
+import museum.client_conversation.AnimationUtil;
 import museum.museum.Museum;
 import museum.player.User;
 import museum.util.LocationUtil;
+import museum.util.MessageUtil;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 
 import java.util.ArrayList;
@@ -63,12 +64,22 @@ public class PreparePlayerBrain implements Prepare {
 			B.postpone(15 * 20, () -> {
 				if ((now - user.getInfo().getLastTimeRewardClaim()) > REWARD_DELAY_HOURS * 3600) {
 					user.getInfo().setLastTimeRewardClaim(now);
-					ClientPacket.sendTopTitle(user, "§aВаша ежедневная награда §6§l10`000$§f, §b§l15 опыта§f, §d20㦶");
-					user.setMoney(user.getMoney() + 10000);
+
+					// Бонус к ежедневной награде
+					int dailyReward = 10000;
+					if (user.getPrefix() != null && user.getPrefix().equals("㧥"))
+						dailyReward = dailyReward + 20000;
+
+					AnimationUtil.topTitle(
+							user,
+							"§aВаша ежедневная награда §6§l%s§f, §b§l15 опыта§f, §d20㦶",
+							MessageUtil.toMoneyFormat(dailyReward)
+					);
+					user.setMoney(user.getMoney() + dailyReward);
 					user.giveExperience(15);
 					user.setCrystal(user.getCrystal() + 20);
 				} else {
-					ClientPacket.sendTopTitle(user, "С наступающим §bНовым Годом§f, приятной игры! 㗩");
+					AnimationUtil.topTitle(user, "Добро пожаловать в ваш §bМузей§f! 㗩");
 				}
 			});
 			return;

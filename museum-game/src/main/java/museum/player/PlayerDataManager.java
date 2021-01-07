@@ -67,6 +67,7 @@ public class PlayerDataManager implements Listener {
 				UserInfo userInfo = userInfoPackage.getUserInfo();
 				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid);
 				// Добавление дефолтных значений, которых не было в самом начале
+				if (userInfo.getPrefixes() == null) userInfo.setPrefixes(new ArrayList<>());
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 				userMap.put(uuid, new User(userInfo));
 			} catch (Exception ex) {
@@ -100,7 +101,8 @@ public class PlayerDataManager implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		val player = (CraftPlayer) event.getPlayer();
 
-		player.setWalkSpeed(.33F);
+		player.setResourcePack("", "");
+		player.setWalkSpeed(.35F);
 
 		timeBar.onJoin(player.getUniqueId());
 		val user = userMap.get(player.getUniqueId());

@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
-import museum.client_conversation.ClientPacket;
+import museum.client_conversation.ScriptTransfer;
 import museum.data.MuseumInfo;
 import museum.misc.Relic;
 import museum.museum.collector.CollectorNavigator;
@@ -142,12 +142,14 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				subject.getAllocation().perform(user, SPAWN_PIECES);
 				subject.getAllocation().perform(user, SPAWN_DISPLAYABLE);
 			}
-			new ClientPacket("museumsubjects").send(user, GlobalSerializers.toJson(user.getSubjects().stream()
-					.filter(Subject::isAllocated)
-					.map(Subject::getDataForClient)
-					.filter(Objects::nonNull)
-					.collect(Collectors.toList())
-			));
+
+			new ScriptTransfer()
+					.json(user.getSubjects().stream()
+							.filter(Subject::isAllocated)
+							.map(Subject::getDataForClient)
+							.filter(Objects::nonNull)
+							.collect(Collectors.toList())
+					).send("museumsubjects", user);
 		});
 	}
 

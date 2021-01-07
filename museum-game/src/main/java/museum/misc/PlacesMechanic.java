@@ -5,8 +5,12 @@ import lombok.Data;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
+import museum.client_conversation.ScriptTransfer;
 import museum.player.User;
 import museum.util.MessageUtil;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
 
@@ -21,6 +25,8 @@ import java.util.stream.Collectors;
 public class PlacesMechanic {
 
 	private static final Map<String, Place> places = Maps.newHashMap();
+	private static final ScriptTransfer CHEST_REWARD = new ScriptTransfer()
+			.item(CraftItemStack.asNMSCopy(new ItemStack(Material.CHEST)));
 
 	public static void init(App app) {
 		places.putAll(app.getMap().getLabels("place").stream()
@@ -46,13 +52,20 @@ public class PlacesMechanic {
 				continue;
 			val v3 = place.getPlace();
 			if (v3.distanceSquared(to) < place.getRadius() * place.getRadius()) {
-				user.giveExperience(place.getClaimedExp());
 				user.getClaimedPlaces().add(place.getTitle());
+				if (place.title.contains("WOW!")) {
+					// Выбор подарка, пока он только один, поэтому и награда такая
+					CHEST_REWARD.send("opencase", user);
+					user.setMoney(user.getMoney() + 100000);
+					break;
+				}
+				user.giveExperience(place.getClaimedExp());
 				MessageUtil.find("claim-place")
 						.set("title", place.getTitle())
 						.set("exp", place.getClaimedExp())
 						.send(user);
 				user.getPlayer().sendTitle("Найдено место!", "§b+" + place.getClaimedExp() + "EXP");
+				break;
 			}
 		}
 	}

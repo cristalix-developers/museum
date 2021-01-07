@@ -54,11 +54,11 @@ import * as gui from '@cristalix/client-api';
 	};
 
 	PluginMessages.on(plugin, 'shop', (bb: ByteBuf) => {
-		var data = UtilNetty.readString(bb, 65536);
+		let data = UtilNetty.readString(bb, 65536);
 		subjects = JSON.parse(data);
 	});
 
-	var activeSubject: Subject = null;
+	let activeSubject: Subject = null;
 
 	Events.on(plugin, 'game_loop', (event) => {
 		let pos = minecraft.getMouseOver().getBlockPos();
@@ -66,7 +66,7 @@ import * as gui from '@cristalix/client-api';
 		let y = pos.getY();
 		let z = pos.getZ();
 
-		var newActiveSubject: Subject = null;
+		let newActiveSubject: Subject = null;
 
 		for (let subject of subjects) {
 			let a = subject.min;

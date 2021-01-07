@@ -11,7 +11,7 @@ import lombok.val;
 import museum.App;
 import museum.PacketMetrics;
 import museum.boosters.BoosterType;
-import museum.client_conversation.ClientPacket;
+import museum.client_conversation.AnimationUtil;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.international.International;
@@ -27,6 +27,7 @@ import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.player.pickaxe.PickaxeType;
 import museum.prototype.Managers;
+import museum.util.LevelSystem;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
 import net.minecraft.server.v1_12_R1.*;
@@ -54,7 +55,6 @@ public class BeforePacketHandler implements Prepare {
 	public static final ItemStack EMERGENCY_STOP = Items.render("go-back-item").asBukkitMirror();
 	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
 	public static final BlockPosition DUMMY = new BlockPosition(0, 0, 0);
-	public static final ClientPacket DROP_CHANNEL = new ClientPacket("museumcursor");
 	private static final ItemStack[] INTERACT_ITEMS = Items.items.keySet().stream()
 			.filter(closure -> closure.contains("treasure"))
 			.map(closure -> Items.render(closure).asBukkitMirror())
@@ -250,22 +250,33 @@ public class BeforePacketHandler implements Prepare {
 		if (Vector.random.nextFloat() > .95)
 			user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 		// С некоторым шансом может выпасть реликвия
-		if (Vector.random.nextFloat() > .997) {
+		if (Vector.random.nextFloat() > .9987) {
 			val relics = ((Excavation) user.getState()).getPrototype().getRelics();
 			if (relics != null && relics.length > 0) {
 				val randomRelic = new Relic(
 						ListUtils.random(((Excavation) user.getState()).getPrototype().getRelics()).getPrototypeAddress()
 				);
+				val relicTitle = randomRelic.getRelic().getItemMeta().getDisplayName();
 				user.getPlayer().getInventory().addItem(randomRelic.getRelic());
 				user.getRelics().add(randomRelic);
+
+				AnimationUtil.throwIconMessage(user, randomRelic.getRelic(), relicTitle, "Находка!");
 				MessageUtil.find("relic-find")
-						.set("title", randomRelic.getRelic().getItemMeta().getDisplayName())
+						.set("title", relicTitle)
 						.send(user);
 			}
 		}
 		Excavation excavation = (Excavation) user.getState();
-		if (Math.abs(user.getLevel() - excavation.getPrototype().getRequiredLevel()) < 60 || excavation.getPrototype().getRequiredLevel() > 149) {
-			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience());
+		val excavationLvl = excavation.getPrototype().getRequiredLevel();
+
+		if (LevelSystem.acceptGiveExp(user, excavationLvl)) {
+			// Бонусы получения опыта
+			int extra = 0;
+			// Если у игрока есть префикс сердечко - шанс получить один опыт
+			if (user.getPrefix() != null && user.getPrefix().equals("䂋") && Math.random() < .10)
+				extra = 1;
+
+			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience() + extra);
 		}
 		// Перебрать все кирки и эффекты на них
 		for (PickaxeType pickaxeType : PickaxeType.values()) {
@@ -300,13 +311,15 @@ public class BeforePacketHandler implements Prepare {
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
 				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0) / 30;
-				DROP_CHANNEL.send(user, String.format("%s §6§l+%.2f$", fragment.getAddress(), prize * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)));
+				AnimationUtil.cursorHighlight(
+						user,
+						"%s §6§l+%.2f$",
+						fragment.getAddress(),
+						prize * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)
+				);
 				user.depositMoneyWithBooster(prize);
 			} else {
-				MessageUtil.find("findfragment")
-						.set("name", fragment.getAddress())
-						.send(user);
-				DROP_CHANNEL.send(user, "§lNEW! §b" + fragment.getAddress() + " §f㦶");
+				AnimationUtil.cursorHighlight(user, "§lNEW! §b" + fragment.getAddress() + " §f㦶");
 				skeleton.getUnlockedFragments().add(fragment);
 			}
 		}

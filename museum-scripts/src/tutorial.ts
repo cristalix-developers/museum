@@ -12,6 +12,8 @@ import * as gui from '@cristalix/client-api';
 			ChatExtensions.sendChatMessage("/gui excavation")
 		} else if (e.key === Keyboard.KEY_H) {
 			ChatExtensions.sendChatMessage("/helps")
+		} else if (e.key === Keyboard.KEY_G) {
+			ChatExtensions.sendChatMessage("/prefixes")
 		}
 	});
 
@@ -22,7 +24,7 @@ import * as gui from '@cristalix/client-api';
 
 	const background = gui.rect({
 		width: 195,
-		height: 80,
+		height: 90,
 		align: {x: 0, y: 0.39},
         color: {a: 0.6, r: 0, g: 0, b: 0},
     });
@@ -34,8 +36,9 @@ import * as gui from '@cristalix/client-api';
 		"§b§lM§f - §bкарта мира §f㸾",
 		"§b§lN§f - §bскрыть/показать §fэто окно 㱬",
 		"§b§lH§f - §bответы §fна разные вопросы 㗒",
+		"§b§lG§f - §fменю префиксов 䁿",
 		"",
-		"§bСчастливого Нового года! §f㶅"
+		"§bПод елкой подарочек! §f㶅"
 	]) {
 		title.children.push(gui.text({
 			text: entry,

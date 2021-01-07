@@ -315,8 +315,8 @@ public class MuseumCommands {
 				return NO_MONEY_MESSAGE;
 			user.setMoney(user.getMoney() - prototype.getPrice());
 		} else if ("right".equals(args[1])) {
-			val crystalPrice = CrystalUtil.convertMoney2Cristal(prototype.getPrice());
-			if (CrystalUtil.convertMoney2Cristal(prototype.getPrice()) <= user.getCrystal())
+			val crystalPrice = CrystalUtil.convertMoney2Crystal(prototype.getPrice());
+			if (CrystalUtil.convertMoney2Crystal(prototype.getPrice()) <= user.getCrystal())
 				user.setCrystal(user.getCrystal() - crystalPrice);
 			else
 				return NO_CRYSTAL_MESSAGE;

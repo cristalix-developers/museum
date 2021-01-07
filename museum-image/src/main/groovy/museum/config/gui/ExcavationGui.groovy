@@ -6,6 +6,7 @@ import museum.App
 import museum.museum.Museum
 import museum.prototype.Managers
 import museum.util.CrystalUtil
+import museum.util.LevelSystem
 import org.bukkit.entity.Player
 
 import java.text.DecimalFormat
@@ -31,9 +32,9 @@ Guis.register 'excavation', { player ->
             button 'O' icon {
                 apply Items.items['excavation-' + excavation.address]
                 text """
-                §e$excavation.title §6${moneyFormatter.format(excavation.price)} §7[ЛКМ] | §d${CrystalUtil.convertMoney2Cristal(excavation.price)} 㦶 §7[ПКМ]
+                §e$excavation.title §6${moneyFormatter.format(excavation.price)} §7[ЛКМ] | §d${CrystalUtil.convertMoney2Crystal(excavation.price)} 㦶 §7[ПКМ]
 
-                Минимальный уровень: §b$excavation.requiredLevel
+                Опыт археолога: ${LevelSystem.acceptGiveExp(user, excavation.requiredLevel) ? "§aесть" : "§cнет"}
                 Кол-во ударов: §e$excavation.hitCount
 
                 §7Можно найти:

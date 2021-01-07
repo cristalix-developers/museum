@@ -8,7 +8,7 @@ import lombok.experimental.Delegate;
 import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
-import museum.client_conversation.ClientPacket;
+import museum.client_conversation.AnimationUtil;
 import museum.data.*;
 import museum.misc.Relic;
 import museum.museum.Museum;
@@ -159,7 +159,7 @@ public class User implements PlayerWrapper {
 						user.getPlayer().sendMessage(message);
 			}
 			if (newLevel > 49) {
-				ClientPacket.sendTopTitle(this, "㿸 Вы достигли §b" + newLevel + " уровня§f, ваша награда §6§l1`000$§f");
+				AnimationUtil.topTitle(this, "㿸 Вы достигли §b%d уровня§f, ваша награда §6§l1`000$§f", newLevel);
 				setMoney(getMoney() + 1000);
 			} else {
 				MessageUtil.find("levelup")

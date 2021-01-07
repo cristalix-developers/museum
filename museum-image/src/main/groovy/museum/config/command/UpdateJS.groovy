@@ -2,9 +2,14 @@
 package museum.config.command
 
 import museum.App
-import museum.client_conversation.ClientPacket
+import museum.client_conversation.ScriptTransfer
 import museum.util.SendScriptUtil
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.inventory.ItemStack
 import ru.cristalix.core.display.messages.JavaScriptMessage
+
+import static org.bukkit.Material.BOW
+import static org.bukkit.Material.IRON_SWORD
 
 registerCommand 'u' handle {
     if (!sender.op) return
@@ -20,18 +25,23 @@ registerCommand 'u' handle {
 
 registerCommand 'pm' handle {
     if (player.op) {
-        if (args.length < 1)
-            return "&cИспользование: &e/pm [Канал (по умолчанию 'channel')] [Сообщение]"
-        def dataLength = 0
-        if (args.length == 1) {
-            dataLength = args[0].bytes.length
-            new ClientPacket('disable').send App.app.getUser(player), args[0]
-        } else if (args.length >= 2) {
-            def data = args.drop(1).join(' ')
-            dataLength = data.bytes.length
-            new ClientPacket(args[0]).send App.app.getUser(player), data
+        if (args.length < 3)
+            return "&cИспользование: &e/pm [item/str/int] [Канал] [Сообщение]"
+        if (args[0] == 'item') {
+            new ScriptTransfer().item(CraftItemStack.asNMSCopy(player.inventory.itemInHand)).send(args[1], App.app.getUser(player))
+        } else if (args[0] == 'str') {
+            new ScriptTransfer().string(args.drop(2).join(' ')).send(args[1], App.app.getUser(player))
+        } else if (args[0] == 'int') {
+            new ScriptTransfer().integer(args.drop(2).join(' ') as Integer).send(args[1], App.app.getUser(player))
         }
-        return "&bСообщение объемом &f&l$dataLength&b байт было отправлено. &f㜗"
+        return "&bСообщение было отправлено. &f㜗"
     }
     return null
+}
+
+registerCommand 'end' handle {
+    new ScriptTransfer()
+            .item(CraftItemStack.asNMSCopy(new ItemStack(IRON_SWORD)))
+            .item(CraftItemStack.asNMSCopy(new ItemStack(BOW)))
+            .send('func:gameend', App.app.getUser(player))
 }

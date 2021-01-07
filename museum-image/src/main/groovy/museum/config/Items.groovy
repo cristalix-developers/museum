@@ -30,7 +30,7 @@ register 'relic-totem', {
     nbt.price = 14
     nbt.relic = 'totem'
     nbt.museum = 'totem'
-    text """&aТотем Майя
+    text """&e⭐⭐⭐ &fТотем Майя
 
     &eДоход оценивается в 14\$
     
@@ -47,7 +47,7 @@ register 'relic-shap', {
     nbt.price = 12
     nbt.relic = 'shap'
     nbt.museum = 'shap'
-    text """&aМаска война Майя
+    text """&e⭐⭐ &fМаска война Майя
 
     &eДоход оценивается в 12\$
     
@@ -64,7 +64,7 @@ register 'relic-yantar', {
     nbt.price = 20
     nbt.relic = 'yantar'
     nbt.museum = 'yantar'
-    text """&aЯнтарь
+    text """&e⭐⭐⭐ &fЯнтарь
 
     &eДоход оценивается в 20\$
     
@@ -82,7 +82,7 @@ register 'relic-tooth', {
     nbt.price = 10
     nbt.relic = 'tooth'
     nbt.museum = 'tooth'
-    text """&aЗуб мегалодона
+    text """&e⭐⭐ &fЗуб мегалодона
 
     &eДоход оценивается в 10\$
         
@@ -99,7 +99,7 @@ register 'relic-anubis', {
     nbt.price = 12
     nbt.relic = 'anubis'
     nbt.museum = 'anubisstick'
-    text """&aОрудие Анубиса
+    text """&e⭐⭐ &fОрудие Анубиса
 
     &eДоход оценивается в 12\$
         
@@ -116,7 +116,7 @@ register 'relic-pot', {
     nbt.price = 7
     nbt.relic = 'pot'
     nbt.museum = 'pot'
-    text """&aДревний горшок
+    text """&e⭐ &fДревний горшок
 
     &eДоход оценивается в 7\$
         
@@ -133,7 +133,7 @@ register 'relic-shield', {
     nbt.price = 10
     nbt.relic = 'shield'
     nbt.museum = 'shieldofruin'
-    text """&aЩит война Древнего Египта
+    text """&e⭐⭐ &fЩит война Древнего Египта
 
     &eДоход оценивается в 10\$
         
