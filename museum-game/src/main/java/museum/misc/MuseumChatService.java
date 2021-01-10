@@ -1,4 +1,4 @@
-package museum.util;
+package museum.misc;
 
 import lombok.val;
 import museum.App;

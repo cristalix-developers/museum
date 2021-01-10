@@ -25,7 +25,7 @@ import museum.ticker.detail.FountainHandler;
 import museum.ticker.detail.WayParticleHandler;
 import museum.ticker.top.TopManager;
 import museum.util.MapLoader;
-import museum.util.MuseumChatService;
+import museum.misc.MuseumChatService;
 import museum.visitor.VisitorHandler;
 import museum.worker.WorkerUtil;
 import net.md_5.bungee.chat.ComponentSerializer;
