@@ -32,7 +32,6 @@ import net.minecraft.server.v1_12_R1.IBlockData;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.inventory.ItemStack;
-import ru.cristalix.core.GlobalSerializers;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 import ru.cristalix.core.util.UtilV3;
@@ -125,7 +124,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 			cachedInfo.views++;
 		} else {
 			for (Subject subject : user.getSubjects())
-				if (!subject.isAllocated())
+				if (!subject.isAllocated() && !subject.getPrototype().getType().equals(SubjectType.MARKER))
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 			for (Relic relic : user.getRelics())
 				inventory.addItem(relic.getRelic());

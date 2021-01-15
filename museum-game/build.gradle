@@ -2,7 +2,7 @@ apply plugin: 'groovy'
 
 dependencies {
     compileOnly 'bottle:bottle-libs:1.0'
-    compileOnly 'cristalix:dark-paper:20.11.11'
+    compileOnly 'cristalix:dark-paper:21.01.12'
     compileOnly 'org.codehaus.groovy:groovy:3.0.5-aug'
     compileOnly 'cristalix:bukkit-core:20.11.11'
     implementation project(':museum-commons')

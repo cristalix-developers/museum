@@ -73,6 +73,11 @@ public class FountainSubject extends Subject {
 	public void throwWater() {
 		if (!(owner.getState() instanceof Museum) || getAllocation() == null || entity == null)
 			return;
+
+		// Если хозяин не в своем музее, то не запускать воду
+		if (!((Museum) owner.getState()).getOwner().equals(owner))
+			return;
+
 		entity.id = entity.id < UPPER_ID_BOUND ? ++entity.id : NEG_ID_BOUND;
 		entity.ticksLived = 1;
 
@@ -87,8 +92,8 @@ public class FountainSubject extends Subject {
 			if (visitor.getPlayer() == null)
 				continue;
 			// Если игрок далеко
-			/*if (entity.origin == null || visitor.getLocation().distanceSquared(spawnLocation) > 325)
-				continue;*/
+			if (visitor.getLocation().distanceSquared(spawnLocation) > 500)
+				continue;
 
 			visitor.sendPacket(spawn);
 			visitor.sendPacket(metadata);

@@ -249,15 +249,18 @@ public class MuseumCommands {
 		if (!((Museum) user.getState()).getOwner().equals(user))
 			return MessageUtil.get("root-refuse");
 		new VirtualSign().openSign(sender, lines -> {
-			for (String line : lines) {
-				if (line != null && !line.isEmpty()) {
-					if (user.getState() instanceof Museum) {
-						((Museum) user.getState()).setTitle(line);
-						MessageUtil.find("museumtitlechange")
-								.set("title", line)
-								.send(user);
-					}
+			if (user.getState() instanceof Museum) {
+				val stringBuilder = new StringBuilder();
+				for (String line : lines) {
+					if (line != null && !line.isEmpty())
+						stringBuilder.append(line);
+					else
+						break;
 				}
+				((Museum) user.getState()).setTitle(stringBuilder.toString());
+				MessageUtil.find("museumtitlechange")
+						.set("title", stringBuilder.toString())
+						.send(user);
 			}
 		});
 		return null;

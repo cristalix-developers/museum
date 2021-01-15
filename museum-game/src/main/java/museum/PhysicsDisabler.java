@@ -9,12 +9,26 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 
 public class PhysicsDisabler implements Listener {
+
+/*	@EventHandler
+	public void disable(ChunkLoadEvent event) {
+		val chunk = event.chunk;
+		chunk.setBiome(EmptyChunkBiome.INSTANCE);
+		chunk.setSkyLight(EmptySkyLight.INSTANCE);
+		chunk.setEmittedLight(new FixedChunkLight((byte)-1));
+	}*/
+
+	@EventHandler
+	public void disable(CraftItemEvent event) {
+		event.setCancelled(true);
+	}
 
 	@EventHandler
 	public void disable(PlayerInteractEntityEvent event) {
@@ -29,8 +43,8 @@ public class PhysicsDisabler implements Listener {
 
 	@EventHandler
 	public void disable(EntityDismountEvent event) {
-		if (event.dismounted.getType() == EntityType.BAT)
-			B.postpone(1, () -> event.dismounted.remove());
+		if (event.getDismounted().getType() == EntityType.BAT)
+			B.postpone(1, () -> event.getDismounted().remove());
 	}
 
 	@EventHandler

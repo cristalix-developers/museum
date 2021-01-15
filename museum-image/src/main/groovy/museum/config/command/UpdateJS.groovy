@@ -5,11 +5,7 @@ import museum.App
 import museum.client_conversation.ScriptTransfer
 import museum.util.SendScriptUtil
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
-import org.bukkit.inventory.ItemStack
 import ru.cristalix.core.display.messages.JavaScriptMessage
-
-import static org.bukkit.Material.BOW
-import static org.bukkit.Material.IRON_SWORD
 
 registerCommand 'u' handle {
     if (!sender.op) return
@@ -39,9 +35,10 @@ registerCommand 'pm' handle {
     return null
 }
 
+/*
 registerCommand 'end' handle {
     new ScriptTransfer()
             .item(CraftItemStack.asNMSCopy(new ItemStack(IRON_SWORD)))
             .item(CraftItemStack.asNMSCopy(new ItemStack(BOW)))
-            .send('func:gameend', App.app.getUser(player))
-}
+            .send('csc:tab-create', App.app.getUser(player))
+}*/
