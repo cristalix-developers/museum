@@ -45,7 +45,8 @@ Guis.register 'donate', { player ->
         ${modifyPrice(user.uniqueId, 149)}
         
         Общий бустер на §b1 час§f,
-        в ТРИ раза больше посетителей!
+        в §lТРИ§f раза больше посетителей
+        и §e§lмонет§f!
         """
     } leftClick {
         performCommand("proccessdonate GLOBAL_VILLAGER_BOOSTER")

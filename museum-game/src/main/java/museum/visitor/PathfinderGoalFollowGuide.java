@@ -2,6 +2,7 @@ package museum.visitor;
 
 import lombok.val;
 import museum.App;
+import museum.boosters.BoosterType;
 import museum.museum.Coin;
 import museum.museum.Museum;
 import museum.player.User;
@@ -87,7 +88,7 @@ public class PathfinderGoalFollowGuide extends PathfinderGoal {
 					val museum = ((Museum) user.getState());
 					if (!museum.getOwner().equals(user))
 						continue;
-					if (museum.getCoins().size() > Coin.MAX_COIN_AMOUNT)
+					if (museum.getCoins().size() > Coin.MAX_COIN_AMOUNT * App.getApp().getPlayerDataManager().calcGlobalMultiplier(BoosterType.VILLAGER))
 						continue;
 					coin.create(user.getConnection());
 					museum.getCoins().add(coin);
