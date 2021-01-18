@@ -19,13 +19,16 @@ registerCommand 'sell' handle {
     if (item && item.itemMeta) {
         def user = App.app.getUser player
         def subject = SubjectLogoUtil.decodeItemStackToSubject(user, user.getInventory().getItemInHand())
-        if (subject) {
+        if (subject && !subject.allocated) {
             user.getInventory().setItemInHand(null)
             user.subjects.remove(subject)
             user.money = user.money + subject.prototype.price * 0.6
             return MessageUtil.find('stand-sell')
                     .set('price', subject.prototype.price * 0.6)
                     .getText()
+        } else if (subject.allocated) {
+            user.getInventory().setItemInHand(null)
+            return null
         }
         def nmsItem = CraftItemStack.asNMSCopy item
         if (nmsItem.tag && nmsItem.tag.hasKeyOfType("relic", 8)) {
