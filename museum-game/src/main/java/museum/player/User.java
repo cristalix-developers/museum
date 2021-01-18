@@ -38,6 +38,7 @@ import ru.cristalix.core.util.UtilV3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Data
@@ -214,7 +215,7 @@ public class User implements PlayerWrapper {
 			if (museum.getPrototype().getBox().contains(lastLocation))
 				return museum;
 		}
-		return null;
+		return museums.get(Managers.museum.getPrototype("main"));
 	}
 
 	public void updateIncome() {

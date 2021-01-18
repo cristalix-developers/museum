@@ -119,10 +119,7 @@ public class BeforePacketHandler implements Prepare {
 				acceptMuseumClick(user, packet);
 			else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP)) {
 				if (user.getState() instanceof International) {
-					B.postpone(10, () -> user.setState(user.getLastMuseum() == null ?
-							user.getMuseums().get(Managers.museum.getPrototype("main")) :
-							user.getLastMuseum()
-					));
+					B.postpone(10, () -> user.setState(user.getLastMuseum()));
 				} else {
 					tryReturnPlayer(user, true);
 				}
@@ -230,6 +227,7 @@ public class BeforePacketHandler implements Prepare {
 			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 5 сек.");
 			MessageUtil.find("excavationend").send(user);
 			B.postpone(100, () -> {
+
 				user.setState(user.getLastMuseum() == null ?
 						user.getMuseums().get(Managers.museum.getPrototype("main")) :
 						user.getLastMuseum()

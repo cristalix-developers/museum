@@ -26,7 +26,7 @@ registerCommand 'sell' handle {
             return MessageUtil.find('stand-sell')
                     .set('price', subject.prototype.price * 0.6)
                     .getText()
-        } else if (subject.allocated) {
+        } else if (subject && subject.allocated) {
             user.getInventory().setItemInHand(null)
             return null
         }

@@ -80,7 +80,8 @@ public class CollectorSubject extends Subject implements Incomeble {
 	public void handle(double... args) {
 		if (args[0] % (60 * 20L) != 0)
 			return;
-		val income = .7 * Math.random() * owner.getLastMuseum().getIncome() + owner.getLastMuseum().getIncome();
+		val museumIncome = owner.getLastMuseum().getIncome();
+		val income = .7 * Math.random() * museumIncome + museumIncome;
 		MessageUtil.find("collector-income")
 				.set("income", MessageUtil.toMoneyFormat(income))
 				.send(owner);

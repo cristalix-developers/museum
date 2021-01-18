@@ -181,10 +181,8 @@ public class MuseumCommands {
 			return null;
 		if (user.getState() instanceof Museum && ((Museum) user.getState()).getOwner().equals(user))
 			return MessageUtil.get("already-at-home");
-		user.setState(user.getLastMuseum() == null ?
-				user.getMuseums().get(Managers.museum.getPrototype("main")) :
-				user.getLastMuseum()
-		);
+
+		user.setState(user.getLastMuseum());
 		return MessageUtil.get("welcome-home");
 	}
 
