@@ -254,11 +254,11 @@ public class BeforePacketHandler implements Prepare {
 				val randomRelic = new Relic(
 						ListUtils.random(((Excavation) user.getState()).getPrototype().getRelics()).getPrototypeAddress()
 				);
-				val relicTitle = randomRelic.getRelic().getItemMeta().getDisplayName();
-				user.getPlayer().getInventory().addItem(randomRelic.getRelic());
-				user.getRelics().add(randomRelic);
+				randomRelic.give(user);
+				val item = randomRelic.getRelic();
+				val relicTitle = item.getItemMeta().getDisplayName();
 
-				AnimationUtil.throwIconMessage(user, randomRelic.getRelic(), relicTitle, "Находка!");
+				AnimationUtil.throwIconMessage(user, item, relicTitle, "Находка!");
 				MessageUtil.find("relic-find")
 						.set("title", relicTitle)
 						.send(user);

@@ -123,7 +123,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 			inventory.setItem(8, backItem);
 			cachedInfo.views++;
 		} else {
-			for (Subject subject : user.getSubjects())
+			for (Subject subject : owner.getSubjects())
 				if (!subject.isAllocated() && !subject.getPrototype().getType().equals(SubjectType.MARKER))
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 			for (Relic relic : user.getRelics())
@@ -135,11 +135,9 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 		WorkerUtil.reload(user);
 
-		B.postpone(20, () -> {
-			for (Subject subject : this.getSubjects()) {
-				subject.getAllocation().perform(user, UPDATE_BLOCKS);
-				subject.getAllocation().perform(user, SPAWN_PIECES);
-				subject.getAllocation().perform(user, SPAWN_DISPLAYABLE);
+		B.postpone(50, () -> {
+			for (Subject subject : getSubjects()) {
+				subject.getAllocation().perform(user, UPDATE_BLOCKS, SPAWN_PIECES, SPAWN_DISPLAYABLE);
 			}
 
 			new ScriptTransfer()

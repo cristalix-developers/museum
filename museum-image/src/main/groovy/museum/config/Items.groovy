@@ -30,6 +30,7 @@ register 'relic-totem', {
     nbt.price = 14
     nbt.relic = 'totem'
     nbt.museum = 'totem'
+    nbt.glow_color = 0x50008000
     text """&e⭐⭐⭐ &fТотем Майя
 
     &eДоход оценивается в 14\$
@@ -44,12 +45,13 @@ register 'relic-totem', {
 
 register 'relic-shap', {
     item CLAY_BALL
-    nbt.price = 12
+    nbt.price = 8
     nbt.relic = 'shap'
     nbt.museum = 'shap'
-    text """&e⭐⭐ &fМаска война Майя
+    nbt.glow_color = 0x50808080
+    text """&e⭐ &fМаска война Майя
 
-    &eДоход оценивается в 12\$
+    &eДоход оценивается в 8\$
     
     Можно продать перекупщику 
 
@@ -64,6 +66,7 @@ register 'relic-yantar', {
     nbt.price = 20
     nbt.relic = 'yantar'
     nbt.museum = 'yantar'
+    nbt.glow_color = 0x50000080
     text """&e⭐⭐⭐ &fЯнтарь
 
     &eДоход оценивается в 20\$
@@ -79,12 +82,13 @@ register 'relic-yantar', {
 
 register 'relic-tooth', {
     item CLAY_BALL
-    nbt.price = 10
+    nbt.price = 9
     nbt.relic = 'tooth'
     nbt.museum = 'tooth'
-    text """&e⭐⭐ &fЗуб мегалодона
+    nbt.glow_color = 0x50808080
+    text """&e⭐ &fЗуб мегалодона
 
-    &eДоход оценивается в 10\$
+    &eДоход оценивается в 9\$
         
     Можно продать перекупщику 
 
@@ -99,6 +103,7 @@ register 'relic-anubis', {
     nbt.price = 12
     nbt.relic = 'anubis'
     nbt.museum = 'anubisstick'
+    nbt.glow_color = 0x50008000
     text """&e⭐⭐ &fОрудие Анубиса
 
     &eДоход оценивается в 12\$
@@ -116,6 +121,7 @@ register 'relic-pot', {
     nbt.price = 7
     nbt.relic = 'pot'
     nbt.museum = 'pot'
+    nbt.glow_color = 0x50808080
     text """&e⭐ &fДревний горшок
 
     &eДоход оценивается в 7\$
@@ -133,6 +139,7 @@ register 'relic-shield', {
     nbt.price = 10
     nbt.relic = 'shield'
     nbt.museum = 'shieldofruin'
+    nbt.glow_color = 0x50008000
     text """&e⭐⭐ &fЩит война Древнего Египта
 
     &eДоход оценивается в 10\$
