@@ -41,11 +41,9 @@ public class PacketMetrics {
 					}
 				})
 				.addAfter("splitter", "metric-decoder", new ByteToMessageDecoder() {
-
 					@Override
 					protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
 						in.markReaderIndex();
-
 						val id = readVarInt(in);
 						in.resetReaderIndex();
 						val state = channel.attr(NetworkManager.c).get();
