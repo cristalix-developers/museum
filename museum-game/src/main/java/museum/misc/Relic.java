@@ -3,6 +3,7 @@ package museum.misc;
 import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.val;
+import museum.player.User;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
@@ -25,5 +26,10 @@ public class Relic {
 		item.tag.setString("relic-uuid", uuid.toString());
 		this.relic = item.asBukkitMirror();
 		this.price = item.tag.getInt("price");
+	}
+
+	public void give(User user) {
+		user.getPlayer().getInventory().addItem(relic);
+		user.getRelics().add(this);
 	}
 }

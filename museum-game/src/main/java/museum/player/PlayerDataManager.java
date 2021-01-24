@@ -109,9 +109,9 @@ public class PlayerDataManager implements Listener {
 
 		user.setConnection(player.getHandle().playerConnection);
 		user.setPlayer(player);
+		user.setState(user.getState()); // Загрузка музея
 
 		player.setGameMode(GameMode.ADVENTURE);
-		user.setState(user.getState()); // Загрузка музея
 		player.setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, false);
 
 		B.postpone(1, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
@@ -127,9 +127,11 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerQuit(PlayerQuitEvent event) {
+		// Удаление игрока из таба других игроков
 		val removePlayer = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, ((CraftPlayer) event.getPlayer()).getHandle());
 		for (Player player : Bukkit.getOnlinePlayers())
 			((CraftPlayer) player).getHandle().playerConnection.sendPacket(removePlayer);
+
 		timeBar.onQuit(event.getPlayer().getUniqueId());
 		event.setQuitMessage(null);
 	}

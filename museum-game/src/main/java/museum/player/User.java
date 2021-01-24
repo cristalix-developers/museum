@@ -210,11 +210,10 @@ public class User implements PlayerWrapper {
 	}
 
 	public Museum getLastMuseum() {
-		for (Museum museum : museums) {
+		for (Museum museum : museums)
 			if (museum.getPrototype().getBox().contains(lastLocation))
 				return museum;
-		}
-		return null;
+		return museums.get(Managers.museum.getPrototype("main"));
 	}
 
 	public void updateIncome() {

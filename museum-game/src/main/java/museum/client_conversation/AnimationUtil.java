@@ -9,10 +9,9 @@ import org.bukkit.inventory.ItemStack;
  * @project museum
  */
 public class AnimationUtil {
+
 	public static void topTitle(User user, String text) {
-		new ScriptTransfer()
-				.string(text)
-				.send("museumcast", user);
+		generateMessage(text, "museumcast", user);
 	}
 
 	public static void topTitle(User user, String text, Object... pasteholders) {
@@ -20,9 +19,7 @@ public class AnimationUtil {
 	}
 
 	public static void cursorHighlight(User user, String text) {
-		new ScriptTransfer()
-				.string(text)
-				.send("museumcursor", user);
+		generateMessage(text, "museumcursor", user);
 	}
 
 	public static void cursorHighlight(User user, String text, Object... pasteholders) {
@@ -35,5 +32,11 @@ public class AnimationUtil {
 				.string(text)
 				.string(subtitle)
 				.send("itemtitle", user);
+	}
+
+	public static void generateMessage(String message, String channel, User user) {
+		new ScriptTransfer()
+				.string(message)
+				.send(channel, user);
 	}
 }

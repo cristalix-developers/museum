@@ -25,8 +25,8 @@ import * as easing from '@cristalix/client-api/lib/easing';
         Draw.displayItemActivation(item);
         title.text = UtilNetty.readString(bb, 65535);
         subtitle.text = UtilNetty.readString(bb, 65535);
-        title.scale.transit(4, 2700, easing.outElastic, () => {
-            title.scale.transit(4, 2700, easing.none, () => {
+        title.scale.transit(3, 3000, easing.outElastic, () => {
+            title.scale.transit(3, 3000, easing.none, () => {
                 title.scale.transit(0, 250, easing.none);
                 subtitle.scale.transit(0, 250, easing.none);
             })

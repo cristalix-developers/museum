@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.UUID;
 
 public class MuseumCommands {
@@ -88,22 +89,19 @@ public class MuseumCommands {
 		if (prototype == null)
 			return null;
 		val user = app.getUser(sender);
-		// Если в инвентаре нету места
+		// Если в инвентаре нет места
 		long count = 0L;
-		for (Subject subject : user.getSubjects()) {
-			if (!subject.isAllocated() && subject.getPrototype().getType() != SubjectType.MARKER) {
+		for (Subject subject : user.getSubjects())
+			if (!subject.isAllocated() && subject.getPrototype().getType() != SubjectType.MARKER)
 				count++;
-			}
-		}
-		if (count > 32) {
+		if (count > 32)
 			return MessageUtil.get("no-free-space");
-		}
 
 		if (user.getMoney() < prototype.getPrice())
 			return NO_MONEY_MESSAGE;
 
 		user.setMoney(user.getMoney() - prototype.getPrice());
-		// new Subject() писать нельзя - так как нужный класс (CollectorSubject...) не уточнет, и все сломается
+		// new Subject() писать нельзя - так как нужный класс (CollectorSubject...) не уточнет, и все ломается
 		user.getSubjects().add(prototype.provide(new SubjectInfo(
 				UUID.randomUUID(),
 				prototype.getAddress()
@@ -134,16 +132,14 @@ public class MuseumCommands {
 		if (museum == null)
 			return MessageUtil.get("museum-not-found");
 
-		if (user.getLastMuseum() != null)
-			if (user.getLastMuseum().equals(museum))
-				return MessageUtil.get("already-at-home");
+		if (Objects.equals(user.getLastMuseum(), museum))
+			return MessageUtil.get("already-at-home");
 
 		user.setState(museum);
 
 		MessageUtil.find("museum-teleported")
 				.set("visitor", user.getName())
 				.send(ownerUser);
-
 		return null;
 	}
 
@@ -177,14 +173,13 @@ public class MuseumCommands {
 
 	private String cmdHome(Player sender, String[] args) {
 		val user = this.app.getUser(sender);
-		if (user.getState() == null)
+		// Не возвращать в музей если игрок возвращается с раскопок
+		if (user.getState() == null || (user.getState() instanceof Excavation && ((Excavation) user.getState()).getHitsLeft() < 0))
 			return null;
 		if (user.getState() instanceof Museum && ((Museum) user.getState()).getOwner().equals(user))
 			return MessageUtil.get("already-at-home");
-		user.setState(user.getLastMuseum() == null ?
-				user.getMuseums().get(Managers.museum.getPrototype("main")) :
-				user.getLastMuseum()
-		);
+
+		user.setState(user.getLastMuseum());
 		return MessageUtil.get("welcome-home");
 	}
 
@@ -249,15 +244,18 @@ public class MuseumCommands {
 		if (!((Museum) user.getState()).getOwner().equals(user))
 			return MessageUtil.get("root-refuse");
 		new VirtualSign().openSign(sender, lines -> {
-			for (String line : lines) {
-				if (line != null && !line.isEmpty()) {
-					if (user.getState() instanceof Museum) {
-						((Museum) user.getState()).setTitle(line);
-						MessageUtil.find("museumtitlechange")
-								.set("title", line)
-								.send(user);
-					}
+			if (user.getState() instanceof Museum) {
+				val stringBuilder = new StringBuilder();
+				for (String line : lines) {
+					if (line != null && !line.isEmpty())
+						stringBuilder.append(line);
+					else
+						break;
 				}
+				((Museum) user.getState()).setTitle(stringBuilder.toString());
+				MessageUtil.find("museumtitlechange")
+						.set("title", stringBuilder.toString())
+						.send(user);
 			}
 		});
 		return null;
@@ -300,11 +298,8 @@ public class MuseumCommands {
 		} catch (Exception ignore) {
 			return null;
 		}
-		if (prototype == null)
-			return null;
-		if (user.getLevel() < PreparePlayerBrain.EXPERIENCE)
-			return null;
-		if (user.getLevel() < prototype.getRequiredLevel())
+		val level = user.getLevel();
+		if (prototype == null || level < PreparePlayerBrain.EXPERIENCE || level < prototype.getRequiredLevel())
 			return null;
 
 		if (user.getGrabbedArmorstand() != null)

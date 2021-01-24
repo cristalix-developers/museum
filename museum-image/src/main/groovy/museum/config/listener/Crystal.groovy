@@ -1,18 +1,19 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.listener
 
-
 import museum.App
 import museum.player.prepare.PreparePlayerBrain
 import museum.util.MessageUtil
 import org.bukkit.Material
 import org.bukkit.event.player.PlayerFishEvent
 
+import static museum.boosters.BoosterType.EXP
+
 on PlayerFishEvent, {
     if (state == PlayerFishEvent.State.CAUGHT_FISH) {
         expToDrop = 0
         def user = App.app.getUser(player)
-        def exp = (int) Math.ceil(Math.random() * 3 + 3)
+        def exp = (int) (Math.ceil(Math.random() * 3 + 3) * App.app.playerDataManager.calcGlobalMultiplier(EXP))
         user.giveExperience(exp)
         MessageUtil.find('fishing').set('exp', exp).send(user)
         return
