@@ -34,7 +34,7 @@ public class AnimationUtil {
 				.send("itemtitle", user);
 	}
 
-	private static void generateMessage(String message, String channel, User user) {
+	public static void generateMessage(String message, String channel, User user) {
 		new ScriptTransfer()
 				.string(message)
 				.send(channel, user);

@@ -59,5 +59,4 @@ public class DefaultElements {
 
 		return userInfo;
 	}
-
 }
