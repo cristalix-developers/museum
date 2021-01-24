@@ -51,5 +51,5 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 		return 0;
 	}
 
-	public void acceptClick(PacketPlay) {}
+	public void acceptClick() {}
 }
