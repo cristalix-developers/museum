@@ -17,7 +17,7 @@ task compileScripts(type: NpxTask) {
 
     dependsOn downloadScripts
 
-    command = 'cristalix-bundler'
+    command = '@cristalix/cristalix-bundler'
     args = ['src']
 
     inputs.dir(file('src'))
