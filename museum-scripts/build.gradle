@@ -13,8 +13,13 @@ task downloadScripts(type: Download) {
     dest scriptFile
 }
 
+task npmInit(type: NpmTask) {
+    args = ['i']
+}
+
 task compileScripts(type: NpxTask) {
 
+    dependsOn npmInit
     dependsOn downloadScripts
 
     command = '@cristalix/bundler'
