@@ -42,7 +42,7 @@ jobs:
       with:
         name: museum-game.jar
         path: museum-game/build/libs/museum-game.jar
-        
+
     - uses: actions/upload-artifact@v2
       with:
         name: museum-service.jar

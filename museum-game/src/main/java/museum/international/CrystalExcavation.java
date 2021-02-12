@@ -36,7 +36,6 @@ public class CrystalExcavation implements International {
 	private WorldMeta worldMeta;
 	private WorldMeta tempWorld;
 	private List<Location> spawnPoints;
-	private final ItemStack crystal = Items.render("crystal").asBukkitMirror();
 	private final ItemStack hook = Items.render("hook").asBukkitMirror();
 
 	public CrystalExcavation() {
@@ -110,7 +109,6 @@ public class CrystalExcavation implements International {
 		// Не выносить canBeBroken(packet.a)) | Операция тяжелее
 		if (packet.c == PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK) {
 			if (canBeBroken(packet.a)) {
-				user.getInventory().addItem(crystal);
 				user.setCrystal(user.getCrystal() + 1);
 				AnimationUtil.cursorHighlight(user, "§l+1 §d㦶");
 			}
