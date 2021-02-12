@@ -36,8 +36,7 @@ public class CrystalExcavation implements International {
 	private WorldMeta worldMeta;
 	private WorldMeta tempWorld;
 	private List<Location> spawnPoints;
-	Material type;
-	private final ItemStack hook = new ItemStack(Material.FISHING_ROD);
+	private final ItemStack hook = Items.render("hook").asBukkitMirror();
 
 	public CrystalExcavation() {
 		load();
