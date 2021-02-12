@@ -20,8 +20,9 @@ Guis.register 'excavation', { player ->
 
     title 'Раскопки'
     layout """
-        IIIOIOIII
-        IOOOPOOOI
+        IIIIIIIII
+        OOOOPOOOO
+        IIIIIIIII
         IIJIIIHII
         IIIIXIIII
     """
@@ -90,7 +91,13 @@ Guis.register 'excavation', { player ->
     button 'P' icon {
         item CLAY_BALL
         nbt.museum = 'crystal_pink'
-        text '§bКристальная экспедиция'
+        text """§bКристальная экспедиция
+        
+        &cБудет закрыта &fнавсегда &c15 
+        &cфевраля &fв 00:00 по МСК.
+        Все кристаллы автоматически 
+        продадуться по курсу &d㦶 -> &8\$
+        """
     } leftClick {
         performCommand("crystal")
     }

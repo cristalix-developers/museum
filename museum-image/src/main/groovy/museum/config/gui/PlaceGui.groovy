@@ -80,7 +80,7 @@ Guis.register 'place-gui', {
                 button 'O' icon {
                     item CLAY_BALL
                     nbt.other = 'access'
-                    text """§b${place.title}
+                    text """§b${place.claimedMoney < 1 ? place.title : "Подарок"}
             
                 Вы получили §6${place.claimedExp} EXP
                 """
