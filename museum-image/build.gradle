@@ -3,7 +3,6 @@ apply plugin: 'groovy'
 dependencies {
     compileOnly project(':museum-game')
     compileOnly 'cristalix:dark-paper:21.01.12'
-    compileOnly 'bottle:bottle-minecraft:1.0.2'
     compileOnly 'bottle:bottle-libs:1.0'
     compileOnly 'org.codehaus.groovy:groovy:3.0.5'
     compileOnly 'cristalix:bukkit-core:20.11.11'
