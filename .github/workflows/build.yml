@@ -36,7 +36,7 @@ jobs:
       env:
         NMS_MAVEN_URI: ${{ secrets.NMS_MAVEN_URI }}
         CRISTALIX_MAVEN_URI: ${{ secrets.CRISTALIX_MAVEN_URI }}
-      run: ./gradlew --warning-mode all --no-daemon build
+      run: ./gradlew --warning-mode all --no-daemon bukkitPlugin
       
     - uses: actions/upload-artifact@v2
       with:
