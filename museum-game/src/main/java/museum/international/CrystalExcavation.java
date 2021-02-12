@@ -36,13 +36,11 @@ public class CrystalExcavation implements International {
 	private WorldMeta worldMeta;
 	private WorldMeta tempWorld;
 	private List<Location> spawnPoints;
-	private final ItemStack hook;
+	private final ItemStack hook = Items.render("hook").asBukkitMirror();
 
 	public CrystalExcavation() {
 		load();
 		worldMeta = tempWorld;
-
-		hook = Items.render("hook").asBukkitMirror();
 
 		TextComponent message = new TextComponent("§cВНИМАНИЕ! §bНачались международные раскопки. §f[§bОтправиться в путь§f]");
 		message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/crystal "));

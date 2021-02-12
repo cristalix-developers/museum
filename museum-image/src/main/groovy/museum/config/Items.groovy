@@ -1,5 +1,5 @@
+@groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config
-
 
 import museum.museum.subject.Subject
 import museum.museum.subject.skeleton.Skeleton
@@ -12,7 +12,6 @@ register 'hook', {
     text '&eКрюк'
     nbt.Unbreakable = 1
 }
-
 
 register 'crystal', {
     item CLAY_BALL
