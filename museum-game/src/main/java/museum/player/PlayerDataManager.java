@@ -102,14 +102,14 @@ public class PlayerDataManager implements Listener {
 		val player = (CraftPlayer) event.getPlayer();
 
 		player.setResourcePack("", "");
-		player.setWalkSpeed(.35F);
+		player.setWalkSpeed(.36F);
 
 		timeBar.onJoin(player.getUniqueId());
 		val user = userMap.get(player.getUniqueId());
 
 		user.setConnection(player.getHandle().playerConnection);
 		user.setPlayer(player);
-		user.setState(user.getState()); // Загрузка музея
+		user.setState(user.getLastMuseum()); // Загрузка музея
 
 		player.setGameMode(GameMode.ADVENTURE);
 		player.setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, false);

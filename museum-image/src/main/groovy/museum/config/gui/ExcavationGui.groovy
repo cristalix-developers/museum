@@ -21,8 +21,8 @@ Guis.register 'excavation', { player ->
     title 'Раскопки'
     layout """
         IIIIIIIII
-        OOOOPOOOO
-        IIIIIIIII
+        OOOOOOOOO
+        IIIIPIIII
         IIJIIIHII
         IIIIXIIII
     """
