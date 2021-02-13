@@ -13,15 +13,11 @@ dependencies {
 ext.bukkitPlugin = [mainClass: 'museum.App', dependencies: 'CoreAPI']
 apply from: 'bukkitPlugin.gradle'
 
-evaluationDependsOn ':museum-scripts'
-
 def bukkitPluginTask = tasks.bukkitPlugin
-def scriptsTask = project(':museum-scripts').tasks.compileScripts
 def imageTask = project(':museum-image').tasks.jar
 
-bukkitPluginTask.dependsOn scriptsTask, imageTask
+bukkitPluginTask.dependsOn imageTask
 
 bukkitPluginTask.with imageTask as Jar
-bukkitPluginTask.from scriptsTask.outputs
 
 tasks.build.dependsOn bukkitPluginTask

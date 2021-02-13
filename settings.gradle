@@ -1,5 +1,4 @@
 rootProject.name = 'museum'
-include 'museum-scripts'
 include 'museum-image'
 include 'museum-game'
 include 'museum-service'

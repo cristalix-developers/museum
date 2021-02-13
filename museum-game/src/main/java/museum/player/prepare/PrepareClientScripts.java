@@ -19,24 +19,24 @@ public class PrepareClientScripts implements Prepare {
 
 	public static final Prepare INSTANCE = new PrepareClientScripts();
 
-	private final JavaScriptMessage scriptsMessage;
+	//private final JavaScriptMessage scriptsMessage;
 
 	public PrepareClientScripts() {
-		try {
-			InputStream resource = B.plugin.getResource("clientcode.bundle.js");
+		//try {
+		//	InputStream resource = B.plugin.getResource("clientcode.bundle.js");
 
-			String jsCode = new BufferedReader(new InputStreamReader(resource))
-					.lines()
-					.collect(Collectors.joining("\n"));
+		//	String jsCode = new BufferedReader(new InputStreamReader(resource))
+		//			.lines()
+		//			.collect(Collectors.joining("\n"));
 
-			scriptsMessage = new JavaScriptMessage(new String[] {jsCode});
-		} catch (Exception exception) {
-			throw new RuntimeException(exception);
-		}
+		//	scriptsMessage = new JavaScriptMessage(new String[] {jsCode});
+		//} catch (Exception exception) {
+		//	throw new RuntimeException(exception);
+		//}
 	}
 
 	@Override
 	public void execute(User user, App app) {
-		Cristalix.displayService().sendScripts(user.getUuid(), scriptsMessage);
+		//Cristalix.displayService().sendScripts(user.getUuid(), scriptsMessage);
 	}
 }
