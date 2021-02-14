@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
+import ru.cristalix.core.formatting.Formatting;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -69,6 +70,10 @@ public class PlayerDataManager implements Listener {
 				// Добавление дефолтных значений, которых не было в самом начале
 				if (userInfo.getPrefixes() == null) userInfo.setPrefixes(new ArrayList<>());
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
+				if (userInfo.getCrystal() > 0) {
+					userInfo.setMoney(userInfo.getMoney() + userInfo.getCrystal() * 15);
+					userInfo.setCrystal(0);
+				}
 				userMap.put(uuid, new User(userInfo));
 			} catch (Exception ex) {
 				event.setCancelReason("Не удалось загрузить статистику о музее.");

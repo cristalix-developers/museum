@@ -11,7 +11,6 @@ import museum.donate.DonateType
 import museum.museum.Museum
 import museum.museum.subject.CollectorSubject
 import museum.packages.SaveUserPackage
-import museum.player.User
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
@@ -53,7 +52,7 @@ registerCommand 'prefixes' handle {
 def prefixes = [
         new Prefix('䂋', 'Любовь', 3, '§l40% §fполучить +§b1 опыт'),
         new Prefix('㧥', 'Бывший бомж', 3, '§f+§620`000\$ §e ежедневной награды'),
-        new Prefix('㕐', '§bПопаду на луну', 3, '§ex2 §fцена продажи §d㦶'),
+        new Prefix('㕐', '§bПопаду на луну', 3, '§b+20% §fшанса получить камень'),
         new Prefix('㫐', 'Dead inside', 2),
         new Prefix('㕄', 'Радуга', 2),
         new Prefix('㗤', '§eЦирк', 2),
@@ -72,10 +71,6 @@ def prefixes = [
         new Prefix('㛳', 'АУ', 1),
         new Prefix('㗯', 'Люблю музыку', 1),
 ]
-
-def openCase(User opener) {
-
-}
 
 Guis.register 'prefixes', {
     if (!(context instanceof Player))

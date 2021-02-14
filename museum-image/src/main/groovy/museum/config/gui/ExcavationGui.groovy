@@ -3,30 +3,72 @@ package museum.config.gui
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
-import museum.museum.Museum
 import museum.prototype.Managers
 import museum.util.CrystalUtil
 import museum.util.LevelSystem
+import org.apache.commons.lang.StringUtils
 import org.bukkit.entity.Player
 
 import java.text.DecimalFormat
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 import static org.bukkit.Material.*
 
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
+def calendar = Calendar.getInstance()
 
 Guis.register 'excavation', { player ->
     def user = App.app.getUser((Player) player)
 
+    calendar.setTime(Date.from(LocalDateTime.now(ZoneId.of("Europe/Moscow"))
+            .toLocalDate()
+            .atStartOfDay()
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+    ))
+
+    def day = calendar.get(Calendar.DAY_OF_WEEK)
+    def realDay = day == 1 ? 7 : day - 1
+
     title 'Раскопки'
     layout """
-        IIIIIIIII
+        IIIILIIII
         OOOOOOOOO
-        IIIIPIIII
+        IIIIIIIII
+        IKKKKKKKI
+        ${StringUtils.repeat('I', realDay)}U${StringUtils.repeat('I', 9 - realDay - 1)}
         IIJIIIHII
-        IIIIXIIII
     """
     button MuseumGuis.background
+
+    button 'L' icon {
+        item NETHER_STAR
+        text """§6Рынок
+        
+        Торги драгоценными камнями,
+        ювелир, огранка, доход.
+        
+        Торги начнуться §b15 февраля 
+        §bв 19:00 по МСК
+        """
+    } leftClick {
+        performCommand("shop poly")
+    }
+
+    button 'U' icon {
+        item CLAY_BALL
+        nbt.other = 'arrow_up'
+        text """§bСегодня доступна"""
+    }
+
+    ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'].forEach {String name ->
+        button 'K' icon {
+            item CLAY_BALL
+            nbt.other = 'tochka'
+            text "§b$name §fВременно недоступно"
+        }
+    }
 
     Managers.excavation.toSorted { a, b -> a.requiredLevel <=> b.requiredLevel }.each { excavation ->
         if (user.level >= excavation.requiredLevel) {
@@ -64,20 +106,11 @@ Guis.register 'excavation', { player ->
         }
     }
 
-    if (user.state instanceof Museum) {
-        button 'X' icon {
-            item BARRIER
-            text '§cНазад'
-        } leftClick {
-            performCommand("gui main")
-        }
-    }
-
     button 'J' icon {
         item SADDLE
         text '§6Магазин'
     } leftClick {
-        performCommand("shop")
+        performCommand("shop mono")
     }
 
     button 'H' icon {
@@ -86,19 +119,5 @@ Guis.register 'excavation', { player ->
         text '§bМузей'
     } leftClick {
         performCommand("home")
-    }
-
-    button 'P' icon {
-        item CLAY_BALL
-        nbt.museum = 'crystal_pink'
-        text """§bКристальная экспедиция
-        
-        &cБудет закрыта &fнавсегда &c15 
-        &cфевраля &fв 00:00 по МСК.
-        Все кристаллы автоматически 
-        продадуться по курсу &d㦶 -> &8\$
-        """
-    } leftClick {
-        performCommand("crystal")
     }
 }

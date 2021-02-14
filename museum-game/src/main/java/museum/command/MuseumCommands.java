@@ -233,7 +233,11 @@ public class MuseumCommands {
 
 		if (user.getState() instanceof Excavation)
 			return MessageUtil.get("museum-first");
-		user.setState(app.getShop());
+		if (args.length < 1) {
+			user.setState(app.getShop());
+			return null;
+		}
+		user.setState(args[0].equals("poly") ? app.getMarket() : app.getShop());
 		return null;
 	}
 

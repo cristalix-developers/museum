@@ -14,6 +14,7 @@ import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
 import museum.international.CrystalExcavation;
+import museum.international.Market;
 import museum.misc.MuseumChatService;
 import museum.misc.PlacesMechanic;
 import museum.museum.Shop;
@@ -67,6 +68,7 @@ public final class App extends JavaPlugin {
 	private YamlConfiguration configuration;
 
 	private Shop shop;
+	private Market market;
 
 	@Override
 	public void onEnable() {
@@ -165,6 +167,7 @@ public final class App extends JavaPlugin {
 		// Инициализация команд
 		new MuseumCommands(this);
 		this.shop = new Shop(this);
+		this.market = new Market(this);
 
 		// Регистрация обработчиков событий
 		B.events(
