@@ -3,6 +3,8 @@ package museum.config.gui
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.config.command.WagonConfig
+import museum.fragment.Gem
+import museum.fragment.GemType
 import museum.museum.Museum
 import museum.museum.map.SkeletonSubjectPrototype
 import museum.museum.subject.*
@@ -82,19 +84,25 @@ Guis.register 'manipulator', { player ->
             item STAINED_GLASS_PANE
             text '&7Вставьте реликвию'
         } fillAvailable()
-        if (subject.relic) {
+        if (subject.fragment) {
+            def type = subject.fragment.address
             button 'O' icon {
-                apply items['relic-' + subject.relic.prototypeAddress]
+                if (type.contains(":")) {
+                    item CLAY_BALL
+                    nbt.museum = GemType.valueOf(type.split(':')[0]).texture
+                } else {
+                    apply items['relic-' + type]
+                }
                 text ''
                 text '&7Нажмите чтобы снять'
             } leftClick {
                 closeInventory()
                 // Так выглядит паранойя
-                def subjectRelic = subject.relic
-                subject.setRelic(null)
-                user.getInventory().addItem(subjectRelic.relic)
+                def subjectRelic = subject.fragment
+                subject.setFragment(null)
+                user.getInventory().addItem(subjectRelic.item)
                 user.relics.add(subjectRelic)
-                subject.updateRelic()
+                subject.updateFragment()
                 ((Museum) user.state).updateIncrease()
                 MessageUtil.find 'relic-tacked' send user
             }

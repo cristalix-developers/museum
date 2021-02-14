@@ -9,7 +9,8 @@ import museum.App;
 import museum.boosters.BoosterType;
 import museum.client_conversation.ScriptTransfer;
 import museum.data.MuseumInfo;
-import museum.misc.Relic;
+import museum.fragment.Fragment;
+import museum.fragment.Relic;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectType;
@@ -126,16 +127,16 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 			for (Subject subject : owner.getSubjects())
 				if (!subject.isAllocated() && !subject.getPrototype().getType().equals(SubjectType.MARKER))
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
-			for (Relic relic : user.getRelics())
-				inventory.addItem(relic.getRelic());
+			for (Fragment relic : user.getRelics())
+				inventory.addItem(relic.getItem());
 		}
-
-		if (user.getGrabbedArmorstand() == null)
-			player.setAllowFlight(true);
 
 		WorkerUtil.reload(user);
 
 		B.postpone(50, () -> {
+			if (user.getGrabbedArmorstand() == null)
+				player.setAllowFlight(true);
+
 			for (Subject subject : getSubjects()) {
 				subject.getAllocation().perform(user, UPDATE_BLOCKS, SPAWN_PIECES, SPAWN_DISPLAYABLE);
 			}

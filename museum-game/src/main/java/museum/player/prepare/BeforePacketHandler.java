@@ -15,7 +15,7 @@ import museum.client_conversation.AnimationUtil;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.international.International;
-import museum.misc.Relic;
+import museum.fragment.Relic;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
 import museum.museum.subject.Subject;
@@ -209,10 +209,10 @@ public class BeforePacketHandler implements Prepare {
 			val relics = ((Excavation) user.getState()).getPrototype().getRelics();
 			if (relics != null && relics.length > 0) {
 				val randomRelic = new Relic(
-						ListUtils.random(((Excavation) user.getState()).getPrototype().getRelics()).getPrototypeAddress()
+						ListUtils.random(((Excavation) user.getState()).getPrototype().getRelics()).getAddress()
 				);
 				randomRelic.give(user);
-				val item = randomRelic.getRelic();
+				val item = randomRelic.getItem();
 				val relicTitle = item.getItemMeta().getDisplayName();
 
 				AnimationUtil.throwIconMessage(user, item, relicTitle, "Находка!");

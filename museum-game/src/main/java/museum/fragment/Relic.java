@@ -1,9 +1,8 @@
-package museum.misc;
+package museum.fragment;
 
 import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.val;
-import museum.player.User;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
@@ -13,23 +12,18 @@ import java.util.UUID;
  * @project museum
  */
 @Getter
-public class Relic {
+public class Relic implements Fragment {
 
-	private final String prototypeAddress;
-	private final ItemStack relic;
+	private final String address;
+	private final ItemStack item;
 	private final int price;
 	private final UUID uuid = UUID.randomUUID();
 
 	public Relic(String prototypeAddress) {
-		this.prototypeAddress = prototypeAddress;
+		this.address = prototypeAddress;
 		val item = Items.render("relic-" + prototypeAddress);
 		item.tag.setString("relic-uuid", uuid.toString());
-		this.relic = item.asBukkitMirror();
+		this.item = item.asBukkitMirror();
 		this.price = item.tag.getInt("price");
-	}
-
-	public void give(User user) {
-		user.getPlayer().getInventory().addItem(relic);
-		user.getRelics().add(this);
 	}
 }

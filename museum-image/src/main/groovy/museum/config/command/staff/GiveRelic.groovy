@@ -2,7 +2,7 @@
 package museum.config.command.staff
 
 import museum.App
-import museum.misc.Relic
+import museum.fragment.Relic
 import org.bukkit.Bukkit
 import ru.cristalix.core.formatting.Formatting
 

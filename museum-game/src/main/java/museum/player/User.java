@@ -10,7 +10,9 @@ import museum.App;
 import museum.boosters.BoosterType;
 import museum.client_conversation.AnimationUtil;
 import museum.data.*;
-import museum.misc.Relic;
+import museum.fragment.Fragment;
+import museum.fragment.Gem;
+import museum.fragment.Relic;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectPrototype;
@@ -51,7 +53,7 @@ public class User implements PlayerWrapper {
 			= new Registry<>(this, Managers.skeleton, SkeletonInfo::new, Skeleton::new);
 	private final Registry<SubjectInfo, SubjectPrototype, Subject> subjects
 			= new Registry<>(this, Managers.subject, SubjectInfo::generateNew, SubjectPrototype::provide);
-	private final List<Relic> relics;
+	private final List<Fragment> relics;
 	private CraftPlayer player;
 	private PlayerConnection connection;
 	private Location lastLocation;
@@ -68,11 +70,9 @@ public class User implements PlayerWrapper {
 		this.skeletons.importInfos(info.getSkeletonInfos());
 		this.subjects.importInfos(info.getSubjectInfos());
 		this.museums.importInfos(info.getMuseumInfos());
-		List<Relic> list = new ArrayList<>();
-		for (String address : info.getClaimedRelics()) {
-			Relic relic = new Relic(address);
-			list.add(relic);
-		}
+		List<Fragment> list = new ArrayList<>();
+		for (String address : info.getClaimedRelics())
+			list.add(address.contains(":") ? new Gem(address) : new Relic(address));
 		this.relics = list;
 
 		if (info.getLastPosition() != null)
@@ -180,8 +180,8 @@ public class User implements PlayerWrapper {
 		info.skeletonInfos = skeletons.getData();
 		info.subjectInfos = subjects.getData();
 		List<String> list = new ArrayList<>();
-		for (Relic relic : relics) {
-			String prototypeAddress = relic.getPrototypeAddress();
+		for (Fragment relic : relics) {
+			String prototypeAddress = relic.getAddress();
 			list.add(prototypeAddress);
 		}
 		info.setClaimedRelics(list);

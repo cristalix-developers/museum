@@ -114,7 +114,7 @@ public class PlayerDataManager implements Listener {
 		player.setGameMode(GameMode.ADVENTURE);
 		player.setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, false);
 
-		B.postpone(1, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
+		B.postpone(4, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
 
 		event.setJoinMessage(null);
 	}

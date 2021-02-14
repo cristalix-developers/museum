@@ -1,7 +1,7 @@
 package museum.excavation;
 
 import lombok.Data;
-import museum.misc.Relic;
+import museum.fragment.Relic;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.prototype.Prototype;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;

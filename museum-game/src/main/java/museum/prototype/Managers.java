@@ -9,7 +9,7 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.data.SubjectInfo;
 import museum.excavation.ExcavationPrototype;
-import museum.misc.Relic;
+import museum.fragment.Relic;
 import museum.museum.map.*;
 import museum.museum.subject.skeleton.Rarity;
 import museum.museum.subject.skeleton.SkeletonPrototype;

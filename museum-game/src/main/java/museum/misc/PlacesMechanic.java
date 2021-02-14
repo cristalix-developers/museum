@@ -47,7 +47,7 @@ public class PlacesMechanic {
 					return new Place(
 							UtilV3.fromVector(place.toVector()),
 							2,
-							Integer.parseInt(ss[1]),
+							Integer.parseInt(ss[1]) / 10,
 							Integer.parseInt(ss[3]),
 							place.getCoords()
 					);
@@ -67,7 +67,7 @@ public class PlacesMechanic {
 				user.getClaimedPlaces().add(place.getTitle());
 				if (place.claimedMoney > 0) {
 					user.setMoney(user.getMoney() + place.claimedMoney);
-					AnimationUtil.cursorHighlight(user, "§c+§l" + place.claimedMoney);
+					AnimationUtil.cursorHighlight(user, "§e+§l" + place.claimedMoney);
 				}
 				user.giveExperience(place.getClaimedExp());
 				MessageUtil.find("claim-place")

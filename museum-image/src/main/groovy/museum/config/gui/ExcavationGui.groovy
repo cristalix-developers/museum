@@ -43,7 +43,7 @@ Guis.register 'excavation', { player ->
                 excavation.availableSkeletonPrototypes
                         .forEach(prototype -> text " §7- §b$prototype.title")
                 excavation.relics.each {
-                    relic -> text " §7- §a${relic.relic.itemMeta.displayName}"
+                    relic -> text " §7- §a${relic.item.itemMeta.displayName}"
                 }
             } leftClick {
                 closeInventory()

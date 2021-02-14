@@ -26,11 +26,11 @@ register 'crystal', {
 
 register 'relic-totem', {
     item CLAY_BALL
-    nbt.price = 14
+    nbt.price = 1400
     nbt.relic = 'totem'
     nbt.museum = 'totem'
     nbt.glow_color = 0x50008000
-    text """&e⭐⭐⭐ &fТотем Майя
+    text """⭐⭐⭐ &fТотем Майя
 
     &eДоход оценивается в 14\$
     
@@ -44,11 +44,11 @@ register 'relic-totem', {
 
 register 'relic-shap', {
     item CLAY_BALL
-    nbt.price = 8
+    nbt.price = 800
     nbt.relic = 'shap'
     nbt.museum = 'shap'
     nbt.glow_color = 0x50808080
-    text """&e⭐ &fМаска война Майя
+    text """⭐ &fМаска война Майя
 
     &eДоход оценивается в 8\$
     
@@ -62,11 +62,11 @@ register 'relic-shap', {
 
 register 'relic-yantar', {
     item CLAY_BALL
-    nbt.price = 20
+    nbt.price = 2000
     nbt.relic = 'yantar'
     nbt.museum = 'yantar'
     nbt.glow_color = 0x50000080
-    text """&e⭐⭐⭐ &fЯнтарь
+    text """⭐⭐⭐ &fЯнтарь
 
     &eДоход оценивается в 20\$
     
@@ -81,11 +81,11 @@ register 'relic-yantar', {
 
 register 'relic-tooth', {
     item CLAY_BALL
-    nbt.price = 9
+    nbt.price = 900
     nbt.relic = 'tooth'
     nbt.museum = 'tooth'
     nbt.glow_color = 0x50808080
-    text """&e⭐ &fЗуб мегалодона
+    text """⭐ &fЗуб мегалодона
 
     &eДоход оценивается в 9\$
         
@@ -99,11 +99,11 @@ register 'relic-tooth', {
 
 register 'relic-anubis', {
     item CLAY_BALL
-    nbt.price = 12
+    nbt.price = 1200
     nbt.relic = 'anubis'
     nbt.museum = 'anubisstick'
     nbt.glow_color = 0x50008000
-    text """&e⭐⭐ &fОрудие Анубиса
+    text """⭐⭐ &fОрудие Анубиса
 
     &eДоход оценивается в 12\$
         
@@ -117,11 +117,11 @@ register 'relic-anubis', {
 
 register 'relic-pot', {
     item CLAY_BALL
-    nbt.price = 7
+    nbt.price = 700
     nbt.relic = 'pot'
     nbt.museum = 'pot'
     nbt.glow_color = 0x50808080
-    text """&e⭐ &fДревний горшок
+    text """⭐ &fДревний горшок
 
     &eДоход оценивается в 7\$
         
@@ -135,11 +135,11 @@ register 'relic-pot', {
 
 register 'relic-shield', {
     item CLAY_BALL
-    nbt.price = 10
+    nbt.price = 1000
     nbt.relic = 'shield'
     nbt.museum = 'shieldofruin'
     nbt.glow_color = 0x50008000
-    text """&e⭐⭐ &fЩит война Древнего Египта
+    text """⭐⭐ &fЩит война Древнего Египта
 
     &eДоход оценивается в 10\$
         

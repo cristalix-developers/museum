@@ -4,7 +4,7 @@ package museum.config.command
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.config.gui.MuseumGuis
-import museum.misc.Relic
+import museum.fragment.Fragment
 import museum.player.User
 import museum.util.CrystalUtil
 import museum.util.MessageUtil
@@ -32,13 +32,13 @@ registerCommand 'sell' handle {
         }
         def nmsItem = CraftItemStack.asNMSCopy item
         if (nmsItem.tag && nmsItem.tag.hasKeyOfType("relic", 8)) {
-            for (Relic currentRelic : user.relics) {
+            for (Fragment currentRelic : user.relics) {
                 if (currentRelic.uuid.toString() == nmsItem.tag.getString('relic-uuid')) {
                     player.itemInHand = null
                     user.relics.remove currentRelic
-                    user.depositMoneyWithBooster(currentRelic.price * 10)
+                    user.money += currentRelic.price
                     return MessageUtil.find('relic-sell')
-                            .set('price', currentRelic.price * 10)
+                            .set('price', currentRelic.price)
                             .getText()
                 }
             }
