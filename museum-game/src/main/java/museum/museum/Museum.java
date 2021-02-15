@@ -10,7 +10,6 @@ import museum.boosters.BoosterType;
 import museum.client_conversation.ScriptTransfer;
 import museum.data.MuseumInfo;
 import museum.fragment.Fragment;
-import museum.fragment.Relic;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectType;
@@ -133,10 +132,11 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 
 		WorkerUtil.reload(user);
 
-		B.postpone(50, () -> {
+		B.postpone(1, () -> {
 			if (user.getGrabbedArmorstand() == null)
 				player.setAllowFlight(true);
-
+		});
+		B.postpone(50, () -> {
 			for (Subject subject : getSubjects()) {
 				subject.getAllocation().perform(user, UPDATE_BLOCKS, SPAWN_PIECES, SPAWN_DISPLAYABLE);
 			}

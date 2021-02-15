@@ -111,7 +111,7 @@ Guis.register 'trade', { player ->
             owner.relics.remove(gem)
             clone.give(victim)
             victim.setMoney(victim.money - cost)
-            owner.setMoney(owner.money + cost)
+            owner.setMoney(owner.money + cost * 0.85)
 
             def message = Formatting.fine("Сделка совершена.")
 

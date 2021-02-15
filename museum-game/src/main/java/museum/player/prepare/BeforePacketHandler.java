@@ -73,7 +73,7 @@ public class BeforePacketHandler implements Prepare {
 					if (dig.c == DROP_ITEM || dig.c == DROP_ALL_ITEMS)
 						return;
 					MinecraftServer.SERVER.postToMainThread(() -> onDigging(user, dig));
-				} else if (packetObj instanceof PacketPlayInSteerVehicle) {
+				} else if (packetObj instanceof PacketPlayInSteerVehicle && user.getRiding() != null) {
 					// Если игрок на коллекторе и нажимает шифт, то скинуть его
 					onUnmount(user, (PacketPlayInSteerVehicle) packetObj);
 				}

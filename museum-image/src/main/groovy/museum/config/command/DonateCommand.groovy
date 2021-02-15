@@ -88,7 +88,7 @@ Guis.register 'prefixes', {
     button 'O' icon {
         item END_CRYSTAL
         text """
-        §bСлучайный префикс §fза §d45`000㦶
+        §bСлучайный префикс §fза §e10'000'000\$
         
         §7Получите случайный префикс!
         
@@ -99,8 +99,8 @@ Guis.register 'prefixes', {
         §6редкий §fили §dэпичный §fпрефикс
         """
     } leftClick {
-        if (user.crystal >= 45000) {
-            user.crystal = user.crystal - 45000
+        if (user.money >= 10000000) {
+            user.money = user.money - 10000000
             def randomPrefix = ListUtils.random(
                     user.prefixChestOpened % 5 == 0 ?
                             prefixes.stream()

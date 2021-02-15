@@ -1,30 +1,25 @@
 package museum.international;
 
 import clepto.ListUtils;
-import clepto.bukkit.groovy.Do;
 import clepto.bukkit.item.Items;
-import clepto.cristalix.WorldMeta;
+import com.google.common.collect.Maps;
 import lombok.val;
 import museum.App;
 import museum.client_conversation.AnimationUtil;
+import museum.fragment.GemType;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
-import museum.util.MapLoader;
 import museum.util.MessageUtil;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.ABORT_DESTROY_BLOCK;
 
@@ -32,33 +27,20 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
  * @author func 25.11.2020
  * @project museum
  */
-public class CrystalExcavation implements International {
-	private WorldMeta worldMeta;
-	private WorldMeta tempWorld;
-	private List<Location> spawnPoints;
-	private final ItemStack crystal = Items.render("crystal").asBukkitMirror();
+public class CrystalExcavations implements International {
+	private final Map<GemType, List<Location>> spawnPoints = Maps.newHashMap();
 	private final ItemStack hook = Items.render("hook").asBukkitMirror();
 
-	public CrystalExcavation() {
-		load();
-		worldMeta = tempWorld;
-
-		TextComponent message = new TextComponent("§cВНИМАНИЕ! §bНачались международные раскопки. §f[§bОтправиться в путь§f]");
-		message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/crystal "));
-
-		// Каждые 360 минут, выгружать игроков в третий мир и отгружать второй мир, затем третий мир становится вторым
-		Do.every(360).minutes(() -> {
-			load();
-			for (Player player : worldMeta.getWorld().getPlayers()) {
-				val location = player.getLocation();
-				location.setWorld(tempWorld.getWorld());
-				player.teleport(location);
+	public CrystalExcavations(App app) {
+		app.getMap().getLabels("mine").forEach(mine -> {
+			for (GemType type : GemType.values()) {
+				if (mine.getTag().toUpperCase().equals(type.name())) {
+					if (!spawnPoints.containsKey(type))
+						spawnPoints.put(type, new ArrayList<>());
+					spawnPoints.get(type).add(mine);
+					break;
+				}
 			}
-			Bukkit.unloadWorld(worldMeta.getWorld(), false);
-			worldMeta = tempWorld;
-			for (User user : App.getApp().getUsers())
-				if (user.getPlayer() != null)
-					user.getPlayer().sendMessage(message);
 		});
 	}
 
@@ -72,7 +54,14 @@ public class CrystalExcavation implements International {
 		val player = user.getPlayer();
 		player.setAllowFlight(false);
 		player.setFlying(false);
-		user.teleport(ListUtils.random(spawnPoints));
+
+		val actual = GemType.getActualGem();
+
+		if (!spawnPoints.containsKey(actual)) {
+			throw new RuntimeException("Cannot find spawn points for " + actual.name());
+		}
+
+		user.teleport(ListUtils.random(spawnPoints.get(actual)));
 		val inventory = user.getInventory();
 		inventory.clear();
 		// Предметы кешируются
@@ -87,7 +76,16 @@ public class CrystalExcavation implements International {
 		inventory.addItem(Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror(), userHook);
 		inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
-		user.getPlayer().sendTitle("Прибытие!", "§bдобывайте кристаллы");
+		user.getPlayer().sendTitle("Прибытие!", "§bударяйте камни");
+		user.sendMessage(
+				"⟼  §6§l" + actual.getLocation(),
+				"",
+				"    §bУдаряйте камни §fв земле.",
+				"  Промывайте полученную руду",
+				"  §bнажимая SHIFT §fоколо водопромывающей",
+				"  станции, взрывай рудники динамитом.",
+				"  Лагает? Скрыть/показать игроков /hide и /show "
+		);
 	}
 
 	@Override
@@ -110,8 +108,6 @@ public class CrystalExcavation implements International {
 		// Не выносить canBeBroken(packet.a)) | Операция тяжелее
 		if (packet.c == PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK) {
 			if (canBeBroken(packet.a)) {
-				user.setCrystal(user.getCrystal() + 1);
-				user.getInventory().addItem(crystal);
 				AnimationUtil.cursorHighlight(user, "§l+1 §d㦶");
 			}
 		} else if (packet.c == PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK) {
@@ -124,13 +120,6 @@ public class CrystalExcavation implements International {
 
 	@Override
 	public boolean canBeBroken(BlockPosition pos) {
-		return worldMeta.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ()).getType() == Material.STAINED_GLASS;
-	}
-
-	private void load() {
-		tempWorld = MapLoader.load("taiga");
-		spawnPoints = tempWorld.getLabels("spawn").stream()
-				.map(label -> label.add(0, 2, 0))
-				.collect(Collectors.toList());
+		return false;
 	}
 }

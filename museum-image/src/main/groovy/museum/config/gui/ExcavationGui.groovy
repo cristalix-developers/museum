@@ -3,6 +3,7 @@ package museum.config.gui
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.fragment.GemType
 import museum.prototype.Managers
 import museum.util.CrystalUtil
 import museum.util.LevelSystem
@@ -10,26 +11,15 @@ import org.apache.commons.lang.StringUtils
 import org.bukkit.entity.Player
 
 import java.text.DecimalFormat
-import java.time.LocalDateTime
-import java.time.ZoneId
 
 import static org.bukkit.Material.*
 
 def moneyFormatter = new DecimalFormat('###,###,###,###,###,###.##$')
-def calendar = Calendar.getInstance()
 
 Guis.register 'excavation', { player ->
     def user = App.app.getUser((Player) player)
 
-    calendar.setTime(Date.from(LocalDateTime.now(ZoneId.of("Europe/Moscow"))
-            .toLocalDate()
-            .atStartOfDay()
-            .atZone(ZoneId.systemDefault())
-            .toInstant()
-    ))
-
-    def day = calendar.get(Calendar.DAY_OF_WEEK)
-    def realDay = day == 1 ? 7 : day - 1
+    def realDay = GemType.getActualGem().ordinal() + 1
 
     title 'Раскопки'
     layout """
@@ -62,11 +52,23 @@ Guis.register 'excavation', { player ->
         text """§bСегодня доступна"""
     }
 
-    ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'].forEach {String name ->
-        button 'K' icon {
+    def counter = 0
+    GemType.values().collect().forEach { GemType type ->
+        counter += 1
+        def item = button 'K' icon {
             item CLAY_BALL
-            nbt.other = 'tochka'
-            text "§b$name §fВременно недоступно"
+            nbt.museum = type.texture
+            nbt.color = type.ordinal() + 1 == realDay ? 0xFFFFFFFF : 0x666666FF
+            if (type.ordinal() + 1 == realDay)
+                nbt.glow_color = 0x55555510
+            text "§b§l${type.dayTag} §f${type.location} ${type.ordinal() + 1 == realDay ? "§aОткрыто" : "§cЗакрыто"}"
+            text ""
+            text "§7Можно найти §f${type.title}"
+        }
+        if (type.ordinal() + 1 == realDay) {
+            item.leftClick {
+                user.setState(App.app.crystal)
+            }
         }
     }
 

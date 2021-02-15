@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TopManager implements Ticked, Listener {
 
-	private static final int UPDATE_SECONDS = 20;
+	private static final int UPDATE_SECONDS = 10;
 	private static final int DATA_COUNT = 15;
 	private final App app;
 	private final Map<TopPackage.TopType, List<TopEntry<String, Object>>> tops = Maps.newConcurrentMap();

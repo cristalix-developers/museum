@@ -13,7 +13,8 @@ import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
-import museum.international.CrystalExcavation;
+import museum.international.CrystalExcavations;
+import museum.international.International;
 import museum.international.Market;
 import museum.misc.MuseumChatService;
 import museum.misc.PlacesMechanic;
@@ -64,11 +65,11 @@ public final class App extends JavaPlugin {
 	private TopManager topManager;
 	private ClientSocket clientSocket;
 	private WorldMeta map;
-	private CrystalExcavation crystalExcavation;
 	private YamlConfiguration configuration;
 
 	private Shop shop;
 	private Market market;
+	private International crystal;
 
 	@Override
 	public void onEnable() {
@@ -147,8 +148,7 @@ public final class App extends JavaPlugin {
 		// Загрузка основного мира
 		map = MapLoader.load("prod1");
 		MapLoader.interceptChunkWriter(this, getNMSWorld());
-		// Загрузка международной кристальной экспедиции
-		crystalExcavation = new CrystalExcavation();
+		crystal = new CrystalExcavations(this);
 
 		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
 		SubjectType.init();

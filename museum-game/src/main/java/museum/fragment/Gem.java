@@ -21,10 +21,10 @@ public class Gem implements Fragment {
 
 	private final GemType type;
 	private final float rarity;
-	private int price;
 	private final int realPrice;
-	private final ItemStack item;
 	private final UUID uuid;
+	private int price;
+	private ItemStack item;
 
 	public Gem(String data) {
 		String[] strings = data.split("\\:");
@@ -67,6 +67,10 @@ public class Gem implements Fragment {
 	public void setPrice(int price) {
 		this.price = price;
 
+		val item = CraftItemStack.asNMSCopy(this.item);
+		item.tag.setInt("gem", price);
+		this.item = CraftItemStack.asCraftMirror(item);
+
 		val meta = this.item.getItemMeta();
 		meta.setLore(generateLore());
 		this.item.setItemMeta(meta);
@@ -80,6 +84,7 @@ public class Gem implements Fragment {
 				"§fРедкость §b" + Math.round(rarity * 100) + "%",
 				"",
 				"§7Можно продать перекупщику",
+				"§7Изменить цену с /gemstat [ЦЕНА]",
 				"",
 				"§7Поставьте камень на витрину для",
 				"§7реликвий, которую вы можете купить",
