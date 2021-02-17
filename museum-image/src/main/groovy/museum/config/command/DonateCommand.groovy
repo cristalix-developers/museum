@@ -167,7 +167,7 @@ Guis.register 'prefixes', {
         button 'X' icon {
             item IRON_INGOT
             text "[ ${prefix.prefix} §f] ${prefix.title} ${have ? '§aВЫБРАТЬ' : ''}"
-            text have ? "" : "§7Можно купить за §d10`000㦶"
+            text have ? "" : "§7Можно купить за §e10'000'000\$"
             text """    
                                 
             Редкость: §aобычный
@@ -236,6 +236,10 @@ registerCommand 'proccessdonate' handle {
                 AnimationUtil.topTitle user, "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
             }
             user.prefixChestOpened = user.prefixChestOpened + 1
+        } else if (donate == DonateType.PRIVILEGES) {
+            user.privileges = true
+            user.donates.add(donate as DonateType)
+            AnimationUtil.topTitle user, "Вы избавились от комиссии! Спасибо за поддержку. 㶅"
         } else if (donate == DonateType.LEGENDARY_PICKAXE) {
             user.pickaxeType = PickaxeType.LEGENDARY
             user.donates.add(donate as DonateType)

@@ -67,7 +67,9 @@ Guis.register 'trade', { player ->
         return null
     }
 
-    title owner.name + " x " + victim.name
+    def privileges = owner.getInfo().privileges || victim.getInfo().privileges
+
+    title owner.name + " x " + victim.name + (privileges ? " Комиссии §aнет" : " Комиссия §c20%")
 
     layout "----X----"
 
@@ -111,7 +113,7 @@ Guis.register 'trade', { player ->
             owner.relics.remove(gem)
             clone.give(victim)
             victim.setMoney(victim.money - cost)
-            owner.setMoney(owner.money + cost * 0.85)
+            owner.setMoney(owner.money + cost * (privileges ? 1F : 0.8F))
 
             def message = Formatting.fine("Сделка совершена.")
 

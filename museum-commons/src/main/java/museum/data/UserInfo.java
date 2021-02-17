@@ -39,5 +39,6 @@ public class UserInfo implements Unique {
 	private long lastTimeRewardClaim;
 	private int prefixChestOpened;
 	private List<String> prefixes;
+	private boolean privileges;
 
 }

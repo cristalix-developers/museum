@@ -31,6 +31,11 @@ import ru.cristalix.core.formatting.Formatting
 
 import static museum.boosters.BoosterType.EXP
 
+class Config {
+    static def COUNTER = 40
+    static def ACTUAL = GemType.getActualGem()
+}
+
 def redstone = new ItemStack(Material.REDSTONE_BLOCK)
 
 Items.register 'tnt', {
@@ -58,12 +63,10 @@ registerCommand 'show' handle {
     }
 }
 
-def actual = GemType.getActualGem()
-
 Items.register 'ore', {
     item Material.CLAY_BALL
-    nbt.museum = actual.oreTexture
-    nbt.ore = actual.name()
+    nbt.museum = Config.ACTUAL.oreTexture
+    nbt.ore = Config.ACTUAL.name()
     text "§bРуда "
     text "После выхода из шахты исчезает"
     text "Держите в руках и нажмите SHIFT"
@@ -94,6 +97,7 @@ on EntityDamageByEntityEvent, {
         def user = App.app.getUser(damager as Player)
         if (user.state instanceof International && entity.helmet.type == Material.STONE) {
             user.inventory.addItem(item)
+            AnimationUtil.cursorHighlight(user, "§d§l+1 §fруда");
         }
     }
 }
@@ -154,16 +158,7 @@ on PlayerInteractEvent, {
                             user.giveExperience(1)
                             AnimationUtil.cursorHighlight(user, '§b§l+1 §fопыт')
                         }
-                        if (Math.random() < 0.01) {
-                            def gem = new Gem(actual.name() + ":" + Math.random() / 1.9 + ":10000")
-                            gem.give(user)
-                            AnimationUtil.throwIconMessage(user, gem.item, gem.type.title, "Находка!")
-                            App.app.users.forEach { User currentUser ->
-                                if (currentUser == user)
-                                    return null
-                                AnimationUtil.cursorHighlight(currentUser, "§b" + user.name + " §f" + actual.title + " §b" + Math.round(gem.rarity * 100) + "%")
-                            }
-                        }
+                        tryGive(user, 0.005)
                         break
                     }
                 }
@@ -192,20 +187,30 @@ on PlayerToggleSneakEvent, {
                             user.giveExperience(1)
                             AnimationUtil.cursorHighlight(user, '§b§l+1 §fопыт')
                         }
-                        if (Math.random() < 0.001) {
-                            def gem = new Gem(actual.name() + ":" + Math.random() / 2 + ":10000")
-                            gem.give(user)
-                            AnimationUtil.throwIconMessage(user, gem.item, gem.type.title, "Находка!")
-                            App.app.users.forEach { User currentUser ->
-                                if (currentUser == user)
-                                    return null
-                                AnimationUtil.cursorHighlight(currentUser, "§b" + user.name + " §f" + actual.title + " §b" + Math.round(gem.rarity * 100) + "%")
-                            }
-                        }
+                        tryGive(user, 0.0023)
                         break
                     }
                 }
             }
+        }
+    }
+}
+
+static void tryGive(User user, float chance) {
+    Config.COUNTER = Config.COUNTER - 1
+    if (Config.COUNTER < 0) {
+        Config.COUNTER = 40
+        Config.ACTUAL = GemType.getActualGem()
+    }
+
+    if (Math.random() < chance) {
+        def gem = new Gem(Config.ACTUAL.name() + ":" + Math.random() / 1.42 + ":500000")
+        gem.give(user)
+        AnimationUtil.throwIconMessage(user, gem.item, gem.type.title, "Находка!")
+        App.app.users.forEach { User currentUser ->
+            if (currentUser == user)
+                return null
+            AnimationUtil.cursorHighlight(currentUser, "§b" + user.name + " §f" + Config.ACTUAL.title + " §b" + Math.round(gem.rarity * 100) + "%")
         }
     }
 }

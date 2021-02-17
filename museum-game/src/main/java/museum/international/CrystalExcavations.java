@@ -1,6 +1,7 @@
 package museum.international;
 
 import clepto.ListUtils;
+import clepto.bukkit.B;
 import clepto.bukkit.item.Items;
 import com.google.common.collect.Maps;
 import lombok.val;
@@ -13,6 +14,7 @@ import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
@@ -21,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigType.ABORT_DESTROY_BLOCK;
-
 /**
  * @author func 25.11.2020
  * @project museum
@@ -30,6 +30,7 @@ import static net.minecraft.server.v1_12_R1.PacketPlayInBlockDig.EnumPlayerDigTy
 public class CrystalExcavations implements International {
 	private final Map<GemType, List<Location>> spawnPoints = Maps.newHashMap();
 	private final ItemStack hook = Items.render("hook").asBukkitMirror();
+	private final ItemStack ore = Items.render("ore").asBukkitMirror();
 
 	public CrystalExcavations(App app) {
 		app.getMap().getLabels("mine").forEach(mine -> {
@@ -106,14 +107,16 @@ public class CrystalExcavations implements International {
 	@Override
 	public void acceptBlockBreak(User user, PacketPlayInBlockDig packet) {
 		// Не выносить canBeBroken(packet.a)) | Операция тяжелее
-		if (packet.c == PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK) {
-			if (canBeBroken(packet.a)) {
-				AnimationUtil.cursorHighlight(user, "§l+1 §d㦶");
-			}
-		} else if (packet.c == PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK) {
-			if (!canBeBroken(packet.a)) {
-				packet.c = ABORT_DESTROY_BLOCK;
-				packet.a = BeforePacketHandler.DUMMY;
+		if (packet.c == PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK) {
+			val block = new Location(user.getWorld(), packet.a.getX(), packet.a.getY(), packet.a.getZ()).getBlock();
+			if (block != null && block.getType() == Material.STAINED_GLASS) {
+				block.setType(Material.AIR);
+				user.getInventory().addItem(ore);
+				AnimationUtil.cursorHighlight(user, "§d§l+1 §fруда");
+				B.postpone(50, () -> {
+					block.setType(Material.STAINED_GLASS);
+					block.setData((byte) 10);
+				});
 			}
 		}
 	}

@@ -5,7 +5,6 @@ import clepto.bukkit.menu.Guis
 import museum.App
 import museum.fragment.GemType
 import museum.prototype.Managers
-import museum.util.CrystalUtil
 import museum.util.LevelSystem
 import org.apache.commons.lang.StringUtils
 import org.bukkit.entity.Player
@@ -77,7 +76,7 @@ Guis.register 'excavation', { player ->
             button 'O' icon {
                 apply Items.items['excavation-' + excavation.address]
                 text """
-                §e$excavation.title §6${moneyFormatter.format(excavation.price)} §7[ЛКМ] | §d${CrystalUtil.convertMoney2Crystal(excavation.price)} 㦶 §7[ПКМ]
+                §e$excavation.title §6${moneyFormatter.format(excavation.price)}
 
                 Опыт археолога: ${LevelSystem.acceptGiveExp(user, excavation.requiredLevel) ? "§aесть" : "§cнет"}
                 Кол-во ударов: §e$excavation.hitCount
@@ -91,15 +90,12 @@ Guis.register 'excavation', { player ->
                 }
             } leftClick {
                 closeInventory()
-                performCommand 'excavation ' + excavation.address + ' left'
-            } rightClick {
-                closeInventory()
-                performCommand 'excavation ' + excavation.address + ' right'
+                performCommand 'excavation ' + excavation.address
             }
         } else {
             button 'O' icon {
                 item CLAY_BALL
-                nbt.other = 'tochka'
+                nbt.other = 'lock'
                 text.clear()
                 text """
                 §8??? §f[§e$excavation.requiredLevel LVL§f]

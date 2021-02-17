@@ -29,6 +29,12 @@ registerCommand 'tpshow' handle {
 
 registerCommand 'tpmus' handle {
     if (getIfLS(delegate)) {
-        Cristalix.transfer([player.uniqueId], RealmId.of('MUSM-' + args[0]))
+        Integer num = 1
+        try {
+            num = Integer.parseInt(args[0])
+        } catch (Exception ignored) {
+            return null
+        }
+        Cristalix.transfer([player.uniqueId], RealmId.of('MUSM-' + num))
     }
 }

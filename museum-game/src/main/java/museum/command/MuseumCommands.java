@@ -17,7 +17,6 @@ import museum.museum.subject.skeleton.Skeleton;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
-import museum.util.CrystalUtil;
 import museum.util.MessageUtil;
 import museum.util.VirtualSign;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -295,7 +294,7 @@ public class MuseumCommands {
 	private String cmdExcavation(Player player, String[] args) {
 		User user = this.app.getUser(player);
 		if (args.length < 2)
-			return "/excavation <место> <left/right>";
+			return "/excavation <место>";
 		ExcavationPrototype prototype;
 		try {
 			prototype = Managers.excavation.getPrototype(args[0]);
@@ -309,17 +308,10 @@ public class MuseumCommands {
 		if (user.getGrabbedArmorstand() != null)
 			return MessageUtil.get("stall-first");
 
-		if ("left".equals(args[1])) {
-			if (prototype.getPrice() > user.getMoney())
-				return NO_MONEY_MESSAGE;
-			user.setMoney(user.getMoney() - prototype.getPrice());
-		} else if ("right".equals(args[1])) {
-			val crystalPrice = CrystalUtil.convertMoney2Crystal(prototype.getPrice());
-			if (CrystalUtil.convertMoney2Crystal(prototype.getPrice()) <= user.getCrystal())
-				user.setCrystal(user.getCrystal() - crystalPrice);
-			else
-				return NO_CRYSTAL_MESSAGE;
-		}
+		if (prototype.getPrice() > user.getMoney())
+			return NO_MONEY_MESSAGE;
+		user.setMoney(user.getMoney() - prototype.getPrice());
+
 		player.closeInventory();
 		user.setState(new Excavation(prototype, prototype.getHitCount()));
 		return null;

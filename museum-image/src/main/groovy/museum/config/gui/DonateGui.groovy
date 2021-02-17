@@ -2,6 +2,7 @@
 package museum.config.gui
 
 import clepto.bukkit.menu.Guis
+import museum.donate.DonateType
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 
@@ -16,15 +17,31 @@ Guis.register 'donate', { player ->
     title '§bВнутриигровые покупки'
     layout """
         ----X----
-        -X-M-Z-Y-
+        -X-MPZ-Y-
         ----J----
     """
+
+    button 'P' icon {
+        item CLAY_BALL
+        nbt.other = 'guild_members'
+        text """
+        §bКомиссия 0%
+         ${modifyPrice(user.uniqueId, DonateType.PRIVILEGES.price)}
+
+        Если вы §aпродаете или покупаете
+        драгоценный камень, комиссия
+        §aисчезнет§f, поэтому вы не теряете
+        денег на переводах валюты.
+        """
+    } leftClick {
+        performCommand("proccessdonate PRIVILEGES")
+    }
 
     button 'X' icon {
         item END_CRYSTAL
         text """
         §bСлучайный префикс
-         ${modifyPrice(user.uniqueId, 79)}
+         ${modifyPrice(user.uniqueId, DonateType.PREFIX_CASE.price)}
         
         §7Получите случайный префикс!
         
@@ -42,7 +59,7 @@ Guis.register 'donate', { player ->
         item BEACON
         text """
         §bГлобальный бустер посетителей §6§lx3
-        ${modifyPrice(user.uniqueId, 149)}
+        ${modifyPrice(user.uniqueId, DonateType.GLOBAL_VILLAGER_BOOSTER.price)}
         
         Общий бустер на §b1 час§f,
         в §lТРИ§f раза больше посетителей
@@ -56,7 +73,7 @@ Guis.register 'donate', { player ->
         item EXP_BOTTLE
         text """
         §bГлобальный бустер опыта §6§lx2
-        ${modifyPrice(user.uniqueId, 149)}
+        ${modifyPrice(user.uniqueId, DonateType.GLOBAL_EXP_BOOSTER.price)}
         
         Общий бустер на §b1 час§f,
         все получат в два раза больше опыта!
@@ -70,7 +87,7 @@ Guis.register 'donate', { player ->
         data 1
         text """
         §6Глобальный бустер денег §6§lx2 
-        ${modifyPrice(user.uniqueId, 199)}
+        ${modifyPrice(user.uniqueId, DonateType.GLOBAL_MONEY_BOOSTER.price)}
         
         Общий бустер на §b1 час§f,
         все получат в два раза больше денег!
@@ -84,7 +101,7 @@ Guis.register 'donate', { player ->
         nbt.museum = 'parovoz'
         text """
         §6Стим-панк сборщик монет
-        ${modifyPrice(user.uniqueId, 249)}
+        ${modifyPrice(user.uniqueId, DonateType.STEAM_PUNK_COLLECTOR.price)}
         
         §bБыстрее всех§f! Собирает самые
         дальние монеты -§b лучший выбор
@@ -103,7 +120,7 @@ Guis.register 'donate', { player ->
         nbt.prison = '23feb'
         text """
         §bЛегендарная кирка
-        ${modifyPrice(user.uniqueId, 349)}
+        ${modifyPrice(user.uniqueId, DonateType.LEGENDARY_PICKAXE.price)}
         
         Особая кирка, приносит 
         §b2 опыта за блок§f и

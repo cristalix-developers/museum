@@ -13,14 +13,15 @@ import java.util.Date;
 @AllArgsConstructor
 public enum GemType {
 
-	RUBY("ruby", "saphire", "⭐⭐⭐ §4Рубин", "ПН", "Бирмандия"),
-	SPINEL("spinel", "saphire","⭐⭐ §cШпиннель", "ВТ", "Таджикистан"),
-	AMETHYST("crystal_pink", "tanzanit","⭐ §dАметист", "СР", "Мадагаскар"),
-	TANZANITE("turmalin", "tanzanit","⭐ §aТанзанит", "ЧТ", "Танзания"),
-	EMERALD("emerald", "tanzanit","⭐⭐ §aИзумруд", "ПТ", "Колумбия"),
-	SAPPHIRE("opal", "saphire","⭐⭐⭐ §9Сапфир", "СБ", "Кешемир"),
-	BRILLIANT("br", "brilliant","⭐⭐⭐ §fБриллиант", "ВС", "Борнео");
+	RUBY(1.1F, "ruby", "saphire", "⭐⭐⭐ §4Рубин", "ПН", "Бирмандия"),
+	SPINEL(0.85F, "spinel", "saphire","⭐⭐ §cШпиннель", "ВТ", "Таджикистан"),
+	AMETHYST(0.75F,"crystal_pink", "tanzanit","⭐ §dАметист", "СР", "Мадагаскар"),
+	TANZANITE(0.9F,"turmalin", "tanzanit","⭐ §aТанзанит", "ЧТ", "Танзания"),
+	EMERALD(1F,"emerald", "tanzanit","⭐⭐ §aИзумруд", "ПТ", "Колумбия"),
+	SAPPHIRE(1.2F,"opal", "saphire","⭐⭐⭐ §9Сапфир", "СБ", "Кешемир"),
+	BRILLIANT(1.3F,"br", "brilliant","⭐⭐⭐ §fБриллиант", "ВС", "Борнео");
 
+	private final float multiplier;
 	private final String texture;
 	private final String oreTexture;
 	private final String title;
