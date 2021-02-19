@@ -106,10 +106,14 @@ public class CrystalExcavations implements International {
 
 	@Override
 	public void acceptBlockBreak(User user, PacketPlayInBlockDig packet) {
-		// Не выносить canBeBroken(packet.a)) | Операция тяжелее
 		if (packet.c == PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK) {
+
+			if (!packet.a.isValidLocation())
+				return;
+
 			val block = new Location(user.getWorld(), packet.a.getX(), packet.a.getY(), packet.a.getZ()).getBlock();
-			if (block != null && block.getType() == Material.STAINED_GLASS) {
+
+			if (block != null && block.getChunk().isLoaded() && block.getType() == Material.STAINED_GLASS) {
 				block.setType(Material.AIR);
 				user.getInventory().addItem(ore);
 				AnimationUtil.cursorHighlight(user, "§d§l+1 §fруда");

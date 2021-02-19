@@ -1,14 +1,12 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.gui
 
-
 import clepto.bukkit.menu.Guis
 import museum.fragment.Fragment
 import museum.fragment.Gem
 import museum.international.Market
 import museum.player.User
 import museum.util.MessageUtil
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
@@ -109,11 +107,13 @@ Guis.register 'trade', { player ->
                 return null
             }
 
-            // Еще паранойя
-            if (!Bukkit.getPlayer(owner.name) || !Bukkit.getPlayer(victim.name))
+            // Паранойя
+            def users = app.getUsers()
+
+            if (!users.contains(owner) || !users.contains(victim))
                 return Formatting.error("Ваш опонент вышел из игры.")
 
-            // Да-да опять, паранойя
+            // Паранойя
             def clone = gem
             owner.relics.remove(gem)
             clone.give(victim)
