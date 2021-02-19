@@ -8,6 +8,7 @@ import museum.fragment.Gem
 import museum.international.Market
 import museum.player.User
 import museum.util.MessageUtil
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
@@ -84,7 +85,7 @@ Guis.register 'trade', { player ->
         ${gem.item.itemMeta.displayName}
 
         Цена камня §a${MessageUtil.toMoneyFormat(cost)} §f/ §e${MessageUtil.toMoneyFormat(victim.money)}
-        Прибыток §b~${Math.round(gem.rarity * 96)}~\$
+        Прибыток §b~${Math.round(gem.realPrice / 100D)}~\$
         Редкость §b${Math.round(gem.rarity * 100)}%
         """
         nbt.museum = gem.type.texture
@@ -92,14 +93,14 @@ Guis.register 'trade', { player ->
 
     if (user == owner) {
         item.leftClick {
-            owner.closeInventory()
             victim.closeInventory()
+            owner.closeInventory()
             owner.getInventory().addItem(gem.getItem())
         }
     } else {
         item.leftClick {
-            owner.closeInventory()
             victim.closeInventory()
+            owner.closeInventory()
 
             if (victim.money <= cost) {
                 owner.getInventory().addItem(gem.getItem())
@@ -108,7 +109,11 @@ Guis.register 'trade', { player ->
                 return null
             }
 
-            // Да-да опять, паранойя 
+            // Еще паранойя
+            if (!Bukkit.getPlayer(owner.name) || !Bukkit.getPlayer(victim.name))
+                return Formatting.error("Ваш опонент вышел из игры.")
+
+            // Да-да опять, паранойя
             def clone = gem
             owner.relics.remove(gem)
             clone.give(victim)

@@ -293,7 +293,7 @@ public class MuseumCommands {
 
 	private String cmdExcavation(Player player, String[] args) {
 		User user = this.app.getUser(player);
-		if (args.length < 2)
+		if (args.length < 1)
 			return "/excavation <место>";
 		ExcavationPrototype prototype;
 		try {

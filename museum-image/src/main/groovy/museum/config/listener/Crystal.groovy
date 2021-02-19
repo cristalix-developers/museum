@@ -36,7 +36,7 @@ class Config {
     static def ACTUAL = GemType.getActualGem()
 }
 
-def redstone = new ItemStack(Material.REDSTONE_BLOCK)
+def stack = new ItemStack(Material.REDSTONE_BLOCK)
 
 Items.register 'tnt', {
     item Material.TNT
@@ -143,7 +143,9 @@ on PlayerInteractEvent, {
                 for (Entity entity : entities) {
                     if (!(entity instanceof ArmorStand))
                         return null
-                    if (entity.equipment.helmet.type == Material.REDSTONE_BLOCK) {
+
+                    def type = entity.equipment.helmet.type
+                    if (type == Material.REDSTONE_BLOCK || type == Material.EMERALD_BLOCK) {
                         AnimationUtil.cursorHighlight(user, '§c§lБУМ!')
 
                         entity.helmet = null
@@ -151,7 +153,8 @@ on PlayerInteractEvent, {
                         currentEntity = entity
 
                         B.postpone(50, () -> {
-                            currentEntity.helmet = redstone
+                            stack.type = type
+                            currentEntity.helmet = stack
                         })
 
                         if (Math.random() < 0.9) {

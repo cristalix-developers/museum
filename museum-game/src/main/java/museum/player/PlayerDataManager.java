@@ -22,12 +22,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.event.AccountEvent;
-import ru.cristalix.core.formatting.Formatting;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -111,8 +111,14 @@ public class PlayerDataManager implements Listener {
 
 		timeBar.onJoin(player.getUniqueId());
 		val user = userMap.get(player.getUniqueId());
+		val connection = player.getHandle().playerConnection;
 
-		user.setConnection(player.getHandle().playerConnection);
+		if (connection == null) {
+			event.getPlayer().kickPlayer("Неустойчивое соединение. Перезагрузите сеть.");
+			return;
+		}
+
+		user.setConnection(connection);
 		user.setPlayer(player);
 		user.setState(user.getLastMuseum()); // Загрузка музея
 
@@ -132,13 +138,22 @@ public class PlayerDataManager implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerQuit(PlayerQuitEvent event) {
+		leave(event.getPlayer());
+		event.setQuitMessage(null);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerQuit(PlayerKickEvent event) {
+		leave(event.getPlayer());
+	}
+
+	public void leave(Player current) {
 		// Удаление игрока из таба других игроков
-		val removePlayer = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, ((CraftPlayer) event.getPlayer()).getHandle());
+		val removePlayer = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, ((CraftPlayer) current).getHandle());
 		for (Player player : Bukkit.getOnlinePlayers())
 			((CraftPlayer) player).getHandle().playerConnection.sendPacket(removePlayer);
 
-		timeBar.onQuit(event.getPlayer().getUniqueId());
-		event.setQuitMessage(null);
+		timeBar.onQuit(current.getUniqueId());
 	}
 
 	public double calcMultiplier(UUID uuid, BoosterType type) {
