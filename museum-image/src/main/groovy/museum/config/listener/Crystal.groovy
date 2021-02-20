@@ -14,7 +14,6 @@ import net.minecraft.server.v1_12_R1.EntityArmorStand
 import net.minecraft.server.v1_12_R1.EnumItemSlot
 import net.minecraft.server.v1_12_R1.MinecraftServer
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
@@ -30,16 +29,17 @@ import org.bukkit.inventory.ItemStack
 import ru.cristalix.core.formatting.Formatting
 
 import static museum.boosters.BoosterType.EXP
+import static org.bukkit.Material.*
 
 class Config {
     static def COUNTER = 40
     static def ACTUAL = GemType.getActualGem()
 }
 
-def stack = new ItemStack(Material.REDSTONE_BLOCK)
+def stack = new ItemStack(REDSTONE_BLOCK)
 
 Items.register 'tnt', {
-    item Material.TNT
+    item TNT
     text "§c§lДинамит §fЛКМ"
     amount 3
 }
@@ -64,7 +64,7 @@ registerCommand 'show' handle {
 }
 
 Items.register 'ore', {
-    item Material.CLAY_BALL
+    item CLAY_BALL
     nbt.museum = Config.ACTUAL.oreTexture
     nbt.ore = Config.ACTUAL.name()
     text "§bРуда "
@@ -85,7 +85,7 @@ on PlayerFishEvent, {
         return
     }
     def hookLocation = getHook().location.clone()
-    if (hookLocation.subtract(0, 0.3, 0).block.type == Material.AIR)
+    if (hookLocation.subtract(0, 0.3, 0).block.type == AIR)
         return
     if (getHook().location.distanceSquared(player.location) > 300)
         return
@@ -95,7 +95,7 @@ on PlayerFishEvent, {
 on EntityDamageByEntityEvent, {
     if (damager instanceof Player && entity instanceof ArmorStand) {
         def user = App.app.getUser(damager as Player)
-        if (user.state instanceof International && entity.helmet.type == Material.STONE) {
+        if (user.state instanceof International && entity.helmet.type == STONE) {
             user.inventory.addItem(item)
             AnimationUtil.cursorHighlight(user, "§d§l+1 §fруда");
         }
@@ -106,11 +106,11 @@ on PlayerInteractEvent, {
     def user = App.app.getUser(player)
     if (!(user.state instanceof International))
         return null
-    if (action == Action.PHYSICAL && player.location.getBlock().type == Material.STONE_PLATE) {
+    if (action == Action.PHYSICAL && player.location.getBlock().type == STONE_PLATE) {
         tnt.amount = 3
         player.inventory.addItem(tnt)
     } else if (action == Action.LEFT_CLICK_AIR) {
-        if (player.itemInHand.type == Material.TNT) {
+        if (player.itemInHand.type == TNT) {
             player.itemInHand.setAmount(player.itemInHand.amount - 1)
 
             def myWorld = player.world
@@ -137,7 +137,7 @@ on PlayerInteractEvent, {
                 def newLocation = new Location(myWorld, stand.x, stand.y, stand.z)
                 myWorld.spawnParticle(Particle.EXPLOSION_LARGE, newLocation, 1)
 
-                def entities = newLocation.clone().subtract(0, 1.5, 0).getNearbyEntities(5, 5, 5)
+                def entities = newLocation.clone().subtract(0, 1.5, 0).getNearbyEntities(4, 4, 4)
                 ArmorStand currentEntity
 
                 for (Entity entity : entities) {
@@ -145,19 +145,22 @@ on PlayerInteractEvent, {
                         return null
 
                     def type = entity.equipment.helmet.type
-                    if (type == Material.REDSTONE_BLOCK || type == Material.EMERALD_BLOCK) {
+                    if (type == REDSTONE_BLOCK || type == EMERALD_BLOCK || type == LAPIS_BLOCK) {
                         AnimationUtil.cursorHighlight(user, '§c§lБУМ!')
 
                         entity.helmet = null
+                        entity.glowing = false
+                        entity.setVisible(false)
 
                         currentEntity = entity
 
                         B.postpone(50, () -> {
                             stack.type = type
                             currentEntity.helmet = stack
+                            entity.glowing = true
                         })
 
-                        if (Math.random() < 0.9) {
+                        if (Math.random() < 0.4) {
                             user.giveExperience(1)
                             AnimationUtil.cursorHighlight(user, '§b§l+1 §fопыт')
                         }
@@ -172,7 +175,7 @@ on PlayerInteractEvent, {
 
 on PlayerToggleSneakEvent, {
     if (player.isSneaking()) {
-        if (!player.itemInHand || player.itemInHand.type != Material.CLAY_BALL)
+        if (!player.itemInHand || player.itemInHand.type != CLAY_BALL)
             return null
         def user = App.app.getUser(player)
         if (!(user.state instanceof International))
@@ -181,12 +184,12 @@ on PlayerToggleSneakEvent, {
         for (Entity entity : entities) {
             if (!(entity instanceof ArmorStand))
                 return null
-            if (entity.equipment.itemInHand.type == Material.CLAY_BALL) {
-                if (player.itemInHand.type == Material.CLAY_BALL) {
+            if (entity.equipment.itemInHand.type == CLAY_BALL) {
+                if (player.itemInHand.type == CLAY_BALL) {
                     def craftItem = CraftItemStack.asNMSCopy(player.itemInHand)
                     if (craftItem.tag && craftItem.tag.hasKeyOfType('ore', 8)) {
                         player.itemInHand.setAmount(player.itemInHand.amount - 1)
-                        if (Math.random() < 0.3) {
+                        if (Math.random() < 0.1) {
                             user.giveExperience(1)
                             AnimationUtil.cursorHighlight(user, '§b§l+1 §fопыт')
                         }
@@ -207,7 +210,7 @@ static void tryGive(User user, float chance) {
     }
 
     if (Math.random() < chance) {
-        def gem = new Gem(Config.ACTUAL.name() + ":" + Math.random() / 1.42 + ":500000")
+        def gem = new Gem(Config.ACTUAL.name() + ":" + Math.random() / 1.38 + ":500000")
         gem.give(user)
         AnimationUtil.throwIconMessage(user, gem.item, gem.type.title, "Находка!")
         App.app.users.forEach { User currentUser ->

@@ -29,7 +29,7 @@ public class TreasureUtil {
 			getTreasurePrice(item).ifPresent(price -> {
 				user.depositMoneyWithBooster(price * item.getAmount());
 				MessageUtil.find("treasure-item")
-						.set("cost", price * item.getAmount())
+						.set("cost", (int) (price * item.getAmount()))
 						.send(user);
 				item.setAmount(0);
 			});

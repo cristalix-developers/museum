@@ -30,7 +30,7 @@ register 'relic-totem', {
     nbt.relic = 'totem'
     nbt.museum = 'totem'
     nbt.glow_color = 0x50008000
-    text """⭐⭐⭐ &fТотем Майя
+    text """⭐⭐⭐ §eТотем Майя
 
     &eДоход оценивается в 14\$
     
@@ -48,7 +48,7 @@ register 'relic-shap', {
     nbt.relic = 'shap'
     nbt.museum = 'shap'
     nbt.glow_color = 0x50808080
-    text """⭐ &fМаска война Майя
+    text """⭐ §eМаска война Майя
 
     &eДоход оценивается в 8\$
     
@@ -66,7 +66,7 @@ register 'relic-yantar', {
     nbt.relic = 'yantar'
     nbt.museum = 'yantar'
     nbt.glow_color = 0x50000080
-    text """⭐⭐⭐ &fЯнтарь
+    text """⭐⭐⭐ §eЯнтарь
 
     &eДоход оценивается в 20\$
     
@@ -85,7 +85,7 @@ register 'relic-tooth', {
     nbt.relic = 'tooth'
     nbt.museum = 'tooth'
     nbt.glow_color = 0x50808080
-    text """⭐ &fЗуб мегалодона
+    text """⭐ §eЗуб мегалодона
 
     &eДоход оценивается в 9\$
         
@@ -103,7 +103,7 @@ register 'relic-anubis', {
     nbt.relic = 'anubis'
     nbt.museum = 'anubisstick'
     nbt.glow_color = 0x50008000
-    text """⭐⭐ &fОрудие Анубиса
+    text """⭐⭐ §eОрудие Анубиса
 
     &eДоход оценивается в 12\$
         
@@ -121,7 +121,7 @@ register 'relic-pot', {
     nbt.relic = 'pot'
     nbt.museum = 'pot'
     nbt.glow_color = 0x50808080
-    text """⭐ &fДревний горшок
+    text """⭐ §eДревний горшок
 
     &eДоход оценивается в 7\$
         
@@ -139,7 +139,7 @@ register 'relic-shield', {
     nbt.relic = 'shield'
     nbt.museum = 'shieldofruin'
     nbt.glow_color = 0x50008000
-    text """⭐⭐ &fЩит война Древнего Египта
+    text """⭐⭐ §eЩит война Древнего Египта
 
     &eДоход оценивается в 10\$
         

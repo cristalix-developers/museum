@@ -10,7 +10,6 @@ import museum.client_conversation.AnimationUtil;
 import museum.fragment.GemType;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
-import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Location;
@@ -91,7 +90,6 @@ public class CrystalExcavations implements International {
 
 	@Override
 	public void leaveState(User user) {
-		MessageUtil.find("leave-crystal").send(user);
 	}
 
 	@Override
@@ -107,13 +105,14 @@ public class CrystalExcavations implements International {
 	@Override
 	public void acceptBlockBreak(User user, PacketPlayInBlockDig packet) {
 		if (packet.c == PacketPlayInBlockDig.EnumPlayerDigType.START_DESTROY_BLOCK) {
+			val location = new Location(user.getWorld(), packet.a.getX(), packet.a.getY(), packet.a.getZ());
 
-			if (!packet.a.isValidLocation())
+			if (location.distanceSquared(user.getLocation()) > 29)
 				return;
 
-			val block = new Location(user.getWorld(), packet.a.getX(), packet.a.getY(), packet.a.getZ()).getBlock();
+			val block = location.getBlock();
 
-			if (block != null && block.getChunk().isLoaded() && block.getType() == Material.STAINED_GLASS) {
+			if (block != null && block.getType() == Material.STAINED_GLASS) {
 				block.setType(Material.AIR);
 				user.getInventory().addItem(ore);
 				AnimationUtil.cursorHighlight(user, "§d§l+1 §fруда");

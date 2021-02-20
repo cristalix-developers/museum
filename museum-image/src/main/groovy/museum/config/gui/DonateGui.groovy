@@ -17,15 +17,16 @@ Guis.register 'donate', { player ->
     title '§bВнутриигровые покупки'
     layout """
         ----X----
-        -X-MPZ-Y-
-        ----J----
+        -X--J--Y-
+        --P-M-Z--
     """
 
     button 'P' icon {
         item CLAY_BALL
         nbt.other = 'guild_members'
         text """
-        §bКомиссия 0%
+        §aКомиссия 0%
+
          ${modifyPrice(user.uniqueId, DonateType.PRIVILEGES.price)}
 
         Если вы §aпродаете или покупаете
@@ -40,7 +41,8 @@ Guis.register 'donate', { player ->
     button 'X' icon {
         item END_CRYSTAL
         text """
-        §bСлучайный префикс
+        §aСлучайный префикс
+
          ${modifyPrice(user.uniqueId, DonateType.PREFIX_CASE.price)}
         
         §7Получите случайный префикс!
@@ -58,7 +60,8 @@ Guis.register 'donate', { player ->
     button 'J' icon {
         item BEACON
         text """
-        §bГлобальный бустер посетителей §6§lx3
+        §aГлобальный бустер посетителей §6§lx3
+
         ${modifyPrice(user.uniqueId, DonateType.GLOBAL_VILLAGER_BOOSTER.price)}
         
         Общий бустер на §b1 час§f,
@@ -73,6 +76,7 @@ Guis.register 'donate', { player ->
         item EXP_BOTTLE
         text """
         §bГлобальный бустер опыта §6§lx2
+
         ${modifyPrice(user.uniqueId, DonateType.GLOBAL_EXP_BOOSTER.price)}
         
         Общий бустер на §b1 час§f,
@@ -86,7 +90,8 @@ Guis.register 'donate', { player ->
         item GOLDEN_APPLE
         data 1
         text """
-        §6Глобальный бустер денег §6§lx2 
+        §eГлобальный бустер денег §6§lx2 
+
         ${modifyPrice(user.uniqueId, DonateType.GLOBAL_MONEY_BOOSTER.price)}
         
         Общий бустер на §b1 час§f,
@@ -101,6 +106,7 @@ Guis.register 'donate', { player ->
         nbt.museum = 'parovoz'
         text """
         §6Стим-панк сборщик монет
+
         ${modifyPrice(user.uniqueId, DonateType.STEAM_PUNK_COLLECTOR.price)}
         
         §bБыстрее всех§f! Собирает самые
@@ -119,7 +125,8 @@ Guis.register 'donate', { player ->
         nbt.HideFlags = 63
         nbt.prison = '23feb'
         text """
-        §bЛегендарная кирка
+        §b§lЛегендарная кирка
+
         ${modifyPrice(user.uniqueId, DonateType.LEGENDARY_PICKAXE.price)}
         
         Особая кирка, приносит 
