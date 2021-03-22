@@ -72,12 +72,11 @@ public class PreparePlayerBrain implements Prepare {
 
 					AnimationUtil.topTitle(
 							user,
-							"§aВаша ежедневная награда §6§l%s§f, §b§l15 опыта§f, §d20㦶",
+							"§aВаша ежедневная награда §6§l%s§f, §b§l15 опыта§f",
 							MessageUtil.toMoneyFormat(dailyReward)
 					);
 					user.setMoney(user.getMoney() + dailyReward);
 					user.giveExperience(15);
-					user.setCrystal(user.getCrystal() + 20);
 				} else {
 					AnimationUtil.topTitle(user, "Добро пожаловать в ваш §bМузей§f! 㗩");
 				}

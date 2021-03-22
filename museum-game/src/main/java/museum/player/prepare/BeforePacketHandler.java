@@ -15,10 +15,9 @@ import museum.client_conversation.AnimationUtil;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.international.International;
-import museum.misc.Relic;
+import museum.fragment.Relic;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
-import museum.museum.subject.RelicShowcaseSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
@@ -26,7 +25,6 @@ import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.player.pickaxe.PickaxeType;
-import museum.prototype.Managers;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
@@ -34,11 +32,9 @@ import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.Collection;
 import java.util.List;
 
 import static museum.excavation.Excavation.isAir;
@@ -77,7 +73,7 @@ public class BeforePacketHandler implements Prepare {
 					if (dig.c == DROP_ITEM || dig.c == DROP_ALL_ITEMS)
 						return;
 					MinecraftServer.SERVER.postToMainThread(() -> onDigging(user, dig));
-				} else if (packetObj instanceof PacketPlayInSteerVehicle) {
+				} else if (packetObj instanceof PacketPlayInSteerVehicle && user.getRiding() != null) {
 					// Если игрок на коллекторе и нажимает шифт, то скинуть его
 					onUnmount(user, (PacketPlayInSteerVehicle) packetObj);
 				}
@@ -119,10 +115,7 @@ public class BeforePacketHandler implements Prepare {
 				acceptMuseumClick(user, packet);
 			else if (itemInMainHand != null && itemInMainHand.equals(EMERGENCY_STOP)) {
 				if (user.getState() instanceof International) {
-					B.postpone(10, () -> user.setState(user.getLastMuseum() == null ?
-							user.getMuseums().get(Managers.museum.getPrototype("main")) :
-							user.getLastMuseum()
-					));
+					B.postpone(10, () -> user.setState(user.getLastMuseum()));
 				} else {
 					tryReturnPlayer(user, true);
 				}
@@ -138,53 +131,19 @@ public class BeforePacketHandler implements Prepare {
 		for (Subject subject : museum.getSubjects()) {
 			for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
 				if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
-					// Если это витрина для реликвий и в руке реликвия - поставить
-					if (subject instanceof RelicShowcaseSubject) {
-						val itemInHand = user.getPlayer().getItemInHand();
-						if (itemInHand != null && itemInHand.hasItemMeta()) {
-							val nmsItem = CraftItemStack.asNMSCopy(itemInHand);
-							if (nmsItem.tag != null && nmsItem.tag.hasKeyOfType("relic", 8)) {
-								placeRelic(user, (RelicShowcaseSubject) subject, nmsItem);
-							}
-						}
+					// Открытие меню настройки постройки
+					packet.a = DUMMY; // Genius
+					if (user != museum.getOwner())
+						MessageUtil.find("non-root").send(user);
+					else {
+						subject.acceptClick();
+						Guis.open(user.getPlayer(), "manipulator", subject.getCachedInfo().getUuid());
 					}
-					// Открыть манипулятор
-					openManipulator(user, museum, packet, subject);
 					break;
 				}
 			}
 		}
 		BeforePacketHandler.this.acceptSubjectPlace(user, museum, packet.a);
-	}
-
-	private void placeRelic(User user, RelicShowcaseSubject stand, net.minecraft.server.v1_12_R1.ItemStack item) {
-		if (stand.getRelic() == null) {
-			for (Relic currentRelic : user.getRelics()) {
-				if (currentRelic.getUuid().toString().equals(item.tag.getString("relic-uuid"))) {
-					user.getPlayer().setItemInHand(null);
-					user.getRelics().remove(currentRelic);
-					stand.setRelic(currentRelic);
-					stand.updateRelic();
-					stand.getAllocation().perform(Allocation.Action.SPAWN_PIECES);
-					MessageUtil.find("relic-placed")
-							.set("title", currentRelic.getRelic().getItemMeta().getDisplayName())
-							.send(user);
-					return;
-				}
-			}
-		} else {
-			MessageUtil.find("relic-in-hand").send(user);
-		}
-	}
-
-	private void openManipulator(User user, Museum museum, PacketPlayInUseItem packet, Subject subject) {
-		packet.a = DUMMY; // Genius
-		B.run(() -> {
-			if (user != museum.getOwner())
-				MessageUtil.find("non-root").send(user);
-			else
-				Guis.open(user.getPlayer(), "manipulator", subject.getCachedInfo().getUuid());
-		});
 	}
 
 	private void acceptSubjectPlace(User user, Museum museum, BlockPosition position) {
@@ -204,7 +163,6 @@ public class BeforePacketHandler implements Prepare {
 		}
 
 		Location origin = location.clone().add(0, 1, 0);
-		Collection<User> viewers = museum.getUsers();
 		if (!museum.addSubject(subject, origin)) {
 			MessageUtil.find("cannot-place").send(user);
 			return;
@@ -212,9 +170,9 @@ public class BeforePacketHandler implements Prepare {
 
 		user.getInventory().setItemInMainHand(AIR_ITEM);
 		subject.getAllocation().perform(Allocation.Action.UPDATE_BLOCKS, Allocation.Action.SPAWN_PIECES, Allocation.Action.SPAWN_DISPLAYABLE);
-		for (User viewer : viewers) {
+
+		for (User viewer : museum.getUsers())
 			viewer.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
-		}
 
 		MessageUtil.find("placed").send(user);
 	}
@@ -227,13 +185,10 @@ public class BeforePacketHandler implements Prepare {
 			return true;
 
 		if (excavation.getHitsLeft() < 1 || force) {
-			user.getPlayer().sendTitle("§6Раскопки завершены!", "до возвращения 5 сек.");
+			user.sendTitle("§6Раскопки завершены!", "до возвращения 5 сек.");
 			MessageUtil.find("excavationend").send(user);
 			B.postpone(100, () -> {
-				user.setState(user.getLastMuseum() == null ?
-						user.getMuseums().get(Managers.museum.getPrototype("main")) :
-						user.getLastMuseum()
-				);
+				user.setState(user.getLastMuseum());
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			});
 			excavation.setHitsLeft(-1);
@@ -254,13 +209,13 @@ public class BeforePacketHandler implements Prepare {
 			val relics = ((Excavation) user.getState()).getPrototype().getRelics();
 			if (relics != null && relics.length > 0) {
 				val randomRelic = new Relic(
-						ListUtils.random(((Excavation) user.getState()).getPrototype().getRelics()).getPrototypeAddress()
+						ListUtils.random(((Excavation) user.getState()).getPrototype().getRelics()).getAddress()
 				);
-				val relicTitle = randomRelic.getRelic().getItemMeta().getDisplayName();
-				user.getPlayer().getInventory().addItem(randomRelic.getRelic());
-				user.getRelics().add(randomRelic);
+				randomRelic.give(user);
+				val item = randomRelic.getItem();
+				val relicTitle = item.getItemMeta().getDisplayName();
 
-				AnimationUtil.throwIconMessage(user, randomRelic.getRelic(), relicTitle, "Находка!");
+				AnimationUtil.throwIconMessage(user, item, relicTitle, "Находка!");
 				MessageUtil.find("relic-find")
 						.set("title", relicTitle)
 						.send(user);

@@ -11,7 +11,6 @@ import museum.donate.DonateType
 import museum.museum.Museum
 import museum.museum.subject.CollectorSubject
 import museum.packages.SaveUserPackage
-import museum.player.User
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
@@ -53,7 +52,7 @@ registerCommand 'prefixes' handle {
 def prefixes = [
         new Prefix('䂋', 'Любовь', 3, '§l40% §fполучить +§b1 опыт'),
         new Prefix('㧥', 'Бывший бомж', 3, '§f+§620`000\$ §e ежедневной награды'),
-        new Prefix('㕐', '§bПопаду на луну', 3, '§ex2 §fцена продажи §d㦶'),
+        new Prefix('㕐', '§bПопаду на луну', 3, '§b+20% §fшанса получить камень'),
         new Prefix('㫐', 'Dead inside', 2),
         new Prefix('㕄', 'Радуга', 2),
         new Prefix('㗤', '§eЦирк', 2),
@@ -73,10 +72,6 @@ def prefixes = [
         new Prefix('㗯', 'Люблю музыку', 1),
 ]
 
-def openCase(User opener) {
-
-}
-
 Guis.register 'prefixes', {
     if (!(context instanceof Player))
         return
@@ -93,7 +88,7 @@ Guis.register 'prefixes', {
     button 'O' icon {
         item END_CRYSTAL
         text """
-        §bСлучайный префикс §fза §d45`000㦶
+        §bСлучайный префикс §fза §e10'000'000\$
         
         §7Получите случайный префикс!
         
@@ -104,8 +99,8 @@ Guis.register 'prefixes', {
         §6редкий §fили §dэпичный §fпрефикс
         """
     } leftClick {
-        if (user.crystal >= 45000) {
-            user.crystal = user.crystal - 45000
+        if (user.money >= 10000000) {
+            user.money = user.money - 10000000
             def randomPrefix = ListUtils.random(
                     user.prefixChestOpened % 5 == 0 ?
                             prefixes.stream()
@@ -172,7 +167,7 @@ Guis.register 'prefixes', {
         button 'X' icon {
             item IRON_INGOT
             text "[ ${prefix.prefix} §f] ${prefix.title} ${have ? '§aВЫБРАТЬ' : ''}"
-            text have ? "" : "§7Можно купить за §d10`000㦶"
+            text have ? "" : "§7Можно купить за §e10'000'000\$"
             text """    
                                 
             Редкость: §aобычный
@@ -241,6 +236,10 @@ registerCommand 'proccessdonate' handle {
                 AnimationUtil.topTitle user, "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
             }
             user.prefixChestOpened = user.prefixChestOpened + 1
+        } else if (donate == DonateType.PRIVILEGES) {
+            user.privileges = true
+            user.donates.add(donate as DonateType)
+            AnimationUtil.topTitle user, "Вы избавились от комиссии! Спасибо за поддержку. 㶅"
         } else if (donate == DonateType.LEGENDARY_PICKAXE) {
             user.pickaxeType = PickaxeType.LEGENDARY
             user.donates.add(donate as DonateType)

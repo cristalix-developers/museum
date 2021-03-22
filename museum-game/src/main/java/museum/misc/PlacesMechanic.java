@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
+import museum.client_conversation.AnimationUtil;
 import museum.client_conversation.ScriptTransfer;
 import museum.player.User;
 import museum.util.MessageUtil;
@@ -25,8 +26,6 @@ import java.util.stream.Collectors;
 public class PlacesMechanic {
 
 	private static final Map<String, Place> places = Maps.newHashMap();
-	private static final ScriptTransfer CHEST_REWARD = new ScriptTransfer()
-			.item(CraftItemStack.asNMSCopy(new ItemStack(Material.CHEST)));
 
 	public static void init(App app) {
 		places.putAll(app.getMap().getLabels("place").stream()
@@ -37,7 +36,20 @@ public class PlacesMechanic {
 							UtilV3.fromVector(place.toVector()),
 							Double.parseDouble(ss[0]),
 							Integer.parseInt(ss[1]),
+							0,
 							tag.substring(2 + ss[0].length() + ss[1].length())
+					);
+				}).collect(Collectors.toMap(Place::getTitle, place -> place)));
+		places.putAll(app.getMap().getLabels("prize").stream()
+				.map(place -> {
+					val tag = place.getTag();
+					val ss = tag.split("\\s+");
+					return new Place(
+							UtilV3.fromVector(place.toVector()),
+							2,
+							Integer.parseInt(ss[1]) / 10,
+							Integer.parseInt(ss[3]),
+							place.getCoords()
 					);
 				}).collect(Collectors.toMap(Place::getTitle, place -> place)));
 	}
@@ -53,11 +65,9 @@ public class PlacesMechanic {
 			val v3 = place.getPlace();
 			if (v3.distanceSquared(to) < place.getRadius() * place.getRadius()) {
 				user.getClaimedPlaces().add(place.getTitle());
-				if (place.title.contains("WOW!")) {
-					// Выбор подарка, пока он только один, поэтому и награда такая
-					CHEST_REWARD.send("opencase", user);
-					user.setMoney(user.getMoney() + 100000);
-					break;
+				if (place.claimedMoney > 0) {
+					user.setMoney(user.getMoney() + place.claimedMoney);
+					AnimationUtil.cursorHighlight(user, "§e+§l" + place.claimedMoney);
 				}
 				user.giveExperience(place.getClaimedExp());
 				MessageUtil.find("claim-place")
@@ -75,6 +85,7 @@ public class PlacesMechanic {
 		private final V3 place;
 		private final double radius;
 		private final int claimedExp;
+		private final int claimedMoney;
 		private final String title;
 	}
 }

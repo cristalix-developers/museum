@@ -13,7 +13,10 @@ import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.donate.DonateType;
-import museum.international.CrystalExcavation;
+import museum.international.CrystalExcavations;
+import museum.international.International;
+import museum.international.Market;
+import museum.misc.MuseumChatService;
 import museum.misc.PlacesMechanic;
 import museum.museum.Shop;
 import museum.museum.map.SubjectType;
@@ -25,7 +28,6 @@ import museum.ticker.detail.FountainHandler;
 import museum.ticker.detail.WayParticleHandler;
 import museum.ticker.top.TopManager;
 import museum.util.MapLoader;
-import museum.util.MuseumChatService;
 import museum.visitor.VisitorHandler;
 import museum.worker.WorkerUtil;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -63,10 +65,11 @@ public final class App extends JavaPlugin {
 	private TopManager topManager;
 	private ClientSocket clientSocket;
 	private WorldMeta map;
-	private CrystalExcavation crystalExcavation;
 	private YamlConfiguration configuration;
 
 	private Shop shop;
+	private Market market;
+	private International crystal;
 
 	@Override
 	public void onEnable() {
@@ -77,26 +80,9 @@ public final class App extends JavaPlugin {
 		AdminCommand.init(this);
 
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
-
-		String museumServiceHost = System.getenv("MUSEUM_SERVICE_HOST");
-		if (museumServiceHost == null || museumServiceHost.isEmpty()) {
-			System.out.println("No MUSEUM_SERVICE_HOST environment variable specified!");
-			museumServiceHost = "127.0.0.1";
-		}
-
-		int museumServicePort;
-		try {
-			museumServicePort = Integer.parseInt(System.getenv("MUSEUM_SERVICE_PORT"));
-		} catch (NumberFormatException | NullPointerException exception) {
-			System.out.println("No MUSEUM_SERVICE_PORT environment variable specified!");
-			museumServicePort = 14653;
-		}
-
-		String museumServicePassword = System.getenv("MUSEUM_SERVICE_PASSWORD");
-		if (museumServicePassword == null) {
-			System.out.println("No MUSEUM_SERVICE_PASSWORD environment variable specified!");
-			museumServicePassword = "12345";
-		}
+		String museumServiceHost = getEnv("MUSEUM_SERVICE_HOST", "127.0.0.1");
+		int museumServicePort = Integer.parseInt(getEnv("MUSEUM_SERVICE_PORT", "14653"));
+		String museumServicePassword = getEnv("MUSEUM_SERVICE_PASSWORD", "12345");
 
 		this.clientSocket = new ClientSocket(
 				museumServiceHost,
@@ -152,7 +138,8 @@ public final class App extends JavaPlugin {
 					Class<?> scriptClass = Class.forName(line);
 					if (!Script.class.isAssignableFrom(scriptClass)) continue;
 					readScript(scriptClass);
-				} catch (ClassNotFoundException ignored) {}
+				} catch (ClassNotFoundException ignored) {
+				}
 			}
 		} catch (Exception exception) {
 			exception.printStackTrace();
@@ -161,8 +148,7 @@ public final class App extends JavaPlugin {
 		// Загрузка основного мира
 		map = MapLoader.load("prod1");
 		MapLoader.interceptChunkWriter(this, getNMSWorld());
-		// Загрузка международной кристальной экспедиции
-		crystalExcavation = new CrystalExcavation();
+		crystal = new CrystalExcavations(this);
 
 		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
 		SubjectType.init();
@@ -181,6 +167,7 @@ public final class App extends JavaPlugin {
 		// Инициализация команд
 		new MuseumCommands(this);
 		this.shop = new Shop(this);
+		this.market = new Market(this);
 
 		// Регистрация обработчиков событий
 		B.events(
@@ -199,6 +186,7 @@ public final class App extends JavaPlugin {
 				topManager
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
+		// Постоянный перерасчет множителя кол-ва посетителей музея
 		VisitorHandler.init(this, () -> (int) Math.ceil(3F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
 
 		// Вывод сервера меню
@@ -251,6 +239,15 @@ public final class App extends JavaPlugin {
 
 	public Collection<User> getUsers() {
 		return playerDataManager.getUsers();
+	}
+
+	private String getEnv(String name, String defaultValue) {
+		String field = System.getenv(name);
+		if (field == null || field.isEmpty()) {
+			System.out.println("No " + name + " environment variable specified!");
+			field = defaultValue;
+		}
+		return field;
 	}
 
 	private void requestConfigurations() {

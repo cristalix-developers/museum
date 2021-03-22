@@ -50,4 +50,6 @@ public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 	public double getIncome() {
 		return 0;
 	}
+
+	public void acceptClick() {}
 }

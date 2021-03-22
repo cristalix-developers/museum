@@ -1,8 +1,10 @@
 package museum.player;
 
 import clepto.ListUtils;
+import clepto.bukkit.item.Items;
 import museum.App;
 import museum.util.ChunkWriter;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
@@ -15,6 +17,8 @@ public interface State {
 			PotionEffectType.NIGHT_VISION,
 			999999, 10, false, false
 	);
+
+	ItemStack BACK_ITEM = Items.render("back").asBukkitMirror();
 
 	void setupScoreboard(User user, SimpleBoardObjective obj);
 

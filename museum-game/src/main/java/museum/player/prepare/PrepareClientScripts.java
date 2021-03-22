@@ -1,14 +1,12 @@
 package museum.player.prepare;
 
-import clepto.bukkit.B;
 import clepto.cristalix.Cristalix;
 import museum.App;
 import museum.player.User;
 import ru.cristalix.core.display.messages.JavaScriptMessage;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.File;
+import java.nio.file.Files;
 import java.util.stream.Collectors;
 
 /**
@@ -23,13 +21,9 @@ public class PrepareClientScripts implements Prepare {
 
 	public PrepareClientScripts() {
 		try {
-			InputStream resource = B.plugin.getResource("clientcode.bundle.js");
-
-			String jsCode = new BufferedReader(new InputStreamReader(resource))
-					.lines()
-					.collect(Collectors.joining("\n"));
-
-			scriptsMessage = new JavaScriptMessage(new String[] {jsCode});
+			scriptsMessage = new JavaScriptMessage(new String[] {
+					Files.lines(new File("./scripts/bundle.js").toPath()).collect(Collectors.joining("\n"))
+			});
 		} catch (Exception exception) {
 			throw new RuntimeException(exception);
 		}

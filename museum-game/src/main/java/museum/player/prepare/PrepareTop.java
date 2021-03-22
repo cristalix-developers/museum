@@ -1,7 +1,7 @@
 package museum.player.prepare;
 
 import museum.App;
-import museum.client_conversation.ScriptTransfer;
+import museum.client_conversation.AnimationUtil;
 import museum.player.User;
 
 /**
@@ -13,8 +13,10 @@ public class PrepareTop implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		new ScriptTransfer()
-				.string("{\"INCOME\":{\"x\":266,\"y\":89.8,\"z\":-270,\"yaw\":-135,\"title\":\"Топ по доходу\"},\"EXPERIENCE\":{\"x\":261,\"y\":89.8,\"z\":-278,\"yaw\":-90,\"title\":\"Топ по опыту\"},\"MONEY\":{\"x\":266,\"y\":90,\"z\":-286,\"yaw\":-45,\"title\":\"Топ по деньгам\"}}")
-				.send("top-create", user);
+		AnimationUtil.generateMessage(
+				"{\"INCOME\":{\"x\":266,\"y\":89.8,\"z\":-270,\"yaw\":-135,\"title\":\"Топ по доходу\"},\"EXPERIENCE\":{\"x\":261,\"y\":89.8,\"z\":-278,\"yaw\":-90,\"title\":\"Топ по опыту\"},\"MONEY\":{\"x\":266,\"y\":90,\"z\":-286,\"yaw\":-45,\"title\":\"Топ по деньгам\"}}",
+				"top-create",
+				user
+		);
 	}
 }

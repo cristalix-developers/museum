@@ -1,5 +1,5 @@
+@groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config
-
 
 import museum.museum.subject.Subject
 import museum.museum.subject.skeleton.Skeleton
@@ -12,7 +12,6 @@ register 'hook', {
     text '&eКрюк'
     nbt.Unbreakable = 1
 }
-
 
 register 'crystal', {
     item CLAY_BALL
@@ -27,10 +26,11 @@ register 'crystal', {
 
 register 'relic-totem', {
     item CLAY_BALL
-    nbt.price = 14
+    nbt.price = 1400
     nbt.relic = 'totem'
     nbt.museum = 'totem'
-    text """&e⭐⭐⭐ &fТотем Майя
+    nbt.glow_color = 0x50008000
+    text """⭐⭐⭐ §eТотем Майя
 
     &eДоход оценивается в 14\$
     
@@ -44,12 +44,13 @@ register 'relic-totem', {
 
 register 'relic-shap', {
     item CLAY_BALL
-    nbt.price = 12
+    nbt.price = 800
     nbt.relic = 'shap'
     nbt.museum = 'shap'
-    text """&e⭐⭐ &fМаска война Майя
+    nbt.glow_color = 0x50808080
+    text """⭐ §eМаска война Майя
 
-    &eДоход оценивается в 12\$
+    &eДоход оценивается в 8\$
     
     Можно продать перекупщику 
 
@@ -61,10 +62,11 @@ register 'relic-shap', {
 
 register 'relic-yantar', {
     item CLAY_BALL
-    nbt.price = 20
+    nbt.price = 2000
     nbt.relic = 'yantar'
     nbt.museum = 'yantar'
-    text """&e⭐⭐⭐ &fЯнтарь
+    nbt.glow_color = 0x50000080
+    text """⭐⭐⭐ §eЯнтарь
 
     &eДоход оценивается в 20\$
     
@@ -79,12 +81,13 @@ register 'relic-yantar', {
 
 register 'relic-tooth', {
     item CLAY_BALL
-    nbt.price = 10
+    nbt.price = 900
     nbt.relic = 'tooth'
     nbt.museum = 'tooth'
-    text """&e⭐⭐ &fЗуб мегалодона
+    nbt.glow_color = 0x50808080
+    text """⭐ §eЗуб мегалодона
 
-    &eДоход оценивается в 10\$
+    &eДоход оценивается в 9\$
         
     Можно продать перекупщику 
 
@@ -96,10 +99,11 @@ register 'relic-tooth', {
 
 register 'relic-anubis', {
     item CLAY_BALL
-    nbt.price = 12
+    nbt.price = 1200
     nbt.relic = 'anubis'
     nbt.museum = 'anubisstick'
-    text """&e⭐⭐ &fОрудие Анубиса
+    nbt.glow_color = 0x50008000
+    text """⭐⭐ §eОрудие Анубиса
 
     &eДоход оценивается в 12\$
         
@@ -113,10 +117,11 @@ register 'relic-anubis', {
 
 register 'relic-pot', {
     item CLAY_BALL
-    nbt.price = 7
+    nbt.price = 700
     nbt.relic = 'pot'
     nbt.museum = 'pot'
-    text """&e⭐ &fДревний горшок
+    nbt.glow_color = 0x50808080
+    text """⭐ §eДревний горшок
 
     &eДоход оценивается в 7\$
         
@@ -130,10 +135,11 @@ register 'relic-pot', {
 
 register 'relic-shield', {
     item CLAY_BALL
-    nbt.price = 10
+    nbt.price = 1000
     nbt.relic = 'shield'
     nbt.museum = 'shieldofruin'
-    text """&e⭐⭐ &fЩит война Древнего Египта
+    nbt.glow_color = 0x50008000
+    text """⭐⭐ §eЩит война Древнего Египта
 
     &eДоход оценивается в 10\$
         

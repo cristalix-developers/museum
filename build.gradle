@@ -15,7 +15,12 @@ subprojects {
         }
     }
 
-    project.ext.mavenUri = "$nmsMavenUri $cristalixMavenUri"
+    def nmsEnv = System.getenv('NMS_MAVEN_URI')
+    def cristalixEnv = System.getenv('CRISTALIX_MAVEN_URI')
+    def nms = nmsEnv ? nmsEnv : "$nmsMavenUri"
+    def cristalix = cristalixEnv ? cristalixEnv : "$cristalixMavenUri"
+
+    project.ext.mavenUri = nms + ' ' + cristalix
     apply from: '../mavenAuth.gradle'
 
     compileJava.options.encoding 'UTF-8'
