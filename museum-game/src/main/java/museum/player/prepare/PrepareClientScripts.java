@@ -1,13 +1,19 @@
 package museum.player.prepare;
 
-import clepto.cristalix.Cristalix;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import lombok.val;
 import museum.App;
 import museum.player.User;
-import ru.cristalix.core.display.messages.JavaScriptMessage;
+import net.minecraft.server.v1_12_R1.PacketDataSerializer;
+import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
+import ru.cristalix.core.display.DisplayChannels;
+import ru.cristalix.core.display.messages.Mod;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author func 13.06.2020
@@ -17,13 +23,18 @@ public class PrepareClientScripts implements Prepare {
 
 	public static final Prepare INSTANCE = new PrepareClientScripts();
 
-	private final JavaScriptMessage scriptsMessage;
+	private final List<PacketPlayOutCustomPayload> packets = new ArrayList<>();
 
 	public PrepareClientScripts() {
 		try {
-			scriptsMessage = new JavaScriptMessage(new String[] {
-					Files.lines(new File("./scripts/bundle.js").toPath()).collect(Collectors.joining("\n"))
-			});
+			val dir = new File("./mods/");
+			for (val file : dir.listFiles()) {
+				byte[] serialize = Mod.serialize(new Mod(Files.readAllBytes(file.toPath())));
+				ByteBuf buffer = Unpooled.buffer();
+				buffer.writeBytes(serialize);
+				PacketDataSerializer ds = new PacketDataSerializer(buffer);
+				packets.add(new PacketPlayOutCustomPayload(DisplayChannels.MOD_CHANNEL, ds));
+			}
 		} catch (Exception exception) {
 			throw new RuntimeException(exception);
 		}
@@ -31,6 +42,8 @@ public class PrepareClientScripts implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		Cristalix.displayService().sendScripts(user.getUuid(), scriptsMessage);
+		for (PacketPlayOutCustomPayload packet : packets) {
+			user.sendPacket(packet);
+		}
 	}
 }

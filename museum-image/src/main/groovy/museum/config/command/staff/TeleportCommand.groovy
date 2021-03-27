@@ -27,6 +27,17 @@ registerCommand 'tpshow' handle {
     }
 }
 
+registerCommand 'get' handle {
+    def user = getIfLS(delegate)
+    if (user) {
+        def player = Bukkit.getPlayer args[0]
+        if (player && player.online) {
+            user.player.showPlayer(App.app, player)
+            player.teleport user.location
+        }
+    }
+}
+
 registerCommand 'tpmus' handle {
     if (getIfLS(delegate)) {
         Integer num = 1
