@@ -28,8 +28,6 @@ public class Shop implements State {
 		val inventory = user.getInventory();
 		inventory.clear();
 		inventory.setItem(8, BACK_ITEM);
-
-		WorkerUtil.reload(user);
 	}
 
 	@Override

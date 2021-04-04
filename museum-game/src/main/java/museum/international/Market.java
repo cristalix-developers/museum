@@ -49,8 +49,6 @@ public class Market implements State {
 				"  нажмите §bправой кнопкой мыши§f,",
 				"  зажимая §bс покупателем SHIFT."
 		);
-
-		WorkerUtil.reload(user);
 	}
 
 	@Override

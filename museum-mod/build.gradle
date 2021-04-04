@@ -1,0 +1,70 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        maven {
+            url "https://repo.implario.dev/public"
+        }
+        maven {
+            url "https://libraries.minecraft.net/"
+        }
+    }
+    dependencies {
+        classpath("ru.cristalix:bundler:2.1.4")
+    }
+}
+
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.30'
+    id 'org.hidetake.ssh' version '2.10.1'
+}
+
+apply plugin: 'ru.cristalix.uiengine.bundler'
+apply plugin: 'kotlin'
+
+bundler {
+    name 'ShoppingHandler'
+    mainClass 'ru.func.mod.ShoppingHandler'
+    version '1.0'
+    author 'func'
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+afterEvaluate {
+    jarFlattened.doFirst {
+        dontobfuscate()
+    }
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+}
+
+
+dependencies {
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.4.30'
+
+    compileOnly 'dev.xdark:clientapi:1.0.7'
+    compileOnly 'dev.xdark:feder:1.0-SNAPSHOT'
+    implementation 'ru.cristalix:uiengine:3.6.1'
+    compileOnly "org.lwjgl.lwjgl:lwjgl:2.9.3"
+    compileOnly "org.lwjgl.lwjgl:lwjgl_util:2.9.3"
+    compileOnly "io.netty:netty-buffer:4.1.58.Final"
+    compileOnly 'com.google.code.gson:gson:2.8.6'
+}
+
+jar {
+    from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
+}
+
+if (file('upload.gradle').file) apply from: 'upload.gradle'

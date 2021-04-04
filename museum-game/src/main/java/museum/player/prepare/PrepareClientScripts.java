@@ -23,7 +23,7 @@ public class PrepareClientScripts implements Prepare {
 
 	public static final Prepare INSTANCE = new PrepareClientScripts();
 
-	private final List<PacketPlayOutCustomPayload> packets = new ArrayList<>();
+	private final List<ByteBuf> packets = new ArrayList<>();
 
 	public PrepareClientScripts() {
 		try {
@@ -32,8 +32,7 @@ public class PrepareClientScripts implements Prepare {
 				byte[] serialize = Mod.serialize(new Mod(Files.readAllBytes(file.toPath())));
 				ByteBuf buffer = Unpooled.buffer();
 				buffer.writeBytes(serialize);
-				PacketDataSerializer ds = new PacketDataSerializer(buffer);
-				packets.add(new PacketPlayOutCustomPayload(DisplayChannels.MOD_CHANNEL, ds));
+				packets.add(buffer);
 			}
 		} catch (Exception exception) {
 			throw new RuntimeException(exception);
@@ -42,8 +41,11 @@ public class PrepareClientScripts implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		for (PacketPlayOutCustomPayload packet : packets) {
-			user.sendPacket(packet);
+		for (val byteBuf : packets) {
+			user.sendPacket(new PacketPlayOutCustomPayload(
+					DisplayChannels.MOD_CHANNEL,
+					new PacketDataSerializer(byteBuf.retainedSlice())
+			));
 		}
 	}
 }
