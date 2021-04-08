@@ -1,6 +1,7 @@
 dependencies {
     implementation 'org.slf4j:slf4j-simple:1.7.30'
     implementation 'io.javalin:javalin:3.11.2'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation project(":museum-commons")
     compileOnly 'org.mongodb:mongodb-driver-async:3.7.1'
     compileOnly 'cristalix:microservice:20.11.04'

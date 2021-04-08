@@ -23,8 +23,8 @@ apply plugin: 'ru.cristalix.uiengine.bundler'
 apply plugin: 'kotlin'
 
 bundler {
-    name 'ShoppingHandler'
-    mainClass 'ru.func.mod.ShoppingHandler'
+    name 'Museum'
+    mainClass 'ru.func.mod.Museum'
     version '1.0'
     author 'func'
 }
@@ -54,9 +54,9 @@ tasks.withType(JavaCompile) {
 dependencies {
     implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.4.30'
 
-    compileOnly 'dev.xdark:clientapi:1.0.7'
+    compileOnly 'dev.xdark:clientapi:live-SNAPSHOT'
     compileOnly 'dev.xdark:feder:1.0-SNAPSHOT'
-    implementation 'ru.cristalix:uiengine:3.6.1'
+    implementation 'ru.cristalix:uiengine:3.6.3'
     compileOnly "org.lwjgl.lwjgl:lwjgl:2.9.3"
     compileOnly "org.lwjgl.lwjgl:lwjgl_util:2.9.3"
     compileOnly "io.netty:netty-buffer:4.1.58.Final"
