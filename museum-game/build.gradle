@@ -8,8 +8,8 @@ dependencies {
     implementation project(':museum-commons')
     implementation 'ru.cristalix:boards-bukkit-api:3.0.0'
     implementation 'ru.cristalix:npcs-bukkit-api:3.0.5'
-    implementation 'clepto:clepto-bukkit:3.2.8'
-    implementation 'clepto:clepto-cristalix:3.0.0'
+    implementation 'clepto:clepto-bukkit:3.4.2'
+    implementation 'clepto:clepto-cristalix:3.0.2'
 }
 
 ext.bukkitPlugin = [mainClass: 'museum.App', dependencies: 'CoreAPI']

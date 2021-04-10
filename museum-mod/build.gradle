@@ -38,6 +38,8 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 afterEvaluate {
     jarFlattened.doFirst {
         dontobfuscate()
+        dontoptimize()
+        keep("class ru.func.mod.**")
     }
 }
 
