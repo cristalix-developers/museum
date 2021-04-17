@@ -50,11 +50,9 @@ class Museum : ModMain {
             offset = Relative.CENTER
             align = Relative.CENTER
             offset.y += 20
-            offset.x -= size.x / 2
             scale = V3(standard * 3 / 4, standard * 3 / 4, 1.0)
             color = Color(0, 0, 0, 0.0)
             enabled = false
-            shoptext.offset.x -= size.x / 2
             shoptext.offset.y -= size.y / 4
             val x = size.x
             addChild(shoptext)
@@ -62,7 +60,6 @@ class Museum : ModMain {
                 offset = Relative.CENTER
                 align = Relative.CENTER
                 offset.y += 20
-                offset.x -= x / 2
                 scale = V3(1.1, 1.1, 1.1)
                 color = Color(255, 255, 255, 1.0)
                 content = "Чтобы купить нажмите Enter"
