@@ -4,5 +4,3 @@ include 'museum-game'
 include 'museum-service'
 include 'museum-commons'
 include 'museum-mod'
-include 'Test'
-

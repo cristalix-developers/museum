@@ -56,11 +56,11 @@ dependencies {
 
     compileOnly 'dev.xdark:clientapi:live-SNAPSHOT'
     compileOnly 'dev.xdark:feder:1.0-SNAPSHOT'
-    implementation 'ru.cristalix:uiengine:3.6.3'
     compileOnly "org.lwjgl.lwjgl:lwjgl:2.9.3"
     compileOnly "org.lwjgl.lwjgl:lwjgl_util:2.9.3"
     compileOnly "io.netty:netty-buffer:4.1.58.Final"
     compileOnly 'com.google.code.gson:gson:2.8.6'
+    implementation 'ru.cristalix:uiengine:3.6.3'
 }
 
 jar {
