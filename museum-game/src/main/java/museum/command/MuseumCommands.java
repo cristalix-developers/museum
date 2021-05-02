@@ -34,7 +34,6 @@ public class MuseumCommands {
 
 	private final App app;
 	public static final String NO_MONEY_MESSAGE = MessageUtil.get("nomoney");
-	private static final String NO_CRYSTAL_MESSAGE = MessageUtil.get("nocrystal");
 	private static final String PLAYER_OFFLINE_MESSAGE = MessageUtil.get("playeroffline");
 
 	public MuseumCommands(App app) {

@@ -32,7 +32,8 @@ public class AdminCommand {
 			val player = Bukkit.getPlayer(args[0]);
 			if (player == null)
 				return null;
-			app.getUser(player).setMoney(Double.parseDouble(args[1]));
+			val user = app.getUser(player);
+			user.setMoney(user.getMoney() + Double.parseDouble(args[1]));
 			return "§aКоличество денег изменено.";
 		}, "money");
 	}
