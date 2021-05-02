@@ -19,13 +19,13 @@ import java.util.List;
  * @author func 13.06.2020
  * @project Museum
  */
-public class PrepareClientScripts implements Prepare {
+public class PrepareMods implements Prepare {
 
-	public static final Prepare INSTANCE = new PrepareClientScripts();
+	public static final Prepare INSTANCE = new PrepareMods();
 
 	private final List<ByteBuf> packets = new ArrayList<>();
 
-	public PrepareClientScripts() {
+	public PrepareMods() {
 		try {
 			val dir = new File("./mods/");
 			for (val file : dir.listFiles()) {

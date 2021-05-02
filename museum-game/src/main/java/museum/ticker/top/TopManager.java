@@ -34,18 +34,16 @@ public class TopManager implements Ticked, Listener {
 
 	private final DecimalFormat TOP_DATA_FORMAT = new DecimalFormat("###,###,###");
 
-	private String data;
-
 	public TopManager(App app) {
 		this.app = app;
-		boards.put(INCOME, newBoard("Топ по доходу", "Прибыль", 266, 91.2, -270, -135));
-		boards.put(EXPERIENCE, newBoard("Топ по опыту", "Опыт", 261, 91.2, -278, -90));
-		boards.put(MONEY, newBoard("Топ по деньгам", "Валюта", 266, 91.2, -286, -45));
+		boards.put(INCOME, newBoard("Топ по доходу", "Прибыль", 266, -270, -135));
+		boards.put(EXPERIENCE, newBoard("Топ по опыту", "Опыт", 261, -278, -90));
+		boards.put(MONEY, newBoard("Топ по деньгам", "Валюта", 266, -286, -45));
 	}
 
 	private Board newBoard(
 			String title, String fieldName,
-			double x, double y, double z, float yaw
+			double x, double z, float yaw
 	) {
 		Board board = Boards.newBoard();
 
@@ -55,7 +53,7 @@ public class TopManager implements Ticked, Listener {
 
 		board.setTitle(title);
 
-		board.setLocation(new Location(app.getWorld(), x, y, z, yaw, 0F));
+		board.setLocation(new Location(app.getWorld(), x, 90.3, z, yaw, 0F));
 
 		Boards.addBoard(board);
 
@@ -66,7 +64,7 @@ public class TopManager implements Ticked, Listener {
 	public void tick(int... args) {
 		if (args[0] % (20 * UPDATE_SECONDS) == 0) {
 			updateData();
-			data = GlobalSerializers.toJson(tops);
+			String data = GlobalSerializers.toJson(tops);
 			if ("{}".equals(data) || data == null)
 				return;
 			boards.forEach((type, top) -> {
