@@ -4,6 +4,9 @@ subprojects {
     if (name == 'museum-mods') return
     apply plugin: 'java'
 
+    String user = project.properties["IMPLARIO_REPO_USER"] ?: getenv('IMPLARIO_REPO_USER')
+    String password = project.properties["IMPLARIO_REPO_PASSWORD"] ?: getenv('IMPLARIO_REPO_PASSWORD')
+
     targetCompatibility = sourceCompatibility = '1.8'
 
     repositories {
@@ -15,9 +18,9 @@ subprojects {
         }
         maven {
             url 'https://repo.implario.dev/cristalix/'
-            redentials {
-                username project.properties["IMPLARIO_REPO_USER"]
-                password project.properties["IMPLARIO_REPO_PASSWORD"]
+            credentials {
+                username user
+                password password
             }
         }
     }
