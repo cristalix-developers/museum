@@ -20,4 +20,6 @@ def imageTask = project(':museum-image').tasks.jar
 
 bukkitPluginTask.dependsOn imageTask
 
+bukkitPluginTask.with imageTask as Jar
+
 tasks.build.dependsOn bukkitPluginTask

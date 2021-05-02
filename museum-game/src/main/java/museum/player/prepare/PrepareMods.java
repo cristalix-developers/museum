@@ -27,7 +27,7 @@ public class PrepareMods implements Prepare {
 
 	public PrepareMods() {
 		try {
-			val dir = new File("./mods/");
+			val dir = new File("./mods");
 			for (val file : dir.listFiles()) {
 				byte[] serialize = Mod.serialize(new Mod(Files.readAllBytes(file.toPath())));
 				ByteBuf buffer = Unpooled.buffer();

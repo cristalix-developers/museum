@@ -6,6 +6,7 @@ import dev.xdark.clientapi.entry.ModMain
 import dev.xdark.clientapi.event.input.KeyPress
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.network.PluginMessage
+import dev.xdark.clientapi.resource.ResourceLocation
 import dev.xdark.feder.NetUtil
 import org.lwjgl.input.Keyboard
 import ru.cristalix.uiengine.UIEngine
