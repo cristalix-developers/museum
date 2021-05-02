@@ -4,8 +4,8 @@ subprojects {
     if (name == 'museum-mods') return
     apply plugin: 'java'
 
-    String user = project.properties["IMPLARIO_REPO_USER"] ?: getenv("IMPLARIO_REPO_USER")
-    String key = project.properties["IMPLARIO_REPO_PASSWORD"] ?: getenv("IMPLARIO_REPO_PASSWORD")
+    String user = project.properties["IMPLARIO_REPO_USER"] ?: System.getenv("IMPLARIO_REPO_USER")
+    String key = project.properties["IMPLARIO_REPO_PASSWORD"] ?: System.getenv("IMPLARIO_REPO_PASSWORD")
 
     targetCompatibility = sourceCompatibility = '1.8'
 
