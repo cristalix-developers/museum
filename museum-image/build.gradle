@@ -2,13 +2,13 @@ apply plugin: 'groovy'
 
 dependencies {
     compileOnly project(':museum-game')
-    compileOnly 'cristalix:dark-paper:21.01.12'
-    compileOnly 'bottle:bottle-libs:1.0'
+    compileOnly 'cristalix:dark-paper:21.02.03'
     compileOnly 'org.codehaus.groovy:groovy:3.0.5'
-    compileOnly 'cristalix:bukkit-core:20.11.11'
+    compileOnly 'cristalix:bukkit-core:21.01.30'
     implementation project(':museum-commons')
     implementation 'clepto:clepto-bukkit:3.4.2'
     implementation 'clepto:clepto-cristalix:3.0.2'
+    implementation 'implario:humanize:1.1.3'
 }
 
 // Скачивать *-SNAPHOT заново при каждом билде

@@ -3,13 +3,13 @@ apply plugin: 'groovy'
 dependencies {
     compileOnly 'cristalix:dark-paper:21.02.03'
     compileOnly 'org.codehaus.groovy:groovy:3.0.5-aug'
-    compileOnly 'cristalix:bukkit-core:21.3.16'
+    compileOnly 'cristalix:bukkit-core:21.01.30'
     compileOnly 'dev.xdark:feder:1.0-SNAPSHOT'
-    implementation project(':museum-commons')
     implementation 'ru.cristalix:boards-bukkit-api:3.0.0'
     implementation 'ru.cristalix:npcs-bukkit-api:3.0.5'
     implementation 'clepto:clepto-bukkit:3.4.2'
     implementation 'clepto:clepto-cristalix:3.0.2'
+    implementation project(':museum-commons')
 }
 
 ext.bukkitPlugin = [mainClass: 'museum.App', dependencies: 'CoreAPI']
@@ -19,7 +19,5 @@ def bukkitPluginTask = tasks.bukkitPlugin
 def imageTask = project(':museum-image').tasks.jar
 
 bukkitPluginTask.dependsOn imageTask
-
-bukkitPluginTask.with imageTask as Jar
 
 tasks.build.dependsOn bukkitPluginTask

@@ -1,7 +1,7 @@
 package museum.museum.map;
 
 import clepto.bukkit.world.Box;
-import clepto.math.V3;
+import implario.math.V3;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import museum.data.SubjectInfo;

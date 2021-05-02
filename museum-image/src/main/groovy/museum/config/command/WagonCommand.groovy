@@ -2,7 +2,7 @@
 package museum.config.command
 
 import clepto.bukkit.LocalArmorStand
-import clepto.bukkit.groovy.Do
+import clepto.bukkit.routine.Do
 import museum.App
 import museum.command.MuseumCommands
 import museum.museum.Museum

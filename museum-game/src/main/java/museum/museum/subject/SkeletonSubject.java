@@ -2,7 +2,7 @@ package museum.museum.subject;
 
 import clepto.bukkit.world.Box;
 import clepto.bukkit.world.Orientation;
-import clepto.math.V3;
+import implario.math.V3;
 import lombok.Getter;
 import lombok.Setter;
 import museum.data.SubjectInfo;
