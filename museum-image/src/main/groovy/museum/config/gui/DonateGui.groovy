@@ -5,11 +5,16 @@ import clepto.bukkit.menu.Guis
 import museum.donate.DonateType
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
+import ru.cristalix.core.coupons.ICouponsService
 
 import static org.bukkit.Material.*
 
 static String modifyPrice(UUID user, int price) {
-    return "§b" + price + " кристаликов"
+    def coupon = ICouponsService.get()
+
+    if (!coupon && !coupon.haveActiveCoupon(user))
+        return "§b" + price + " кристаликов"
+    return "§7§m$price§b ${coupon.priceWithDiscountInt(user, price)} кристаликов"
 }
 
 Guis.register 'donate', { player ->
