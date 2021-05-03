@@ -1,7 +1,7 @@
 package museum.config.gui
 
 
-import clepto.humanize.TimeFormatter
+import implario.humanize.TimeFormatter
 import museum.App
 import museum.config.command.WagonConfig
 import museum.museum.Museum

@@ -2,6 +2,9 @@ package museum;
 
 import clepto.bukkit.B;
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent;
+import dev.xdark.feder.EmptyChunkBiome;
+import dev.xdark.feder.FixedChunkLight;
+import lombok.val;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
@@ -11,19 +14,19 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 import static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL;
 
 public class PhysicsDisabler implements Listener {
 
-/*	@EventHandler
+	@EventHandler
 	public void disable(ChunkLoadEvent event) {
 		val chunk = event.chunk;
 		chunk.setBiome(EmptyChunkBiome.INSTANCE);
-		chunk.setSkyLight(EmptySkyLight.INSTANCE);
 		chunk.setEmittedLight(new FixedChunkLight((byte)-1));
-	}*/
+	}
 
 	@EventHandler
 	public void disable(CraftItemEvent event) {

@@ -1,8 +1,8 @@
 package museum.museum.subject;
 
 import clepto.bukkit.world.Box;
-import clepto.math.V3;
 import com.google.common.collect.Maps;
+import implario.math.V3;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

@@ -48,9 +48,8 @@ public class PlayerDataManager implements Listener {
 
 		prepares = Arrays.asList(
 				BeforePacketHandler.INSTANCE,
-				PrepareClientScripts.INSTANCE,
+				PrepareMods.INSTANCE,
 				new PrepareScoreBoard(),
-				PrepareTop.INSTANCE,
 				PrepareShopBlocks.INSTANCE,
 				PreparePlayerBrain.INSTANCE
 		);

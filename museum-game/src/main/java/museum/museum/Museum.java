@@ -130,8 +130,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				inventory.addItem(relic.getItem());
 		}
 
-		WorkerUtil.reload(user);
-
 		B.postpone(1, () -> {
 			if (user.getGrabbedArmorstand() == null)
 				player.setAllowFlight(true);

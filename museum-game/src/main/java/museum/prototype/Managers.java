@@ -1,10 +1,10 @@
 package museum.prototype;
 
-import clepto.ListUtils;
 import clepto.bukkit.InvalidConfigException;
 import clepto.bukkit.item.Items;
 import clepto.bukkit.world.Label;
 import clepto.bukkit.world.WorldConfigurationException;
+import implario.ListUtils;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.data.SubjectInfo;

@@ -1,5 +1,6 @@
 package museum.international;
 
+import clepto.bukkit.item.Items;
 import lombok.val;
 import museum.App;
 import museum.fragment.Fragment;
@@ -7,8 +8,8 @@ import museum.fragment.Gem;
 import museum.player.State;
 import museum.player.User;
 import museum.util.LocationUtil;
-import museum.worker.WorkerUtil;
 import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
 /**
@@ -17,6 +18,8 @@ import ru.cristalix.core.scoreboard.SimpleBoardObjective;
  */
 public class Market implements State {
 	private final Location spawnLocation;
+
+	private final ItemStack BACK_ITEM = Items.render("back").asBukkitMirror();
 
 	public Market(App app) {
 		this.spawnLocation = LocationUtil.resetLabelRotation(app.getMap().requireLabel("market-spawn"), 0);
@@ -49,8 +52,6 @@ public class Market implements State {
 				"  нажмите §bправой кнопкой мыши§f,",
 				"  зажимая §bс покупателем SHIFT."
 		);
-
-		WorkerUtil.reload(user);
 	}
 
 	@Override

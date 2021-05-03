@@ -9,7 +9,11 @@ import org.bukkit.entity.Player
 import static org.bukkit.Material.*
 
 static String modifyPrice(UUID user, int price) {
-    return "§b" + price + " кристаликов"
+    //def coupon = ICouponsService.get()
+
+    //if (!coupon && !coupon.haveActiveCoupon(user))
+        //return "§b" + price + " кристаликов"
+    return "§7§m$price§b ${(int) (price * 0.8)} кристаликов"
 }
 
 Guis.register 'donate', { player ->
