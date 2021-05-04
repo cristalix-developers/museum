@@ -25,7 +25,6 @@ import museum.util.ChunkWriter;
 import museum.util.LocationUtil;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
-import museum.worker.WorkerUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.IBlockData;

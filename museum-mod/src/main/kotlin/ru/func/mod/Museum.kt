@@ -2,15 +2,13 @@ package ru.func.mod
 
 import KotlinMod
 import com.google.gson.Gson
-import dev.xdark.clientapi.ClientApi
-import dev.xdark.clientapi.entry.ModMain
 import dev.xdark.clientapi.event.input.KeyPress
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.network.PluginMessage
+import dev.xdark.clientapi.resource.ResourceLocation
 import dev.xdark.feder.NetUtil
 import org.lwjgl.input.Keyboard
 import ru.cristalix.uiengine.UIEngine
-import ru.cristalix.uiengine.UIEngine.clientApi
 import ru.cristalix.uiengine.element.*
 import ru.cristalix.uiengine.utility.*
 import java.util.*
@@ -30,10 +28,43 @@ class Museum : KotlinMod() {
     private lateinit var shoptext: TextElement
     private var hints = ArrayList<Pair<Long, AbstractElement>>()
 
+
     override fun onEnable() {
         UIEngine.initialize(this)
 
         val minecraft = clientApi.minecraft()
+
+        // Загрузка фотографий
+        val namespace = "museum"
+        val images: MutableList<RemoteTexture> = mutableListOf()
+        images.add(RemoteTexture(ResourceLocation.of(namespace, "2.png"), "http://51.38.128.132/2.png", "3A4D82B6AFC5F289BFFF8384315D6C0478FC1AB5"))
+        images.add(RemoteTexture(ResourceLocation.of(namespace, "3.png"), "http://51.38.128.132/3.png", "3A4D82B6AFC5F289BFFF8384315D6C0478FC1AB1"))
+        loadTexture(images)
+
+        val museum = Context3D(V3(314.9, 100.0, -295.7))
+        val cosmo = Context3D(V3(296.05, 104.0, -123.1))
+
+        repeat(2) {
+            cosmo.addChild(rectangle {
+                textureLocation = ResourceLocation.of(namespace, "2.png")
+                size = V3(100.0, 100.0, 100.0)
+                color = WHITE
+                rotation = Rotation(Math.PI, 0.0, 1.0, 0.0)
+                if (it % 2 == 0)
+                    offset.x = -174.0
+            })
+        }
+        repeat(4) {
+            museum.addChild(rectangle {
+                textureLocation = ResourceLocation.of(namespace, "3.png")
+                size = V3(100.0, 100.0, 100.0)
+                color = WHITE
+                offset.z = -it * 150.0
+                rotation = Rotation(Math.PI / 2, 0.0, 1.0, 0.0)
+            })
+        }
+        UIEngine.worldContexts.addAll(listOf(cosmo, museum))
+
 
         // Магазин
         var sell: Array<ToSell>? = null
@@ -158,7 +189,8 @@ class Museum : KotlinMod() {
             } else if (channel == "itemtitle") {
                 // Потом
             } else if (channel == "museumcast") {
-                topmessage.size = V3(clientApi.resolution().scaledWidth_double, clientApi.resolution().scaledHeight_double)
+                topmessage.size =
+                    V3(clientApi.resolution().scaledWidth_double, clientApi.resolution().scaledHeight_double)
 
                 val localBox = topmessage.children[0] as RectangleElement
                 val message = localBox.children[0] as TextElement
@@ -231,7 +263,7 @@ class Museum : KotlinMod() {
                 clientApi.chat().sendChatMessage("/helps")
             } else if (key == Keyboard.KEY_G) {
                 clientApi.chat().sendChatMessage("/prefixes")
-            } 
+            }
         }
     }
 }

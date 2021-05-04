@@ -12,6 +12,7 @@ buildscript {
 }
 
 plugins {
+    id 'org.hidetake.ssh' version '2.10.1'
     id 'org.jetbrains.kotlin.jvm' version '1.4.31' apply false
 }
 
@@ -39,13 +40,11 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     }
 }
 
-jar {
-    from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
-}
+jar.from configurations.runtimeClasspath.collect(project.&zipTree)
 
 bundler {
     name 'Museum'
     mainClass 'ru.func.mod.Museum'
-    version '1.0'
+    version '1.1'
     author 'func'
 }
