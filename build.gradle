@@ -1,7 +1,6 @@
 apply plugin: 'java'
 
 subprojects {
-    if (name == 'museum-mods') return
     apply plugin: 'java'
 
     String user = project.properties["IMPLARIO_REPO_USER"] ?: System.getenv("IMPLARIO_REPO_USER")
@@ -10,8 +9,6 @@ subprojects {
     targetCompatibility = sourceCompatibility = '1.8'
 
     repositories {
-        // MavenLocal is considered to be a bad practice
-        // mavenLocal()
         mavenCentral()
         maven {
             url "https://repo.implario.dev/public"
@@ -44,17 +41,6 @@ subprojects {
         from {
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-        }
-    }
-
-    task deploy(type: Copy) {
-        dependsOn build
-        from jar
-        String dirPath = System.getenv()["OUTPUT_DIR"]
-        File file = dirPath ? file(dirPath) : rootProject.buildDir
-        into file
-        doLast {
-            println "Deployed $jar.archiveName to $file.path"
         }
     }
 }

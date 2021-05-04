@@ -1,38 +1,39 @@
 package ru.func.mod
 
+import KotlinMod
 import com.google.gson.Gson
 import dev.xdark.clientapi.ClientApi
 import dev.xdark.clientapi.entry.ModMain
 import dev.xdark.clientapi.event.input.KeyPress
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.network.PluginMessage
-import dev.xdark.clientapi.resource.ResourceLocation
 import dev.xdark.feder.NetUtil
 import org.lwjgl.input.Keyboard
 import ru.cristalix.uiengine.UIEngine
+import ru.cristalix.uiengine.UIEngine.clientApi
 import ru.cristalix.uiengine.element.*
 import ru.cristalix.uiengine.utility.*
 import java.util.*
 
-class Museum : ModMain {
+class Museum : KotlinMod() {
 
     data class ToSell(
-            val address: String,
-            val title: String,
-            val min: V3,
-            val max: V3,
-            val cost: Double,
-            val uuid: UUID,
+        val address: String,
+        val title: String,
+        val min: V3,
+        val max: V3,
+        val cost: Double,
+        val uuid: UUID,
     )
 
     private lateinit var shopbox: RectangleElement
     private lateinit var shoptext: TextElement
     private var hints = ArrayList<Pair<Long, AbstractElement>>()
 
-    override fun load(api: ClientApi) {
-        UIEngine.initialize(api)
+    override fun onEnable() {
+        UIEngine.initialize(this)
 
-        val minecraft = api.minecraft()
+        val minecraft = clientApi.minecraft()
 
         // Магазин
         var sell: Array<ToSell>? = null
@@ -55,7 +56,6 @@ class Museum : ModMain {
             color = Color(0, 0, 0, 0.0)
             enabled = false
             shoptext.offset.y -= size.y / 4
-            val x = size.x
             addChild(shoptext)
             addChild(text {
                 offset = Relative.CENTER
@@ -88,11 +88,11 @@ class Museum : ModMain {
 
         // Сообщения сверху
         val topmessage = rectangle {
-            size = V3(api.resolution().scaledWidth_double, api.resolution().scaledHeight_double)
+            size = V3(clientApi.resolution().scaledWidth_double, clientApi.resolution().scaledHeight_double)
             align = Relative.CENTER
             origin = Relative.CENTER
             addChild(rectangle {
-                size = V3(api.resolution().scaledWidth_double, 0.0)
+                size = V3(clientApi.resolution().scaledWidth_double, 0.0)
                 align = Relative.TOP
                 origin = Relative.TOP
                 color = Color(0, 0, 0, 0.6)
@@ -122,7 +122,7 @@ class Museum : ModMain {
                 "§b§lG§f - §fменю префиксов 䁿",
                 "",
                 "§bПриятной игры! §f㶅"
-            ).forEachIndexed{ i, line ->
+            ).forEachIndexed { i, line ->
                 addChild(text {
                     content = line
                     align = V3(0.1, 0.12 * i + 0.1, 0.0)
@@ -158,12 +158,12 @@ class Museum : ModMain {
             } else if (channel == "itemtitle") {
                 // Потом
             } else if (channel == "museumcast") {
-                topmessage.size = V3(api.resolution().scaledWidth_double, api.resolution().scaledHeight_double)
+                topmessage.size = V3(clientApi.resolution().scaledWidth_double, clientApi.resolution().scaledHeight_double)
 
                 val localBox = topmessage.children[0] as RectangleElement
                 val message = localBox.children[0] as TextElement
 
-                localBox.size = V3(api.resolution().scaledWidth_double, localBox.size.y)
+                localBox.size = V3(clientApi.resolution().scaledWidth_double, localBox.size.y)
                 message.content = NetUtil.readUtf8(data)
                 message.enabled = true
 
@@ -222,20 +222,16 @@ class Museum : ModMain {
 
         UIEngine.registerHandler(KeyPress::class.java) {
             if (key == Keyboard.KEY_RETURN && activeSubject != null) {
-                api.chat().sendChatMessage("/buy ${activeSubject?.address}")
+                clientApi.chat().sendChatMessage("/buy ${activeSubject?.address}")
             } else if (key == Keyboard.KEY_N) {
                 help.enabled = !help.enabled
             } else if (key == Keyboard.KEY_M) {
-                api.chat().sendChatMessage("/gui excavation")
+                clientApi.chat().sendChatMessage("/gui excavation")
             } else if (key == Keyboard.KEY_H) {
-                api.chat().sendChatMessage("/helps")
+                clientApi.chat().sendChatMessage("/helps")
             } else if (key == Keyboard.KEY_G) {
-                api.chat().sendChatMessage("/prefixes")
-            }
+                clientApi.chat().sendChatMessage("/prefixes")
+            } 
         }
-    }
-
-    override fun unload() {
-        UIEngine.uninitialize()
     }
 }
