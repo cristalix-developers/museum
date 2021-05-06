@@ -60,7 +60,7 @@ public class BoosterManager implements Subservice {
 
 		mustDeleted.forEach(booster -> {
 			MuseumService.alert("§fБустер закончился!", "§b" + booster.getType().getName());
-			MuseumService.alertMessage("§fГлобальный бустер §b" + booster.getType().getName() + " §fзакончился!");
+			MuseumService.alertMessage("§f§bi§f Глобальный бустер §b" + booster.getType().getName() + " §fзакончился!");
 			globalBoosters.remove(booster.getType());
 			thanksMap.remove(booster.getUuid());
 		});
@@ -69,20 +69,18 @@ public class BoosterManager implements Subservice {
 
 	private void every4Minute() {
 		if (!globalBoosters.isEmpty()) {
-			ComponentBuilder alertMessage = new ComponentBuilder("================\n").color(ChatColor.YELLOW);
-			alertMessage.append("     \n");
+			ComponentBuilder alertMessage = new ComponentBuilder("      \n").color(ChatColor.YELLOW);
 			globalBoosters.forEach((type, boost) ->
 					alertMessage.bold(false)
 							.append("Бустер ").color(ChatColor.WHITE)
 							.append(type.getName()).color(ChatColor.AQUA)
 							.append(" от ").color(ChatColor.WHITE)
 							.append(boost.getOwnerName()).color(ChatColor.YELLOW)
-							.append(" | ").bold(true).color(ChatColor.BLUE)
+							.append(" осталось ").color(ChatColor.WHITE)
 							.append(UtilTime.formatTime(boost.getUntil() - System.currentTimeMillis(), true)).color(ChatColor.GREEN)
 							.append("\n")
 			);
-			alertMessage.append("        \n");
-			alertMessage.append("Поблагодарить ")
+			alertMessage.append("[Клик] Поблагодарить ")
 					.event(CLICK_EVENT)
 					.event(HOVER_EVENT)
 					.append("/thx")
@@ -92,12 +90,11 @@ public class BoosterManager implements Subservice {
 					.bold(true)
 					.append("\n");
 			alertMessage.append("        \n");
-			alertMessage.append("================\n").color(ChatColor.YELLOW);
 			MuseumService.alertMessage(alertMessage.create());
 		}
 		globalBoosters.values().forEach(booster -> {
 			int thanksCount = thanksMap.computeIfAbsent(booster.getUuid(), (g) -> new HashSet<>()).size();
-			MuseumService.sendMessage(Collections.singleton(booster.getOwner()), "§f[§c!§f] За время работы вашего бустера §b" + booster.getType().getName() + "§f вас поблагодарили §e" + thanksCount + " §fигроков!");
+			MuseumService.sendMessage(Collections.singleton(booster.getOwner()), "§f§bi§f За время работы вашего бустера §b" + booster.getType().getName() + "§f вас поблагодарили §e" + thanksCount + " §fигроков!");
 		});
 	}
 
@@ -118,7 +115,7 @@ public class BoosterManager implements Subservice {
 		globalBoosters.put(booster.getType(), booster);
 		notifyBoosters();
 		MuseumService.alert("§eБустер активирован!", "§b" + booster.getType().getName());
-		MuseumService.alertMessage("§f[§c!§f] Игрок §e" + booster.getOwnerName() + "§f активировал глобальный бустер §b" + booster.getType().getName() + " §fна час! Поблагодарить его §d§l/thx");
+		MuseumService.alertMessage("§f§bi§f Игрок §e" + booster.getOwnerName() + "§f активировал глобальный бустер §b" + booster.getType().getName() + " §fна час! Поблагодарить его §d§l/thx");
 	}
 
 	public CompletableFuture<List<BoosterInfo>> receiveGlobal() {

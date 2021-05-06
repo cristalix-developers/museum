@@ -3,6 +3,7 @@ package museum.config.gui
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.client_conversation.AnimationUtil
 import museum.util.MessageUtil
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -120,7 +121,8 @@ Guis.register 'pickaxe', { player ->
                     user.money = user.money - cost
                     user.info.extraChance = user.info.extraChance + 0.1
                     closeInventory()
-                }
+                } else
+                    AnimationUtil.buyFailure(user)
             }
         }
     }
@@ -144,7 +146,8 @@ Guis.register 'pickaxe', { player ->
                     user.money = user.money - cost
                     user.info.extraSpeed = user.info.extraSpeed + 1
                     closeInventory()
-                }
+                } else
+                    AnimationUtil.buyFailure(user)
             }
         }
     }
@@ -169,7 +172,8 @@ Guis.register 'pickaxe', { player ->
                     user.money = user.money - cost
                     user.info.extraBreak = user.info.extraBreak + 5
                     closeInventory()
-                }
+                } else
+                    AnimationUtil.buyFailure(user)
             }
         }
     }

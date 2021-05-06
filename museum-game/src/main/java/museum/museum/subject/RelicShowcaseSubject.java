@@ -6,6 +6,7 @@ import museum.App;
 import museum.data.SubjectInfo;
 import museum.fragment.Fragment;
 import museum.fragment.Gem;
+import museum.fragment.Meteorite;
 import museum.fragment.Relic;
 import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
@@ -32,7 +33,7 @@ public class RelicShowcaseSubject extends Subject {
 	public RelicShowcaseSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
 		this.fragment = info.metadata != null && !info.metadata.isEmpty() ?
-				info.metadata.contains(":") ? new Gem(info.metadata) : new Relic(info.metadata) : null;
+				info.metadata.contains(":") ? new Gem(info.metadata) : info.metadata.contains("meteor") ? new Meteorite(info.metadata) : new Relic(info.metadata) : null;
 	}
 
 	@Override

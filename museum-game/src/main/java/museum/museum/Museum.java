@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
+import museum.client_conversation.AnimationUtil;
 import museum.client_conversation.ScriptTransfer;
 import museum.data.MuseumInfo;
 import museum.fragment.Fragment;
@@ -19,6 +20,7 @@ import museum.museum.subject.MarkerSubject;
 import museum.museum.subject.Subject;
 import museum.player.State;
 import museum.player.User;
+import museum.player.prepare.BeforePacketHandler;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Storable;
 import museum.util.ChunkWriter;
@@ -49,7 +51,6 @@ import static museum.museum.subject.Allocation.Action.*;
 @Getter
 public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements State {
 
-	// todo: Надо их кешировать, а то музеев много
 	private final ItemStack menu = Items.render("menu").asBukkitMirror();
 	private final ItemStack backItem = Items.render("back").asBukkitMirror();
 	private final ItemStack visitorMenu = Items.render("visitor-menu").asBukkitMirror();
@@ -122,9 +123,21 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 			inventory.setItem(8, backItem);
 			cachedInfo.views++;
 		} else {
-			for (Subject subject : owner.getSubjects())
+			int collectorAmount = 0;
+
+			for (Subject subject : owner.getSubjects()) {
+				if (subject instanceof CollectorSubject && subject.isAllocated())
+					collectorAmount++;
+				if (collectorAmount > 2) {
+					B.postpone(30, () -> AnimationUtil.throwIconMessage(owner, BeforePacketHandler.EMERGENCY_STOP, "Снятие коллекторов", "ОШИБКА"));
+					for (Subject collector : owner.getSubjects())
+						if (collector instanceof CollectorSubject)
+							collector.setAllocation(null);
+					continue;
+				}
 				if (!subject.isAllocated() && !subject.getPrototype().getType().equals(SubjectType.MARKER))
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
+			}
 			for (Fragment relic : user.getRelics())
 				inventory.addItem(relic.getItem());
 		}
@@ -133,7 +146,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 			if (user.getGrabbedArmorstand() == null)
 				player.setAllowFlight(true);
 		});
-		B.postpone(50, () -> {
+		B.postpone(20, () -> {
 			for (Subject subject : getSubjects()) {
 				subject.getAllocation().perform(user, UPDATE_BLOCKS, SPAWN_PIECES, SPAWN_DISPLAYABLE);
 			}

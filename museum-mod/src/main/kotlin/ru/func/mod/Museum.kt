@@ -5,6 +5,8 @@ import com.google.gson.Gson
 import dev.xdark.clientapi.event.input.KeyPress
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.network.PluginMessage
+import dev.xdark.clientapi.item.ItemTools
+import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.resource.ResourceLocation
 import dev.xdark.feder.NetUtil
 import org.lwjgl.input.Keyboard
@@ -103,19 +105,27 @@ class Museum : KotlinMod() {
         val timeLife = 5 * 1000
 
         // Предмет на экране
-        //val title = text {
-        //        offset = Relative.CENTER
-        //        align = Relative.CENTER
-        //        scale = V3(1.0, 1.0, 1.0)
-        //        color = Color(255, 255, 255, 1.0)
-        //}
-        //val subtitle = text {
-        //    offset = Relative.CENTER
-        //    align = Relative.CENTER
-        //    offset.y -= 20
-        //    scale = V3(1.0, 1.0, 1.0)
-        //    color = Color(255, 255, 255, 1.0)
-        //}
+        val title = text {
+            content = ""
+            beforeRender = {
+                GlStateManager.disableDepth()
+            }
+            align = V3(0.5, 0.6)
+            origin = BOTTOM
+            scale = V3(0.0, 0.0, 0.0)
+            shadow = true
+        }
+        val subtitle = text {
+            content = ""
+            align = V3(0.5, 0.6)
+            afterRender = {
+                GlStateManager.enableDepth()
+            }
+            offset.y = 1.0
+            origin = TOP
+            shadow = true
+        }
+        UIEngine.overlayContext.addChild(title, subtitle)
 
         // Сообщения сверху
         val topmessage = rectangle {
@@ -187,7 +197,27 @@ class Museum : KotlinMod() {
                 }
                 hints.add(Pair(System.currentTimeMillis(), hint))
             } else if (channel == "itemtitle") {
-                // Потом
+                clientApi.overlayRenderer().displayItemActivation(ItemTools.read(data))
+                title.content = NetUtil.readUtf8(data)
+                subtitle.content = NetUtil.readUtf8(data)
+                title.animate(4.0, Easings.ELASTIC_OUT) {
+                    scale.x = 4.0
+                    scale.y = 4.0
+                }
+                subtitle.animate(2, Easings.ELASTIC_OUT) {
+                    scale.x = 2.0
+                    scale.y = 2.0
+                }
+                UIEngine.overlayContext.schedule(8) {
+                    title.animate(0.25) {
+                        scale.x = 0.0
+                        scale.y = 0.0
+                    }
+                    subtitle.animate(0.25) {
+                        scale.x = 0.0
+                        scale.y = 0.0
+                    }
+                }
             } else if (channel == "museumcast") {
                 topmessage.size =
                     V3(clientApi.resolution().scaledWidth_double, clientApi.resolution().scaledHeight_double)

@@ -1,17 +1,19 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.command
 
-
 import clepto.bukkit.menu.Guis
 import implario.ListUtils
 import museum.App
 import museum.client_conversation.AnimationUtil
+import museum.config.gui.LootBox
 import museum.data.PickaxeType
 import museum.data.SubjectInfo
 import museum.donate.DonateType
 import museum.museum.Museum
 import museum.museum.subject.CollectorSubject
 import museum.packages.SaveUserPackage
+import museum.packages.UserTransactionPackage.TransactionResponse
+import museum.player.User
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
@@ -48,6 +50,10 @@ registerCommand 'donate' handle {
 
 registerCommand 'prefixes' handle {
     Guis.open player, 'prefixes', player
+}
+
+void givePrefix(User owner) {
+
 }
 
 def prefixes = [
@@ -127,7 +133,8 @@ Guis.register 'prefixes', {
             }
             user.prefixChestOpened = user.prefixChestOpened + 1
             closeInventory()
-        }
+        } else
+            AnimationUtil.buyFailure(user)
     }
     def counter = 0
     3.times {
@@ -209,10 +216,14 @@ registerCommand 'proccessdonate' handle {
 
     App.app.processDonate(user.getUuid(), donate).thenAccept(transaction -> {
         if (!transaction.ok) {
+            if (transaction == TransactionResponse.INSUFFICIENT_FUNDS)
+                AnimationUtil.buyFailure(user)
             user.sendMessage(Formatting.error(transaction.name))
             return
         }
-        if (donate == DonateType.PREFIX_CASE) {
+        if (donate == DonateType.ITEM_CASE) {
+            LootBox.giveDrop(user)
+        } else if (donate == DonateType.PREFIX_CASE) {
             def randomPrefix = ListUtils.random(
                     user.prefixChestOpened % 5 == 0 ?
                             prefixes.stream()

@@ -24,11 +24,28 @@ register 'main', { player ->
 
     title 'Главное меню'
     layout """
+        ----K----
         F--SMT--S
         -H--O--JP
     """
 
     button MuseumGuis.background
+
+    button 'K' icon {
+        item CLAY_BALL
+        nbt.other = 'new_lvl_rare_close'
+        text """§bСлучайная посылка
+
+        §f㧩 Вы получите случайный 
+        §fдрагоценный камень [60%-100%],
+        §fа так же случайный 
+        §fметеорит доходом от 15\$ до 100\$.
+        
+        §bНажмите чтобы посмотреть!
+        """
+    } leftClick {
+        open(player, 'loot', player)
+    }
 
     button 'P' icon {
         item GOLDEN_CARROT

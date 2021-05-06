@@ -12,7 +12,6 @@ import javax.imageio.ImageIO
 data class RemoteTexture(val RC : ResourceLocation , val address : String, val sha1 : String)
 
 fun loadTexture(images: MutableList<RemoteTexture>){
-
     val cacheDir = Paths.get("museum/")
     if(!Files.exists(cacheDir))
         Files.createDirectory(cacheDir)

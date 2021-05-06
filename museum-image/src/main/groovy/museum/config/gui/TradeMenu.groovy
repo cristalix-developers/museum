@@ -2,6 +2,7 @@
 package museum.config.gui
 
 import clepto.bukkit.menu.Guis
+import museum.client_conversation.AnimationUtil
 import museum.fragment.Fragment
 import museum.fragment.Gem
 import museum.international.Market
@@ -103,7 +104,7 @@ Guis.register 'trade', { player ->
             if (victim.money <= cost) {
                 owner.getInventory().addItem(gem.getItem())
                 owner.sendMessage(Formatting.error("У оппонента недостаточно средств."))
-                victim.sendMessage(Formatting.error("Вам не хватает денег."))
+                AnimationUtil.buyFailure(victim)
                 return null
             }
 

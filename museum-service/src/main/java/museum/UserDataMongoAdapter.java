@@ -48,7 +48,8 @@ public class UserDataMongoAdapter extends MongoAdapter<UserInfo> {
                 for (PlayerTopEntry<Object> playerEntry : playerEntries) {
                     GroupData data = map.get(playerEntry.getKey().getUuid());
                     playerEntry.setUserName(data.getUsername());
-                    playerEntry.setDisplayName(UtilCristalix.createDisplayName(data));
+                    val prefix = playerEntry.getKey().prefix;
+                    playerEntry.setDisplayName((prefix == null || prefix.isEmpty() ? "" : prefix) + " " + UtilCristalix.createDisplayName(data));
                 }
             } catch(Exception ex) {
                 ex.printStackTrace();

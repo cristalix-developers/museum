@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 
 import static org.bukkit.Material.*
 
-static String modifyPrice(UUID user, int price) {
+public static String modifyPrice(UUID user, int price) {
     //def coupon = ICouponsService.get()
 
     //if (!coupon && !coupon.haveActiveCoupon(user))

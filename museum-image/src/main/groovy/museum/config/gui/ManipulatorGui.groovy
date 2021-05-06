@@ -3,8 +3,8 @@ package museum.config.gui
 import clepto.bukkit.menu.Guis
 import museum.App
 import museum.config.command.WagonConfig
-import museum.fragment.Gem
 import museum.fragment.GemType
+import museum.fragment.Meteorite
 import museum.museum.Museum
 import museum.museum.map.SkeletonSubjectPrototype
 import museum.museum.subject.*
@@ -87,7 +87,13 @@ Guis.register 'manipulator', { player ->
         if (subject.fragment) {
             def type = subject.fragment.address
             button 'O' icon {
-                if (type.contains(":")) {
+                if (type.contains("meteor")) {
+                    def meteor = Meteorite.Meteorites.valueOf(type.split("\\_")[1].toUpperCase())
+                    item subject.fragment.item.type
+                    text meteor.title
+                    text ""
+                    subject.fragment.getItem().getItemMeta().lore.forEach {text it }
+                } else if (type.contains(":")) {
                     item CLAY_BALL
                     nbt.museum = GemType.valueOf(type.split(':')[0]).texture
                 } else {

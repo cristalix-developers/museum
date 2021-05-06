@@ -27,6 +27,8 @@ registerCommand 'sell' handle {
         def nmsItem = CraftItemStack.asNMSCopy item
         if (nmsItem.tag && nmsItem.tag.hasKeyOfType("relic", 8)) {
             for (Fragment currentRelic : user.relics) {
+                if (currentRelic.address.contains("meteor"))
+                    continue
                 if (currentRelic.uuid.toString() == nmsItem.tag.getString('relic-uuid')) {
                     player.itemInHand = null
                     user.relics.remove currentRelic

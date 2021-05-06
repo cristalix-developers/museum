@@ -128,6 +128,8 @@ public class BeforePacketHandler implements Prepare {
 	private void acceptMuseumClick(User user, PacketPlayInUseItem packet) {
 		Museum museum = (Museum) user.getState();
 		BlockPosition pos = packet.a;
+		if (packet.c == EnumHand.OFF_HAND)
+			return;
 		for (Subject subject : museum.getSubjects()) {
 			for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
 				if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {

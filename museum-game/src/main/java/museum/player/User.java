@@ -12,6 +12,7 @@ import museum.client_conversation.AnimationUtil;
 import museum.data.*;
 import museum.fragment.Fragment;
 import museum.fragment.Gem;
+import museum.fragment.Meteorite;
 import museum.fragment.Relic;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
@@ -71,8 +72,16 @@ public class User implements PlayerWrapper {
 		this.subjects.importInfos(info.getSubjectInfos());
 		this.museums.importInfos(info.getMuseumInfos());
 		List<Fragment> list = new ArrayList<>();
-		for (String address : info.getClaimedRelics())
-			list.add(address.contains(":") ? new Gem(address) : new Relic(address));
+		for (String address : info.getClaimedRelics()) {
+			Fragment fragment;
+			if (address.contains(":"))
+				fragment = new Gem(address);
+			else if (address.contains("meteor"))
+				fragment = new Meteorite(address);
+			else
+				fragment = new Relic(address);
+			list.add(fragment);
+		}
 		this.relics = list;
 
 		if (info.getLastPosition() != null)
@@ -113,7 +122,7 @@ public class User implements PlayerWrapper {
 	}
 
 	public void setState(State state) {
-		AsyncCatcher.catchOp("user state change");
+		AsyncCatcher.catchOp("Async state change");
 		if (this.state != null && this.state != state)
 			this.state.leaveState(this);
 		val previousState = this.state;

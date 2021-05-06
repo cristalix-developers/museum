@@ -3,6 +3,7 @@ package museum.command;
 import clepto.bukkit.B;
 import lombok.val;
 import museum.App;
+import museum.client_conversation.AnimationUtil;
 import museum.data.PickaxeType;
 import museum.data.SubjectInfo;
 import museum.excavation.Excavation;
@@ -33,7 +34,6 @@ import java.util.UUID;
 public class MuseumCommands {
 
 	private final App app;
-	public static final String NO_MONEY_MESSAGE = MessageUtil.get("nomoney");
 	private static final String PLAYER_OFFLINE_MESSAGE = MessageUtil.get("playeroffline");
 
 	public MuseumCommands(App app) {
@@ -95,8 +95,10 @@ public class MuseumCommands {
 		if (count > 32)
 			return MessageUtil.get("no-free-space");
 
-		if (user.getMoney() < prototype.getPrice())
-			return NO_MONEY_MESSAGE;
+		if (user.getMoney() < prototype.getPrice()) {
+			AnimationUtil.buyFailure(user);
+			return null;
+		}
 
 		user.setMoney(user.getMoney() - prototype.getPrice());
 		// new Subject() писать нельзя - так как нужный класс (CollectorSubject...) не уточнет, и все ломается
@@ -155,8 +157,10 @@ public class MuseumCommands {
 
 		if (state instanceof Museum) {
 			val museum = (Museum) state;
-			if (visitor.getMoney() <= museum.getIncome() / 2)
-				return NO_MONEY_MESSAGE;
+			if (visitor.getMoney() <= museum.getIncome() / 2) {
+				AnimationUtil.buyFailure(visitor);
+				return null;
+			}
 
 			visitor.setMoney(visitor.getMoney() - museum.getIncome() / 2);
 			owner.setMoney(owner.getMoney() + museum.getIncome() / 2);
@@ -307,8 +311,11 @@ public class MuseumCommands {
 		if (user.getGrabbedArmorstand() != null)
 			return MessageUtil.get("stall-first");
 
-		if (prototype.getPrice() > user.getMoney())
-			return NO_MONEY_MESSAGE;
+		if (prototype.getPrice() > user.getMoney()) {
+			AnimationUtil.buyFailure(user);
+			return null;
+		}
+
 		user.setMoney(user.getMoney() - prototype.getPrice());
 
 		player.closeInventory();
@@ -323,8 +330,10 @@ public class MuseumCommands {
 			return null;
 		player.closeInventory();
 
-		if (user.getMoney() < pickaxe.getPrice())
-			return NO_MONEY_MESSAGE;
+		if (user.getMoney() < pickaxe.getPrice()) {
+			AnimationUtil.buyFailure(user);
+			return null;
+		}
 
 		user.setMoney(user.getMoney() - pickaxe.getPrice());
 		user.setPickaxeType(pickaxe);

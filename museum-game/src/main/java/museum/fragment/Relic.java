@@ -22,8 +22,8 @@ public class Relic implements Fragment {
 	public Relic(String prototypeAddress) {
 		this.address = prototypeAddress;
 		val item = Items.render("relic-" + prototypeAddress);
+		this.price = item.tag.getInt("price");
 		item.tag.setString("relic-uuid", uuid.toString());
 		this.item = item.asBukkitMirror();
-		this.price = item.tag.getInt("price");
 	}
 }
