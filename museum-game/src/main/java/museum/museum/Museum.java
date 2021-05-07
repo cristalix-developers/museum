@@ -8,7 +8,7 @@ import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client_conversation.AnimationUtil;
-import museum.client_conversation.ScriptTransfer;
+import museum.client_conversation.ModTransfer;
 import museum.data.MuseumInfo;
 import museum.fragment.Fragment;
 import museum.museum.collector.CollectorNavigator;
@@ -151,7 +151,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				subject.getAllocation().perform(user, UPDATE_BLOCKS, SPAWN_PIECES, SPAWN_DISPLAYABLE);
 			}
 
-			new ScriptTransfer()
+			new ModTransfer()
 					.json(user.getSubjects().stream()
 							.filter(Subject::isAllocated)
 							.map(Subject::getDataForClient)

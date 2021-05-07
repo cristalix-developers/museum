@@ -34,7 +34,7 @@ register 'main', { player ->
     button 'K' icon {
         item CLAY_BALL
         nbt.other = 'new_lvl_rare_close'
-        text """§bСлучайная посылка
+        text """§bЛутбокс
 
         §f㧩 Вы получите случайный 
         §fдрагоценный камень [60%-100%],

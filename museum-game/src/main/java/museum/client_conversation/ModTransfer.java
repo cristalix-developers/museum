@@ -11,24 +11,24 @@ import ru.cristalix.core.GlobalSerializers;
  * @author func 02.01.2021
  * @project museum
  */
-public class ScriptTransfer {
+public class ModTransfer {
 	private final PacketDataSerializer serializer = new PacketDataSerializer(Unpooled.buffer());
 
-	public ScriptTransfer json(Object object) {
+	public ModTransfer json(Object object) {
 		return string(GlobalSerializers.toJson(object));
 	}
 
-	public ScriptTransfer string(String string) {
+	public ModTransfer string(String string) {
 		serializer.writeString(string);
 		return this;
 	}
 
-	public ScriptTransfer item(ItemStack item) {
+	public ModTransfer item(ItemStack item) {
 		serializer.writeItem(item);
 		return this;
 	}
 
-	public ScriptTransfer integer(int integer) {
+	public ModTransfer integer(int integer) {
 		serializer.writeInt(integer);
 		return this;
 	}

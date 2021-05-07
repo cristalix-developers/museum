@@ -5,11 +5,16 @@ import clepto.bukkit.menu.Guis
 import implario.ListUtils
 import museum.App
 import museum.client_conversation.AnimationUtil
+import museum.client_conversation.ModTransfer
 import museum.donate.DonateType
 import museum.fragment.Gem
 import museum.fragment.GemType
 import museum.fragment.Meteorite
 import museum.player.User
+import org.bukkit.ChatColor
+import org.bukkit.Sound
+import org.bukkit.SoundCategory
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
 
 import static org.bukkit.Material.BARRIER
@@ -21,14 +26,29 @@ static void giveDrop(User owner) {
     def meteor = new Meteorite("meteor_" + ListUtils.random(Meteorite.Meteorites.values()).name())
     meteor.give(owner)
 
-    AnimationUtil.topTitle owner, "Вы получили " + gem.type.title + " " + Math.round(gem.rarity * 100) + "% §fи " + meteor.meteorite.title + "!"
-    AnimationUtil.throwIconMessage(owner, gem.item, gem.type.title + " " + Math.round(gem.rarity * 100) + "%", "и " + meteor.meteorite.title)
+    new ModTransfer()
+        .integer(2)
+        .item(CraftItemStack.asNMSCopy(gem.item))
+        .string(ChatColor.stripColor(gem.type.title + " " + Math.round(gem.rarity * 100F) + "%"))
+        .string(getRare(gem.type.title))
+        .item(CraftItemStack.asNMSCopy(meteor.item))
+        .string(ChatColor.stripColor(meteor.item.getItemMeta().displayName))
+        .string(getRare(meteor.item.getItemMeta().displayName))
+        .send("lootbox", owner)
+}
+
+static String getRare(String string) {
+    return string.contains("⭐⭐⭐") ? "LEGENDARY" : string.contains("⭐⭐") ? "EPIC" : "RARE"
+}
+
+registerCommand 'lootboxsound' handle {
+    player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.MASTER, 1, 2);
 }
 
 Guis.register 'loot', { Player player ->
     def user = App.app.getUser(player)
 
-    title 'Черный рынок'
+    title 'Лутбокс'
     layout "XXKXOXLXP"
 
     button MuseumGuis.background
@@ -40,13 +60,13 @@ Guis.register 'loot', { Player player ->
 
         §f㦶 Случайную драгоценность §6[60%-100%]§f:
         
-            §b⭐⭐⭐ Рубин
-            §b⭐⭐⭐ Сапфир
-            §b⭐⭐⭐ Бриллиант
-            §a⭐⭐ Изумруд
-            §a⭐⭐ Шпиннель
-            §7⭐ Аметист
-            §7⭐ Танзанит
+            §6⭐⭐⭐ Рубин
+            §6⭐⭐⭐ Сапфир
+            §6⭐⭐⭐ Бриллиант
+            §5⭐⭐ Изумруд
+            §5⭐⭐ Шпиннель
+            §b⭐ Аметист
+            §b⭐ Танзанит
         """
     }
 
@@ -57,21 +77,21 @@ Guis.register 'loot', { Player player ->
 
         §f㩙 Случайный метеорит:
         
-            §b⭐⭐⭐ Гоба 100дд
-            §b⭐⭐⭐ Эйби 90дд
-            §b⭐⭐⭐ Альфиане́лло 80дд
-            §a⭐⭐ Нахла 50дд
-            §a⭐⭐ Альенде 45дд
-            §a⭐⭐ Гирин 40дд
-            §a⭐⭐ Нортон Каунти 40дд
-            §a⭐⭐ Куня-Ургенч 40дд
-            §7⭐ Челябинский 30дд
-            §7⭐ Бахмут 25дд
-            §7⭐ Саттерз-Милл 20дд
-            §7⭐ Андреевка 20дд
-            §7⭐ Сихотэ-Алинский 20дд
-            §7⭐ Башкувка 15дд
-            §7⭐ Барботан 15дд
+            §6⭐⭐⭐ Гоба 100дд
+            §6⭐⭐⭐ Эйби 90дд
+            §6⭐⭐⭐ Альфиане́лло 80дд
+            §5⭐⭐ Нахла 50дд
+            §5⭐⭐ Альенде 45дд
+            §5⭐⭐ Гирин 40дд
+            §5⭐⭐ Нортон Каунти 40дд
+            §5⭐⭐ Куня-Ургенч 40дд
+            §b⭐ Челябинский 30дд
+            §b⭐ Бахмут 25дд
+            §b⭐ Саттерз-Милл 20дд
+            §b⭐ Андреевка 20дд
+            §b⭐ Сихотэ-Алинский 20дд
+            §b⭐ Башкувка 15дд
+            §b⭐ Барботан 15дд
         """
     }
 

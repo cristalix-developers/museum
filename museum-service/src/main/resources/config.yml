@@ -16,6 +16,11 @@ npc:
     hint: '§eПравый клик'
     command: 'sell'
     skin: 'http://textures.minecraft.net/texture/e839df4ab41baefb1c09761220ffa9a128af2c96044aedc621db033d6d7'
+  loot:
+    title: '§b§lЛУТБОКС'
+    hint: '§eПравый клик'
+    command: 'gui loot'
+    skin: 'http://textures.minecraft.net/texture/e839df4ab41baefb1c09761220ffa9a128af2c96044aedc621db033d6d7'
   default:
     title: ' '
     hint: ' '

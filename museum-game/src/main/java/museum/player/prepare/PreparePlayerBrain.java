@@ -4,14 +4,21 @@ import clepto.bukkit.B;
 import clepto.bukkit.Cycle;
 import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
+import implario.ListUtils;
 import lombok.val;
 import museum.App;
 import museum.client_conversation.AnimationUtil;
+import museum.client_conversation.ModTransfer;
+import museum.fragment.Gem;
+import museum.fragment.GemType;
+import museum.fragment.Meteorite;
 import museum.museum.Museum;
 import museum.player.User;
 import museum.util.LocationUtil;
 import museum.util.MessageUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -61,7 +68,7 @@ public class PreparePlayerBrain implements Prepare {
 
 		if (player.hasPlayedBefore() || user.getExperience() >= EXPERIENCE) {
 			val now = System.currentTimeMillis() / 1000;
-			B.postpone(15 * 20, () -> {
+			B.postpone(10 * 20, () -> {
 				if ((now - user.getInfo().getLastTimeRewardClaim()) > REWARD_DELAY_HOURS * 3600) {
 					user.getInfo().setLastTimeRewardClaim(now);
 
@@ -72,11 +79,21 @@ public class PreparePlayerBrain implements Prepare {
 
 					AnimationUtil.topTitle(
 							user,
-							"§aВаша ежедневная награда §6§l%s§f, §b§l15 опыта§f",
+							"§aВаша ежедневная награда §6§l%s§f §l+ЛУТБОКС",
 							MessageUtil.toMoneyFormat(dailyReward)
 					);
+					B.postpone(60, () -> {
+						val gem = new Gem(ListUtils.random(GemType.values()).name() + ":" + (0.1 + Math.random() / 100 * 70) + ":10000");
+						gem.give(user);
+						val gemTitle = gem.getType().getTitle();
+						new ModTransfer()
+								.integer(1)
+								.item(CraftItemStack.asNMSCopy(gem.getItem()))
+								.string(ChatColor.stripColor(gemTitle + " " + Math.round(gem.getRarity() * 100F) + "%"))
+								.string(getRare(gemTitle))
+								.send("lootbox", user);
+					});
 					user.setMoney(user.getMoney() + dailyReward);
-					user.giveExperience(15);
 				} else {
 					AnimationUtil.topTitle(user, "Добро пожаловать в ваш §bМузей§f! 㗩");
 				}
@@ -100,5 +117,9 @@ public class PreparePlayerBrain implements Prepare {
 				player.sendTitle(titles.get(iteration));
 				player.teleport(dots.get(iteration).toCenterLocation());
 		});
+	}
+
+	private String getRare(String string) {
+		return string.contains("⭐⭐⭐") ? "LEGENDARY" : string.contains("⭐⭐") ? "EPIC" : "RARE";
 	}
 }

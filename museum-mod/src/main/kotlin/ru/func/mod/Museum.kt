@@ -2,14 +2,20 @@ package ru.func.mod
 
 import KotlinMod
 import com.google.gson.Gson
+import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.input.KeyPress
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.network.PluginMessage
+import dev.xdark.clientapi.event.render.NameTemplateRender
+import dev.xdark.clientapi.event.render.RenderTickPre
 import dev.xdark.clientapi.item.ItemTools
 import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.resource.ResourceLocation
 import dev.xdark.feder.NetUtil
 import org.lwjgl.input.Keyboard
+import org.lwjgl.opengl.GL11
+import org.lwjgl.util.vector.Matrix4f
+import org.lwjgl.util.vector.Vector3f
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.*
 import ru.cristalix.uiengine.utility.*
@@ -39,8 +45,20 @@ class Museum : KotlinMod() {
         // Загрузка фотографий
         val namespace = "museum"
         val images: MutableList<RemoteTexture> = mutableListOf()
-        images.add(RemoteTexture(ResourceLocation.of(namespace, "2.png"), "http://51.38.128.132/2.png", "3A4D82B6AFC5F289BFFF8384315D6C0478FC1AB5"))
-        images.add(RemoteTexture(ResourceLocation.of(namespace, "3.png"), "http://51.38.128.132/3.png", "3A4D82B6AFC5F289BFFF8384315D6C0478FC1AB1"))
+        images.add(
+            RemoteTexture(
+                ResourceLocation.of(namespace, "2.png"),
+                "http://51.38.128.132/2.png",
+                "3A4D82B6AFC5F289BFFF8384315D6C0478FC1AB5"
+            )
+        )
+        images.add(
+            RemoteTexture(
+                ResourceLocation.of(namespace, "3.png"),
+                "http://51.38.128.132/3.png",
+                "3A4D82B6AFC5F289BFFF8384315D6C0478FC1AB1"
+            )
+        )
         loadTexture(images)
 
         val museum = Context3D(V3(314.9, 100.0, -295.7))
@@ -71,30 +89,27 @@ class Museum : KotlinMod() {
         // Магазин
         var sell: Array<ToSell>? = null
         var activeSubject: ToSell? = null
-        val standard = 1.9
 
         shoptext = text {
-            offset = Relative.CENTER
-            align = Relative.CENTER
-            scale = V3(standard, standard, 1.0)
+            offset = Relative.TOP_LEFT
+            align = Relative.TOP_LEFT
+            align.x += 0.05
+            align.y += 0.05
             color = Color(0, 255, 0, 1.0)
         }
 
         shopbox = rectangle {
-            size = V3(220.0, 25.0)
-            offset = Relative.CENTER
-            align = Relative.CENTER
-            offset.y += 20
-            scale = V3(standard * 3 / 4, standard * 3 / 4, 1.0)
-            color = Color(0, 0, 0, 0.0)
+            size = V3(220.0, 40.0)
+            offset = V3(0.5, 0.5)
+            align = V3(0.33, 0.7)
+            color = Color(0, 0, 0, 0.62)
             enabled = false
-            shoptext.offset.y -= size.y / 4
             addChild(shoptext)
             addChild(text {
-                offset = Relative.CENTER
-                align = Relative.CENTER
-                offset.y += 20
-                scale = V3(1.1, 1.1, 1.1)
+                offset = Relative.LEFT
+                align = Relative.LEFT
+                align.x += 0.05
+                align.y += 0.05
                 color = Color(255, 255, 255, 1.0)
                 content = "Чтобы купить нажмите Enter"
             })
@@ -267,11 +282,10 @@ class Museum : KotlinMod() {
                     val b = it.max
                     if (a.x <= x && x <= b.x && a.y <= y && y <= b.y && a.z <= z && z <= b.z) {
                         shoptext.content = "${it.title} ${it.cost.toInt()}$"
-                        shoptext.scale.x = standard - (shoptext.content.length * 0.04)
-                        shoptext.scale.y = standard - (shoptext.content.length * 0.04)
                         activeSubject = it
                         shopbox.enabled = true
                         shown = true
+                        help.enabled = false
                     }
                 }
 
@@ -282,7 +296,8 @@ class Museum : KotlinMod() {
             }
         }
 
-        UIEngine.registerHandler(KeyPress::class.java) {
+        UIEngine.registerHandler(KeyPress::class.java)
+        {
             if (key == Keyboard.KEY_RETURN && activeSubject != null) {
                 clientApi.chat().sendChatMessage("/buy ${activeSubject?.address}")
             } else if (key == Keyboard.KEY_N) {

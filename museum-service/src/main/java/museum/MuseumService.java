@@ -148,7 +148,7 @@ public class MuseumService {
 					return;
 				}
 				findCoupon(pckg.getUser()).thenAccept(data -> {
-					int price = (int) (pckg.getDonate().getPrice() * 0.8F);
+					int price = pckg.getDonate().getPrice();
 					if (data != null)
 						price = (int) data.priceWithDiscount(price);
 					// Делфику донат бесплатно бекдор взлом хак

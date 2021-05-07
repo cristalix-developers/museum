@@ -28,7 +28,7 @@ public class AnimationUtil {
 	}
 
 	public static void throwIconMessage(User user, ItemStack itemStack, String text, String subtitle) {
-		new ScriptTransfer()
+		new ModTransfer()
 				.item(CraftItemStack.asNMSCopy(itemStack))
 				.string(text)
 				.string(subtitle)
@@ -36,7 +36,7 @@ public class AnimationUtil {
 	}
 
 	public static void generateMessage(String message, String channel, User user) {
-		new ScriptTransfer()
+		new ModTransfer()
 				.string(message)
 				.send(channel, user);
 	}
