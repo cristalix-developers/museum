@@ -1,7 +1,6 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.command
 
-
 import museum.App
 import museum.fragment.Fragment
 import museum.util.MessageUtil
@@ -27,14 +26,18 @@ registerCommand 'sell' handle {
         def nmsItem = CraftItemStack.asNMSCopy item
         if (nmsItem.tag && nmsItem.tag.hasKeyOfType("relic", 8)) {
             for (Fragment currentRelic : user.relics) {
-                if (currentRelic.address.contains("meteor"))
-                    continue
                 if (currentRelic.uuid.toString() == nmsItem.tag.getString('relic-uuid')) {
+                    def price = 0
+
+                    if (currentRelic.address.contains("meteor"))
+                        price += 20 * currentRelic.price
+                    else
+                        price += currentRelic.price
                     player.itemInHand = null
                     user.relics.remove currentRelic
-                    user.money += currentRelic.price
+                    user.money += price
                     return MessageUtil.find('relic-sell')
-                            .set('price', MessageUtil.toMoneyFormat(currentRelic.price))
+                            .set('price', MessageUtil.toMoneyFormat(price))
                             .getText()
                 }
             }

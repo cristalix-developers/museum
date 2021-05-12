@@ -36,7 +36,7 @@ public class Meteorite implements Fragment {
 			val item = CraftItemStack.asNMSCopy(meteorite.getItem());
 
 			item.tag.setString("relic-uuid", uuid.toString());
-			item.tag.setInt("price", meteorite.price * 100);
+			item.tag.setInt("price", getPrice());
 
 			cache = item.asBukkitMirror();
 		}
