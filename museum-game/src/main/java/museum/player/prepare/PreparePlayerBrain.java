@@ -11,7 +11,6 @@ import museum.client_conversation.AnimationUtil;
 import museum.client_conversation.ModTransfer;
 import museum.fragment.Gem;
 import museum.fragment.GemType;
-import museum.fragment.Meteorite;
 import museum.museum.Museum;
 import museum.player.User;
 import museum.util.LocationUtil;
@@ -66,6 +65,8 @@ public class PreparePlayerBrain implements Prepare {
 	public void execute(User user, App app) {
 		final CraftPlayer player = user.getPlayer();
 
+		user.sendMessage((user.isMessages() ? "Отключить" : "Включить") + " экранные сообщения игроков /con");
+
 		if (player.hasPlayedBefore() || user.getExperience() >= EXPERIENCE) {
 			val now = System.currentTimeMillis() / 1000;
 			B.postpone(10 * 20, () -> {
@@ -102,20 +103,20 @@ public class PreparePlayerBrain implements Prepare {
 		}
 
 		Cycle.run(5 * 20, titles.size(), iteration -> {
-				if (!player.isOnline()) {
-					exit();
-					return;
-				}
-				if (iteration >= titles.size() - 1) {
-					if (user.getExperience() >= EXPERIENCE)
-						player.teleport(dots.get(dots.size() - 1).toCenterLocation());
-					user.giveExperience(EXPERIENCE);
-					((Museum) user.getState()).giveMenu(user);
-					exit();
-					return;
-				}
-				player.sendTitle(titles.get(iteration));
-				player.teleport(dots.get(iteration).toCenterLocation());
+			if (!player.isOnline()) {
+				exit();
+				return;
+			}
+			if (iteration >= titles.size() - 1) {
+				if (user.getExperience() >= EXPERIENCE)
+					player.teleport(dots.get(dots.size() - 1).toCenterLocation());
+				user.giveExperience(EXPERIENCE);
+				((Museum) user.getState()).giveMenu(user);
+				exit();
+				return;
+			}
+			player.sendTitle(titles.get(iteration));
+			player.teleport(dots.get(iteration).toCenterLocation());
 		});
 	}
 

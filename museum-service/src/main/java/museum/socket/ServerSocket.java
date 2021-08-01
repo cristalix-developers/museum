@@ -3,7 +3,6 @@ package museum.socket;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -25,10 +24,10 @@ public class ServerSocket extends Thread {
 	private static final EventLoopGroup BOSS_GROUP, WORKER_GROUP;
 
 	static {
-		boolean epoll;
+		boolean epoll = true;
 		try {
 			Class.forName("io.netty.channel.epoll.Epoll");
-			epoll = !Boolean.getBoolean("cristalix.net.disable-native-transport") && Epoll.isAvailable();
+			//epoll = !Boolean.getBoolean("cristalix.net.disable-native-transport") && Epoll.isAvailable();
 		} catch (ClassNotFoundException e) {
 			epoll = false;
 		}

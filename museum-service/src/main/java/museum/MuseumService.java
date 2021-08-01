@@ -75,6 +75,7 @@ public class MuseumService {
 	private static RealmsController realmsController;
 
 	public static void main(String[] args) throws InterruptedException {
+		System.setProperty("cristalix.core.net-context-limit", "655360");
 		int museumServicePort;
 		try {
 			museumServicePort = Integer.parseInt(System.getenv("MUSEUM_SERVICE_PORT"));
