@@ -45,11 +45,6 @@ public class CrystalExcavations implements International {
 	}
 
 	@Override
-	public void setupScoreboard(User user, SimpleBoardObjective obj) {
-		obj.setDisplayName("Международные раскопки");
-	}
-
-	@Override
 	public void enterState(User user) {
 		val player = user.getPlayer();
 		player.setAllowFlight(false);

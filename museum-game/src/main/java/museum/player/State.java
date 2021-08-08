@@ -16,8 +16,6 @@ public interface State {
 			999999, 10, false, false
 	);
 
-	void setupScoreboard(User user, SimpleBoardObjective obj);
-
 	void enterState(User user);
 
 	void leaveState(User user);

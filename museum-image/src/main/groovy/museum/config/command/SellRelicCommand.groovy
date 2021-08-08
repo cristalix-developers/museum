@@ -15,7 +15,7 @@ registerCommand 'sell' handle {
         if (subject && !subject.allocated) {
             user.getInventory().setItemInHand(null)
             user.subjects.remove(subject)
-            user.money = user.money + subject.prototype.price * 0.6
+            user.giveMoney(subject.prototype.price * 0.6)
             return MessageUtil.find('stand-sell')
                     .set('price', MessageUtil.toMoneyFormat(subject.prototype.price * 0.6))
                     .getText()
@@ -35,7 +35,7 @@ registerCommand 'sell' handle {
                         price += currentRelic.price
                     player.itemInHand = null
                     user.relics.remove currentRelic
-                    user.money += price
+                    user.giveMoney(price)
                     return MessageUtil.find('relic-sell')
                             .set('price', MessageUtil.toMoneyFormat(price))
                             .getText()

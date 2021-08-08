@@ -118,7 +118,7 @@ Guis.register 'pickaxe', { player ->
                 text "Купить за §e$cost\$"
             } leftClick {
                 if (user.money > cost) {
-                    user.money = user.money - cost
+                    user.giveMoney(-cost)
                     user.info.extraChance = user.info.extraChance + 0.1
                     closeInventory()
                 } else
@@ -143,7 +143,7 @@ Guis.register 'pickaxe', { player ->
                 text "Купить за §e$cost\$"
             } leftClick {
                 if (user.money > cost) {
-                    user.money = user.money - cost
+                    user.giveMoney(-cost)
                     user.info.extraSpeed = user.info.extraSpeed + 1
                     closeInventory()
                 } else
@@ -169,7 +169,7 @@ Guis.register 'pickaxe', { player ->
                 text "Купить за §e$cost\$"
             } leftClick {
                 if (user.money > cost) {
-                    user.money = user.money - cost
+                    user.giveMoney(-cost)
                     user.info.extraBreak = user.info.extraBreak + 5
                     closeInventory()
                 } else

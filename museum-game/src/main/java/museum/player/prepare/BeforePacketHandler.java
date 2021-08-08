@@ -181,7 +181,7 @@ public class BeforePacketHandler implements Prepare {
 
 	private boolean tryReturnPlayer(User user, boolean force) {
 		Excavation excavation = ((Excavation) user.getState());
-		excavation.setHitsLeft(excavation.getHitsLeft() - 1);
+		excavation.updateHits(user, excavation.getHitsLeft() -1);
 
 		if (excavation.getHitsLeft() < 0)
 			return true;
@@ -193,7 +193,7 @@ public class BeforePacketHandler implements Prepare {
 				user.setState(user.getLastMuseum());
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			});
-			excavation.setHitsLeft(-1);
+			excavation.updateHits(user, -1);
 			return false;
 		}
 		return excavation.getHitsLeft() < 0;

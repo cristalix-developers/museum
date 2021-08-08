@@ -100,16 +100,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	}
 
 	@Override
-	public void setupScoreboard(User user, SimpleBoardObjective objective) {
-		objective.setDisplayName(this.title);
-
-		objective.startGroup("Музей");
-		if (owner != user) objective.record("Владелец", owner.getName());
-		objective.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(getIncome() * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)))
-				.record("Посещений", () -> "§b" + this.getViews());
-	}
-
-	@Override
 	public void enterState(User user) {
 		teleportUser(user);
 

@@ -26,11 +26,6 @@ public class Market implements State {
 	}
 
 	@Override
-	public void setupScoreboard(User user, SimpleBoardObjective obj) {
-		obj.setDisplayName("Рынок");
-	}
-
-	@Override
 	public void enterState(User user) {
 		user.teleport(this.spawnLocation);
 		val inventory = user.getInventory();

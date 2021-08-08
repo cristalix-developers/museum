@@ -118,8 +118,8 @@ Guis.register 'trade', { player ->
             def clone = gem
             owner.relics.remove(gem)
             clone.give(victim)
-            victim.setMoney(victim.money - cost)
-            owner.setMoney(owner.money + cost * (privileges ? 1F : 0.8F))
+            victim.giveMoney(-cost)
+            owner.giveMoney(cost * (privileges ? 1F : 0.8F))
 
             def message = Formatting.fine("Сделка совершена.")
 

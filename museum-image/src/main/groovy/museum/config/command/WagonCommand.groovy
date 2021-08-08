@@ -36,7 +36,7 @@ Do.every 1 ticks {
 on PlayerQuitEvent, EventPriority.LOWEST, {
     if (playerOrderedWagon.contains(player.uniqueId)) {
         def user = App.app.getUser player
-        user.money = user.money + WagonConfig.COST
+        user.giveMoney(WagonConfig.COST)
         playerOrderedWagon.remove player.uniqueId
     }
 }
@@ -69,11 +69,11 @@ registerCommand 'wagonbuy' handle {
     def user = App.app.getUser sender as CraftPlayer
     if (user.getMoney() < WagonConfig.COST) {
         AnimationUtil.buyFailure(user)
-        return MuseumCommands.NO_MONEY_MESSAGE
+        return null
     }
     if (playerOrderedWagon.contains user.uuid)
         return MessageUtil.get('wagon-copy')
-    user.money = user.money - WagonConfig.COST
+    user.giveMoney(-WagonConfig.COST)
     playerOrderedWagon.add user.uuid
     return MessageUtil.get('wagon-buy')
 }

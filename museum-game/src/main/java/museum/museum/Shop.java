@@ -21,11 +21,6 @@ public class Shop implements State {
 	}
 
 	@Override
-	public void setupScoreboard(User user, SimpleBoardObjective obj) {
-		obj.setDisplayName("Магазин");
-	}
-
-	@Override
 	public void enterState(User user) {
 		user.teleport(this.spawnLocation);
 		val inventory = user.getInventory();

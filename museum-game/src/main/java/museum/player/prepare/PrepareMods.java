@@ -1,9 +1,11 @@
 package museum.player.prepare;
 
+import clepto.bukkit.B;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.val;
 import museum.App;
+import museum.client_conversation.AnimationUtil;
 import museum.player.User;
 import net.minecraft.server.v1_12_R1.PacketDataSerializer;
 import net.minecraft.server.v1_12_R1.PacketPlayOutCustomPayload;
@@ -47,5 +49,10 @@ public class PrepareMods implements Prepare {
 					new PacketDataSerializer(byteBuf.retainedSlice())
 			));
 		}
+		B.postpone(1, () -> {
+			AnimationUtil.updateLevelBar(user);
+			AnimationUtil.updateMoney(user);
+			AnimationUtil.updateOnlineAll();
+		});
 	}
 }

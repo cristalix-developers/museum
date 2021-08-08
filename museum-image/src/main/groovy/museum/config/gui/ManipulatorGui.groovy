@@ -237,7 +237,7 @@ Guis.register 'manipulator', { player ->
                     """
                 } leftClick {
                     if (user.money >= upgradeCost) {
-                        user.money = user.money - upgradeCost
+                        user.giveMoney(-upgradeCost)
                         subject.level = subject.level + 1
                         user.sendMessage(Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
                         Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)

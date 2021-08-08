@@ -2,20 +2,15 @@ package ru.func.mod
 
 import KotlinMod
 import com.google.gson.Gson
-import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.input.KeyPress
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.network.PluginMessage
-import dev.xdark.clientapi.event.render.NameTemplateRender
-import dev.xdark.clientapi.event.render.RenderTickPre
+import dev.xdark.clientapi.event.render.*
 import dev.xdark.clientapi.item.ItemTools
 import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.resource.ResourceLocation
 import dev.xdark.feder.NetUtil
 import org.lwjgl.input.Keyboard
-import org.lwjgl.opengl.GL11
-import org.lwjgl.util.vector.Matrix4f
-import org.lwjgl.util.vector.Vector3f
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.*
 import ru.cristalix.uiengine.utility.*
@@ -40,7 +35,27 @@ class Museum : KotlinMod() {
     override fun onEnable() {
         UIEngine.initialize(this)
 
+        LevelBar()
+        Statistic()
+
         val minecraft = clientApi.minecraft()
+
+        // Отменяю рендер голода
+        UIEngine.registerHandler(HungerRender::class.java) {
+            isCancelled = true
+        }
+
+        UIEngine.registerHandler(ArmorRender::class.java) {
+            isCancelled = true
+        }
+
+        UIEngine.registerHandler(HealthRender::class.java) {
+            isCancelled = true
+        }
+
+        UIEngine.registerHandler(ExpBarRender::class.java) {
+            isCancelled = true
+        }
 
         // Загрузка фотографий
         val namespace = "museum"

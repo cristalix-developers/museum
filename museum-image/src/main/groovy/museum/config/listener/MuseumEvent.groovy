@@ -1,7 +1,6 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.listener
 
-
 import museum.App
 import museum.misc.PlacesMechanic
 import museum.museum.Museum

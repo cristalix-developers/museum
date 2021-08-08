@@ -4,6 +4,7 @@ import clepto.bukkit.item.Items;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.val;
+import museum.client_conversation.ModTransfer;
 import museum.player.State;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
@@ -82,11 +83,10 @@ public class Excavation implements State {
 		}
 	}
 
-	@Override
-	public void setupScoreboard(User user, SimpleBoardObjective objective) {
-		objective.setDisplayName("Раскопки");
-		objective.startGroup("Раскопки")
-				.record("Ударов", () -> Math.max(hitsLeft, 0) + " осталось")
-				.record("Шахта", prototype.getTitle());
+	public void updateHits(User user, int setHit) {
+		hitsLeft = setHit;
+		new ModTransfer()
+				.integer(hitsLeft)
+				.send("museum:hitcount", user);
 	}
 }

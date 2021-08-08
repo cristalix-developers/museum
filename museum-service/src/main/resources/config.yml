@@ -26,6 +26,11 @@ npc:
     hint: ' '
     command: ' '
     skin: 'http://textures.minecraft.net/texture/c11558ed09d7d1a94255f78d98c122f4d1c649430a8b005711baadf305f7c'
+  polishing:
+    title: '§b§lПОЛИРОВКА'
+    hint: '§eПравый клик'
+    command: 'gui polishing'
+    skin: 'http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27'
 
 chat:
   messages:

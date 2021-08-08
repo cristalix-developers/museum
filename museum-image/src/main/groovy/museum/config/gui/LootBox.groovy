@@ -112,7 +112,7 @@ Guis.register 'loot', { Player player ->
         """
     } leftClick {
         if (user.money > cost) {
-            user.money = user.money - cost
+            user.giveMoney(-cost)
             giveDrop(user)
             closeInventory()
         } else

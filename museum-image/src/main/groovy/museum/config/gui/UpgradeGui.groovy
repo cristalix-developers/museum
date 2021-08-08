@@ -83,7 +83,7 @@ register 'rod', { player ->
             AnimationUtil.buyFailure(user)
             return MessageUtil.get('nomoney')
         }
-        user.money -= cost
+        user.giveMoney(-cost)
         user.info.hookLevel = user.info.hookLevel + 1
         closeInventory()
         return MessageUtil.find('buy-hook').set('level', user.info.hookLevel).text

@@ -33,6 +33,11 @@ public class ModTransfer {
 		return this;
 	}
 
+	public ModTransfer pointed(double pointed) {
+		serializer.writeDouble(pointed);
+		return this;
+	}
+
 	public void send(String channel, User user) {
 		user.sendPacket(new PacketPlayOutCustomPayload(channel, serializer));
 	}

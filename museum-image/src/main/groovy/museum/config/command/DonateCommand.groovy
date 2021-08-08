@@ -107,7 +107,7 @@ Guis.register 'prefixes', {
         """
     } leftClick {
         if (user.money >= 10000000) {
-            user.money = user.money - 10000000
+            user.giveMoney(-10000000)
             def randomPrefix = ListUtils.random(
                     user.prefixChestOpened % 5 == 0 ?
                             prefixes.stream()
@@ -120,7 +120,7 @@ Guis.register 'prefixes', {
             for (def prefix in user.info.prefixes) {
                 if (prefix.contains(randomPrefix.prefix)) {
                     flag = false
-                    user.money = user.money + 50000
+                    user.giveMoney(50000)
                     AnimationUtil.topTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
                     break
                 }
@@ -236,7 +236,7 @@ registerCommand 'proccessdonate' handle {
             for (def prefix in user.info.prefixes) {
                 if (prefix.contains(randomPrefix.prefix)) {
                     flag = false
-                    user.money = user.money + 50000
+                    user.giveMoney(50000)
                     AnimationUtil.topTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
                     break
                 }

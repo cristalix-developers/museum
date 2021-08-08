@@ -20,7 +20,6 @@ import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
-import museum.player.prepare.PrepareScoreBoard;
 import museum.prototype.Managers;
 import museum.prototype.Registry;
 import museum.util.LevelSystem;
@@ -91,7 +90,7 @@ public class User implements PlayerWrapper {
 
 		this.state = this.museums.get(Managers.museum.getPrototype("main"));
 
-		updateIncome();
+		B.postpone(50, this::updateIncome);
 	}
 
 	public void hideFromAll() {
@@ -141,7 +140,6 @@ public class User implements PlayerWrapper {
 				hideFromAll();
 			}
 		});
-		PrepareScoreBoard.setupScoreboard(this);
 	}
 
 	public Subject getSubject(UUID uuid) {
@@ -177,6 +175,7 @@ public class User implements PlayerWrapper {
 						.send(this);
 			}
 		}
+		AnimationUtil.updateLevelBar(this);
 	}
 
 	public int getLevel() {
@@ -229,9 +228,15 @@ public class User implements PlayerWrapper {
 		setIncome(0);
 		for (Museum museum : getMuseums())
 			setIncome(getIncome() + museum.getIncome());
+		AnimationUtil.updateIncome(this);
 	}
 
 	public void depositMoneyWithBooster(double income) {
-		setMoney(getMoney() + income * App.getApp().getPlayerDataManager().calcMultiplier(getUuid(), BoosterType.COINS));
+		giveMoney(income * App.getApp().getPlayerDataManager().calcMultiplier(getUuid(), BoosterType.COINS));
+	}
+
+	public void giveMoney(double money) {
+		setMoney(getMoney() + money);
+		AnimationUtil.updateMoney(this);
 	}
 }
