@@ -73,14 +73,14 @@ public class TopManager implements Ticked, Listener {
 
 				int counter = 0;
 				for (TopEntry<String, String> topEntry : tops.get(type)) {
+					counter++;
 					top.addContent(
 							UUID.randomUUID(),
-							"" + ++counter,
+							"" + counter,
 							topEntry.getKey(),
 							topEntry.getValue()
 					);
 				}
-
 				top.updateContent();
 			});
 		}

@@ -52,7 +52,8 @@ public class DefaultElements {
 				-1L,
 				0,
 				new ArrayList<>(),
-				false
+				false,
+				true
 		);
 
 		for (SubjectInfo subject : proto.getDefaultSubjects())

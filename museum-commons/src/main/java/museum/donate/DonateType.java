@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 public enum DonateType {
 
-	PREFIX_CASE("Случайный префикс", 79, false),
-	ITEM_CASE("Лутбокс", 49, false),
+	PREFIX_CASE("Случайный префикс", 49, false),
+	ITEM_CASE("Лутбокс", 39, false),
 	PRIVILEGES("Комиссия 0%", 119, true),
 	GLOBAL_MONEY_BOOSTER("Глобальный бустер денег", 199, false),
 	GLOBAL_VILLAGER_BOOSTER("Глобальный бустер посетителей", 149, false),

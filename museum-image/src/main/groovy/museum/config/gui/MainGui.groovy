@@ -1,6 +1,5 @@
 package museum.config.gui
 
-
 import implario.humanize.TimeFormatter
 import museum.App
 import museum.config.command.WagonConfig
@@ -24,7 +23,7 @@ register 'main', { player ->
 
     title 'Главное меню'
     layout """
-        ----K----
+        ---K-L---
         F--SMT--S
         -H--O--JP
     """
@@ -47,13 +46,26 @@ register 'main', { player ->
         open(player, 'loot', player)
     }
 
+    button 'L' icon {
+        item END_CRYSTAL
+        text """
+        §bПрефиксы
+
+        §fВыберите префикс!
+        §fНекоторые редкие префиксы
+        §fдают бонусы.
+        """
+    } leftClick {
+        performCommand('prefixes')
+    }
+
     button 'P' icon {
         item GOLDEN_CARROT
         text """
-        >> §bВнутриигровые покупки §f<<
-        
-        Тут вы можете купить,
-        интересные вещи...
+        §f>> §bВнутриигровые покупки §f<<
+        §f
+        §fТут вы можете купить,
+        §fинтересные вещи...
         """
     } leftClick {
         closeInventory()
