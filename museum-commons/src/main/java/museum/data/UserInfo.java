@@ -41,4 +41,5 @@ public class UserInfo implements Unique {
 	private List<String> prefixes;
 	private boolean privileges;
 	private boolean messages;
+	private Integer day;
 }

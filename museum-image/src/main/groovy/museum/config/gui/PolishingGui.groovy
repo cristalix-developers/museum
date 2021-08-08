@@ -28,7 +28,7 @@ register 'polishing', { player ->
     def itemInHand = user.player.itemInHand
     def tag = CraftItemStack.asNMSCopy(itemInHand).tag
     def price = 25000
-    def chance = 0.25
+    def chance = 0.40
 
     if (itemInHand == null || tag == null || !tag.hasKeyOfType('gem', 99)) {
         button 'M' icon {
@@ -79,7 +79,7 @@ register 'polishing', { player ->
             if (Math.random() < chance)
                 AnimationUtil.topTitle(user, '§cКамень был разрушен')
             else {
-                new Gem(gem.type.name() + ":" + Math.random() * 1.1 + ":" + gem.price).give user
+                new Gem(gem.type.name() + ":" + Math.random() * 0.95 + ":" + gem.price).give user
                 AnimationUtil.topTitle user, '§aКамень был отполирован'
             }
         } else

@@ -3,9 +3,7 @@ package ru.func.mod
 import dev.xdark.clientapi.event.network.PluginMessage
 import dev.xdark.feder.NetUtil
 import ru.cristalix.uiengine.UIEngine
-import ru.cristalix.uiengine.element.animate
 import ru.cristalix.uiengine.utility.*
-import kotlin.math.absoluteValue
 
 /**
  * @author Рейдж 08.08.2021
@@ -13,7 +11,6 @@ import kotlin.math.absoluteValue
  */
 class Statistic {
     init {
-
         val balanceText = text {
             offset = V3(-3.0, -14.0)
             origin = BOTTOM_RIGHT
@@ -56,7 +53,7 @@ class Statistic {
             when (channel) {
                 "museum:balance" -> balanceText.content = "Баланс §a${NetUtil.readUtf8(data)}"
                 "museum:online" -> online.content = "Онлайн §b${data.readInt()}"
-                "museum:coinprice" -> coinPrice.content = "Цена монеты §e${data.readDouble()}"
+                "museum:coinprice" -> coinPrice.content = "Цена монеты §e${NetUtil.readUtf8(data)}"
                 "museum:hitcount" -> {
                     val hit = data.readInt()
                     if (hit > 0) {

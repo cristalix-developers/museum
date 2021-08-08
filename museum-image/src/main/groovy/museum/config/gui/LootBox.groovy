@@ -21,7 +21,7 @@ import static org.bukkit.Material.BARRIER
 import static org.bukkit.Material.CLAY_BALL
 
 static void giveDrop(User owner) {
-    def gem = new Gem(ListUtils.random(GemType.values()).name() + ":" + (0.6 + Math.random() / 100 * 40) + ":10000")
+    def gem = new Gem(ListUtils.random(GemType.values()).name() + ":" + (Math.random() * 1.1) + ":10000")
     gem.give(owner)
     def meteor = new Meteorite("meteor_" + ListUtils.random(Meteorite.Meteorites.values()).name())
     meteor.give(owner)
@@ -58,7 +58,7 @@ Guis.register 'loot', { Player player ->
         nbt.museum = 'ruby'
         text """§aВы получите:
 
-        §f㦶 Случайную драгоценность §6[60%-100%]§f:
+        §f㦶 Случайную драгоценность §6[0%-110%]§f:
         
             §6⭐⭐⭐ Рубин
             §6⭐⭐⭐ Сапфир

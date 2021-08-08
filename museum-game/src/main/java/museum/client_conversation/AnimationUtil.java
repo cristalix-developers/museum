@@ -11,6 +11,8 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.realm.IRealmService;
 
+import java.text.DecimalFormat;
+
 /**
  * @author func 02.01.2021
  * @project museum
@@ -70,12 +72,17 @@ public class AnimationUtil {
     }
 
     public static void updateOnlineAll() {
-        Bukkit.getOnlinePlayers().forEach(player -> updateOnline(App.getApp().getUser(player)));
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            val user = App.getApp().getUser(player);
+
+            if (user != null)
+                updateOnline(user);
+        });
     }
 
     public static void updateIncome(User user) {
         new ModTransfer()
-                .pointed(user.getIncome())
+                .string(new DecimalFormat("#00.0").format(user.getIncome()))
                 .send("museum:coinprice", user);
     }
 

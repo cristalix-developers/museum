@@ -2,6 +2,7 @@ package museum.player.prepare;
 
 import clepto.bukkit.B;
 import clepto.bukkit.Cycle;
+import clepto.bukkit.menu.Guis;
 import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
 import implario.ListUtils;
@@ -72,6 +73,9 @@ public class PreparePlayerBrain implements Prepare {
 			B.postpone(10 * 20, () -> {
 				if ((now - user.getInfo().getLastTimeRewardClaim()) > REWARD_DELAY_HOURS * 3600) {
 					user.getInfo().setLastTimeRewardClaim(now);
+					user.setDay(user.getDay() + 1);
+
+					B.postpone(5, () -> Guis.open(player, "daily-reward", player));
 
 					// Бонус к ежедневной награде
 					int dailyReward = 10000;

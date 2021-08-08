@@ -1,6 +1,7 @@
 package museum.player;
 
 import clepto.bukkit.B;
+import clepto.bukkit.menu.Guis;
 import com.google.common.collect.Maps;
 import lombok.Setter;
 import lombok.val;
@@ -71,6 +72,9 @@ public class PlayerDataManager implements Listener {
 
                 if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 
+                if (userInfo.getDay() == null)
+                    userInfo.setDay(0);
+                
                 userMap.put(uuid, new User(userInfo));
             } catch (Exception ex) {
                 event.setCancelReason("Не удалось загрузить статистику о музее.");
@@ -112,6 +116,10 @@ public class PlayerDataManager implements Listener {
 
         player.setResourcePack("", "");
         player.setWalkSpeed(.36F);
+
+        App.getApp().getUser(player).setDay(App.getApp().getUser(player).getDay() + 1);
+        System.out.println(App.getApp().getUser(player).getDay());
+        B.postpone(5, () -> Guis.open(player, "daily-reward", player));
 
         if (!App.getApp().getPlayerDataManager().globalBoosters.isEmpty())
             timeBar.onJoin(player.getUniqueId());
