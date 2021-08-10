@@ -11,6 +11,8 @@ import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.resource.ResourceLocation
 import dev.xdark.feder.NetUtil
 import org.lwjgl.input.Keyboard
+import org.lwjgl.input.Mouse
+import org.lwjgl.opengl.Display
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.*
 import ru.cristalix.uiengine.utility.*
@@ -31,12 +33,25 @@ class Museum : KotlinMod() {
     private lateinit var shoptext: TextElement
     private var hints = ArrayList<Pair<Long, AbstractElement>>()
 
+    var dragging: Boolean = false
+    var draggingX: Double = 0.0
+    var draggingY: Double = 0.0
+
+    fun getMouse(): V2 {
+        val resolution = UIEngine.clientApi.resolution()
+        val factor = resolution.scaleFactor
+        val mouseX = (Mouse.getX() / factor).toDouble()
+        val mouseY = ((Display.getHeight() - Mouse.getY()) / factor).toDouble()
+        return V2(mouseX, mouseY)
+    }
+
 
     override fun onEnable() {
         UIEngine.initialize(this)
 
         LevelBar()
         Statistic()
+        ScreenMessage()
 
         val minecraft = clientApi.minecraft()
 
@@ -311,8 +326,7 @@ class Museum : KotlinMod() {
             }
         }
 
-        UIEngine.registerHandler(KeyPress::class.java)
-        {
+        UIEngine.registerHandler(KeyPress::class.java) {
             if (key == Keyboard.KEY_RETURN && activeSubject != null) {
                 clientApi.chat().sendChatMessage("/buy ${activeSubject?.address}")
             } else if (key == Keyboard.KEY_N) {

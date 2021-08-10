@@ -4,6 +4,7 @@ import clepto.bukkit.item.Items;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.val;
+import museum.client_conversation.AnimationUtil;
 import museum.client_conversation.ModTransfer;
 import museum.player.State;
 import museum.player.User;
@@ -46,6 +47,7 @@ public class Excavation implements State {
 		inventory.addItem(pickaxe);
 
 		inventory.addItem(prototype.getPallette());
+		AnimationUtil.screenMessage(user, prototype.getPallette());
 		inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
 		user.teleport(prototype.getSpawn().clone().add(0, 6, 0));

@@ -65,6 +65,12 @@ public class AnimationUtil {
                 .send("museum:balance", user);
     }
 
+    public static void screenMessage(User user, int... id) {
+        new ModTransfer()
+                .integers(id)
+                .send("museum:screenmessage", user);
+    }
+
     public static void updateOnline(User user) {
         new ModTransfer()
                 .integer(IRealmService.get().getOnlineOnRealms("MUSM"))

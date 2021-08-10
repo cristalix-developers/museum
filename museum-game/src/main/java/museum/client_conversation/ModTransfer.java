@@ -33,6 +33,11 @@ public class ModTransfer {
 		return this;
 	}
 
+	public ModTransfer integers(int... integers) {
+		serializer.writeIntArray(integers);
+		return this;
+	}
+
 	public ModTransfer pointed(double pointed) {
 		serializer.writeDouble(pointed);
 		return this;
