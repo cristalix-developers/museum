@@ -59,7 +59,6 @@ class Statistic {
         }
 
         val box = rectangle {
-            color = BLACK
             size = V3(125.0, 80.0)
             onClick = onClick@{ _: AbstractElement, b: Boolean, _: MouseButton ->
                 dragging = b

@@ -33,6 +33,7 @@ public class Auction implements Event {
 
     private SkeletonPrototype proto;
     private final PlayerDataManager playerDataManager = App.getApp().getPlayerDataManager();
+
     private ItemStack itemStack = new ItemStack(Material.CLAY_BALL);
 
 
@@ -56,7 +57,7 @@ public class Auction implements Event {
                 .forEach(user -> {
                     new ModTransfer()
                             .string("Торги! Сделать ставку §b/rate <сумма>")
-                            .integer(10)
+                            .integer(600)
                             .send("museum:tradingtime", user);
                     AnimationUtil.throwIconMessage(user, itemStack, "Торги!", "Участвовать в торгах /rate");
                 });

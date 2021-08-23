@@ -123,10 +123,6 @@ public class PlayerDataManager implements Listener {
         player.setResourcePack("", "");
         player.setWalkSpeed(.36F);
 
-        App.getApp().getUser(player).setDay(App.getApp().getUser(player).getDay() + 1);
-        System.out.println(App.getApp().getUser(player).getDay());
-        B.postpone(5, () -> Guis.open(player, "daily-reward", player));
-
         if (!App.getApp().getPlayerDataManager().globalBoosters.isEmpty())
             timeBar.onJoin(player.getUniqueId());
 
