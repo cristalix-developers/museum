@@ -53,6 +53,7 @@ public class MuseumCommands {
 		B.regCommand(this::cmdVisit, "visit", "museum");
 		B.regCommand(this::cmdBuy, "buy");
 		B.regCommand(this::cmdPrefix, "prefix");
+		B.regCommand(this::cmdRate, "rate");
 	}
 
 	private String cmdPrefix(Player player, String[] args) {
@@ -339,5 +340,16 @@ public class MuseumCommands {
 		user.setPickaxeType(pickaxe);
 		player.performCommand("gui pickaxe");
 		return MessageUtil.get("newpickaxe");
+	}
+
+	private String cmdRate(Player player, String[] args) {
+		if (args.length == 0)
+			return "/rate <цена>";
+		else if (!app.getPlayerDataManager().isRateBegun())
+			return "Торги ещё не начались.";
+
+		App.getApp().getPlayerDataManager().getMembers().put(player.getUniqueId(), Integer.parseInt(args[0]));
+
+		return "Ваша ставка была принята.";
 	}
 }

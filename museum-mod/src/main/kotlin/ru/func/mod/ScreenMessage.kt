@@ -14,23 +14,23 @@ import ru.cristalix.uiengine.utility.*
 class ScreenMessage {
     init {
         val item = rectangle {
-            size = V3(50.0, 50.0)
             align = Relative.CENTER
             origin = Relative.CENTER
             color = TRANSPARENT
-            textureSize = V2(50.0, 50.0)
+            scale = V3(2.1, 2.1)
             enabled = false
         }
-
-        UIEngine.overlayContext.addChild(item)
 
         UIEngine.registerHandler(PluginMessage::class.java) {
             if (channel == "museum:screenmessage") {
                 item.enabled = true
                 item.addChild(item {
-                    UIEngine.clientApi.itemRegistry().getItem(data.readInt()).newStack(1,0)
+                    repeat(2) {
+                        stack = ItemTools.read(data)
+                    }
                 })
             }
         }
+        UIEngine.overlayContext.addChild(item)
     }
 }

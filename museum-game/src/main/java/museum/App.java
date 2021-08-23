@@ -24,6 +24,7 @@ import museum.packages.*;
 import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.prototype.Managers;
+import museum.ticker.detail.Auction;
 import museum.ticker.detail.FountainHandler;
 import museum.ticker.detail.WayParticleHandler;
 import museum.ticker.top.TopManager;
@@ -183,6 +184,7 @@ public final class App extends JavaPlugin {
 		new TickTimerHandler(this, Arrays.asList(
 				new FountainHandler(this),
 				new WayParticleHandler(this),
+				new Auction(),
 				topManager
 		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 

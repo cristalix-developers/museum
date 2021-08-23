@@ -3,6 +3,7 @@ package ru.func.mod
 import com.google.gson.Gson
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.network.PluginMessage
+import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.feder.NetUtil
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
@@ -58,7 +59,8 @@ class Statistic {
         }
 
         val box = rectangle {
-            color = Color(0, 0, 0, 0.62)
+            color = BLACK
+            size = V3(125.0, 80.0)
             onClick = onClick@{ _: AbstractElement, b: Boolean, _: MouseButton ->
                 dragging = b
                 if (b) {
@@ -117,7 +119,6 @@ class Statistic {
         repeat(4) {
             box.children.add(
                 rectangle {
-                    size = V3(250.0, 16.0)
                     color = TRANSPARENT
                 }
             )
@@ -150,11 +151,6 @@ class Statistic {
 
             box.scale = V3(settings.scale, settings.scale, 1.0)
 
-            box.size = V3(
-                if (settings.vertical) slotSize + 10 else slotSize * 4 + 10,
-                if (settings.vertical) slotSize * 4 + 10 else slotSize + 10,
-            )
-
             for ((i, child) in box.children.withIndex()) {
                 if (settings.vertical) child.offset = V3(120.0, i * slotSize + 5)
                 else child.offset = V3(i * slotSize + 5, 5.0)
@@ -170,7 +166,7 @@ class Statistic {
 
     private fun saveSettings(settings: Settings) {
         try {
-            Files.write(Paths.get("statistic.json"), gson.toJson(settings).toByteArray());
+            Files.write(Paths.get("statistic.json"), gson.toJson(settings).toByteArray())
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -179,7 +175,7 @@ class Statistic {
     private fun readSettings(): Settings? {
         try {
             val readAllLines = Files.readAllLines(Paths.get("statistic.json"))
-            if (readAllLines == null || readAllLines.isEmpty()) return null;
+            if (readAllLines == null || readAllLines.isEmpty()) return null
             return gson.fromJson(readAllLines.get(0), Settings::class.java)
         } catch (exception: Exception) {
             return null

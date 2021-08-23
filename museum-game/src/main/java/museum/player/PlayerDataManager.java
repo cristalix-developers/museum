@@ -3,6 +3,7 @@ package museum.player;
 import clepto.bukkit.B;
 import clepto.bukkit.menu.Guis;
 import com.google.common.collect.Maps;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import museum.App;
@@ -43,6 +44,11 @@ public class PlayerDataManager implements Listener {
     @Setter
     private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
     private final List<Prepare> prepares;
+    @Getter
+    private final Map<UUID, Integer> members = Maps.newHashMap();
+    @Getter
+    @Setter
+    private boolean isRateBegun = false;
 
     @SuppressWarnings("deprecation")
     public PlayerDataManager(App app) {
@@ -74,7 +80,7 @@ public class PlayerDataManager implements Listener {
 
                 if (userInfo.getDay() == null)
                     userInfo.setDay(0);
-                
+
                 userMap.put(uuid, new User(userInfo));
             } catch (Exception ex) {
                 event.setCancelReason("Не удалось загрузить статистику о музее.");
@@ -169,6 +175,7 @@ public class PlayerDataManager implements Listener {
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(removePlayer);
 
         timeBar.onQuit(current.getUniqueId());
+        App.getApp().getPlayerDataManager().getMembers().remove(current.getUniqueId());
     }
 
     public double calcMultiplier(UUID uuid, BoosterType type) {

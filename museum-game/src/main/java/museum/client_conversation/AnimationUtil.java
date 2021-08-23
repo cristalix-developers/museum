@@ -65,9 +65,9 @@ public class AnimationUtil {
                 .send("museum:balance", user);
     }
 
-    public static void screenMessage(User user, int... id) {
+    public static void screenMessage(User user, ItemStack itemStack) {
         new ModTransfer()
-                .integers(id)
+                .item(CraftItemStack.asNMSCopy(itemStack))
                 .send("museum:screenmessage", user);
     }
 
