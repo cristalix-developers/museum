@@ -24,6 +24,7 @@ import museum.packages.*;
 import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.prototype.Managers;
+import museum.ticker.Timer;
 import museum.ticker.detail.Auction;
 import museum.ticker.detail.FountainHandler;
 import museum.ticker.detail.WayParticleHandler;
@@ -59,249 +60,252 @@ import java.util.logging.Level;
 
 @Getter
 public final class App extends JavaPlugin {
-	@Getter
-	private static App app;
+    @Getter
+    private static App app;
 
-	private PlayerDataManager playerDataManager;
-	private TopManager topManager;
-	private ClientSocket clientSocket;
-	private WorldMeta map;
-	private YamlConfiguration configuration;
+    private PlayerDataManager playerDataManager;
+    private TopManager topManager;
+    private ClientSocket clientSocket;
+    private WorldMeta map;
+    private YamlConfiguration configuration;
 
-	private Shop shop;
-	private Market market;
-	private International crystal;
+    private Shop shop;
+    private Market market;
+    private International crystal;
 
-	@Override
-	public void onEnable() {
-		B.plugin = App.app = this;
-		B.events(new PhysicsDisabler());
+    @Override
+    public void onEnable() {
+        B.plugin = App.app = this;
+        B.events(new PhysicsDisabler());
 
-		// Добавление админ-команд
-		AdminCommand.init(this);
+        // Добавление админ-команд
+        AdminCommand.init(this);
 
-		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
-		String museumServiceHost = getEnv("MUSEUM_SERVICE_HOST", "127.0.0.1");
-		int museumServicePort = Integer.parseInt(getEnv("MUSEUM_SERVICE_PORT", "14653"));
-		String museumServicePassword = getEnv("MUSEUM_SERVICE_PASSWORD", "12345");
+        // Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
+        String museumServiceHost = getEnv("MUSEUM_SERVICE_HOST", "127.0.0.1");
+        int museumServicePort = Integer.parseInt(getEnv("MUSEUM_SERVICE_PORT", "14653"));
+        String museumServicePassword = getEnv("MUSEUM_SERVICE_PASSWORD", "12345");
 
-		this.clientSocket = new ClientSocket(
-				museumServiceHost,
-				museumServicePort,
-				museumServicePassword,
-				Cristalix.getRealmString()
-		);
-		this.clientSocket.connect();
-		this.clientSocket.registerHandler(BroadcastTitlePackage.class, pckg -> {
-			String[] data = pckg.getData();
-			Bukkit.getOnlinePlayers().forEach(pl -> pl.sendTitle(data[0], data[1], pckg.getFadeIn(), pckg.getStay(), pckg.getFadeOut()));
-		});
-		this.clientSocket.registerHandler(BroadcastMessagePackage.class, pckg -> Bukkit.getOnlinePlayers()
-				.forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage()))));
-		this.clientSocket.registerHandler(TargetMessagePackage.class, pckg -> {
-			pckg.getUsers().stream()
-					.map(Bukkit::getPlayer)
-					.filter(Objects::nonNull)
-					.forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage())));
-		});
+        this.clientSocket = new ClientSocket(
+                museumServiceHost,
+                museumServicePort,
+                museumServicePassword,
+                Cristalix.getRealmString()
+        );
+        this.clientSocket.connect();
+        this.clientSocket.registerHandler(BroadcastTitlePackage.class, pckg -> {
+            String[] data = pckg.getData();
+            Bukkit.getOnlinePlayers().forEach(pl -> pl.sendTitle(data[0], data[1], pckg.getFadeIn(), pckg.getStay(), pckg.getFadeOut()));
+        });
+        this.clientSocket.registerHandler(BroadcastMessagePackage.class, pckg -> Bukkit.getOnlinePlayers()
+                .forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage()))));
+        this.clientSocket.registerHandler(TargetMessagePackage.class, pckg -> {
+            pckg.getUsers().stream()
+                    .map(Bukkit::getPlayer)
+                    .filter(Objects::nonNull)
+                    .forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage())));
+        });
 
-		// Регистрация Core сервисов
-		val core = CoreApi.get();
-		core.unregisterService(IChatService.class);
-		core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
-		core.registerService(IScoreboardService.class, new ScoreboardService());
-		//core.registerService(ICouponsService.class, new BukkitCouponsService(core.getSocketClient(), ICommandService.get()));
+        // Регистрация Core сервисов
+        val core = CoreApi.get();
+        core.unregisterService(IChatService.class);
+        core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
+        core.registerService(IScoreboardService.class, new ScoreboardService());
+        //core.registerService(ICouponsService.class, new BukkitCouponsService(core.getSocketClient(), ICommandService.get()));
 
-		// Регистрация обработчика пакета конфига
-		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
+        // Регистрация обработчика пакета конфига
+        clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
 
-		requestConfigurations();
+        requestConfigurations();
 
-		// Определение groovy операций
-		RuntimeExtensionModules.modules.add(new SimpleExtensionModule("museum", "1") {
-			@Override
-			public List<Class> getInstanceMethodsExtensionClasses() {
-				return Collections.singletonList(Extensions.class);
-			}
+        // Определение groovy операций
+        RuntimeExtensionModules.modules.add(new SimpleExtensionModule("museum", "1") {
+            @Override
+            public List<Class> getInstanceMethodsExtensionClasses() {
+                return Collections.singletonList(Extensions.class);
+            }
 
-			@Override
-			public List<Class> getStaticMethodsExtensionClasses() {
-				return new ArrayList<>();
-			}
-		});
+            @Override
+            public List<Class> getStaticMethodsExtensionClasses() {
+                return new ArrayList<>();
+            }
+        });
 
-		// Прогрузка Groovy-скриптов
-		try (val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {
-			while (true) {
-				String line = reader.readLine();
-				if (line == null || line.isEmpty()) break;
-				try {
-					Class<?> scriptClass = Class.forName(line);
-					if (!Script.class.isAssignableFrom(scriptClass)) continue;
-					readScript(scriptClass);
-				} catch (ClassNotFoundException ignored) {
-				}
-			}
-		} catch (Exception exception) {
-			exception.printStackTrace();
-		}
+        // Прогрузка Groovy-скриптов
+        try (val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {
+            while (true) {
+                String line = reader.readLine();
+                if (line == null || line.isEmpty()) break;
+                try {
+                    Class<?> scriptClass = Class.forName(line);
+                    if (!Script.class.isAssignableFrom(scriptClass)) continue;
+                    readScript(scriptClass);
+                } catch (ClassNotFoundException ignored) {
+                }
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
 
-		// Загрузка основного мира
-		map = MapLoader.load("prod1");
-		MapLoader.interceptChunkWriter(this, getNMSWorld());
-		crystal = new CrystalExcavations(this);
+        // Загрузка основного мира
+        map = MapLoader.load("prod1");
+        MapLoader.interceptChunkWriter(this, getNMSWorld());
+        crystal = new CrystalExcavations(this);
 
-		// Загрузга всех построек (витрины/коллекторы), мэнеджеров
-		SubjectType.init();
-		Managers.init();
-		clepto.bukkit.menu.Guis.init();
+        // Загрузга всех построек (витрины/коллекторы), мэнеджеров
+        SubjectType.init();
+        Managers.init();
+        clepto.bukkit.menu.Guis.init();
 
-		// Класс управляющий игроками
-		this.playerDataManager = new PlayerDataManager(this);
+        // Класс управляющий игроками
+        this.playerDataManager = new PlayerDataManager(this);
 
-		// Прогрузка мэнеджера топа
-		topManager = new TopManager(this);
+        // Прогрузка мэнеджера топа
+        topManager = new TopManager(this);
 
-		// Получение бустеров
-		requestBoosters();
+        // Получение бустеров
+        requestBoosters();
 
-		// Инициализация команд
-		new MuseumCommands(this);
-		this.shop = new Shop(this);
-		this.market = new Market(this);
+        // Инициализация команд
+        new MuseumCommands(this);
+        this.shop = new Shop(this);
+        this.market = new Market(this);
 
-		// Регистрация обработчиков событий
-		B.events(
-				playerDataManager,
-				new GuiEvents()
-		);
+        // Регистрация обработчиков событий
+        B.events(
+                playerDataManager,
+                new GuiEvents()
+        );
 
-		// Инициализация NPC и точек сбора
-		WorkerUtil.init(this);
-		PlacesMechanic.init(this);
+        // Инициализация NPC и точек сбора
+        WorkerUtil.init(this);
+        PlacesMechanic.init(this);
 
-		// Обработка каждого тика
-		new TickTimerHandler(this, Arrays.asList(
-				new FountainHandler(this),
-				new WayParticleHandler(this),
-				new Auction(),
-				topManager
-		), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
+        // Обработка каждого тика
+        new TickTimerHandler(this, Arrays.asList(
+                new FountainHandler(this),
+                new WayParticleHandler(this),
+                topManager
+        ), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
 
-		// Постоянный перерасчет множителя кол-ва посетителей музея
-		VisitorHandler.init(this, () -> (int) Math.ceil(3F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
+        new Timer(Collections.singletonList(
+                new Auction()
+        ));
 
-		// Вывод сервера меню
-		val realm = IRealmService.get().getCurrentRealmInfo();
-		realm.setLobbyServer(true);
-		realm.setStatus(RealmStatus.WAITING_FOR_PLAYERS);
-		realm.setGroupName("Музей");
-		IScoreboardService.get().getServerStatusBoard().setDisplayName("§fМузей #§b" + realm.getRealmId().getId());
-	}
+        // Постоянный перерасчет множителя кол-ва посетителей музея
+        VisitorHandler.init(this, () -> (int) Math.ceil(3F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
 
-	@Override
-	public void onDisable() {
-		clientSocket.write(playerDataManager.bulk(true));
-		try {
-			Thread.sleep(1000L); // Если вдруг он не успеет написать в сокет(хотя вряд ли, конечно)
-		} catch (Exception exception) {
-			exception.printStackTrace();
-		}
-	}
+        // Вывод сервера меню
+        val realm = IRealmService.get().getCurrentRealmInfo();
+        realm.setLobbyServer(true);
+        realm.setStatus(RealmStatus.WAITING_FOR_PLAYERS);
+        realm.setGroupName("Музей");
+        IScoreboardService.get().getServerStatusBoard().setDisplayName("§fМузей #§b" + realm.getRealmId().getId());
+    }
 
-	@Override
-	public FileConfiguration getConfig() {
-		return configuration;
-	}
+    @Override
+    public void onDisable() {
+        clientSocket.write(playerDataManager.bulk(true));
+        try {
+            Thread.sleep(1000L); // Если вдруг он не успеет написать в сокет(хотя вряд ли, конечно)
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
 
-	public User getUser(UUID uuid) {
-		return playerDataManager.getUser(uuid);
-	}
+    @Override
+    public FileConfiguration getConfig() {
+        return configuration;
+    }
 
-	public World getNMSWorld() {
-		return map.getWorld().getHandle();
-	}
+    public User getUser(UUID uuid) {
+        return playerDataManager.getUser(uuid);
+    }
 
-	public User getUser(Player player) {
-		return getUser(player.getUniqueId());
-	}
+    public World getNMSWorld() {
+        return map.getWorld().getHandle();
+    }
 
-	public CompletableFuture<UserTransactionPackage.TransactionResponse> processDonate(UUID user, DonateType donate) {
-		return clientSocket.writeAndAwaitResponse(new UserTransactionPackage(user, donate, null))
-				.thenApply(UserTransactionPackage::getResponse);
-	}
+    public User getUser(Player player) {
+        return getUser(player.getUniqueId());
+    }
 
-	private InputStreamReader reader(String base64) {
-		return new InputStreamReader(new ByteArrayInputStream(Base64.getDecoder().decode(base64)));
-	}
+    public CompletableFuture<UserTransactionPackage.TransactionResponse> processDonate(UUID user, DonateType donate) {
+        return clientSocket.writeAndAwaitResponse(new UserTransactionPackage(user, donate, null))
+                .thenApply(UserTransactionPackage::getResponse);
+    }
 
-	public CraftWorld getWorld() {
-		return map.getWorld();
-	}
+    private InputStreamReader reader(String base64) {
+        return new InputStreamReader(new ByteArrayInputStream(Base64.getDecoder().decode(base64)));
+    }
 
-	public Collection<User> getUsers() {
-		return playerDataManager.getUsers();
-	}
+    public CraftWorld getWorld() {
+        return map.getWorld();
+    }
 
-	private String getEnv(String name, String defaultValue) {
-		String field = System.getenv(name);
-		if (field == null || field.isEmpty()) {
-			System.out.println("No " + name + " environment variable specified!");
-			field = defaultValue;
-		}
-		return field;
-	}
+    public Collection<User> getUsers() {
+        return playerDataManager.getUsers();
+    }
 
-	private void requestConfigurations() {
-		try {
-			RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage())
-					.get(3L, TimeUnit.SECONDS);
-			fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getItemsData()));
-		} catch (Exception exception) {
-			exception.printStackTrace();
-			Bukkit.getLogger().severe("We can't receive museum configurations! Retry in 3sec");
-			try {
-				Thread.sleep(3000L);
-			} catch (InterruptedException interruptedException) {
-				interruptedException.printStackTrace();
-				Thread.currentThread().interrupt();
-			}
-			requestConfigurations();
-		}
-	}
+    private String getEnv(String name, String defaultValue) {
+        String field = System.getenv(name);
+        if (field == null || field.isEmpty()) {
+            System.out.println("No " + name + " environment variable specified!");
+            field = defaultValue;
+        }
+        return field;
+    }
 
-	private void fillConfigurations(ConfigurationsPackage pckg) {
-		YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
-		itemsConfig.getKeys(false)
-				.forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
+    private void requestConfigurations() {
+        try {
+            RequestConfigurationsPackage pckg = clientSocket.writeAndAwaitResponse(new RequestConfigurationsPackage())
+                    .get(3L, TimeUnit.SECONDS);
+            fillConfigurations(new ConfigurationsPackage(pckg.getConfigData(), pckg.getItemsData()));
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            Bukkit.getLogger().severe("We can't receive museum configurations! Retry in 3sec");
+            try {
+                Thread.sleep(3000L);
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+            requestConfigurations();
+        }
+    }
 
-		this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
-	}
+    private void fillConfigurations(ConfigurationsPackage pckg) {
+        YamlConfiguration itemsConfig = YamlConfiguration.loadConfiguration(reader(pckg.getItemsData()));
+        itemsConfig.getKeys(false)
+                .forEach(key -> Lemonade.parse(itemsConfig.getConfigurationSection(key)).register(key));
 
-	private void requestBoosters() {
-		try {
-			RequestGlobalBoostersPackage pckg = clientSocket.writeAndAwaitResponse(new RequestGlobalBoostersPackage())
-					.get(3L, TimeUnit.SECONDS);
-			playerDataManager.setGlobalBoosters(pckg.getBoosters());
-		} catch (Exception exception) {
-			exception.printStackTrace();
-			Bukkit.getLogger().severe("We can't get boosters! Retry in 3sec");
-			try {
-				Thread.sleep(3000L);
-			} catch (InterruptedException interruptedException) {
-				interruptedException.printStackTrace();
-				Thread.currentThread().interrupt();
-			}
-			requestBoosters();
-		}
-	}
+        this.configuration = YamlConfiguration.loadConfiguration(reader(pckg.getConfigData()));
+    }
 
-	private void readScript(Class<?> scriptClass) {
-		try {
-			Script script = (Script) scriptClass.newInstance();
-			script.run();
-		} catch (Exception exception) {
-			Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", exception);
-		}
-	}
+    private void requestBoosters() {
+        try {
+            RequestGlobalBoostersPackage pckg = clientSocket.writeAndAwaitResponse(new RequestGlobalBoostersPackage())
+                    .get(3L, TimeUnit.SECONDS);
+            playerDataManager.setGlobalBoosters(pckg.getBoosters());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            Bukkit.getLogger().severe("We can't get boosters! Retry in 3sec");
+            try {
+                Thread.sleep(3000L);
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+            requestBoosters();
+        }
+    }
+
+    private void readScript(Class<?> scriptClass) {
+        try {
+            Script script = (Script) scriptClass.newInstance();
+            script.run();
+        } catch (Exception exception) {
+            Bukkit.getLogger().log(Level.SEVERE, "An error occurred while running script '" + scriptClass.getName() + "':", exception);
+        }
+    }
 }
