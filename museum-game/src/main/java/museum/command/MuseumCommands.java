@@ -25,6 +25,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import ru.cristalix.core.formatting.Formatting;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
@@ -344,12 +345,16 @@ public class MuseumCommands {
 
 	private String cmdRate(Player player, String[] args) {
 		if (args.length == 0)
-			return "/rate <цена>";
+			return Formatting.error("/rate <цена>");
 		else if (!app.getPlayerDataManager().isRateBegun())
-			return "Торги ещё не начались.";
+			return Formatting.error("Торги ещё не начались.");
+		else if (Integer.parseInt(args[0]) > 10)
+			return Formatting.error("Сумма должна быть больше 10$.");
+		else if (Integer.parseInt(args[0]) > app.getUser(player).getMoney())
+			return Formatting.error("У вас нет таких денег.");
+		else
+			App.getApp().getPlayerDataManager().getMembers().put(player.getUniqueId(), Integer.parseInt(args[0]));
 
-		App.getApp().getPlayerDataManager().getMembers().put(player.getUniqueId(), Integer.parseInt(args[0]));
-
-		return "Ваша ставка была принята.";
+		return Formatting.fine("Ваша ставка была принята.");
 	}
 }

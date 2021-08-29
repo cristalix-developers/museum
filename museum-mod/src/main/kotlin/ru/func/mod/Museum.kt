@@ -49,6 +49,7 @@ class Museum : KotlinMod() {
     override fun onEnable() {
         UIEngine.initialize(this)
 
+        RewardManager()
         LevelBar()
         Statistic()
         ScreenMessage()

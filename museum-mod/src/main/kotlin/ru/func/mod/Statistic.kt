@@ -60,19 +60,19 @@ class Statistic {
 
         val box = rectangle {
             size = V3(125.0, 80.0)
-            onClick = onClick@{ _: AbstractElement, b: Boolean, _: MouseButton ->
-                dragging = b
-                if (b) {
-                    val mouse = getMouse()
-                    val resolution = UIEngine.clientApi.resolution()
-                    draggingX =
-                        mouse.x - this.offset.x - this.align.x * resolution.scaledWidth_double + this.origin.x * this.size.x
-                    draggingY =
-                        mouse.y - this.offset.y - this.align.y * resolution.scaledHeight_double + this.origin.y * this.size.y
-                } else {
-                    saveSettings(Settings(align.x, align.y, offset.x, offset.y, 1.0, "normal", true))
-                }
-            }
+            //onClick = onClick@{ _: AbstractElement, b: Boolean, _: MouseButton ->
+            //    dragging = b
+            //    if (b) {
+            //        val mouse = getMouse()
+            //        val resolution = UIEngine.clientApi.resolution()
+            //        draggingX =
+            //            mouse.x - this.offset.x - this.align.x * resolution.scaledWidth_double + this.origin.x * this.size.x
+            //        draggingY =
+            //            mouse.y - this.offset.y - this.align.y * resolution.scaledHeight_double + this.origin.y * this.size.y
+            //    } else {
+            //        saveSettings(Settings(align.x, align.y, offset.x, offset.y, 1.0, "normal", true))
+            //    }
+            //}
             addChild(hitCount, online, coinPrice, balanceText)
         }
 
@@ -156,11 +156,7 @@ class Statistic {
             }
         }
 
-        reload(
-            readSettings() ?: Settings(
-                0.0, 0.0, 835.0, 430.0, 1.0, "", true
-            )
-        )
+        reload(Settings(0.0, 0.0, 835.0, 430.0, 1.0, "", true))
     }
 
     private fun saveSettings(settings: Settings) {

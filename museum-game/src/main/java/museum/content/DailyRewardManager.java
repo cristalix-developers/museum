@@ -6,7 +6,7 @@ import museum.client_conversation.ModTransfer;
 import museum.player.User;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 
-import java.util.Arrays;
+import java.util.stream.Stream;
 
 /**
  * @author Рейдж 26.08.2021
@@ -16,9 +16,12 @@ import java.util.Arrays;
 @UtilityClass
 public class DailyRewardManager {
 
-    public void open(User user) {
-        val transfer = new ModTransfer().integer(user.getDay() + 1);
-        Arrays.stream(WeekRewards.values()).forEach(rewards -> transfer.item(CraftItemStack.asNMSCopy(rewards.getIcon())).string("§7Награда: " + rewards.getTitle()));
-        transfer.send("museum:weekly-reward", user);
-    }
+	public void open(User user) {
+		val transfer = new ModTransfer().integer(user.getDay() + 1);
+		Stream.of(WeekRewards.values()).forEach(rewards ->
+				transfer.item(CraftItemStack.asNMSCopy(rewards.getIcon()))
+						.string("§7Награда: " + rewards.getTitle())
+		);
+		transfer.send("museum:weekly-reward", user);
+	}
 }

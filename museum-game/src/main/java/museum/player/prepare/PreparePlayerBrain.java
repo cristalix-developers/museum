@@ -1,8 +1,6 @@
 package museum.player.prepare;
 
-import clepto.bukkit.B;
 import clepto.bukkit.Cycle;
-import clepto.bukkit.menu.Guis;
 import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
 import implario.ListUtils;
@@ -18,7 +16,6 @@ import museum.fragment.Meteorite;
 import museum.museum.Museum;
 import museum.player.User;
 import museum.util.LocationUtil;
-import museum.util.MessageUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
@@ -75,11 +72,11 @@ public class PreparePlayerBrain implements Prepare {
         if (player.hasPlayedBefore() || user.getExperience() >= EXPERIENCE) {
             val now = System.currentTimeMillis();
             // Обнулить комбо сбора наград если прошло больше суток или комбо > 7
-            if ((user.getDay() > 0 && now - user.getLastTimeRewardClaim() > 24 * 60 * 60 * 1000) || user.getDay() > 6) {
+            if ((user.getDay() > 0 && now - user.getLastTimeRewardClaim() * 10000 > 24 * 60 * 60 * 1000) || user.getDay() > 6) {
                 user.setDay(0);
             }
-            if (now - user.getLastTimeRewardClaim() > 14 * 60 * 60 * 1000) {
-                user.setLastTimeRewardClaim(now);
+            if (now - user.getLastTimeRewardClaim() * 10000 > REWARD_DELAY_HOURS * 60 * 60 * 10000) {
+                user.setLastTimeRewardClaim(now / 10000);
                 DailyRewardManager.open(user);
 
                 val dailyReward = WeekRewards.values()[user.getDay()];
