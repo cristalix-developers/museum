@@ -295,3 +295,44 @@ register 'subject-info', {
         Стоимость: $subject.prototype.price
     """
 }
+
+register 'earth', {
+    item CLAY_BALL
+    text 'Земля'
+    nbt.skyblock = 'earth'
+}
+
+register 'quantum-helmet', {
+    item CHAINMAIL_HELMET
+    text '&eШлем астронавта'
+    nbt.armors = 'quantum'
+}
+
+register 'quantum-chestplate', {
+    item CHAINMAIL_CHESTPLATE
+    text '&eКомбинизон астронавта'
+    nbt.armors = 'quantum'
+}
+
+register 'quantum-leggings', {
+    item CHAINMAIL_LEGGINGS
+    text '&eКомбинизон астронавта'
+    nbt.armors = 'quantum'
+}
+
+register 'quantum-boots', {
+    item CHAINMAIL_BOOTS
+    text '&eБотинки астронавта'
+    nbt.armors = 'quantum'
+}
+
+register 'jetpack', {
+    item CHAINMAIL_CHESTPLATE
+    text '&bДжетпак'
+    nbt.armors = 'miner'
+}
+
+register 'antenna', {
+    item SULPHUR
+    nbt.amoung = 'antenna'
+}

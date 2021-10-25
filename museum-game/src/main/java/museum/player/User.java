@@ -239,4 +239,10 @@ public class User implements PlayerWrapper {
 		setMoney(getMoney() + money);
 		AnimationUtil.updateMoney(this);
 	}
+
+	public void giveCosmoCrystal(int crystal) {
+		setCosmoCrystal(getCosmoCrystal() + crystal);
+		AnimationUtil.cursorHighlight(this, "§b§l"+ (crystal > 0 ? "+" : "-") + crystal + " §fкристалл");
+		AnimationUtil.updateCosmoCrystal(this);
+	}
 }

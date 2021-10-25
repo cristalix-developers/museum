@@ -16,7 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,10 +110,7 @@ public class CrystalExcavations implements International {
 				block.setType(Material.AIR);
 				user.getInventory().addItem(ore);
 				AnimationUtil.cursorHighlight(user, "§d§l+1 §fруда");
-				B.postpone(50, () -> {
-					block.setType(Material.STAINED_GLASS);
-					block.setData((byte) 10);
-				});
+				B.postpone(50, () -> block.setTypeAndDataFast(Material.STAINED_GLASS.id, (byte) 3));
 			}
 		}
 	}

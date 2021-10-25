@@ -1,24 +1,20 @@
 package museum.excavation;
 
-import clepto.bukkit.item.Items;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.val;
-import museum.client_conversation.AnimationUtil;
 import museum.client_conversation.ModTransfer;
 import museum.player.State;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
+import museum.player.prepare.PreparePlayerBrain;
 import museum.util.ChunkWriter;
 import museum.util.MessageUtil;
 import museum.util.TreasureUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
 @Data
 @AllArgsConstructor
@@ -41,11 +37,7 @@ public class Excavation implements State {
 
         inventory.clear();
 
-        val pickaxe = Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror();
-        val meta = pickaxe.getItemMeta();
-        meta.addEnchant(Enchantment.DIG_SPEED, meta.getEnchantLevel(Enchantment.DIG_SPEED) + user.getInfo().getExtraSpeed(), true);
-        pickaxe.setItemMeta(meta);
-        inventory.addItem(pickaxe);
+        PreparePlayerBrain.givePickaxe(user);
 
         inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 

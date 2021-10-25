@@ -3,15 +3,16 @@ package museum.worker;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
+import museum.cosmos.Cosmos;
 import museum.player.User;
+import museum.util.StandHelper;
+import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import ru.cristalix.npcs.data.NpcBehaviour;
 import ru.cristalix.npcs.server.Npc;
 import ru.cristalix.npcs.server.Npcs;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -20,6 +21,8 @@ import java.util.function.Supplier;
  */
 @UtilityClass
 public class WorkerUtil {
+
+    private final Location cosmos = new Location(App.getApp().getWorld(), 278, 90, -147);
 
     private final static String defaultSkin = App.getApp().getConfig().getString("npc.default.skin");
     public static final Supplier<NpcWorker> STALL_WORKER_TEMPLATE = () -> new NpcWorker(
@@ -44,5 +47,20 @@ public class WorkerUtil {
                     .skinDigest(skin.substring(skin.length() - 10))
                     .build());
         });
+
+        new StandHelper(cosmos.clone().add(.5, .4, -.5))
+                .customName("§b§lКОСМОС")
+                .isInvisible(true)
+                .isMarker(true)
+                .hasGravity(false)
+                .build();
+
+        new StandHelper(cosmos.clone().add(.5, 0,-.5))
+                .customName("§eКЛИК НА МЕНЯ")
+                .isInvisible(true)
+                .isMarker(true)
+                .hasGravity(false)
+                .slot(EnumItemSlot.HEAD, Cosmos.EARTH)
+                .build();
     }
 }

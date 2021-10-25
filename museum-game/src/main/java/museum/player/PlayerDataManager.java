@@ -1,7 +1,6 @@
 package museum.player;
 
 import clepto.bukkit.B;
-import clepto.bukkit.menu.Guis;
 import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
@@ -80,6 +79,9 @@ public class PlayerDataManager implements Listener {
 
                 if (userInfo.getDay() == null)
                     userInfo.setDay(0);
+
+                if (userInfo.getCosmoCrystal() == null)
+                    userInfo.setCosmoCrystal(0);
 
                 userMap.put(uuid, new User(userInfo));
             } catch (Exception ex) {
