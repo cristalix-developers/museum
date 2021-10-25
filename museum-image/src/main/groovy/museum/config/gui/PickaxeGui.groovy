@@ -3,7 +3,6 @@ package museum.config.gui
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
-import museum.client_conversation.AnimationUtil
 import museum.util.MessageUtil
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -81,10 +80,7 @@ Guis.register 'pickaxe', { player ->
     title 'Улучшение кирки'
     layout """
         ----F----
-        ---------
-        --I-H-K--
-        --I-H-K--
-        --I-H-K--
+        ----O----
         ----X----
     """
     button MuseumGuis.background
@@ -102,80 +98,14 @@ Guis.register 'pickaxe', { player ->
         performCommand 'pickaxe'
     }
 
-    for (double i = 1; i <= 1.2; i = i + 0.1) {
-        def cost = i * 10000d
-        if (i <= user.info.extraChance) {
-            button 'K' icon {
-                item CLAY_BALL
-                nbt.other = 'tochka'
-                text '§8Данная прокачка уже получена.'
-            }
-        } else {
-            button 'K' icon {
-                item BOOK
-                text "§b+10% к удаче обнаружния кости"
-                text ""
-                text "Купить за §e$cost\$"
-            } leftClick {
-                if (user.money > cost) {
-                    user.giveMoney(-cost)
-                    user.info.extraChance = user.info.extraChance + 0.1
-                    closeInventory()
-                } else
-                    AnimationUtil.buyFailure(user)
-            }
-        }
-    }
-    for (int i = 1; i <= 3; i++) {
-        def cost = i * 5000
-        if (i <= user.info.extraSpeed) {
-            button 'H' icon {
-                item CLAY_BALL
-                nbt.other = 'tochka'
-                text '§8Данная прокачка уже получена.'
-            }
-        } else {
-            button 'H' icon {
-                item EXP_BOTTLE
-                amount i
-                text "§b+1 эффективности кирки"
-                text ""
-                text "Купить за §e$cost\$"
-            } leftClick {
-                if (user.money > cost) {
-                    user.giveMoney(-cost)
-                    user.info.extraSpeed = user.info.extraSpeed + 1
-                    closeInventory()
-                } else
-                    AnimationUtil.buyFailure(user)
-            }
-        }
-    }
-
-    for (int i = 1; i <= 3; i++) {
-        def cost = i * 1000
-        if (i * 5 <= user.info.extraBreak) {
-            button 'I' icon {
-                item CLAY_BALL
-                nbt.other = 'tochka'
-                text '§8Данная прокачка уже получена.'
-            }
-        } else {
-            button 'I' icon {
-                item STONE
-                amount i * 5
-                text "§b${i * 5} дополнлительных удара(ов)"
-                text ""
-                text "Купить за §e$cost\$"
-            } leftClick {
-                if (user.money > cost) {
-                    user.giveMoney(-cost)
-                    user.info.extraBreak = user.info.extraBreak + 5
-                    closeInventory()
-                } else
-                    AnimationUtil.buyFailure(user)
-            }
-        }
+    button 'O' icon {
+        item PAPER
+        text """
+        §bУлучшение кирки недоступно
+        
+        Данная система будет 
+        изменена к концу месяца.
+        """
     }
 
     button 'X' icon {

@@ -79,7 +79,7 @@ on PlayerFishEvent, {
     if (state == PlayerFishEvent.State.CAUGHT_FISH) {
         expToDrop = 0
         def user = App.app.getUser(player)
-        def exp = (int) (Math.ceil(Math.random() * 3 + 3) * App.app.playerDataManager.calcGlobalMultiplier(EXP))
+        def exp = (int) (Math.ceil(Math.random() * 10 + 3) * App.app.playerDataManager.calcGlobalMultiplier(EXP))
         user.giveExperience(exp)
         MessageUtil.find('fishing').set('exp', exp).send(user)
         return
@@ -180,7 +180,7 @@ on PlayerToggleSneakEvent, {
         def user = App.app.getUser(player)
         if (!(user.state instanceof International))
             return null
-        def entities = player.location.getNearbyEntities(3, 2, 3)
+        def entities = player.location.getNearbyEntities(4, 4, 4)
         for (Entity entity : entities) {
             if (!(entity instanceof ArmorStand))
                 return null

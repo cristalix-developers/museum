@@ -6,12 +6,11 @@ import museum.client_conversation.AnimationUtil
 import museum.fragment.Fragment
 import museum.fragment.Gem
 import museum.util.MessageUtil
-import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
 
 import static clepto.bukkit.menu.Guis.register
-import static org.bukkit.Material.*
+import static org.bukkit.Material.CLAY_BALL
 
 register 'polishing', { player ->
     def user = App.app.getUser((Player) player)
@@ -62,7 +61,7 @@ register 'polishing', { player ->
 
         §7Вы можете поменять
         §7процент драгоценного
-        §7камня (от §c0 §7до §b110%§7).
+        §7камня (от §c0 §7до §b100%§7).
             
         §cШанс потерять камень ${(int) (chance * 100)}%
         §eСтоимость услуги ${MessageUtil.toMoneyFormat(price)}
@@ -79,7 +78,7 @@ register 'polishing', { player ->
             if (Math.random() < chance)
                 AnimationUtil.topTitle(user, '§cКамень был разрушен')
             else {
-                new Gem(gem.type.name() + ":" + Math.random() * 0.95 + ":" + gem.price).give user
+                new Gem(gem.type.name() + ":" + Math.random() * 1.0 + ":" + gem.price).give user
                 AnimationUtil.topTitle user, '§aКамень был отполирован'
             }
         } else

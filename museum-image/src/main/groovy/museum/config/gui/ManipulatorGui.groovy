@@ -2,6 +2,7 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.client_conversation.AnimationUtil
 import museum.config.command.WagonConfig
 import museum.fragment.GemType
 import museum.fragment.Meteorite
@@ -239,6 +240,7 @@ Guis.register 'manipulator', { player ->
                     if (user.money >= upgradeCost) {
                         user.giveMoney(-upgradeCost)
                         subject.level = subject.level + 1
+                        AnimationUtil.glowing(user, 0, 0, 255)
                         user.sendMessage(Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
                         Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
                     } else {

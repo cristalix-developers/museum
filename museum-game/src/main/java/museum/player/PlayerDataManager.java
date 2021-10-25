@@ -1,7 +1,6 @@
 package museum.player;
 
 import clepto.bukkit.B;
-import clepto.bukkit.menu.Guis;
 import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
@@ -93,7 +92,7 @@ public class PlayerDataManager implements Listener {
             if (data == null)
                 return;
             val info = data.generateUserInfo();
-            info.setTimePlayed(info.getTimePlayed() + System.currentTimeMillis() - data.getEnterTime());
+            info.setTimePlayed(info.getTimePlayed() + (System.currentTimeMillis() - data.getEnterTime()) / 10);
             client.write(new SaveUserPackage(event.getUuid(), info));
         }, 100);
         client.registerHandler(GlobalBoostersPackage.class, pckg -> {

@@ -154,6 +154,7 @@ public class User implements PlayerWrapper {
 		info.experience += exp * App.getApp().getPlayerDataManager().calcMultiplier(getUuid(), BoosterType.EXP);
 		int newLevel = getLevel();
 		if (newLevel != prevLevel) {
+			AnimationUtil.glowing(this, 42, 189, 102);
 			if (newLevel % 50 == 0) {
 				TextComponent message = new TextComponent("" +
 						"§cВНИМАНИЕ! §e" + getName() +

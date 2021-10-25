@@ -12,7 +12,6 @@ import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.PlayerDataManager;
 import museum.prototype.Managers;
 import museum.ticker.Event;
-import net.minecraft.server.v1_12_R1.Item;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -23,7 +22,6 @@ import ru.cristalix.core.formatting.Formatting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Рейдж 23.08.2021
@@ -57,9 +55,10 @@ public class Auction implements Event {
                 .forEach(user -> {
                     new ModTransfer()
                             .string("Торги! Сделать ставку §b/rate <сумма>")
-                            .integer(600)
+                            .integer(300)
                             .send("museum:tradingtime", user);
-                    AnimationUtil.throwIconMessage(user, itemStack, "Торги!", "Участвовать в торгах /rate");
+                    if (user.isMessages())
+                        AnimationUtil.throwIconMessage(user, itemStack, "Торги!", "Участвовать в торгах /rate");
                 });
     }
 
@@ -93,6 +92,6 @@ public class Auction implements Event {
 
     @Override
     public int endTime() {
-        return 900;
+        return 600;
     }
 }

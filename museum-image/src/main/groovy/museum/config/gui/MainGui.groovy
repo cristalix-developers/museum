@@ -81,7 +81,7 @@ register 'main', { player ->
         Денег: ${moneyFormatter.format(user.money)}
         Опыт: $user.experience
         Опыта осталось: ${LevelSystem.formatExperience(user.experience)}
-        Часов сыграно: ${user.timePlayed / 3_600_000}
+        Часов сыграно: ${user.timePlayed / 36_000_000}
         Монет собрано: $user.pickedCoinsCount
         Кирка: $user.pickaxeType.name
         Раскопок: $user.excavationCount
