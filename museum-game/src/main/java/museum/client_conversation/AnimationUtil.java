@@ -108,4 +108,12 @@ public class AnimationUtil {
         AnimationUtil.throwIconMessage(user, BeforePacketHandler.EMERGENCY_STOP, "Ошибка", "Недостаточно средств");
         user.closeInventory();
     }
+
+    public static void glowing(User user, int red, int blue, int green) {
+        new ModTransfer()
+                .integer(red)
+                .integer(blue)
+                .integer(green)
+                .send("museum:glow", user);
+    }
 }

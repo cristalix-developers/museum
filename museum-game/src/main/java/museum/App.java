@@ -61,7 +61,7 @@ import java.util.logging.Level;
 @Getter
 public final class App extends JavaPlugin {
     @Getter
-    private static App app;
+    public static App app;
 
     private PlayerDataManager playerDataManager;
     private TopManager topManager;

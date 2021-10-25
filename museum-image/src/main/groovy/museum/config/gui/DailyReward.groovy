@@ -25,7 +25,7 @@ register 'daily-reward', { Player player ->
         -I-I-I-I-
         """
 
-    button reward('Награда за первый вход в игру', 1, userStatistic, user -> user.giveMoney(5000))
+    button reward('Награда за первый вход в игру', 1, userStatistic, user -> user.giveMoney(10000))
     button reward('Награда за второй вход в игру', 2, userStatistic, user -> user.giveExperience(100))
     button reward('Награда за третий вход в игру', 3, userStatistic,
             user -> new Gem(GemType.RUBY.name() + ':' + 0.8 + ':10000'))

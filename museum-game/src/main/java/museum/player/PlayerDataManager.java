@@ -95,7 +95,7 @@ public class PlayerDataManager implements Listener {
             if (data == null)
                 return;
             val info = data.generateUserInfo();
-            info.setTimePlayed(info.getTimePlayed() + System.currentTimeMillis() - data.getEnterTime());
+            info.setTimePlayed(info.getTimePlayed() + (System.currentTimeMillis() - data.getEnterTime()) / 10);
             client.write(new SaveUserPackage(event.getUuid(), info));
         }, 100);
         client.registerHandler(GlobalBoostersPackage.class, pckg -> {

@@ -45,7 +45,6 @@ class Museum : KotlinMod() {
         return V2(mouseX, mouseY)
     }
 
-
     override fun onEnable() {
         UIEngine.initialize(this)
 
@@ -285,6 +284,8 @@ class Museum : KotlinMod() {
                         size.y = 0.0
                     }
                 }
+            } else if (channel == "museum:glow") {
+                GlowEffect.show(0.5, data.readInt(), data.readInt(), data.readInt(), 1.0)
             }
         }
 

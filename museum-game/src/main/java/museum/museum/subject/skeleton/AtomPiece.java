@@ -18,13 +18,13 @@ public class AtomPiece implements Displayable, Piece {
 	private final PacketPlayOutEntityDestroy packetDestroy;
 
 	public AtomPiece(EntityArmorStand as) {
-		this.stand = as;
-
 		as.setBasePlate(false);
 		as.setNoGravity(true);
 		as.setInvisible(true);
 		as.setCustomNameVisible(false);
+		as.setMarker(true);
 
+		this.stand = as;
 		this.packetSpawn = new PacketPlayOutSpawnEntity(as, 78);
 		this.packetMetadata = new PacketPlayOutEntityMetadata(as.getId(), as.getDataWatcher(), false);
 		this.packetDestroy = new PacketPlayOutEntityDestroy(new int[] {as.getId()});

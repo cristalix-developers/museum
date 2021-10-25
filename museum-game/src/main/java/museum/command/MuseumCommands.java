@@ -102,6 +102,7 @@ public class MuseumCommands {
 			return null;
 		}
 
+		AnimationUtil.glowing(user, 0, 0, 255);
 		user.setMoney(user.getMoney() - prototype.getPrice());
 		// new Subject() писать нельзя - так как нужный класс (CollectorSubject...) не уточнет, и все ломается
 		user.getSubjects().add(prototype.provide(new SubjectInfo(
@@ -348,7 +349,7 @@ public class MuseumCommands {
 			return Formatting.error("/rate <цена>");
 		else if (!app.getPlayerDataManager().isRateBegun())
 			return Formatting.error("Торги ещё не начались.");
-		else if (Integer.parseInt(args[0]) > 10)
+		else if (Integer.parseInt(args[0]) < 10)
 			return Formatting.error("Сумма должна быть больше 10$.");
 		else if (Integer.parseInt(args[0]) > app.getUser(player).getMoney())
 			return Formatting.error("У вас нет таких денег.");
