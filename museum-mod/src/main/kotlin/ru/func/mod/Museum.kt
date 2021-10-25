@@ -33,18 +33,6 @@ class Museum : KotlinMod() {
     private lateinit var shoptext: TextElement
     private var hints = ArrayList<Pair<Long, AbstractElement>>()
 
-    var dragging: Boolean = false
-    var draggingX: Double = 0.0
-    var draggingY: Double = 0.0
-
-    fun getMouse(): V2 {
-        val resolution = UIEngine.clientApi.resolution()
-        val factor = resolution.scaleFactor
-        val mouseX = (Mouse.getX() / factor).toDouble()
-        val mouseY = ((Display.getHeight() - Mouse.getY()) / factor).toDouble()
-        return V2(mouseX, mouseY)
-    }
-
     override fun onEnable() {
         UIEngine.initialize(this)
 
@@ -54,6 +42,7 @@ class Museum : KotlinMod() {
         ScreenMessage()
         TradingTime()
         CrystalBar()
+        Title()
 
         val minecraft = clientApi.minecraft()
 

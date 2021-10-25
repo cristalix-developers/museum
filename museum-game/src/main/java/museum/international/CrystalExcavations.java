@@ -70,7 +70,7 @@ public class CrystalExcavations implements International {
 		inventory.addItem(Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror(), userHook);
 		inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
-		user.sendTitle("§7Прибытие!\n\n§bударяйте камни");
+		user.sendTitle("§7Прибытие!\n\n\n§bударяйте камни");
 		user.sendMessage(
 				"⟼  §6§l" + actual.getLocation(),
 				"",

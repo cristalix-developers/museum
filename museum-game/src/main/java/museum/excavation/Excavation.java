@@ -42,7 +42,7 @@ public class Excavation implements State {
         inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
         user.teleport(prototype.getSpawn().clone().add(0, 6, 0));
-        user.getPlayer().sendTitle("§6Прибытие!", prototype.getTitle());
+        user.sendTitle("§7Прибытие!\n\n\n§b" + prototype.getTitle());
 
         MessageUtil.find("visitexcavation")
                 .set("title", prototype.getTitle())
