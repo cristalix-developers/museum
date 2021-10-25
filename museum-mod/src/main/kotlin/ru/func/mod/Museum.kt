@@ -53,6 +53,7 @@ class Museum : KotlinMod() {
         Statistic()
         ScreenMessage()
         TradingTime()
+        CrystalBar()
 
         val minecraft = clientApi.minecraft()
 

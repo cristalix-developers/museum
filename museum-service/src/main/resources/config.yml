@@ -31,6 +31,11 @@ npc:
     hint: '§eПравый клик'
     command: 'gui polishing'
     skin: 'http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27'
+  boer:
+    title: '§b§lАСТРОНАВТ'
+    hint: '§eПравый клик'
+    command: 'gui boer'
+    skin: 'http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27'
 
 chat:
   messages:

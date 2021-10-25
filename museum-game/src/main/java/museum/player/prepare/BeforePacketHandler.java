@@ -65,9 +65,9 @@ public class BeforePacketHandler implements Prepare {
 		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
-				if (packetObj instanceof PacketPlayInUseItem)
+				if (packetObj instanceof PacketPlayInUseItem) {
 					MinecraftServer.SERVER.postToMainThread(() -> onItemUse(user, (PacketPlayInUseItem) packetObj));
-				else if (packetObj instanceof PacketPlayInBlockDig) {
+				} else if (packetObj instanceof PacketPlayInBlockDig) {
 					val dig = (PacketPlayInBlockDig) packetObj;
 					// Если пакет о дропе предмета - дропнуть пакет
 					if (dig.c == DROP_ITEM || dig.c == DROP_ALL_ITEMS)

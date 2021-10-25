@@ -80,6 +80,9 @@ public class PlayerDataManager implements Listener {
                 if (userInfo.getDay() == null)
                     userInfo.setDay(0);
 
+                if (userInfo.getCosmoCrystal() == null)
+                    userInfo.setCosmoCrystal(0);
+
                 userMap.put(uuid, new User(userInfo));
             } catch (Exception ex) {
                 event.setCancelReason("Не удалось загрузить статистику о музее.");

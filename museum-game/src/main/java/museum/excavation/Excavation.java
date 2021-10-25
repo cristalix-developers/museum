@@ -1,6 +1,5 @@
 package museum.excavation;
 
-import clepto.bukkit.item.Items;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.val;
@@ -8,13 +7,13 @@ import museum.client_conversation.ModTransfer;
 import museum.player.State;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
+import museum.player.prepare.PreparePlayerBrain;
 import museum.util.ChunkWriter;
 import museum.util.MessageUtil;
 import museum.util.TreasureUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 
 @Data
@@ -38,16 +37,12 @@ public class Excavation implements State {
 
         inventory.clear();
 
-        val pickaxe = Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror();
-        val meta = pickaxe.getItemMeta();
-        meta.addEnchant(Enchantment.DIG_SPEED, meta.getEnchantLevel(Enchantment.DIG_SPEED) + user.getInfo().getExtraSpeed(), true);
-        pickaxe.setItemMeta(meta);
-        inventory.addItem(pickaxe);
+        PreparePlayerBrain.givePickaxe(user);
 
         inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
         user.teleport(prototype.getSpawn().clone().add(0, 6, 0));
-        user.sendTitle("§7Прибытие!\n\n§b" + prototype.getTitle());
+        user.getPlayer().sendTitle("§6Прибытие!", prototype.getTitle());
 
         MessageUtil.find("visitexcavation")
                 .set("title", prototype.getTitle())

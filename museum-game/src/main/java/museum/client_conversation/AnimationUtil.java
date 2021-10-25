@@ -92,6 +92,18 @@ public class AnimationUtil {
                 .send("museum:coinprice", user);
     }
 
+    public static void updateCosmoCrystal(User user) {
+        new ModTransfer()
+                .integer(user.getCosmoCrystal())
+                .send("museum:cosmo-crystal", user);
+    }
+
+    public static void leaveCosmos(User user) {
+        new ModTransfer()
+                .integer(user.getCosmoCrystal())
+                .send("museum:cosmo-leave", user);
+    }
+
     public static void buyFailure(User user) {
         AnimationUtil.throwIconMessage(user, BeforePacketHandler.EMERGENCY_STOP, "Ошибка", "Недостаточно средств");
         user.closeInventory();

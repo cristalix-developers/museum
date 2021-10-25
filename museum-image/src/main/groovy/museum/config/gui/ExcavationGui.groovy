@@ -3,6 +3,7 @@ package museum.config.gui
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.cosmos.Cosmos
 import museum.fragment.GemType
 import museum.prototype.Managers
 import museum.util.LevelSystem
@@ -27,9 +28,26 @@ Guis.register 'excavation', { player ->
         IIIIIIIII
         IKKKKKKKI
         ${StringUtils.repeat('I', realDay)}U${StringUtils.repeat('I', 9 - realDay - 1)}
-        IIJIIIHII
+        IIJICIHII
     """
     button MuseumGuis.background
+
+    button 'C' icon {
+        item CLAY_BALL
+        nbt.skyblock = 'earth'
+        text """§bКосмос
+
+        §fВы когда нибудь хотели
+        §fпобывать в космосе?
+        §fОтправтесь и откройте новые
+        §fпросторы!
+        """
+    } leftClick {
+        closeInventory()
+        player.location.yaw = 90
+        player.location.pitch = -10
+        player.teleport Cosmos.ROCKET
+    }
 
     button 'L' icon {
         item NETHER_STAR

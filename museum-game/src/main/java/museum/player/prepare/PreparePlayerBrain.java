@@ -1,6 +1,7 @@
 package museum.player.prepare;
 
 import clepto.bukkit.Cycle;
+import clepto.bukkit.item.Items;
 import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
 import implario.ListUtils;
@@ -19,6 +20,7 @@ import museum.util.LocationUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.enchantments.Enchantment;
 import ru.cristalix.core.formatting.Formatting;
 
 import java.util.ArrayList;
@@ -132,5 +134,13 @@ public class PreparePlayerBrain implements Prepare {
                 .string(ChatColor.stripColor(meteor.getItem().getItemMeta().getDisplayName()))
                 .string(getRare(meteor.getItem().getItemMeta().getDisplayName()))
                 .send("lootbox", owner);
+    }
+
+    public static void givePickaxe(User user) {
+        val pickaxe = Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror();
+        val meta = pickaxe.getItemMeta();
+        meta.addEnchant(Enchantment.DIG_SPEED, meta.getEnchantLevel(Enchantment.DIG_SPEED) + user.getInfo().getExtraSpeed(), true);
+        pickaxe.setItemMeta(meta);
+        user.getInventory().addItem(pickaxe);
     }
 }
