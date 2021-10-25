@@ -5,7 +5,6 @@ import museum.App
 import museum.config.command.WagonConfig
 import museum.museum.Museum
 import museum.museum.map.SubjectType
-import museum.util.LevelSystem
 import org.bukkit.entity.Player
 
 import java.text.DecimalFormat
@@ -23,24 +22,33 @@ register 'main', { player ->
 
     title 'Главное меню'
     layout """
-        ---K-L---
-        F--SMT--S
-        -H--O--JP
+        -H--M--L-
+        O--STJ--P
+        -S--F--K-
+        ----X----
     """
 
     button MuseumGuis.background
+
+    button 'X' icon {
+        item CLAY_BALL
+        text '§cНазад'
+        nbt.other = "cancel"
+    } leftClick {
+        closeInventory()
+    }
 
     button 'K' icon {
         item CLAY_BALL
         nbt.other = 'new_lvl_rare_close'
         text """§bЛутбокс
 
-        §f㧩 Вы получите случайный 
-        §fдрагоценный камень [60%-100%],
-        §fа так же случайный 
-        §fметеорит доходом от 15\$ до 100\$.
+        §7㧩 Вы получите случайный 
+        §7драгоценный камень [60%-100%],
+        §7а так же случайный 
+        §7метеорит доходом от 15\$ до 100\$.
         
-        §bНажмите чтобы посмотреть!
+        §l§aНажмите чтобы посмотреть!
         """
     } leftClick {
         open(player, 'loot', player)
@@ -51,9 +59,11 @@ register 'main', { player ->
         text """
         §bПрефиксы
 
-        §fВыберите префикс!
-        §fНекоторые редкие префиксы
-        §fдают бонусы.
+        §7Выберите префикс!
+        §7Некоторые редкие префиксы
+        §7дают бонусы.
+        
+        §l§aНажмите чтобы посмотреть!
         """
     } leftClick {
         performCommand('prefixes')
@@ -62,30 +72,33 @@ register 'main', { player ->
     button 'P' icon {
         item GOLDEN_CARROT
         text """
-        §f>> §bВнутриигровые покупки §f<<
-        §f
-        §fТут вы можете купить,
-        §fинтересные вещи...
+        §bОсобое снаряжение
+        §7
+        §7Тут вы можете купить,
+        §7интересные вещи...
+        
+        §l§aНажмите чтобы посмотреть!
         """
     } leftClick {
         closeInventory()
         open(player, 'donate', player)
     }
 
+    def timePlayed = (user.timePlayed / 60_000).intValue()
+
     button 'F' icon {
         item PAPER
         text """
-        §bПрофиль
+        §bПрофиль ${user.player.name}
 
-        Уровень: $user.level
-        Денег: ${moneyFormatter.format(user.money)}
-        Опыт: $user.experience
-        Опыта осталось: ${LevelSystem.formatExperience(user.experience)}
-        Часов сыграно: ${user.timePlayed / 36_000_000}
-        Монет собрано: $user.pickedCoinsCount
-        Кирка: $user.pickaxeType.name
-        Раскопок: $user.excavationCount
-        Фрагментов: ${user.skeletons.stream().mapToInt(s -> s.unlockedFragments.size()).sum()}
+        §7Уровень: §b$user.level
+        §7Опыт: §b$user.experience 
+        §7Денег: §a${moneyFormatter.format(user.money)}
+        §7Время в игре: §f${(timePlayed / 60).toInteger()} ч. ${(timePlayed % 60)} мин.
+        §7Монет собрано: §e$user.pickedCoinsCount
+        §7Кирка: §f$user.pickaxeType.name
+        §7Раскопок: §c$user.excavationCount
+        §7Фрагментов: §c${user.skeletons.stream().mapToInt(s -> s.unlockedFragments.size()).sum()}
         """
     }
 
@@ -94,9 +107,9 @@ register 'main', { player ->
         text """
         §bПереименовать музей
 
-        Если вам не нравится
-        название вашего музея
-        вы можете его изменить.
+        §7Если вам не нравится
+        §7название вашего музея
+        §7вы можете его изменить.
         """
     } leftClick {
         performCommand('changetitle')
@@ -107,7 +120,7 @@ register 'main', { player ->
         text """
         §bИнструменты
         
-        Улучшайте ваше снаряжение.
+        §7Улучшайте ваше снаряжение.
         """
         nbt.HideFlags = 63
     } leftClick {
@@ -121,14 +134,13 @@ register 'main', { player ->
         text """
         &bМузей
     
-        Хозяин: &e$museum.owner.name
-        Название: &e$museum.title
-        Посещений: &b$museum.views
-    
-        Доход: &a${moneyFormatter.format(museum.income)} 
-        Витрин: &e${museum.getSubjects(SubjectType.SKELETON_CASE).size()}
-    
-        Создан &a${formatter.format(Duration.ofMillis(System.currentTimeMillis() - museum.creationDate.time))} назад
+        §7Хозяин: &e$museum.owner.name
+        §7Название: &e$museum.title
+        §7Посещений: &b$museum.views
+        §7Доход: &a${moneyFormatter.format(museum.income)} 
+        §7Витрин: &e${museum.getSubjects(SubjectType.SKELETON_CASE).size()}
+   
+        &aСоздан ${formatter.format(Duration.ofMillis(System.currentTimeMillis() - museum.creationDate.time))} назад
         """
     }
 
@@ -137,8 +149,10 @@ register 'main', { player ->
         text """
         §bЭкспедиции
 
-        Отправтесь на раскопки
-        и найдите следы прошлого.
+        §7Отправляйтесь на раскопки
+        §7и найдите следы прошлого.
+        
+        §l§aОтправиться в путь!
         """
     } leftClick {
         performCommand('gui excavation')
@@ -149,8 +163,8 @@ register 'main', { player ->
         text """
         §bПригласить друга
 
-        Нажмите и введите
-        никнейм приглашенного!
+        §7Нажмите и введите
+        §7никнейм приглашенного!
         """
     } leftClick {
         performCommand 'invite'
@@ -161,10 +175,10 @@ register 'main', { player ->
         text """
         &bЗаказать товар | &e$WagonConfig.COST\$
 
-        Закажите фургон с продовольствием,
-        он будет вас ждать слева от музея, 
-        идите к желтому знаку за тем
-        &fотнесите товар в лавку.
+        §7Закажите фургон с продовольствием,
+        §7он будет вас ждать слева от музея, 
+        §7идите к желтому знаку за тем
+        §7отнесите товар в лавку.
         """
     } leftClick {
         performCommand 'wagonbuy'
@@ -176,7 +190,8 @@ register 'main', { player ->
         text """
         &bНочь &f/ &bДень
 
-        Меняйте режим так, как нравится глазам!
+        §7Меняйте режим так, 
+        §7как нравится глазам!
         """
     } leftClick {
         user.player.setPlayerTime(user.info.darkTheme ? 12000 : 21000, true)

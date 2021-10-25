@@ -86,12 +86,17 @@ Guis.register 'prefixes', {
 
     title 'Выбор префиксов'
     layout """
-        -XXXXXXX-
-        --XXXXX--
-        ----O----
-        ---EEE---
-        --RRRRR--
+        XXXXXXXXX
+        XXX-RRRRR
+        -EEE-O-L-
         """
+    button 'L' icon {
+        item CLAY_BALL
+        text '§cНазад'
+        nbt.other = "cancel"
+    } leftClick {
+        performCommand("gui main")
+    }
     button 'O' icon {
         item END_CRYSTAL
         text """
@@ -145,8 +150,8 @@ Guis.register 'prefixes', {
             text """[ ${prefix.prefix} §f] ${prefix.title} ${have ? '§aВЫБРАТЬ' : ''}
         §7Выпадает из 'Случайный префикс'
 
-        Редкость: §dэпический
-        Бонус: ${prefix.bonus}
+        §7Редкость: §dэпический
+        §7Бонус: ${prefix.bonus}
         """
         } leftClick {
             performCommand('changeprefix ' + prefix.prefix)
@@ -161,8 +166,8 @@ Guis.register 'prefixes', {
             text """[ ${prefix.prefix} §f] ${prefix.title} ${have ? '§aВЫБРАТЬ' : ''}
         §7Выпадает из 'Случайный префикс'
 
-        Редкость: §bредкий
-        Бонус: §cотсутствует
+        §7Редкость: §bредкий
+        §7Бонус: §cотсутствует
         """
         } leftClick {
             performCommand('changeprefix ' + prefix.prefix)
@@ -178,8 +183,8 @@ Guis.register 'prefixes', {
             text have ? "" : "§7Можно купить за §e10'000'000\$"
             text """    
                                 
-            Редкость: §aобычный
-            Бонус: §cотсутствует
+            §7Редкость: §aобычный
+            §7Бонус: §cотсутствует
             """
         } leftClick {
             if (user.prefix && user.prefix.contains('LS'))

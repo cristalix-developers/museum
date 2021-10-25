@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 
 import static org.bukkit.Material.*
 
-public static String modifyPrice(UUID user, int price) {
+static String modifyPrice(UUID user, int price) {
     return "§b" + price + " кристаликов"
 }
 
@@ -19,7 +19,16 @@ Guis.register 'donate', { player ->
         ----X----
         -X--J--Y-
         --P-M-Z--
+        ----L----
     """
+
+    button 'L' icon {
+        item CLAY_BALL
+        text '§cНазад'
+        nbt.other = "cancel"
+    } leftClick {
+        performCommand("gui main")
+    }
 
     button 'P' icon {
         item CLAY_BALL

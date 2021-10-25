@@ -17,7 +17,6 @@ import org.bukkit.SoundCategory
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
 
-import static org.bukkit.Material.BARRIER
 import static org.bukkit.Material.CLAY_BALL
 
 static void giveDrop(User owner) {
@@ -58,15 +57,14 @@ Guis.register 'loot', { Player player ->
         nbt.museum = 'ruby'
         text """§aВы получите:
 
-        §f㦶 Случайную драгоценность §6[0%-110%]§f:
-        
-            §6⭐⭐⭐ Рубин
-            §6⭐⭐⭐ Сапфир
-            §6⭐⭐⭐ Бриллиант
-            §5⭐⭐ Изумруд
-            §5⭐⭐ Шпиннель
-            §b⭐ Аметист
-            §b⭐ Танзанит
+        §7㦶 Случайную драгоценность §6[0%-110%]§f:
+        §6    ⭐⭐⭐ Рубин
+        §6    ⭐⭐⭐ Сапфир
+        §6    ⭐⭐⭐ Бриллиант
+        §5    ⭐⭐ Изумруд
+        §5    ⭐⭐ Шпиннель
+        §b    ⭐ Аметист
+        §b    ⭐ Танзанит
         """
     }
 
@@ -102,13 +100,13 @@ Guis.register 'loot', { Player player ->
         nbt.other = 'new_lvl_rare_close'
         text """§bСлучайная посылка
 
-        §f㧩 Вы получите случайный 
-        §fдрагоценный камень и метеорит!
+        §7㧩 Вы получите случайный 
+        §7драгоценный камень и метеорит!
         
         §f§lВНИМАНИЕ!
         
-        §f[§bЛКМ§f] За игровую валюту §e10`000`000\$
-        §f[§bПКМ§f] За кристалики ${DonateGui.modifyPrice(player.uniqueId, DonateType.ITEM_CASE.price)}
+        §bЛКМ §7За игровую валюту §a10`000`000\$
+        §bПКМ §7За кристалики ${DonateGui.modifyPrice(player.uniqueId, DonateType.ITEM_CASE.price)}
         """
     } leftClick {
         if (user.money > cost) {
@@ -122,8 +120,9 @@ Guis.register 'loot', { Player player ->
     }
 
     button 'P' icon {
-        item BARRIER
+        item CLAY_BALL
         text '§cНазад'
+        nbt.other = "cancel"
     } leftClick {
         performCommand("gui main")
     }

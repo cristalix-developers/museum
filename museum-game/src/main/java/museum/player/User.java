@@ -120,6 +120,10 @@ public class User implements PlayerWrapper {
 		}
 	}
 
+	public void sendTitle(String title) {
+		AnimationUtil.title(this, title);
+	}
+
 	public void setState(State state) {
 		AsyncCatcher.catchOp("Async state change");
 		if (this.state != null && this.state != state)

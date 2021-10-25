@@ -187,7 +187,7 @@ public class BeforePacketHandler implements Prepare {
 			return true;
 
 		if (excavation.getHitsLeft() < 1 || force) {
-			user.sendTitle("§6Раскопки завершены!", "до возвращения 5 сек.");
+			user.sendTitle("§7Раскопки завершены!\n\n§bВозвращаем вас...");
 			MessageUtil.find("excavationend").send(user);
 			B.postpone(100, () -> {
 				user.setState(user.getLastMuseum());

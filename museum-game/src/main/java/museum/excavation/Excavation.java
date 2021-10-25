@@ -4,7 +4,6 @@ import clepto.bukkit.item.Items;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.val;
-import museum.client_conversation.AnimationUtil;
 import museum.client_conversation.ModTransfer;
 import museum.player.State;
 import museum.player.User;
@@ -15,10 +14,8 @@ import museum.util.TreasureUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
 @Data
 @AllArgsConstructor
@@ -50,7 +47,7 @@ public class Excavation implements State {
         inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
         user.teleport(prototype.getSpawn().clone().add(0, 6, 0));
-        user.getPlayer().sendTitle("§6Прибытие!", prototype.getTitle());
+        user.sendTitle("§7Прибытие!\n\n§b" + prototype.getTitle());
 
         MessageUtil.find("visitexcavation")
                 .set("title", prototype.getTitle())

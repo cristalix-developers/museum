@@ -109,9 +109,10 @@ Guis.register 'pickaxe', { player ->
     }
 
     button 'X' icon {
-        item BARRIER
+        item CLAY_BALL
         text '§cНазад'
+        nbt.other = "cancel"
     } leftClick {
-        performCommand("gui tools")
+        performCommand("gui main")
     }
 }

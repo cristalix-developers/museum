@@ -89,7 +89,7 @@ public class PlacesMechanic {
 						.set("title", place.getTitle())
 						.set("exp", place.getClaimedExp())
 						.send(user);
-				user.getPlayer().sendTitle("Найдено место!", "§b+" + place.getClaimedExp() + "EXP");
+				user.sendTitle("§7Найдено место!\n\n§b+" + place.getClaimedExp() + "EXP");
 				break;
 			}
 		}

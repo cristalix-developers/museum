@@ -45,21 +45,21 @@ register 'emptySkeleton', {
 
 register 'tooBigSkeleton', {
     nbt.color = 0xFFAAAAAA
-    text '&7Этот скелет слишком большой для этой витрины'
+    text '&cВитрина слишком маленькая'
 }
 
 register 'alreadyPlacedSkeleton', {
     nbt.color = 0xFFAAAAAA
-    text '&cЭтот скелет уже стоит на другой витрине'
+    text '&eКости на другой витрине'
 }
 
 register 'currentSkeleton', {
     nbt.glow_color = 0xFF55FF55
-    text '&eНажмите, чтобы убрать скелет со стенда'
+    text '&cУбрать скелет со стенда'
 }
 
 register 'availableSkeleton', {
-    text '&aНажмите, чтобы поставить скелет на стенд'
+    text '&aПоставить скелет на стенд'
 }
 
 Guis.register 'manipulator', { player ->
@@ -135,7 +135,7 @@ Guis.register 'manipulator', { player ->
     button 'C' icon {
         item CONCRETE
         data abstractSubject.cachedInfo.color.woolData
-        text "»$abstractSubject.cachedInfo.color.chatColor §lИзменить цвет §f«"
+        text "§bИзменить цвет"
     } leftClick {
         Guis.open(delegate, 'colorChange', abstractSubject.cachedInfo.uuid)
     }
@@ -143,7 +143,7 @@ Guis.register 'manipulator', { player ->
     button 'D' icon {
         item CLAY_BALL
         nbt.other = 'guild_shop'
-        text 'Убрать'
+        text '§cУбрать'
     } leftClick {
         def allocation = abstractSubject.allocation
         if (!allocation) return
@@ -234,7 +234,7 @@ Guis.register 'manipulator', { player ->
 
                     С каждым уровнем витрина 
                     приносит на &b$upgradePercent%▲&f больше дохода
-                    &b${subject.level} &fуровень -> &b&l${subject.level + 1} уровень &a+${subject.level * upgradePercent}% ▲▲▲
+                    &b${subject.level} &fуровень ➠ &b&l${subject.level + 1} уровень &a+${subject.level * upgradePercent}% ▲▲▲
                     """
                 } leftClick {
                     if (user.money >= upgradeCost) {

@@ -104,4 +104,8 @@ public class AnimationUtil {
                 .integer(green)
                 .send("museum:glow", user);
     }
+
+    public static void title(User user, String title) {
+        new ModTransfer().string(title).send("museum:title", user);
+    }
 }
