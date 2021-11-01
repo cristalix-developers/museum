@@ -119,7 +119,7 @@ public class User implements PlayerWrapper {
         for (User current : app.getUsers()) {
             if (current.getConnection() == null)
                 continue;
-            if (current.getState() == this.state) {
+            if (current.getState() == this.state || current.getState().getClass().equals(this.state.getClass())) {
                 current.getPlayer().showPlayer(app, player);
                 player.showPlayer(app, current.getPlayer());
             }
@@ -257,15 +257,6 @@ public class User implements PlayerWrapper {
         giveMoney(income * App.getApp().getPlayerDataManager().calcMultiplier(getUuid(), BoosterType.COINS));
     }
 
-    public void depositBoerWithBooster(double income) {
-        for (Fragment value : relics.values()) {
-            if (value instanceof Boer) {
-                val boer = (Boer) value;
-                boer.setSecondsLeft((int) (income * App.getApp().getPlayerDataManager().calcMultiplier(boer.getOwner(), BoosterType.BOER)));
-            }
-        }
-    }
-
     public void giveMoney(double money) {
         setMoney(getMoney() + money);
         AnimationUtil.updateMoney(this);
@@ -274,7 +265,7 @@ public class User implements PlayerWrapper {
     public void giveCosmoCrystal(int crystal, boolean notification) {
         setCosmoCrystal(getCosmoCrystal() + crystal);
 		if (notification)
-        	AnimationUtil.cursorHighlight(this, "§b§l" + (crystal > 0 ? "+" : "-") + crystal + " §fкристалл");
+        	AnimationUtil.cursorHighlight(this, "§b§l" + (crystal > 0 ? "+" : "-") + crystal + " §f㦶");
         AnimationUtil.updateCosmoCrystal(this);
     }
 }

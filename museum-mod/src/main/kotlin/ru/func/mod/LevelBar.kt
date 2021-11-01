@@ -49,7 +49,7 @@ class LevelBar {
                     size.x = 180.0 / requiredExperience * experience
                 }
 
-                (online.children[1] as TextElement).content = "Уровень §b${level} §7$experience/$requiredExperience"
+                (online.children[1] as TextElement).content = "Уровень §b${level} §7$experience из $requiredExperience"
             }
         }
     }

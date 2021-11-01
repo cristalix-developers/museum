@@ -7,8 +7,13 @@ import museum.misc.PlacesMechanic
 import museum.museum.Museum
 import museum.museum.map.SubjectType
 import museum.museum.subject.product.FoodProduct
+import museum.player.User
 import museum.util.MessageUtil
+import net.minecraft.server.v1_12_R1.EnumMoveType
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
+import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
@@ -74,8 +79,7 @@ on PlayerMoveEvent, {
             user.performCommand 'wagon'
         }
     }
-    if (user.state instanceof Cosmos && player.location.y < 50)
-        player.teleport Cosmos.SPACE
+    LocationVerification.execute(user, player)
 }
 
 on EntityDismountEvent, {
@@ -86,3 +90,17 @@ on EntityDismountEvent, {
         dismounted.remove()
     }
 }
+
+class LocationVerification {
+    static void execute(User user, Entity entity) {
+        if (user.state instanceof Cosmos && (Math.abs(entity.location.y - Cosmos.SPACE.y) > 100 ||
+                Cosmos.SPACE.distanceSquared(entity.location) > 250 * 250)) {
+            def vector = Cosmos.SPACE.toVector().subtract(entity.location.toVector())
+            if (entity instanceof ArmorStand)
+                (entity as CraftArmorStand).handle.move(EnumMoveType.SELF, vector.x, vector.y, vector.z)
+            else
+                entity.velocity = vector
+        }
+    }
+}
+

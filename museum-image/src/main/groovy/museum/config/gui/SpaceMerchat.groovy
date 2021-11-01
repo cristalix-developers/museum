@@ -35,7 +35,7 @@ register 'boer', { player ->
         """
         nbt.other = 'win2'
     } leftClick {
-        if (user.getMoney() >= money) {
+        if (user.getMoney() >= money && user.cosmoCrystal >= crystal) {
             user.giveMoney(-money)
             user.giveCosmoCrystal(-crystal, false)
             new Boer('boer_' + BoerType.STANDARD.name(), player.uniqueId).give(user)

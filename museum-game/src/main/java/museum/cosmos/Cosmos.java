@@ -50,6 +50,8 @@ public class Cosmos implements International {
     public void enterState(User user) {
         val player = user.getPlayer();
 
+        AnimationUtil.updateCosmoCrystal(user);
+
         player.setAllowFlight(false);
         player.setFlying(false);
 

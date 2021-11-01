@@ -3,6 +3,7 @@ package museum.cosmos.boer;
 import com.google.common.collect.Sets;
 import lombok.val;
 import museum.App;
+import museum.boosters.BoosterType;
 import museum.ticker.Ticked;
 import org.bukkit.Bukkit;
 
@@ -15,18 +16,19 @@ public class BoerManager implements Ticked {
     @Override
     public void tick(int... args) {
         if (args[0] % 20 == 0) {
+            val booster = App.getApp().getPlayerDataManager().calcGlobalMultiplier(BoosterType.BOER);
             boers.forEach(boer -> {
                 val player = Bukkit.getPlayer(boer.getOwner());
                 if ((player == null || !player.isOnline() || boer.getSecondsLeft() <= 0) && !boer.getStands().isEmpty()) {
                     boers.remove(boer.boerRemove());
                 } else {
+                    if (player == null)
+                        return;
+                    val user = App.getApp().getUser(player);
                     boer.setSecondsLeft(boer.getSecondsLeft() - 1);
                     val seconds = boer.getSecondsLeft();
                     boer.getHead().setCustomName("§l" + seconds / 60 / 60 % 24 + ":" + seconds / 60 % 60 + ":" + seconds % 60);
-                    if ((int) (args[0] / 20.0D) % boer.getType().getSpeed() == 0) {
-                        if (player == null)
-                            return;
-                        val user = App.getApp().getUser(player);
+                    if ((int) (args[0] / 20.0D) % (boer.getType().getSpeed() / booster) == 0) {
                         user.giveExperience(1.0D, boer.isNotification());
                         user.giveCosmoCrystal(1, boer.isNotification());
                     }

@@ -5,7 +5,6 @@ import com.mongodb.async.client.MongoClient;
 import com.mongodb.async.client.MongoClients;
 import io.javalin.Javalin;
 import io.netty.channel.Channel;
-import lombok.val;
 import museum.boosters.BoosterType;
 import museum.configuration.ConfigurationManager;
 import museum.data.BoosterInfo;
@@ -137,19 +136,13 @@ public class MuseumService {
 		registerHandler(UserTransactionPackage.class, (channel, source, pckg) -> {
 			System.out.println("Received UserTransactionPackage from " + source);
 			userData.find(pckg.getUser()).thenAccept(info -> {
-				val preHandler = TRANSACTION_PRE_AUTHORIZE_MAP.get(pckg.getDonate());
-				if (preHandler != null && !preHandler.test(pckg, info)) {
-					pckg.setResponse(UserTransactionPackage.TransactionResponse.INTERNAL_ERROR);
-					answer(channel, pckg);
-					return;
-				}
 				if (pckg.getDonate().isSave() && info.getDonates().contains(pckg.getDonate())) {
 					pckg.setResponse(UserTransactionPackage.TransactionResponse.ALREADY_BUYED);
 					answer(channel, pckg);
 					return;
 				}
 				findCoupon(pckg.getUser()).thenAccept(data -> {
-					int price = pckg.getDonate().getPrice();
+					int price = (int) (pckg.getDonate().getPrice() * 0.7F);
 					if (data != null)
 						price = (int) data.priceWithDiscount(price);
 					// Делфику донат бесплатно бекдор взлом хак

@@ -111,7 +111,6 @@ public final class App extends JavaPlugin {
         core.unregisterService(IChatService.class);
         core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
         core.registerService(IScoreboardService.class, new ScoreboardService());
-        //core.registerService(ICouponsService.class, new BukkitCouponsService(core.getSocketClient(), ICommandService.get()));
 
         // Регистрация обработчика пакета конфига
         clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);

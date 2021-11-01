@@ -16,7 +16,6 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.util.Vector
 import ru.cristalix.core.formatting.Formatting
 
 import static clepto.bukkit.item.Items.register
@@ -123,7 +122,6 @@ register 'sink-treasure', {
 }
 
 def speed = 3
-def vector = new Vector(0, 3, 0)
 def MAX_BOER_COUNT = 6
 on PlayerInteractEvent, {
     def user = app.getUser player
@@ -169,8 +167,11 @@ on PlayerInteractEvent, {
                 craftArmorStand.killEntity()
                 stand.remove()
                 cosmos.stand = null
-                player.teleport(playerLocation.clone().add(0, 1, 0))
-                player.velocity = vector
+                def teleport = playerLocation.clone()
+                do {
+                    teleport.add(0,1,0)
+                } while (teleport.block.type != AIR)
+                player.teleport(teleport.add(0,2,0))
                 return
             }
             craftArmorStand.move(
@@ -186,6 +187,7 @@ on PlayerInteractEvent, {
                 direction.y * speed,
                 direction.z * speed
         )
+        LocationVerification.execute(user, stand)
         app.world.spawnParticle(Particle.EXPLOSION_LARGE, playerLocation, 5)
     }
 

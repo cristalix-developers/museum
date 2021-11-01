@@ -17,6 +17,8 @@ public enum DonateType {
 	LOCAL_EXP_BOOSTER("Локальный бустер опыта", 99, false),
 	LEGENDARY_PICKAXE("Легендарная кирка", 349, true),
 	STEAM_PUNK_COLLECTOR("Стим-панк сборщик монет", 249, true),
+	BOER("Глобальный бустер бура x2", 79, false),
+	BIG_BOER("Глобальный бустер бура х5", 199,false),
 	;
 
 	private final String name;
