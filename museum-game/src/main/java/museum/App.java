@@ -12,6 +12,7 @@ import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
+import museum.cosmos.boer.BoerManager;
 import museum.donate.DonateType;
 import museum.international.CrystalExcavations;
 import museum.international.International;
@@ -24,7 +25,6 @@ import museum.packages.*;
 import museum.player.PlayerDataManager;
 import museum.player.User;
 import museum.prototype.Managers;
-import museum.ticker.Timer;
 import museum.ticker.detail.Auction;
 import museum.ticker.detail.FountainHandler;
 import museum.ticker.detail.WayParticleHandler;
@@ -185,12 +185,10 @@ public final class App extends JavaPlugin {
         new TickTimerHandler(this, Arrays.asList(
                 new FountainHandler(this),
                 new WayParticleHandler(this),
-                topManager
+                topManager,
+                new Auction(),
+                new BoerManager()
         ), clientSocket, playerDataManager).runTaskTimer(this, 0, 1);
-
-        new Timer(Collections.singletonList(
-                new Auction()
-        ));
 
         // Постоянный перерасчет множителя кол-ва посетителей музея
         VisitorHandler.init(this, () -> (int) Math.ceil(3F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));

@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.val;
 import museum.App;
 import museum.client_conversation.AnimationUtil;
+import museum.cosmos.boer.Boer;
+import museum.fragment.Fragment;
 import museum.international.International;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;
@@ -58,6 +60,10 @@ public class Cosmos implements International {
         player.getInventory().setArmorContents(armor);
         PreparePlayerBrain.givePickaxe(user);
         player.getInventory().addItem(JETPACK);
+        for (Fragment value : user.getRelics().values()) {
+            if (value instanceof Boer)
+                player.getInventory().addItem(value.getItem());
+        }
 
         AnimationUtil.topTitle(user, "Вы покинули землю 㕉");
         AnimationUtil.throwIconMessage(user, EARTH.asBukkitMirror(), "", "");
@@ -90,7 +96,7 @@ public class Cosmos implements International {
 
             if (block != null && block.getType() == Material.STAINED_GLASS) {
                 block.setTypeAndDataFast(0, (byte) 0);
-                user.giveCosmoCrystal(1);
+                user.giveCosmoCrystal(1, true);
                 B.postpone(20 * 10, () -> block.setTypeAndDataFast(Material.STAINED_GLASS.id, (byte) 3));
             }
         }
@@ -110,6 +116,7 @@ public class Cosmos implements International {
                 .isInvisible(true)
                 .isMarker(true)
                 .hasGravity(false)
+                .fixedData("trash", 1)
                 .build();
     }
 

@@ -2,30 +2,34 @@
 package museum.config.listener
 
 import clepto.bukkit.B
-import clepto.bukkit.item.Items
-import clepto.bukkit.menu.Guis
 import museum.cosmos.Cosmos
+import museum.cosmos.boer.Boer
 import museum.excavation.Excavation
 import museum.international.International
 import museum.museum.Museum
 import museum.util.TreasureUtil
 import net.minecraft.server.v1_12_R1.EnumMoveType
+import org.bukkit.Bukkit
 import org.bukkit.Particle
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import ru.cristalix.core.formatting.Formatting
 
 import static clepto.bukkit.item.Items.register
+import static clepto.bukkit.menu.Guis.open
 import static museum.App.app
 import static museum.cosmos.Cosmos.JETPACK
 import static museum.cosmos.Cosmos.ROCKET
 import static org.bukkit.Material.*
-import static org.bukkit.event.block.Action.*
+import static org.bukkit.event.block.Action.LEFT_CLICK_BLOCK
+import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK
 
 on PAPER use {
-    Guis.open player, 'main', null
+    open player, 'main', null
 }
 
 on WOOD_DOOR use {
@@ -120,72 +124,13 @@ register 'sink-treasure', {
 
 def speed = 3
 def vector = new Vector(0, 3, 0)
-def wall = CraftItemStack.asNMSCopy(new ItemStack(COBBLE_WALL))
-def prismarine = CraftItemStack.asNMSCopy(new ItemStack(PRISMARINE))
-def diamondBlock = CraftItemStack.asNMSCopy(new ItemStack(DIAMOND_BLOCK))
-def anvil = CraftItemStack.asNMSCopy(new ItemStack(ANVIL))
-def antenna = Items.render('antenna')
+def MAX_BOER_COUNT = 6
 on PlayerInteractEvent, {
     def user = app.getUser player
     def playerLocation = player.location
     playerLocation.yaw = 0
     playerLocation.pitch = 0
     def direction = player.eyeLocation.direction
-
-    /*new StandHelper(playerLocation)
-        .isInvisible(true)
-        .hasGravity(false)
-        .isMarker(true)
-        .slot(EnumItemSlot.HEAD, Items.render("relic-tooth"))
-        .headPose(Math.PI / 7, Math.PI,0.0D)
-        .isSmall(true)
-        .build()
-
-    new StandHelper(playerLocation.clone().add(0.0D,0.0D,0.2D))
-            .isInvisible(true)
-            .hasGravity(false)
-            .isMarker(true)
-            .slot(EnumItemSlot.HEAD, Items.render("relic-tooth"))
-            .headPose(Math.PI / 7, -0.0D,0.0D)
-            .isSmall(true)
-            .build()
-
-    new StandHelper(playerLocation.clone().add(0.0D, -0.5D, 0.1D))
-            .isInvisible(true)
-            .hasGravity(false)
-            .isMarker(true)
-            .slot(EnumItemSlot.HEAD, wall)
-            .build()
-
-    new StandHelper(playerLocation.clone().add(0.0D, -0.0D, 0.1D))
-            .isInvisible(true)
-            .hasGravity(false)
-            .isMarker(true)
-            .slot(EnumItemSlot.HEAD, prismarine)
-            .build()
-
-    new StandHelper(playerLocation.clone().add(-0.1D, 0.8D, 0.1D))
-            .isInvisible(true)
-            .hasGravity(false)
-            .isMarker(true)
-            .slot(EnumItemSlot.HEAD, diamondBlock)
-            .isSmall(true)
-            .build()
-
-    new StandHelper(playerLocation.clone().add(0.0D, 1.3D, 0.1D))
-            .isInvisible(true)
-            .hasGravity(false)
-            .isMarker(true)
-            .slot(EnumItemSlot.HEAD, anvil)
-            .isSmall(true)
-            .build()
-
-    new StandHelper(playerLocation.clone().add(0.0D, 0.5D, 0.1D))
-            .isInvisible(true)
-            .hasGravity(false)
-            .isMarker(true)
-            .slot(EnumItemSlot.HEAD, antenna)
-            .build()*/
 
     if (playerLocation.distanceSquared(ROCKET) < 45 && user.state instanceof Museum)
         user.setState(new Cosmos())
@@ -199,8 +144,24 @@ on PlayerInteractEvent, {
 
         def stand = cosmos.stand
 
-        if (stand == null)
+        if (stand == null) {
+            if (action == RIGHT_CLICK_BLOCK) {
+                def nmsItem = CraftItemStack.asNMSCopy(player.inventory.itemInHand)
+                if (!nmsItem.tag || !nmsItem.tag.hasKeyOfType('boer-uuid', 8))
+                    return
+                def currentRelic = (Boer) user.relics.get(UUID.fromString(nmsItem.tag.getString('boer-uuid')))
+                if (currentRelic == null)
+                    return null
+                if (user.relics.values().stream()
+                        .filter { it instanceof Boer }
+                        .filter { (it as Boer).isStanding() }.count() >= MAX_BOER_COUNT) {
+                    player.sendMessage Formatting.error('Вы не можете установить ещё один бур.')
+                    return
+                }
+                currentRelic.view(user, clickedBlock.location.clone().add(0.0D, 1.0D, 0.0D))
+            }
             return
+        }
 
         def craftArmorStand = ((CraftArmorStand) stand).getHandle()
         B.postpone 3, {
@@ -228,9 +189,23 @@ on PlayerInteractEvent, {
         app.world.spawnParticle(Particle.EXPLOSION_LARGE, playerLocation, 5)
     }
 
-    if (action != RIGHT_CLICK_BLOCK && action != RIGHT_CLICK_AIR)
+    if (action != RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR)
         return
     if (!(user.getState() instanceof Excavation))
         return
     TreasureUtil.sellAll(user)
+}
+
+on PlayerInteractAtEntityEvent, {
+    def user = app.getUser(player)
+
+    if (user.state instanceof Cosmos && clickedEntity.hasMetadata('boer')) {
+        def owner = Bukkit.getPlayer(UUID.fromString(clickedEntity.getMetadata('owner')[0].asString()))
+        def boer = UUID.fromString(clickedEntity.getMetadata('boer')[0].asString())
+        def fragment = user.relics.get(boer) as Boer
+
+        if (player.uniqueId != owner.uniqueId)
+            player.sendMessage(Formatting.error('Этот бур не принадлежит вам.'))
+        open(player, 'boer-upgrade', fragment)
+    }
 }

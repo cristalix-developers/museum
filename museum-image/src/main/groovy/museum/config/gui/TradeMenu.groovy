@@ -3,7 +3,6 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import museum.client_conversation.AnimationUtil
-import museum.fragment.Fragment
 import museum.fragment.Gem
 import museum.international.Market
 import museum.player.User
@@ -36,15 +35,14 @@ on PlayerInteractEntityEvent, {
                 return null
 
             if (user.state instanceof Market) {
-                for (Fragment currentRelic : user.relics) {
-                    if (currentRelic.uuid.toString() == nmsItem.tag.getString('relic-uuid')) {
-                        def data = new Object[]{player, clickedEntity, currentRelic}
-                        Guis.open(player, 'trade', data)
-                        Guis.open(clickedEntity as Player, 'trade', data)
-                        player.inventory.setItemInHand(null)
-                        return null
-                    }
-                }
+                def currentRelic = user.relics.get(UUID.fromString(nmsItem.tag.getString('relic-uuid')))
+                if (currentRelic == null)
+                    return null
+                def data = new Object[]{player, clickedEntity, currentRelic}
+                Guis.open(player, 'trade', data)
+                Guis.open(clickedEntity as Player, 'trade', data)
+                player.inventory.setItemInHand(null)
+                return null
             }
         }
     }
@@ -146,15 +144,12 @@ registerCommand 'gemstat' handle {
     if (cost < 10 || cost > 300000000)
         return Formatting.error("Значение слишком маленькое или слишком большое!")
 
-    for (Fragment currentRelic : user.relics) {
-        if (currentRelic.uuid.toString() == item.tag.getString('relic-uuid')) {
-            if (currentRelic instanceof Gem) {
-                currentRelic.setPrice(cost)
-
-                user.inventory.setItemInHand(currentRelic.item)
-
-                return Formatting.fine("Цена камня изменена на " + MessageUtil.toMoneyFormat(cost))
-            }
-        }
+    def currentRelic = user.relics.get(UUID.fromString(item.tag.getString('relic-uuid')))
+    if (currentRelic == null)
+        return null
+    if (currentRelic instanceof Gem) {
+        currentRelic.setPrice(cost)
+        user.inventory.setItemInHand(currentRelic.item)
+        return Formatting.fine("Цена камня изменена на " + MessageUtil.toMoneyFormat(cost))
     }
 }

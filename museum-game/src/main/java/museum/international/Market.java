@@ -10,7 +10,6 @@ import museum.player.User;
 import museum.util.LocationUtil;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
-import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
 /**
  * @author func 14.02.2021
@@ -35,7 +34,7 @@ public class Market implements State {
 		user.getPlayer().setAllowFlight(false);
 		user.getPlayer().setFlying(false);
 
-		for (Fragment fragment : user.getRelics())
+		for (Fragment fragment : user.getRelics().values())
 			if (fragment instanceof Gem)
 				user.getInventory().addItem(fragment.getItem());
 

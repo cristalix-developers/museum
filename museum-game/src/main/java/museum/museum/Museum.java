@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import museum.App;
-import museum.boosters.BoosterType;
 import museum.client_conversation.AnimationUtil;
 import museum.client_conversation.ModTransfer;
+import museum.cosmos.boer.Boer;
 import museum.data.MuseumInfo;
 import museum.fragment.Fragment;
 import museum.museum.collector.CollectorNavigator;
@@ -25,7 +25,6 @@ import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Storable;
 import museum.util.ChunkWriter;
 import museum.util.LocationUtil;
-import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
@@ -34,7 +33,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.math.V3;
-import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 import ru.cristalix.core.util.UtilV3;
 
 import java.util.*;
@@ -128,8 +126,10 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				if (!subject.isAllocated() && !subject.getPrototype().getType().equals(SubjectType.MARKER))
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
 			}
-			for (Fragment relic : user.getRelics())
-				inventory.addItem(relic.getItem());
+			for (Fragment relic : user.getRelics().values()) {
+				if (!(relic instanceof Boer))
+					inventory.addItem(relic.getItem());
+			}
 		}
 
 		B.postpone(1, () -> {

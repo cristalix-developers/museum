@@ -17,10 +17,10 @@ public interface Fragment {
 
 	default void give(User user) {
 		user.getPlayer().getInventory().addItem(getItem());
-		user.getRelics().add(this);
+		user.getRelics().put(getUuid(), this);
 	}
 
 	default void remove(User user) {
-		user.getRelics().remove(this);
+		user.getRelics().remove(getUuid());
 	}
 }

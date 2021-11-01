@@ -25,7 +25,7 @@ class Day(val day: Int, private val icon: ItemStack, val name: String, private v
         }, item {
             origin = CENTER
             align = CENTER
-            scale = V3(2.0, 2.0)
+            scale = V3(2.0, 2.0, 2.0)
             stack = icon
         }, text {
             offset.y -= 5

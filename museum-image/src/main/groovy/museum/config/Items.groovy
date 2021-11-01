@@ -3,6 +3,7 @@ package museum.config
 
 import museum.museum.subject.Subject
 import museum.museum.subject.skeleton.Skeleton
+import org.bukkit.enchantments.Enchantment
 
 import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
@@ -306,24 +307,28 @@ register 'quantum-helmet', {
     item CHAINMAIL_HELMET
     text '&eШлем астронавта'
     nbt.armors = 'quantum'
+    enchant Enchantment.BINDING_CURSE, 1
 }
 
 register 'quantum-chestplate', {
     item CHAINMAIL_CHESTPLATE
     text '&eКомбинизон астронавта'
     nbt.armors = 'quantum'
+    enchant Enchantment.BINDING_CURSE, 1
 }
 
 register 'quantum-leggings', {
     item CHAINMAIL_LEGGINGS
     text '&eКомбинизон астронавта'
     nbt.armors = 'quantum'
+    enchant Enchantment.BINDING_CURSE, 1
 }
 
 register 'quantum-boots', {
     item CHAINMAIL_BOOTS
     text '&eБотинки астронавта'
     nbt.armors = 'quantum'
+    enchant Enchantment.BINDING_CURSE, 1
 }
 
 register 'jetpack', {

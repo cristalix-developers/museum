@@ -108,7 +108,7 @@ Guis.register 'manipulator', { player ->
                 def subjectRelic = subject.fragment
                 subject.setFragment(null)
                 user.getInventory().addItem(subjectRelic.item)
-                user.relics.add(subjectRelic)
+                user.relics.put(subjectRelic.uuid, subjectRelic)
                 subject.updateFragment()
                 ((Museum) user.state).updateIncrease()
                 MessageUtil.find 'relic-tacked' send user

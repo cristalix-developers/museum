@@ -18,6 +18,8 @@ import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 
+import java.util.UUID;
+
 /**
  * @author func 11.11.2020
  * @project museum
@@ -106,19 +108,17 @@ public class RelicShowcaseSubject extends Subject {
 				if (fragment != null)
 					MessageUtil.find("relic-in-hand").send(owner);
 				else {
-					for (Fragment currentRelic : owner.getRelics()) {
-						if (currentRelic.getUuid().toString().equals(nmsItem.tag.getString("relic-uuid"))) {
-							player.setItemInHand(null);
-							currentRelic.remove(owner);
-							setFragment(currentRelic);
-							updateFragment();
-							getAllocation().perform(Allocation.Action.SPAWN_PIECES);
-							MessageUtil.find("relic-placed")
-									.set("title", currentRelic.getItem().getItemMeta().getDisplayName())
-									.send(owner);
-							return;
-						}
-					}
+					val currentRelic = owner.getRelics().get(UUID.fromString(nmsItem.tag.getString("relic-uuid")));
+					if (currentRelic == null)
+						return;
+					player.setItemInHand(null);
+					currentRelic.remove(owner);
+					setFragment(currentRelic);
+					updateFragment();
+					getAllocation().perform(Allocation.Action.SPAWN_PIECES);
+					MessageUtil.find("relic-placed")
+							.set("title", currentRelic.getItem().getItemMeta().getDisplayName())
+							.send(owner);
 				}
 			}
 		}

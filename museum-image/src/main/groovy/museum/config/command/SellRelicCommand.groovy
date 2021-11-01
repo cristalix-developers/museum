@@ -2,7 +2,6 @@
 package museum.config.command
 
 import museum.App
-import museum.fragment.Fragment
 import museum.util.MessageUtil
 import museum.util.SubjectLogoUtil
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
@@ -25,22 +24,16 @@ registerCommand 'sell' handle {
         }
         def nmsItem = CraftItemStack.asNMSCopy item
         if (nmsItem.tag && nmsItem.tag.hasKeyOfType("relic", 8)) {
-            for (Fragment currentRelic : user.relics) {
-                if (currentRelic.uuid.toString() == nmsItem.tag.getString('relic-uuid')) {
-                    def price = 0
-
-                    if (currentRelic.address.contains("meteor"))
-                        price += 20 * currentRelic.price
-                    else
-                        price += currentRelic.price
-                    player.itemInHand = null
-                    user.relics.remove currentRelic
-                    user.giveMoney(price)
-                    return MessageUtil.find('relic-sell')
-                            .set('price', MessageUtil.toMoneyFormat(price))
-                            .getText()
-                }
-            }
+            def currentRelic = user.relics.get(UUID.fromString(nmsItem.tag.getString('relic-uuid')))
+            if (currentRelic == null)
+                return
+            def price = (currentRelic.address.contains("meteor") ? 20 : 1) * currentRelic.price
+            player.itemInHand = null
+            user.relics.remove currentRelic
+            user.giveMoney(price)
+            return MessageUtil.find('relic-sell')
+                    .set('price', MessageUtil.toMoneyFormat(price))
+                    .getText()
         }
     }
 }

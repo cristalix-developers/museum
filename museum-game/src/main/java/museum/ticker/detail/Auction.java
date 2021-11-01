@@ -11,7 +11,7 @@ import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.PlayerDataManager;
 import museum.prototype.Managers;
-import museum.ticker.Event;
+import museum.ticker.Ticked;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,7 +27,13 @@ import java.util.Map;
  * @author Рейдж 23.08.2021
  * @project museum
  */
-public class Auction implements Event {
+public class Auction implements Ticked {
+
+    private static final int DURATION = 120;
+    private int secondsLeft = DURATION;
+
+    private static final int WAIT_SECOND = 1800;
+    private int beforeStart = WAIT_SECOND;
 
     private SkeletonPrototype proto;
     private final PlayerDataManager playerDataManager = App.getApp().getPlayerDataManager();
@@ -45,53 +51,50 @@ public class Auction implements Event {
     }
 
     @Override
-    public void start() {
-        playerDataManager.setRateBegun(true);
-        proto = ListUtils.random(new ArrayList<>(Managers.skeleton));
+    public void tick(int... args) {
+        if (args[0] % 20 == 0) {
+            if (secondsLeft == 0 && beforeStart == 0) {
+                secondsLeft = DURATION;
+                beforeStart = WAIT_SECOND;
 
-        B.bc(Formatting.fine("Житель нашёл кость динозавра §b" + proto.getTitle() + ". §fУчаствовать в торгах §b/rate"));
-        Bukkit.getOnlinePlayers().stream()
-                .map(player -> App.getApp().getUser(player))
-                .forEach(user -> {
-                    new ModTransfer()
-                            .string("Торги! Сделать ставку §b/rate <сумма>")
-                            .integer(300)
-                            .send("museum:tradingtime", user);
-                    if (user.isMessages())
-                        AnimationUtil.throwIconMessage(user, itemStack, "Торги!", "Участвовать в торгах /rate");
-                });
-    }
+                playerDataManager.setRateBegun(true);
+                proto = ListUtils.random(new ArrayList<>(Managers.skeleton));
 
-    @Override
-    public void end() {
-        if (playerDataManager.getMembers().isEmpty()) {
-            B.bc(Formatting.fine("Ни кто не участвовал в торгах. Кость осталась у жителя."));
-            playerDataManager.setRateBegun(false);
-            return;
+                B.bc(Formatting.fine("Житель нашёл кость динозавра §b" + proto.getTitle() + ". §fУчаствовать в торгах §b/rate"));
+                Bukkit.getOnlinePlayers().stream()
+                        .map(player -> App.getApp().getUser(player))
+                        .forEach(user -> {
+                            new ModTransfer()
+                                    .string("Торги! Сделать ставку §b/rate <сумма>")
+                                    .integer(DURATION)
+                                    .send("museum:tradingtime", user);
+                            if (user.isMessages())
+                                AnimationUtil.throwIconMessage(user, itemStack, "Торги!", "Участвовать в торгах /rate");
+                        });
+            } else if (secondsLeft == 0) {
+                if (beforeStart == WAIT_SECOND) {
+                    if (playerDataManager.getMembers().isEmpty()) {
+                        B.bc(Formatting.fine("Ни кто не участвовал в торгах. Кость осталась у жителя."));
+                    } else {
+                        val maxEntry = Collections.max(playerDataManager.getMembers().entrySet(), Map.Entry.comparingByValue());
+                        val user = App.getApp().getUser(Bukkit.getPlayer(maxEntry.getKey()));
+
+                        Fragment fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
+                        Skeleton skeleton = user.getSkeletons().supply(proto);
+
+                        user.setMoney(user.getMoney() - maxEntry.getValue());
+
+                        user.getPlayer().sendMessage(Formatting.fine("Вы победили в торгах и выиграли кость динозавра§b" + proto.getTitle() + "§f."));
+                        skeleton.getUnlockedFragments().add(fragment);
+
+                        playerDataManager.getMembers().clear();
+                    }
+                    playerDataManager.setRateBegun(false);
+                }
+                beforeStart--;
+            } else {
+                secondsLeft--;
+            }
         }
-
-        val maxEntry = Collections.max(playerDataManager.getMembers().entrySet(), Map.Entry.comparingByValue());
-        val user = App.getApp().getUser(Bukkit.getPlayer(maxEntry.getKey()));
-
-        Fragment fragment = ListUtils.random(proto.getFragments().toArray(new Fragment[0]));
-        Skeleton skeleton = user.getSkeletons().supply(proto);
-
-        user.setMoney(user.getMoney() - maxEntry.getValue());
-
-        user.getPlayer().sendMessage(Formatting.fine("Вы победили в торгах и выиграли кость динозавра§b" + proto.getTitle() + "§f."));
-        skeleton.getUnlockedFragments().add(fragment);
-
-        playerDataManager.getMembers().clear();
-        playerDataManager.setRateBegun(false);
-    }
-
-    @Override
-    public int startTime() {
-        return 300;
-    }
-
-    @Override
-    public int endTime() {
-        return 600;
     }
 }
