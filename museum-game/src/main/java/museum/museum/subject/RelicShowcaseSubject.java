@@ -6,6 +6,7 @@ import museum.App;
 import museum.data.SubjectInfo;
 import museum.fragment.Fragment;
 import museum.fragment.Gem;
+import museum.fragment.Meteorite;
 import museum.fragment.Relic;
 import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
@@ -16,6 +17,8 @@ import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+
+import java.util.UUID;
 
 /**
  * @author func 11.11.2020
@@ -32,7 +35,7 @@ public class RelicShowcaseSubject extends Subject {
 	public RelicShowcaseSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
 		this.fragment = info.metadata != null && !info.metadata.isEmpty() ?
-				info.metadata.contains(":") ? new Gem(info.metadata) : new Relic(info.metadata) : null;
+				info.metadata.contains(":") ? new Gem(info.metadata) : info.metadata.contains("meteor") ? new Meteorite(info.metadata) : new Relic(info.metadata) : null;
 	}
 
 	@Override
@@ -105,19 +108,17 @@ public class RelicShowcaseSubject extends Subject {
 				if (fragment != null)
 					MessageUtil.find("relic-in-hand").send(owner);
 				else {
-					for (Fragment currentRelic : owner.getRelics()) {
-						if (currentRelic.getUuid().toString().equals(nmsItem.tag.getString("relic-uuid"))) {
-							player.setItemInHand(null);
-							currentRelic.remove(owner);
-							setFragment(currentRelic);
-							updateFragment();
-							getAllocation().perform(Allocation.Action.SPAWN_PIECES);
-							MessageUtil.find("relic-placed")
-									.set("title", currentRelic.getItem().getItemMeta().getDisplayName())
-									.send(owner);
-							return;
-						}
-					}
+					val currentRelic = owner.getRelics().get(UUID.fromString(nmsItem.tag.getString("relic-uuid")));
+					if (currentRelic == null)
+						return;
+					player.setItemInHand(null);
+					currentRelic.remove(owner);
+					setFragment(currentRelic);
+					updateFragment();
+					getAllocation().perform(Allocation.Action.SPAWN_PIECES);
+					MessageUtil.find("relic-placed")
+							.set("title", currentRelic.getItem().getItemMeta().getDisplayName())
+							.send(owner);
 				}
 			}
 		}

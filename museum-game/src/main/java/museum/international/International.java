@@ -1,14 +1,15 @@
 package museum.international;
 
+import clepto.bukkit.item.Items;
 import museum.player.State;
 import museum.player.User;
-import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
+import org.bukkit.inventory.ItemStack;
 
 public interface International extends State {
 
-	void acceptBlockBreak(User user, PacketPlayInBlockDig packet);
+	ItemStack BACK_ITEM = Items.render("goback").asBukkitMirror();
 
-	boolean canBeBroken(BlockPosition pos);
+	void acceptBlockBreak(User user, PacketPlayInBlockDig packet);
 
 }

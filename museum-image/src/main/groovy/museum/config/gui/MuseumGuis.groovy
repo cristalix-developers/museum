@@ -6,7 +6,7 @@ import clepto.bukkit.menu.Guis
 
 import java.text.DecimalFormat
 
-import static org.bukkit.Material.BARRIER
+import static org.bukkit.Material.CLAY_BALL
 import static org.bukkit.Material.STAINED_GLASS_PANE
 
 class MuseumGuis {
@@ -24,8 +24,9 @@ class MuseumGuis {
 
     static Gui.Button backToManipulator(uuid) {
         def button = Guis.staticButton('X').icon {
-            item BARRIER
+            item CLAY_BALL
             text '§cНазад'
+            nbt.other = "cancel"
         } leftClick {
             Guis.open(delegate, 'manipulator', uuid)
         }

@@ -1,33 +1,23 @@
 package museum.international;
 
-import clepto.bukkit.item.Items;
 import lombok.val;
 import museum.App;
 import museum.fragment.Fragment;
 import museum.fragment.Gem;
-import museum.player.State;
 import museum.player.User;
 import museum.util.LocationUtil;
+import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
-import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
 /**
  * @author func 14.02.2021
  * @project museum
  */
-public class Market implements State {
+public class Market implements International {
 	private final Location spawnLocation;
-
-	private final ItemStack BACK_ITEM = Items.render("back").asBukkitMirror();
 
 	public Market(App app) {
 		this.spawnLocation = LocationUtil.resetLabelRotation(app.getMap().requireLabel("market-spawn"), 0);
-	}
-
-	@Override
-	public void setupScoreboard(User user, SimpleBoardObjective obj) {
-		obj.setDisplayName("Рынок");
 	}
 
 	@Override
@@ -40,7 +30,7 @@ public class Market implements State {
 		user.getPlayer().setAllowFlight(false);
 		user.getPlayer().setFlying(false);
 
-		for (Fragment fragment : user.getRelics())
+		for (Fragment fragment : user.getRelics().values())
 			if (fragment instanceof Gem)
 				user.getInventory().addItem(fragment.getItem());
 
@@ -66,5 +56,9 @@ public class Market implements State {
 	@Override
 	public boolean nightVision() {
 		return false;
+	}
+
+	@Override
+	public void acceptBlockBreak(User user, PacketPlayInBlockDig packet) {
 	}
 }

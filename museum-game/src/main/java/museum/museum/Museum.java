@@ -6,8 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import museum.App;
-import museum.boosters.BoosterType;
-import museum.client_conversation.ScriptTransfer;
+import museum.client_conversation.AnimationUtil;
+import museum.client_conversation.ModTransfer;
+import museum.cosmos.boer.Boer;
 import museum.data.MuseumInfo;
 import museum.fragment.Fragment;
 import museum.museum.collector.CollectorNavigator;
@@ -19,13 +20,12 @@ import museum.museum.subject.MarkerSubject;
 import museum.museum.subject.Subject;
 import museum.player.State;
 import museum.player.User;
+import museum.player.prepare.BeforePacketHandler;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Storable;
 import museum.util.ChunkWriter;
 import museum.util.LocationUtil;
-import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
-import museum.worker.WorkerUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.IBlockData;
@@ -33,7 +33,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.math.V3;
-import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 import ru.cristalix.core.util.UtilV3;
 
 import java.util.*;
@@ -50,7 +49,6 @@ import static museum.museum.subject.Allocation.Action.*;
 @Getter
 public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements State {
 
-	// todo: Надо их кешировать, а то музеев много
 	private final ItemStack menu = Items.render("menu").asBukkitMirror();
 	private final ItemStack backItem = Items.render("back").asBukkitMirror();
 	private final ItemStack visitorMenu = Items.render("visitor-menu").asBukkitMirror();
@@ -100,16 +98,6 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	}
 
 	@Override
-	public void setupScoreboard(User user, SimpleBoardObjective objective) {
-		objective.setDisplayName(this.title);
-
-		objective.startGroup("Музей");
-		if (owner != user) objective.record("Владелец", owner.getName());
-		objective.record("Цена монеты", () -> "§b" + MessageUtil.toMoneyFormat(getIncome() * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)))
-				.record("Посещений", () -> "§b" + this.getViews());
-	}
-
-	@Override
 	public void enterState(User user) {
 		teleportUser(user);
 
@@ -123,23 +111,37 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 			inventory.setItem(8, backItem);
 			cachedInfo.views++;
 		} else {
-			for (Subject subject : owner.getSubjects())
+			int collectorAmount = 0;
+
+			for (Subject subject : owner.getSubjects()) {
+				if (subject instanceof CollectorSubject && subject.isAllocated())
+					collectorAmount++;
+				if (collectorAmount > 2) {
+					B.postpone(30, () -> AnimationUtil.throwIconMessage(owner, BeforePacketHandler.EMERGENCY_STOP, "Снятие коллекторов", "ОШИБКА"));
+					for (Subject collector : owner.getSubjects())
+						if (collector instanceof CollectorSubject)
+							collector.setAllocation(null);
+					continue;
+				}
 				if (!subject.isAllocated() && !subject.getPrototype().getType().equals(SubjectType.MARKER))
 					inventory.addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
-			for (Fragment relic : user.getRelics())
-				inventory.addItem(relic.getItem());
+			}
+			for (Fragment relic : user.getRelics().values()) {
+				if (!(relic instanceof Boer))
+					inventory.addItem(relic.getItem());
+			}
 		}
 
 		B.postpone(1, () -> {
 			if (user.getGrabbedArmorstand() == null)
 				player.setAllowFlight(true);
 		});
-		B.postpone(50, () -> {
+		B.postpone(20, () -> {
 			for (Subject subject : getSubjects()) {
 				subject.getAllocation().perform(user, UPDATE_BLOCKS, SPAWN_PIECES, SPAWN_DISPLAYABLE);
 			}
 
-			new ScriptTransfer()
+			new ModTransfer()
 					.json(user.getSubjects().stream()
 							.filter(Subject::isAllocated)
 							.map(Subject::getDataForClient)

@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 public enum DonateType {
 
-	PREFIX_CASE("Случайный префикс", 79, false),
+	PREFIX_CASE("Случайный префикс", 49, false),
+	ITEM_CASE("Лутбокс", 39, false),
 	PRIVILEGES("Комиссия 0%", 119, true),
 	GLOBAL_MONEY_BOOSTER("Глобальный бустер денег", 199, false),
 	GLOBAL_VILLAGER_BOOSTER("Глобальный бустер посетителей", 149, false),
@@ -16,6 +17,8 @@ public enum DonateType {
 	LOCAL_EXP_BOOSTER("Локальный бустер опыта", 99, false),
 	LEGENDARY_PICKAXE("Легендарная кирка", 349, true),
 	STEAM_PUNK_COLLECTOR("Стим-панк сборщик монет", 249, true),
+	BOER("Глобальный бустер бура x2", 79, false),
+	BIG_BOER("Глобальный бустер бура х5", 199,false),
 	;
 
 	private final String name;

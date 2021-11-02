@@ -1,17 +1,19 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.command
 
-
 import clepto.bukkit.menu.Guis
 import implario.ListUtils
 import museum.App
 import museum.client_conversation.AnimationUtil
+import museum.config.gui.LootBox
 import museum.data.PickaxeType
 import museum.data.SubjectInfo
 import museum.donate.DonateType
 import museum.museum.Museum
 import museum.museum.subject.CollectorSubject
 import museum.packages.SaveUserPackage
+import museum.packages.UserTransactionPackage.TransactionResponse
+import museum.player.User
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
@@ -50,6 +52,10 @@ registerCommand 'prefixes' handle {
     Guis.open player, 'prefixes', player
 }
 
+void givePrefix(User owner) {
+
+}
+
 def prefixes = [
         new Prefix('䂋', 'Любовь', 3, '§l40% §fполучить +§b1 опыт'),
         new Prefix('㧥', 'Бывший бомж', 3, '§f+§620`000\$ §e ежедневной награды'),
@@ -80,12 +86,17 @@ Guis.register 'prefixes', {
 
     title 'Выбор префиксов'
     layout """
-        -XXXXXXX-
-        --XXXXX--
-        ----O----
-        ---EEE---
-        --RRRRR--
+        XXXXXXXXX
+        XXX-RRRRR
+        -EEE-O-L-
         """
+    button 'L' icon {
+        item CLAY_BALL
+        text '§cНазад'
+        nbt.other = "cancel"
+    } leftClick {
+        performCommand("gui main")
+    }
     button 'O' icon {
         item END_CRYSTAL
         text """
@@ -101,7 +112,7 @@ Guis.register 'prefixes', {
         """
     } leftClick {
         if (user.money >= 10000000) {
-            user.money = user.money - 10000000
+            user.giveMoney(-10000000)
             def randomPrefix = ListUtils.random(
                     user.prefixChestOpened % 5 == 0 ?
                             prefixes.stream()
@@ -114,7 +125,7 @@ Guis.register 'prefixes', {
             for (def prefix in user.info.prefixes) {
                 if (prefix.contains(randomPrefix.prefix)) {
                     flag = false
-                    user.money = user.money + 50000
+                    user.giveMoney(50000)
                     AnimationUtil.topTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
                     break
                 }
@@ -127,7 +138,8 @@ Guis.register 'prefixes', {
             }
             user.prefixChestOpened = user.prefixChestOpened + 1
             closeInventory()
-        }
+        } else
+            AnimationUtil.buyFailure(user)
     }
     def counter = 0
     3.times {
@@ -138,8 +150,8 @@ Guis.register 'prefixes', {
             text """[ ${prefix.prefix} §f] ${prefix.title} ${have ? '§aВЫБРАТЬ' : ''}
         §7Выпадает из 'Случайный префикс'
 
-        Редкость: §dэпический
-        Бонус: ${prefix.bonus}
+        §7Редкость: §dэпический
+        §7Бонус: ${prefix.bonus}
         """
         } leftClick {
             performCommand('changeprefix ' + prefix.prefix)
@@ -154,8 +166,8 @@ Guis.register 'prefixes', {
             text """[ ${prefix.prefix} §f] ${prefix.title} ${have ? '§aВЫБРАТЬ' : ''}
         §7Выпадает из 'Случайный префикс'
 
-        Редкость: §bредкий
-        Бонус: §cотсутствует
+        §7Редкость: §bредкий
+        §7Бонус: §cотсутствует
         """
         } leftClick {
             performCommand('changeprefix ' + prefix.prefix)
@@ -171,8 +183,8 @@ Guis.register 'prefixes', {
             text have ? "" : "§7Можно купить за §e10'000'000\$"
             text """    
                                 
-            Редкость: §aобычный
-            Бонус: §cотсутствует
+            §7Редкость: §aобычный
+            §7Бонус: §cотсутствует
             """
         } leftClick {
             if (user.prefix && user.prefix.contains('LS'))
@@ -209,10 +221,14 @@ registerCommand 'proccessdonate' handle {
 
     App.app.processDonate(user.getUuid(), donate).thenAccept(transaction -> {
         if (!transaction.ok) {
+            if (transaction == TransactionResponse.INSUFFICIENT_FUNDS)
+                AnimationUtil.buyFailure(user)
             user.sendMessage(Formatting.error(transaction.name))
             return
         }
-        if (donate == DonateType.PREFIX_CASE) {
+        if (donate == DonateType.ITEM_CASE) {
+            LootBox.giveDrop(user)
+        } else if (donate == DonateType.PREFIX_CASE) {
             def randomPrefix = ListUtils.random(
                     user.prefixChestOpened % 5 == 0 ?
                             prefixes.stream()
@@ -225,7 +241,7 @@ registerCommand 'proccessdonate' handle {
             for (def prefix in user.info.prefixes) {
                 if (prefix.contains(randomPrefix.prefix)) {
                     flag = false
-                    user.money = user.money + 50000
+                    user.giveMoney(50000)
                     AnimationUtil.topTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
                     break
                 }

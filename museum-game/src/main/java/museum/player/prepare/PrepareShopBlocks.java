@@ -1,7 +1,7 @@
 package museum.player.prepare;
 
 import museum.App;
-import museum.client_conversation.ScriptTransfer;
+import museum.client_conversation.ModTransfer;
 import museum.museum.map.SubjectPrototype;
 import museum.player.User;
 import museum.prototype.Managers;
@@ -26,6 +26,6 @@ public class PrepareShopBlocks implements Prepare {
 							.toArray(SubjectPrototype.SubjectDataForClient[]::new)
 			);
 		}
-		new ScriptTransfer().string(dataForClients).send("shop", user);
+		new ModTransfer().string(dataForClients).send("shop", user);
 	}
 }

@@ -2,11 +2,13 @@ package museum.player;
 
 import clepto.bukkit.B;
 import com.google.common.collect.Maps;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
+import museum.client_conversation.AnimationUtil;
 import museum.data.BoosterInfo;
 import museum.data.UserInfo;
 import museum.packages.*;
@@ -32,6 +34,7 @@ import ru.cristalix.core.event.AccountEvent;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PlayerDataManager implements Listener {
 
@@ -41,6 +44,19 @@ public class PlayerDataManager implements Listener {
 	@Setter
 	private List<BoosterInfo> globalBoosters = new ArrayList<>(0);
 	private final List<Prepare> prepares;
+	@Getter
+	private final Map<UUID, Integer> members = Maps.newHashMap();
+	@Getter
+	@Setter
+	private boolean isRateBegun = false;
+
+	private final Set<UUID> ADMIN_LIST = Stream.of(
+			"9a109585-e5e5-11ea-acca-1cb72caa35fd", // fifa
+			"307264a1-2c69-11e8-b5ea-1cb72caa35fd", // func
+			"6f3f4a2e-7f84-11e9-8374-1cb72caa35fd", // faelan
+			"bf30a1df-85de-11e8-a6de-1cb72caa35fd", // reidj
+			"e7c13d3d-ac38-11e8-8374-1cb72caa35fd" // delfikpro
+	).map(UUID::fromString).collect(Collectors.toSet());
 
 	@SuppressWarnings("deprecation")
 	public PlayerDataManager(App app) {
@@ -49,7 +65,6 @@ public class PlayerDataManager implements Listener {
 		prepares = Arrays.asList(
 				BeforePacketHandler.INSTANCE,
 				PrepareMods.INSTANCE,
-				new PrepareScoreBoard(),
 				PrepareShopBlocks.INSTANCE,
 				PreparePlayerBrain.INSTANCE
 		);
@@ -68,11 +83,15 @@ public class PlayerDataManager implements Listener {
 				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid);
 				// Добавление дефолтных значений, которых не было в самом начале
 				if (userInfo.getPrefixes() == null) userInfo.setPrefixes(new ArrayList<>());
+
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
-				if (userInfo.getCrystal() > 0) {
-					userInfo.setMoney(userInfo.getMoney() + userInfo.getCrystal() * 15);
-					userInfo.setCrystal(0);
-				}
+
+				if (userInfo.getDay() == null)
+					userInfo.setDay(0);
+
+				if (userInfo.getCosmoCrystal() == null)
+					userInfo.setCosmoCrystal(0);
+
 				userMap.put(uuid, new User(userInfo));
 			} catch (Exception ex) {
 				event.setCancelReason("Не удалось загрузить статистику о музее.");
@@ -85,10 +104,17 @@ public class PlayerDataManager implements Listener {
 			if (data == null)
 				return;
 			val info = data.generateUserInfo();
-			info.setTimePlayed(info.getTimePlayed() + System.currentTimeMillis() - data.getEnterTime());
+			info.setTimePlayed(info.getTimePlayed() + (System.currentTimeMillis() - data.getEnterTime()) / 10);
 			client.write(new SaveUserPackage(event.getUuid(), info));
 		}, 100);
-		client.registerHandler(GlobalBoostersPackage.class, pckg -> globalBoosters = pckg.getBoosters());
+		client.registerHandler(GlobalBoostersPackage.class, pckg -> {
+			globalBoosters = pckg.getBoosters();
+			val current = App.getApp().getPlayerDataManager().timeBar;
+			if (globalBoosters.isEmpty())
+				Bukkit.getOnlinePlayers().forEach(player -> current.onQuit(player.getUniqueId()));
+			else
+				Bukkit.getOnlinePlayers().forEach(player -> current.onJoin(player.getUniqueId()));
+		});
 		client.registerHandler(ExtraDepositUserPackage.class, this::handleExtraDeposit);
 		this.timeBar = new MultiTimeBar(
 				() -> new ArrayList<>(globalBoosters),
@@ -107,13 +133,16 @@ public class PlayerDataManager implements Listener {
 
 		player.setResourcePack("", "");
 		player.setWalkSpeed(.36F);
+		player.setOp(ADMIN_LIST.contains(player.getUniqueId()));
 
-		timeBar.onJoin(player.getUniqueId());
+		if (!App.getApp().getPlayerDataManager().globalBoosters.isEmpty())
+			timeBar.onJoin(player.getUniqueId());
+
 		val user = userMap.get(player.getUniqueId());
 		val connection = player.getHandle().playerConnection;
 
-		if (connection == null) {
-			event.getPlayer().kickPlayer("Неустойчивое соединение. Перезагрузите сеть.");
+		if (user == null || connection == null) {
+			event.getPlayer().kickPlayer("Неустойчивое соединение. Попробуйте еще раз.");
 			return;
 		}
 
@@ -124,7 +153,7 @@ public class PlayerDataManager implements Listener {
 		player.setGameMode(GameMode.ADVENTURE);
 		player.setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, false);
 
-		B.postpone(4, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
+		B.postpone(5, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
 
 		event.setJoinMessage(null);
 	}
@@ -138,6 +167,7 @@ public class PlayerDataManager implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		leave(event.getPlayer());
+		AnimationUtil.updateOnlineAll();
 		event.setQuitMessage(null);
 	}
 
@@ -153,6 +183,7 @@ public class PlayerDataManager implements Listener {
 			((CraftPlayer) player).getHandle().playerConnection.sendPacket(removePlayer);
 
 		timeBar.onQuit(current.getUniqueId());
+		App.getApp().getPlayerDataManager().getMembers().remove(current.getUniqueId());
 	}
 
 	public double calcMultiplier(UUID uuid, BoosterType type) {

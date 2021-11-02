@@ -40,5 +40,7 @@ public class UserInfo implements Unique {
 	private int prefixChestOpened;
 	private List<String> prefixes;
 	private boolean privileges;
-
+	private boolean messages;
+	private Integer day;
+	private Integer cosmoCrystal;
 }

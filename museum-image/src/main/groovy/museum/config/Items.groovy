@@ -3,6 +3,7 @@ package museum.config
 
 import museum.museum.subject.Subject
 import museum.museum.subject.skeleton.Skeleton
+import org.bukkit.enchantments.Enchantment
 
 import static clepto.bukkit.item.Items.register
 import static org.bukkit.Material.*
@@ -234,7 +235,8 @@ register 'place-menu', {
 }
 
 register 'goback', {
-    item BARRIER
+    item CLAY_BALL
+    nbt.other = "cancel"
     text '§cВернуться'
 }
 
@@ -270,7 +272,8 @@ register 'subject-destroy', {
 }
 
 register 'go-back-item', {
-    item BARRIER
+    item CLAY_BALL
+    nbt.other = "cancel"
     text """
         §cПрекратить раскопки §7[§eПКМ-БЛОК§7]
 
@@ -294,4 +297,49 @@ register 'subject-info', {
 
         Стоимость: $subject.prototype.price
     """
+}
+
+register 'earth', {
+    item CLAY_BALL
+    text 'Земля'
+    nbt.skyblock = 'earth'
+}
+
+register 'quantum-helmet', {
+    item CHAINMAIL_HELMET
+    text '&eШлем астронавта'
+    nbt.armors = 'quantum'
+    enchant Enchantment.BINDING_CURSE, 1
+}
+
+register 'quantum-chestplate', {
+    item CHAINMAIL_CHESTPLATE
+    text '&eКомбинизон астронавта'
+    nbt.armors = 'quantum'
+    enchant Enchantment.BINDING_CURSE, 1
+}
+
+register 'quantum-leggings', {
+    item CHAINMAIL_LEGGINGS
+    text '&eКомбинизон астронавта'
+    nbt.armors = 'quantum'
+    enchant Enchantment.BINDING_CURSE, 1
+}
+
+register 'quantum-boots', {
+    item CHAINMAIL_BOOTS
+    text '&eБотинки астронавта'
+    nbt.armors = 'quantum'
+    enchant Enchantment.BINDING_CURSE, 1
+}
+
+register 'jetpack', {
+    item CHAINMAIL_CHESTPLATE
+    text '&bДжетпак'
+    nbt.armors = 'miner'
+}
+
+register 'antenna', {
+    item SULPHUR
+    nbt.amoung = 'antenna'
 }

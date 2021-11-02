@@ -11,5 +11,4 @@ public interface Subservice {
 	default void updateOnRealms() {
 		ServerSocketHandler.broadcast(createPackage());
 	}
-
 }

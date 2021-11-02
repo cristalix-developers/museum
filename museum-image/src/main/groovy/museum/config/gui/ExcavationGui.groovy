@@ -3,6 +3,7 @@ package museum.config.gui
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.cosmos.Cosmos
 import museum.fragment.GemType
 import museum.prototype.Managers
 import museum.util.LevelSystem
@@ -27,18 +28,35 @@ Guis.register 'excavation', { player ->
         IIIIIIIII
         IKKKKKKKI
         ${StringUtils.repeat('I', realDay)}U${StringUtils.repeat('I', 9 - realDay - 1)}
-        IIJIIIHII
+        IIJICIHII
     """
     button MuseumGuis.background
 
+    button 'C' icon {
+        item CLAY_BALL
+        nbt.skyblock = 'earth'
+        text """§bКосмос
+
+        §7Вы когда нибудь хотели
+        §7побывать в космосе?
+        §7Отправтесь и откройте новые
+        §7просторы!
+        """
+    } leftClick {
+        closeInventory()
+        player.location.yaw = 90
+        player.location.pitch = -10
+        player.teleport Cosmos.ROCKET
+    }
+
     button 'L' icon {
         item NETHER_STAR
-        text """§6Рынок
+        text """§bРынок
         
-        Торги драгоценными камнями,
-        ювелир, огранка, доход.
-        
-        Торги начнуться §b15 февраля 
+        §7Торги драгоценными камнями,
+        §7ювелир, огранка, доход.
+        §7
+        §7Торги начнуться §b15 февраля 
         §bв 19:00 по МСК
         """
     } leftClick {
@@ -48,7 +66,7 @@ Guis.register 'excavation', { player ->
     button 'U' icon {
         item CLAY_BALL
         nbt.other = 'arrow_up'
-        text """§bСегодня доступна"""
+        text """§l§aСегодня доступна"""
     }
 
     def counter = 0
@@ -78,8 +96,8 @@ Guis.register 'excavation', { player ->
                 text """
                 §e$excavation.title §6${moneyFormatter.format(excavation.price)}
 
-                Опыт археолога: ${LevelSystem.acceptGiveExp(user, excavation.requiredLevel) ? "§aесть" : "§cнет"}
-                Кол-во ударов: §e$excavation.hitCount
+                §7Опыт археолога: ${LevelSystem.acceptGiveExp(user, excavation.requiredLevel) ? "§aесть" : "§cнет"}
+                §7Кол-во ударов: §e$excavation.hitCount
 
                 §7Можно найти:
                 """
@@ -106,7 +124,7 @@ Guis.register 'excavation', { player ->
 
     button 'J' icon {
         item SADDLE
-        text '§6Магазин'
+        text '§bМагазин'
     } leftClick {
         performCommand("shop mono")
     }

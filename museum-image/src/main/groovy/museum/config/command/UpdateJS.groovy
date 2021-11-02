@@ -3,7 +3,7 @@ package museum.config.command
 
 import museum.App
 import museum.client_conversation.AnimationUtil
-import museum.client_conversation.ScriptTransfer
+import museum.client_conversation.ModTransfer
 import museum.util.SendScriptUtil
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import ru.cristalix.core.display.messages.JavaScriptMessage
@@ -25,11 +25,11 @@ registerCommand 'pm' handle {
         if (args.length < 3)
             return "&cИспользование: &e/pm [item/str/int] [Канал] [Сообщение]"
         if (args[0] == 'item') {
-            new ScriptTransfer().item(CraftItemStack.asNMSCopy(player.inventory.itemInHand)).send(args[1], App.app.getUser(player))
+            new ModTransfer().item(CraftItemStack.asNMSCopy(player.inventory.itemInHand)).send(args[1], App.app.getUser(player))
         } else if (args[0] == 'str') {
             AnimationUtil.generateMessage args.drop(2).join(' '), args[1], App.app.getUser(player)
         } else if (args[0] == 'int') {
-            new ScriptTransfer().integer(args.drop(2).join(' ') as Integer).send(args[1], App.app.getUser(player))
+            new ModTransfer().integer(args.drop(2).join(' ') as Integer).send(args[1], App.app.getUser(player))
         }
         return "&bСообщение было отправлено. &f㜗"
     }

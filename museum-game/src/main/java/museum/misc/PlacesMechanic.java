@@ -6,12 +6,10 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
 import museum.client_conversation.AnimationUtil;
-import museum.client_conversation.ScriptTransfer;
+import museum.fragment.Fragment;
+import museum.fragment.Meteorite;
 import museum.player.User;
 import museum.util.MessageUtil;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.math.V3;
 import ru.cristalix.core.util.UtilV3;
 
@@ -37,6 +35,7 @@ public class PlacesMechanic {
 							Double.parseDouble(ss[0]),
 							Integer.parseInt(ss[1]),
 							0,
+							null,
 							tag.substring(2 + ss[0].length() + ss[1].length())
 					);
 				}).collect(Collectors.toMap(Place::getTitle, place -> place)));
@@ -49,7 +48,20 @@ public class PlacesMechanic {
 							2,
 							Integer.parseInt(ss[1]) / 10,
 							Integer.parseInt(ss[3]),
+							null,
 							place.getCoords()
+					);
+				}).collect(Collectors.toMap(Place::getTitle, place -> place)));
+		places.putAll(app.getMap().getLabels("met").stream()
+				.map(place -> {
+					val meteorite = new Meteorite("meteor_" + place.getTag());
+					return new Place(
+							UtilV3.fromVector(place.toVector()),
+							3,
+							10,
+							10000,
+							meteorite,
+							meteorite.getMeteorite().getTitle()
 					);
 				}).collect(Collectors.toMap(Place::getTitle, place -> place)));
 	}
@@ -67,14 +79,17 @@ public class PlacesMechanic {
 				user.getClaimedPlaces().add(place.getTitle());
 				if (place.claimedMoney > 0) {
 					user.setMoney(user.getMoney() + place.claimedMoney);
-					AnimationUtil.cursorHighlight(user, "§e+§l" + place.claimedMoney);
+					AnimationUtil.cursorHighlight(user, "§6+§l" + place.claimedMoney + "$");
+				}
+				if (place.fragment instanceof Meteorite) {
+					place.fragment.give(user);
 				}
 				user.giveExperience(place.getClaimedExp());
 				MessageUtil.find("claim-place")
 						.set("title", place.getTitle())
 						.set("exp", place.getClaimedExp())
 						.send(user);
-				user.getPlayer().sendTitle("Найдено место!", "§b+" + place.getClaimedExp() + "EXP");
+				user.sendTitle("§7Найдено место!\n\n\n§b+" + place.getClaimedExp() + "EXP");
 				break;
 			}
 		}
@@ -86,6 +101,7 @@ public class PlacesMechanic {
 		private final double radius;
 		private final int claimedExp;
 		private final int claimedMoney;
+		private final Fragment fragment;
 		private final String title;
 	}
 }

@@ -9,7 +9,7 @@ registerCommand 'thx' handle {
     App.app.clientSocket.writeAndAwaitResponse(new ThanksExecutePackage(player.uniqueId)).thenAccept {
         def user = App.app.getUser player
         player.sendMessage(Formatting.fine("Вы поблагодарили за $it.boostersCount бустер(ов)! + Монеты 㳞"))
-        user.money = user.money + user.income * it.boostersCount
+        user.giveMoney user.income * it.boostersCount
     }
     return
 }

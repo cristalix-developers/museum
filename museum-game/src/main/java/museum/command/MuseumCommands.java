@@ -3,6 +3,7 @@ package museum.command;
 import clepto.bukkit.B;
 import lombok.val;
 import museum.App;
+import museum.client_conversation.AnimationUtil;
 import museum.data.PickaxeType;
 import museum.data.SubjectInfo;
 import museum.excavation.Excavation;
@@ -24,6 +25,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import ru.cristalix.core.formatting.Formatting;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
@@ -33,7 +35,6 @@ import java.util.UUID;
 public class MuseumCommands {
 
 	private final App app;
-	public static final String NO_MONEY_MESSAGE = MessageUtil.get("nomoney");
 	private static final String PLAYER_OFFLINE_MESSAGE = MessageUtil.get("playeroffline");
 
 	public MuseumCommands(App app) {
@@ -53,6 +54,7 @@ public class MuseumCommands {
 		B.regCommand(this::cmdVisit, "visit", "museum");
 		B.regCommand(this::cmdBuy, "buy");
 		B.regCommand(this::cmdPrefix, "prefix");
+		B.regCommand(this::cmdRate, "rate");
 	}
 
 	private String cmdPrefix(Player player, String[] args) {
@@ -95,9 +97,12 @@ public class MuseumCommands {
 		if (count > 32)
 			return MessageUtil.get("no-free-space");
 
-		if (user.getMoney() < prototype.getPrice())
-			return NO_MONEY_MESSAGE;
+		if (user.getMoney() < prototype.getPrice()) {
+			AnimationUtil.buyFailure(user);
+			return null;
+		}
 
+		AnimationUtil.glowing(user, 0, 0, 255);
 		user.setMoney(user.getMoney() - prototype.getPrice());
 		// new Subject() писать нельзя - так как нужный класс (CollectorSubject...) не уточнет, и все ломается
 		user.getSubjects().add(prototype.provide(new SubjectInfo(
@@ -155,8 +160,10 @@ public class MuseumCommands {
 
 		if (state instanceof Museum) {
 			val museum = (Museum) state;
-			if (visitor.getMoney() <= museum.getIncome() / 2)
-				return NO_MONEY_MESSAGE;
+			if (visitor.getMoney() <= museum.getIncome() / 2) {
+				AnimationUtil.buyFailure(visitor);
+				return null;
+			}
 
 			visitor.setMoney(visitor.getMoney() - museum.getIncome() / 2);
 			owner.setMoney(owner.getMoney() + museum.getIncome() / 2);
@@ -307,8 +314,11 @@ public class MuseumCommands {
 		if (user.getGrabbedArmorstand() != null)
 			return MessageUtil.get("stall-first");
 
-		if (prototype.getPrice() > user.getMoney())
-			return NO_MONEY_MESSAGE;
+		if (prototype.getPrice() > user.getMoney()) {
+			AnimationUtil.buyFailure(user);
+			return null;
+		}
+
 		user.setMoney(user.getMoney() - prototype.getPrice());
 
 		player.closeInventory();
@@ -323,12 +333,29 @@ public class MuseumCommands {
 			return null;
 		player.closeInventory();
 
-		if (user.getMoney() < pickaxe.getPrice())
-			return NO_MONEY_MESSAGE;
+		if (user.getMoney() < pickaxe.getPrice()) {
+			AnimationUtil.buyFailure(user);
+			return null;
+		}
 
 		user.setMoney(user.getMoney() - pickaxe.getPrice());
 		user.setPickaxeType(pickaxe);
 		player.performCommand("gui pickaxe");
 		return MessageUtil.get("newpickaxe");
+	}
+
+	private String cmdRate(Player player, String[] args) {
+		if (args.length == 0)
+			return Formatting.error("/rate <цена>");
+		else if (!app.getPlayerDataManager().isRateBegun())
+			return Formatting.error("Торги ещё не начались.");
+		else if (Integer.parseInt(args[0]) < 10)
+			return Formatting.error("Сумма должна быть больше 10$.");
+		else if (Integer.parseInt(args[0]) > app.getUser(player).getMoney())
+			return Formatting.error("У вас нет таких денег.");
+		else
+			App.getApp().getPlayerDataManager().getMembers().put(player.getUniqueId(), Integer.parseInt(args[0]));
+
+		return Formatting.fine("Ваша ставка была принята.");
 	}
 }

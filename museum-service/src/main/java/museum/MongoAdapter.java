@@ -107,6 +107,7 @@ public class MongoAdapter<T extends Unique> {
 		val operations = Arrays.asList(
 				Aggregates.project(Projections.fields(
 						Projections.include(fieldName),
+						Projections.include("prefix"),
 						Projections.include("uuid"),
 						Projections.exclude("_id")
 				)), Aggregates.sort(Sorts.descending(fieldName)),

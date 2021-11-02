@@ -23,10 +23,9 @@ Guis.register 'colorChange', { player ->
     title 'Изменение цвета'
 
     layout '''
+        -CCCCCCC-
+        -CCCCCCC-
         ----X----
-        -CCCCCCC-
-        -CCCCCCC-
-        ---------
     '''
 
     button MuseumGuis.background

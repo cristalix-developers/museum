@@ -20,7 +20,7 @@ public class DefaultElements {
 		MuseumPrototype proto = Managers.museum.getPrototype("main");
 		MuseumInfo startMuseum = new MuseumInfo(
 				proto.getAddress(),
-				"Музей археологии",
+				"Музей палеантологии",
 				new Date(),
 				0
 		);
@@ -52,7 +52,10 @@ public class DefaultElements {
 				-1L,
 				0,
 				new ArrayList<>(),
-				false
+				false,
+				true,
+				0,
+				0
 		);
 
 		for (SubjectInfo subject : proto.getDefaultSubjects())

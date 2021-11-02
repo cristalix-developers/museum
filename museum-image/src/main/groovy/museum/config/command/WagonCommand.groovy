@@ -4,6 +4,7 @@ package museum.config.command
 import clepto.bukkit.LocalArmorStand
 import clepto.bukkit.routine.Do
 import museum.App
+import museum.client_conversation.AnimationUtil
 import museum.command.MuseumCommands
 import museum.museum.Museum
 import museum.museum.map.SubjectType
@@ -35,7 +36,7 @@ Do.every 1 ticks {
 on PlayerQuitEvent, EventPriority.LOWEST, {
     if (playerOrderedWagon.contains(player.uniqueId)) {
         def user = App.app.getUser player
-        user.money = user.money + WagonConfig.COST
+        user.giveMoney(WagonConfig.COST)
         playerOrderedWagon.remove player.uniqueId
     }
 }
@@ -66,11 +67,13 @@ registerCommand 'wagon' handle {
 
 registerCommand 'wagonbuy' handle {
     def user = App.app.getUser sender as CraftPlayer
-    if (user.getMoney() < WagonConfig.COST)
-        return MuseumCommands.NO_MONEY_MESSAGE
+    if (user.getMoney() < WagonConfig.COST) {
+        AnimationUtil.buyFailure(user)
+        return null
+    }
     if (playerOrderedWagon.contains user.uuid)
         return MessageUtil.get('wagon-copy')
-    user.money = user.money - WagonConfig.COST
+    user.giveMoney(-WagonConfig.COST)
     playerOrderedWagon.add user.uuid
     return MessageUtil.get('wagon-buy')
 }

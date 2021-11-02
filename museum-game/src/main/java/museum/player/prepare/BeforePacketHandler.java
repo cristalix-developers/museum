@@ -13,7 +13,6 @@ import museum.PacketMetrics;
 import museum.boosters.BoosterType;
 import museum.client_conversation.AnimationUtil;
 import museum.excavation.Excavation;
-import museum.excavation.ExcavationPrototype;
 import museum.fragment.Relic;
 import museum.international.International;
 import museum.museum.Museum;
@@ -48,7 +47,7 @@ public class BeforePacketHandler implements Prepare {
 
 	public static final Prepare INSTANCE = new BeforePacketHandler();
 
-	public static final ItemStack EMERGENCY_STOP = Items.render("go-back-item").asBukkitMirror();
+	public static final ItemStack EMERGENCY_STOP = Items.render("goback").asBukkitMirror();
 	public static final V4 OFFSET = new V4(0, 0.03, 0, 4);
 	public static final BlockPosition DUMMY = new BlockPosition(0, 0, 0);
 	private static final ItemStack[] INTERACT_ITEMS = Items.items.keySet().stream()
@@ -65,9 +64,9 @@ public class BeforePacketHandler implements Prepare {
 		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {
-				if (packetObj instanceof PacketPlayInUseItem)
+				if (packetObj instanceof PacketPlayInUseItem) {
 					MinecraftServer.SERVER.postToMainThread(() -> onItemUse(user, (PacketPlayInUseItem) packetObj));
-				else if (packetObj instanceof PacketPlayInBlockDig) {
+				} else if (packetObj instanceof PacketPlayInBlockDig) {
 					val dig = (PacketPlayInBlockDig) packetObj;
 					// Если пакет о дропе предмета - дропнуть пакет
 					if (dig.c == DROP_ITEM || dig.c == DROP_ALL_ITEMS)
@@ -128,6 +127,8 @@ public class BeforePacketHandler implements Prepare {
 	private void acceptMuseumClick(User user, PacketPlayInUseItem packet) {
 		Museum museum = (Museum) user.getState();
 		BlockPosition pos = packet.a;
+		if (packet.c == EnumHand.OFF_HAND)
+			return;
 		for (Subject subject : museum.getSubjects()) {
 			for (Location loc : subject.getAllocation().getAllocatedBlocks()) {
 				if (loc.getBlockX() == pos.getX() && loc.getBlockY() == pos.getY() && loc.getBlockZ() == pos.getZ()) {
@@ -179,19 +180,19 @@ public class BeforePacketHandler implements Prepare {
 
 	private boolean tryReturnPlayer(User user, boolean force) {
 		Excavation excavation = ((Excavation) user.getState());
-		excavation.setHitsLeft(excavation.getHitsLeft() - 1);
+		excavation.updateHits(user, excavation.getHitsLeft() -1);
 
 		if (excavation.getHitsLeft() < 0)
 			return true;
 
 		if (excavation.getHitsLeft() < 1 || force) {
-			user.sendTitle("§6Раскопки завершены!", "до возвращения 5 сек.");
+			user.sendTitle("§7Раскопки завершены!\n\n\n§bВозвращаем вас...");
 			MessageUtil.find("excavationend").send(user);
 			B.postpone(100, () -> {
 				user.setState(user.getLastMuseum());
 				user.setExcavationCount(user.getExcavationCount() + 1);
 			});
-			excavation.setHitsLeft(-1);
+			excavation.updateHits(user, -1);
 			return false;
 		}
 		return excavation.getHitsLeft() < 0;
@@ -202,10 +203,10 @@ public class BeforePacketHandler implements Prepare {
 		if (user.getPlayer() == null || !(user.getState() instanceof Excavation))
 			return;
 		// С некоторым шансом может выпасть интерактивая вещь
-		if (Vector.random.nextFloat() > .95)
+		if (Vector.random.nextFloat() > .9)
 			user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 		// С некоторым шансом может выпасть реликвия
-		if (Vector.random.nextFloat() > .9987) {
+		if (Vector.random.nextFloat() > .998) {
 			val relics = ((Excavation) user.getState()).getPrototype().getRelics();
 			if (relics != null && relics.length > 0) {
 				val randomRelic = new Relic(
@@ -244,9 +245,8 @@ public class BeforePacketHandler implements Prepare {
 	}
 
 	private void generateFragments(User user, BlockPosition position) {
-		ExcavationPrototype prototype = ((Excavation) user.getState()).getPrototype();
-		SkeletonPrototype proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
-
+		val prototype = ((Excavation) user.getState()).getPrototype();
+		val proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
 		val playerChance = user.getInfo().getExtraChance() > 1 ? user.getInfo().getExtraChance() : 1;
 		val bingo = proto.getRarity().getRareScale() * playerChance / 300D;
 		val randomValue = Math.random();

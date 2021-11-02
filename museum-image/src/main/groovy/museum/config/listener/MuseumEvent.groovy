@@ -2,17 +2,27 @@
 package museum.config.listener
 
 
-import museum.App
+import museum.cosmos.Cosmos
 import museum.misc.PlacesMechanic
 import museum.museum.Museum
 import museum.museum.map.SubjectType
 import museum.museum.subject.product.FoodProduct
+import museum.player.User
 import museum.util.MessageUtil
+import net.minecraft.server.v1_12_R1.EnumMoveType
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
+import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.spigotmc.event.entity.EntityDismountEvent
 import ru.cristalix.core.math.V3
+
+import static museum.App.getApp
 
 on InventoryOpenEvent, {
     def type = inventory.type
@@ -30,7 +40,7 @@ on PlayerMoveEvent, {
     if (from.blockX == to.blockX && from.blockY == to.blockY && from.blockZ == to.blockZ)
         return
 
-    def user = App.app.getUser(player.uniqueId)
+    def user = app.getUser(player.uniqueId)
 
     if (!user || !user.state)
         return
@@ -69,4 +79,28 @@ on PlayerMoveEvent, {
             user.performCommand 'wagon'
         }
     }
+    LocationVerification.execute(user, player)
 }
+
+on EntityDismountEvent, {
+    if (entity == null || !(entity instanceof CraftPlayer))
+        return
+    if (dismounted.hasMetadata('trash')) {
+        (app.getUser(entity as Player).state as Cosmos).stand = null
+        dismounted.remove()
+    }
+}
+
+class LocationVerification {
+    static void execute(User user, Entity entity) {
+        if (user.state instanceof Cosmos && (Math.abs(entity.location.y - Cosmos.SPACE.y) > 100 ||
+                Cosmos.SPACE.distanceSquared(entity.location) > 250 * 250)) {
+            def vector = Cosmos.SPACE.toVector().subtract(entity.location.toVector())
+            if (entity instanceof ArmorStand)
+                (entity as CraftArmorStand).handle.move(EnumMoveType.SELF, vector.x, vector.y, vector.z)
+            else
+                entity.velocity = vector
+        }
+    }
+}
+

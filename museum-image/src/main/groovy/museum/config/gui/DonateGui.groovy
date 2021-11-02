@@ -9,11 +9,8 @@ import org.bukkit.entity.Player
 import static org.bukkit.Material.*
 
 static String modifyPrice(UUID user, int price) {
-    //def coupon = ICouponsService.get()
-
-    //if (!coupon && !coupon.haveActiveCoupon(user))
-        //return "§b" + price + " кристаликов"
-    return "§7§m$price§b ${(int) (price * 0.8)} кристаликов"
+    //return "§b" + price + " кристаликов"
+    return "§7§m$price§b ${(int) (price * 0.7)} кристаликов"
 }
 
 Guis.register 'donate', { player ->
@@ -21,9 +18,18 @@ Guis.register 'donate', { player ->
     title '§bВнутриигровые покупки'
     layout """
         ----X----
-        -X--J--Y-
+        -XK-J-KY-
         --P-M-Z--
+        ----L----
     """
+
+    button 'L' icon {
+        item CLAY_BALL
+        text '§cНазад'
+        nbt.other = "cancel"
+    } leftClick {
+        performCommand("gui main")
+    }
 
     button 'P' icon {
         item CLAY_BALL
@@ -59,6 +65,40 @@ Guis.register 'donate', { player ->
         """
     } leftClick {
         performCommand("proccessdonate PREFIX_CASE")
+    }
+
+    button 'K' icon {
+        item CLAY_BALL
+        nbt.other = 'win2'
+        text """
+        §aГлобальный бустер бура §6§lx2
+
+        ${modifyPrice(user.uniqueId, DonateType.BOER.price)}
+       
+        Общий бустер на §b1 час§f,
+        в §lДВА§f раза быстрее работает
+        бур!
+        """
+    } leftClick {
+        performCommand("proccessdonate BOER")
+    }
+
+    button 'K' icon {
+        item CLAY_BALL
+        nbt.other = 'win2'
+        nbt.HideFlags = 63
+        enchant(Enchantment.LUCK, 1)
+        text """
+        §aГлобальный бустер бура §6§lx5
+
+        ${modifyPrice(user.uniqueId, DonateType.BIG_BOER.price)}
+       
+        Общий бустер на §b1 час§f,
+        в §lПЯТЬ§f раза быстрее работает
+        бур!
+        """
+    } leftClick {
+        performCommand("proccessdonate BIG_BOER")
     }
 
     button 'J' icon {

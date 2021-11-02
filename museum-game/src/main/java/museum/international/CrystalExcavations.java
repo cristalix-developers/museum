@@ -10,13 +10,11 @@ import museum.client_conversation.AnimationUtil;
 import museum.fragment.GemType;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
-import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import ru.cristalix.core.scoreboard.SimpleBoardObjective;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,11 +40,6 @@ public class CrystalExcavations implements International {
 				}
 			}
 		});
-	}
-
-	@Override
-	public void setupScoreboard(User user, SimpleBoardObjective obj) {
-		obj.setDisplayName("Международные раскопки");
 	}
 
 	@Override
@@ -76,7 +69,7 @@ public class CrystalExcavations implements International {
 		inventory.addItem(Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror(), userHook);
 		inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
-		user.getPlayer().sendTitle("Прибытие!", "§bударяйте камни");
+		user.sendTitle("§7Прибытие!\n\n\n§bударяйте камни");
 		user.sendMessage(
 				"⟼  §6§l" + actual.getLocation(),
 				"",
@@ -116,16 +109,8 @@ public class CrystalExcavations implements International {
 				block.setType(Material.AIR);
 				user.getInventory().addItem(ore);
 				AnimationUtil.cursorHighlight(user, "§d§l+1 §fруда");
-				B.postpone(50, () -> {
-					block.setType(Material.STAINED_GLASS);
-					block.setData((byte) 10);
-				});
+				B.postpone(50, () -> block.setTypeAndDataFast(Material.STAINED_GLASS.id, (byte) 3));
 			}
 		}
-	}
-
-	@Override
-	public boolean canBeBroken(BlockPosition pos) {
-		return false;
 	}
 }

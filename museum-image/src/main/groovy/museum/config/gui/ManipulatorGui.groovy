@@ -2,9 +2,10 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.client_conversation.AnimationUtil
 import museum.config.command.WagonConfig
-import museum.fragment.Gem
 import museum.fragment.GemType
+import museum.fragment.Meteorite
 import museum.museum.Museum
 import museum.museum.map.SkeletonSubjectPrototype
 import museum.museum.subject.*
@@ -44,21 +45,21 @@ register 'emptySkeleton', {
 
 register 'tooBigSkeleton', {
     nbt.color = 0xFFAAAAAA
-    text '&7Этот скелет слишком большой для этой витрины'
+    text '&cВитрина слишком маленькая'
 }
 
 register 'alreadyPlacedSkeleton', {
     nbt.color = 0xFFAAAAAA
-    text '&cЭтот скелет уже стоит на другой витрине'
+    text '&eКости на другой витрине'
 }
 
 register 'currentSkeleton', {
     nbt.glow_color = 0xFF55FF55
-    text '&eНажмите, чтобы убрать скелет со стенда'
+    text '&cУбрать скелет со стенда'
 }
 
 register 'availableSkeleton', {
-    text '&aНажмите, чтобы поставить скелет на стенд'
+    text '&aПоставить скелет на стенд'
 }
 
 Guis.register 'manipulator', { player ->
@@ -87,7 +88,13 @@ Guis.register 'manipulator', { player ->
         if (subject.fragment) {
             def type = subject.fragment.address
             button 'O' icon {
-                if (type.contains(":")) {
+                if (type.contains("meteor")) {
+                    def meteor = Meteorite.Meteorites.valueOf(type.split("\\_")[1].toUpperCase())
+                    item subject.fragment.item.type
+                    text meteor.title
+                    text ""
+                    subject.fragment.getItem().getItemMeta().lore.forEach {text it }
+                } else if (type.contains(":")) {
                     item CLAY_BALL
                     nbt.museum = GemType.valueOf(type.split(':')[0]).texture
                 } else {
@@ -101,14 +108,15 @@ Guis.register 'manipulator', { player ->
                 def subjectRelic = subject.fragment
                 subject.setFragment(null)
                 user.getInventory().addItem(subjectRelic.item)
-                user.relics.add(subjectRelic)
+                user.relics.put(subjectRelic.uuid, subjectRelic)
                 subject.updateFragment()
                 ((Museum) user.state).updateIncrease()
                 MessageUtil.find 'relic-tacked' send user
             }
         }
         button 'E' icon {
-            item BARRIER
+            item CLAY_BALL
+            nbt.other = "cancel"
             text '&cУбрать витрину'
         } leftClick {
             def allocation = abstractSubject.allocation
@@ -128,7 +136,7 @@ Guis.register 'manipulator', { player ->
     button 'C' icon {
         item CONCRETE
         data abstractSubject.cachedInfo.color.woolData
-        text "»$abstractSubject.cachedInfo.color.chatColor §lИзменить цвет §f«"
+        text "§bИзменить цвет"
     } leftClick {
         Guis.open(delegate, 'colorChange', abstractSubject.cachedInfo.uuid)
     }
@@ -136,7 +144,7 @@ Guis.register 'manipulator', { player ->
     button 'D' icon {
         item CLAY_BALL
         nbt.other = 'guild_shop'
-        text 'Убрать'
+        text '§cУбрать'
     } leftClick {
         def allocation = abstractSubject.allocation
         if (!allocation) return
@@ -227,12 +235,13 @@ Guis.register 'manipulator', { player ->
 
                     С каждым уровнем витрина 
                     приносит на &b$upgradePercent%▲&f больше дохода
-                    &b${subject.level} &fуровень -> &b&l${subject.level + 1} уровень &a+${subject.level * upgradePercent}% ▲▲▲
+                    &b${subject.level} &fуровень ➠ &b&l${subject.level + 1} уровень &a+${subject.level * upgradePercent}% ▲▲▲
                     """
                 } leftClick {
                     if (user.money >= upgradeCost) {
-                        user.money = user.money - upgradeCost
+                        user.giveMoney(-upgradeCost)
                         subject.level = subject.level + 1
+                        AnimationUtil.glowing(user, 0, 0, 255)
                         user.sendMessage(Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
                         Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
                     } else {

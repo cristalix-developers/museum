@@ -144,7 +144,10 @@ public class MongoServiceTest {
                 -1,
                 0,
                 Collections.emptyList(),
-                false
+                false,
+                true,
+                0,
+                0
         );
     }
 }
