@@ -1,24 +1,20 @@
 package museum.international;
 
-import clepto.bukkit.item.Items;
 import lombok.val;
 import museum.App;
 import museum.fragment.Fragment;
 import museum.fragment.Gem;
-import museum.player.State;
 import museum.player.User;
 import museum.util.LocationUtil;
+import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * @author func 14.02.2021
  * @project museum
  */
-public class Market implements State {
+public class Market implements International {
 	private final Location spawnLocation;
-
-	private final ItemStack BACK_ITEM = Items.render("back").asBukkitMirror();
 
 	public Market(App app) {
 		this.spawnLocation = LocationUtil.resetLabelRotation(app.getMap().requireLabel("market-spawn"), 0);
@@ -60,5 +56,9 @@ public class Market implements State {
 	@Override
 	public boolean nightVision() {
 		return false;
+	}
+
+	@Override
+	public void acceptBlockBreak(User user, PacketPlayInBlockDig packet) {
 	}
 }

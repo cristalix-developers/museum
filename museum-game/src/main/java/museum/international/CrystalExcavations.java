@@ -10,7 +10,6 @@ import museum.client_conversation.AnimationUtil;
 import museum.fragment.GemType;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
-import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -113,10 +112,5 @@ public class CrystalExcavations implements International {
 				B.postpone(50, () -> block.setTypeAndDataFast(Material.STAINED_GLASS.id, (byte) 3));
 			}
 		}
-	}
-
-	@Override
-	public boolean canBeBroken(BlockPosition pos) {
-		return false;
 	}
 }

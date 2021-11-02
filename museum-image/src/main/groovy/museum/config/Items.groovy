@@ -235,7 +235,8 @@ register 'place-menu', {
 }
 
 register 'goback', {
-    item BARRIER
+    item CLAY_BALL
+    nbt.other = "cancel"
     text '§cВернуться'
 }
 
@@ -271,7 +272,8 @@ register 'subject-destroy', {
 }
 
 register 'go-back-item', {
-    item BARRIER
+    item CLAY_BALL
+    nbt.other = "cancel"
     text """
         §cПрекратить раскопки §7[§eПКМ-БЛОК§7]
 

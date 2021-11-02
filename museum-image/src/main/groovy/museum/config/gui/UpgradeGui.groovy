@@ -42,7 +42,8 @@ register 'tools', { player ->
         performCommand 'gui rod'
     }
     button 'X' icon {
-        item BARRIER
+        item CLAY_BALL
+        nbt.other = "cancel"
         text '§cНазад'
     } leftClick {
         performCommand("gui main")
@@ -90,7 +91,8 @@ register 'rod', { player ->
     }
 
     button 'X' icon {
-        item BARRIER
+        item CLAY_BALL
+        nbt.other = "cancel"
         text '§cНазад'
     } leftClick {
         performCommand("gui tools")

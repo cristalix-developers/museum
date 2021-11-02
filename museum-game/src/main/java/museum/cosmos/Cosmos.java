@@ -14,7 +14,6 @@ import museum.international.International;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.util.StandHelper;
-import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -62,10 +61,10 @@ public class Cosmos implements International {
         player.getInventory().setArmorContents(armor);
         PreparePlayerBrain.givePickaxe(user);
         player.getInventory().addItem(JETPACK);
-        for (Fragment value : user.getRelics().values()) {
+        player.getInventory().setItem(8, BACK_ITEM);
+        for (Fragment value : user.getRelics().values())
             if (value instanceof Boer)
                 player.getInventory().addItem(value.getItem());
-        }
 
         AnimationUtil.topTitle(user, "Вы покинули землю 㕉");
         AnimationUtil.throwIconMessage(user, EARTH.asBukkitMirror(), "", "");
@@ -75,9 +74,9 @@ public class Cosmos implements International {
 
     @Override
     public void leaveState(User user) {
-        AnimationUtil.leaveCosmos(user);
         AnimationUtil.topTitle(user, "Вы вернулись на землю 㕉");
         AnimationUtil.throwIconMessage(user, EARTH.asBukkitMirror(), "", "");
+        AnimationUtil.leaveCosmos(user);
     }
 
     @Override
@@ -102,11 +101,6 @@ public class Cosmos implements International {
                 B.postpone(20 * 10, () -> block.setTypeAndDataFast(Material.STAINED_GLASS.id, (byte) 3));
             }
         }
-    }
-
-    @Override
-    public boolean canBeBroken(BlockPosition pos) {
-        return false;
     }
 
     public void useJetpack(Player player) {

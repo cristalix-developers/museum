@@ -32,7 +32,7 @@ public class Auction implements Ticked {
     private static final int DURATION = 120;
     private int secondsLeft = DURATION;
 
-    private static final int WAIT_SECOND = 1800;
+    private static final int WAIT_SECOND = 900;
     private int beforeStart = WAIT_SECOND;
 
     private SkeletonPrototype proto;

@@ -48,7 +48,7 @@ register 'polishing', { player ->
     }
 
     def gem = null
-    for (Fragment currentRelic : user.relics) {
+    for (Fragment currentRelic : user.relics.values()) {
         if (currentRelic.uuid.toString() == tag.getString('relic-uuid')) {
             gem = currentRelic as Gem
         }

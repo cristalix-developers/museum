@@ -115,7 +115,8 @@ Guis.register 'manipulator', { player ->
             }
         }
         button 'E' icon {
-            item BARRIER
+            item CLAY_BALL
+            nbt.other = "cancel"
             text '&cУбрать витрину'
         } leftClick {
             def allocation = abstractSubject.allocation

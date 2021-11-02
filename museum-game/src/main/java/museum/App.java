@@ -19,7 +19,7 @@ import museum.international.International;
 import museum.international.Market;
 import museum.misc.MuseumChatService;
 import museum.misc.PlacesMechanic;
-import museum.museum.Shop;
+import museum.international.Shop;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
 import museum.player.PlayerDataManager;

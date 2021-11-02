@@ -14,6 +14,10 @@ import static org.bukkit.Material.CLAY_BALL
 register 'boer-upgrade', { player ->
     def user = app.getUser((Player) player)
 
+    title 'Настройка бура'
+
+    layout '-D-B-R--C'
+
     Boer boer
     try {
         boer = context as Boer
@@ -23,10 +27,6 @@ register 'boer-upgrade', { player ->
 
     if (boer == null)
         return null
-
-    title 'Настройка бура'
-
-    layout '-D-B-R--C'
 
     button 'D' icon {
         item CLAY_BALL

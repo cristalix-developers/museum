@@ -17,6 +17,10 @@ public class BoerManager implements Ticked {
     public void tick(int... args) {
         if (args[0] % 20 == 0) {
             val booster = App.getApp().getPlayerDataManager().calcGlobalMultiplier(BoosterType.BOER);
+            val bigBooster = App.getApp().getPlayerDataManager().calcGlobalMultiplier(BoosterType.BIG_BOER);
+
+            val finalBooster = 1 + (booster > 1 ? booster - 1 : 0) + (bigBooster > 1 ? bigBooster - 1 : 0);
+
             boers.forEach(boer -> {
                 val player = Bukkit.getPlayer(boer.getOwner());
                 if ((player == null || !player.isOnline() || boer.getSecondsLeft() <= 0) && !boer.getStands().isEmpty()) {
@@ -28,7 +32,7 @@ public class BoerManager implements Ticked {
                     boer.setSecondsLeft(boer.getSecondsLeft() - 1);
                     val seconds = boer.getSecondsLeft();
                     boer.getHead().setCustomName("§l" + seconds / 60 / 60 % 24 + ":" + seconds / 60 % 60 + ":" + seconds % 60);
-                    if ((int) (args[0] / 20.0D) % (boer.getType().getSpeed() / booster) == 0) {
+                    if ((int) (args[0] / 20.0D) % (boer.getType().getSpeed() / finalBooster) == 0) {
                         user.giveExperience(1.0D, boer.isNotification());
                         user.giveCosmoCrystal(1, boer.isNotification());
                     }

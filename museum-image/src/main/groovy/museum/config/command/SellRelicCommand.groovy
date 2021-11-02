@@ -29,7 +29,7 @@ registerCommand 'sell' handle {
                 return
             def price = (currentRelic.address.contains("meteor") ? 20 : 1) * currentRelic.price
             player.itemInHand = null
-            user.relics.remove currentRelic
+            user.relics.remove currentRelic.uuid
             user.giveMoney(price)
             return MessageUtil.find('relic-sell')
                     .set('price', MessageUtil.toMoneyFormat(price))

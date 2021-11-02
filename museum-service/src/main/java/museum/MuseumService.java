@@ -45,17 +45,12 @@ public class MuseumService {
 	public static String PASSWORD;
 	@SuppressWarnings("rawtypes")
 	public static final Map<Class<? extends MuseumPackage>, PackageHandler> HANDLER_MAP = new HashMap<>();
-	private static final Map<DonateType, BiPredicate<UserTransactionPackage, UserInfo>> TRANSACTION_PRE_AUTHORIZE_MAP = new HashMap<DonateType, BiPredicate<UserTransactionPackage, UserInfo>>() {{
-		put(DonateType.GLOBAL_MONEY_BOOSTER, globalBoosterPreAuthorize(BoosterType.COINS));
-		put(DonateType.GLOBAL_EXP_BOOSTER, globalBoosterPreAuthorize(BoosterType.EXP));
-		put(DonateType.GLOBAL_VILLAGER_BOOSTER, globalBoosterPreAuthorize(BoosterType.VILLAGER));
-		put(DonateType.LOCAL_EXP_BOOSTER, localBoosterPreAuthorize(BoosterType.EXP));
-		put(DonateType.LOCAL_MONEY_BOOSTER, localBoosterPreAuthorize(BoosterType.COINS));
-	}};
 	private static final Map<DonateType, BiConsumer<UserTransactionPackage, UserInfo>> TRANSACTION_POST_AUTHORIZE_MAP
 			= new HashMap<DonateType, BiConsumer<UserTransactionPackage, UserInfo>>() {{
 		put(DonateType.GLOBAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, true));
 		put(DonateType.GLOBAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, true));
+		put(DonateType.BOER, boosterPostAuthorize(BoosterType.BOER, true));
+		put(DonateType.BIG_BOER, boosterPostAuthorize(BoosterType.BIG_BOER, true));
 		put(DonateType.GLOBAL_VILLAGER_BOOSTER, boosterPostAuthorize(BoosterType.VILLAGER, true));
 		put(DonateType.LOCAL_MONEY_BOOSTER, boosterPostAuthorize(BoosterType.COINS, false));
 		put(DonateType.LOCAL_EXP_BOOSTER, boosterPostAuthorize(BoosterType.EXP, false));
@@ -198,7 +193,7 @@ public class MuseumService {
 			answer(channel, museumPackage);
 		}));
 		registerHandler(RequestGlobalBoostersPackage.class, ((channel, serverName, museumPackage) -> {
-			museumPackage.setBoosters(new ArrayList<>(boosterManager.getGlobalBoosters().values()));
+			museumPackage.setBoosters(new ArrayList<>(boosterManager.getGlobalBoosters()));
 			answer(channel, museumPackage);
 		}));
 		registerHandler(TopPackage.class, ((channel, serverName, museumPackage) ->
@@ -248,7 +243,6 @@ public class MuseumService {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
 			}
 			if (args[0].equals("delete")) {
 				if (args.length < 2) System.out.println("Usage: delete [uuid]");
@@ -366,10 +360,6 @@ public class MuseumService {
 
 	public static void sendMessage(Set<UUID> users, BaseComponent[] message) {
 		ServerSocketHandler.broadcast(new TargetMessagePackage(users, ComponentSerializer.toString(message)));
-	}
-
-	private static BiPredicate<UserTransactionPackage, UserInfo> globalBoosterPreAuthorize(BoosterType type) {
-		return (pckg, info) -> !boosterManager.getGlobalBoosters().containsKey(type);
 	}
 
 	private static BiPredicate<UserTransactionPackage, UserInfo> localBoosterPreAuthorize(BoosterType type) {

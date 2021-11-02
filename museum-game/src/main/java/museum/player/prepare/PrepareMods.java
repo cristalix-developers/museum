@@ -49,7 +49,7 @@ public class PrepareMods implements Prepare {
 					new PacketDataSerializer(byteBuf.retainedSlice())
 			));
 		}
-		B.postpone(1, () -> {
+		B.postpone(30, () -> {
 			AnimationUtil.updateLevelBar(user);
 			AnimationUtil.updateMoney(user);
 			AnimationUtil.updateOnlineAll();

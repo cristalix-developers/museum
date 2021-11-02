@@ -62,7 +62,7 @@ public class Boer implements Fragment {
 
         val meta = this.item.getItemMeta();
 
-        meta.setDisplayName("§bКосмический бур");
+        meta.setDisplayName("§bКосмический бур §l§f" + (1 + type.ordinal()) + "§fУР.");
         meta.setLore(Arrays.asList(
                 "",
                 "§7Данный бур работает",
@@ -85,6 +85,10 @@ public class Boer implements Fragment {
     }
 
     public void view(User user, Location location) {
+        if (isStanding()) {
+            user.sendMessage(Formatting.error("У вас уже стоит этот бур!"));
+            return;
+        }
         val player = user.getPlayer();
         val item = player.inventory.getItemInHand();
         val nmsItem = CraftItemStack.asNMSCopy(item);
