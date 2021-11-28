@@ -168,9 +168,11 @@ on PlayerInteractEvent, {
                 stand.remove()
                 cosmos.stand = null
                 def teleport = playerLocation.clone()
+                def iterations = 0
                 do {
+                    iterations++
                     teleport.add(0,1,0)
-                } while (teleport.block.type != AIR)
+                } while (teleport.block.type != AIR && iterations < 30)
                 player.teleport(teleport.add(0,2,0))
                 return
             }

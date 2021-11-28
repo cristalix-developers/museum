@@ -9,8 +9,8 @@ import org.bukkit.entity.Player
 import static org.bukkit.Material.*
 
 static String modifyPrice(UUID user, int price) {
-    //return "§b" + price + " кристаликов"
-    return "§7§m$price§b ${(int) (price * 0.7)} кристаликов"
+    return "§b" + price + " кристаликов"
+    //return "§7§m$price§b ${(int) (price * 0.7)} кристаликов"
 }
 
 Guis.register 'donate', { player ->

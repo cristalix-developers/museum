@@ -183,7 +183,7 @@ on PlayerToggleSneakEvent, {
         def entities = player.location.getNearbyEntities(4, 4, 4)
         for (Entity entity : entities) {
             if (!(entity instanceof ArmorStand))
-                return null
+                continue
             if (entity.equipment.itemInHand.type == CLAY_BALL) {
                 if (player.itemInHand.type == CLAY_BALL) {
                     def craftItem = CraftItemStack.asNMSCopy(player.itemInHand)
@@ -191,7 +191,6 @@ on PlayerToggleSneakEvent, {
                         player.itemInHand.setAmount(player.itemInHand.amount - 1)
                         if (Math.random() < 0.1) {
                             user.giveExperience(1)
-                            AnimationUtil.cursorHighlight(user, '§b§l+1 §fопыт')
                         }
                         tryGive(user, 0.0023)
                         break

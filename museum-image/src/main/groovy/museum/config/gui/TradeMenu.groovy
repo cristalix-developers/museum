@@ -67,7 +67,7 @@ Guis.register 'trade', { player ->
 
     def privileges = owner.getInfo().privileges || victim.getInfo().privileges
 
-    title owner.name + " x " + victim.name + (privileges ? " Комиссии §aнет" : " Комиссия §c20%")
+    title owner.name + " x " + victim.name + (privileges ? " Комиссии §aнет" : " Комиссия §c50%")
 
     layout "----X----"
 
@@ -110,14 +110,14 @@ Guis.register 'trade', { player ->
             def users = app.getUsers()
 
             if (!users.contains(owner) || !users.contains(victim))
-                return Formatting.error("Ваш опонент вышел из игры.")
+                return Formatting.error("Ваш оппонент вышел из игры.")
 
             // Паранойя
             def clone = gem
-            owner.relics.remove(gem)
+            owner.relics.remove(gem.uuid)
             clone.give(victim)
             victim.giveMoney(-cost)
-            owner.giveMoney(cost * (privileges ? 1F : 0.8F))
+            owner.giveMoney(cost * (privileges ? 1F : 0.5F))
 
             def message = Formatting.fine("Сделка совершена.")
 
