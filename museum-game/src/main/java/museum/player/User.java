@@ -23,6 +23,7 @@ import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
+import museum.player.pickaxe.PickaxeUpgrade;
 import museum.prototype.Managers;
 import museum.prototype.Registry;
 import museum.util.LevelSystem;
@@ -45,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 public class User implements PlayerWrapper {
@@ -58,6 +60,7 @@ public class User implements PlayerWrapper {
     private final Registry<SubjectInfo, SubjectPrototype, Subject> subjects
             = new Registry<>(this, Managers.subject, SubjectInfo::generateNew, SubjectPrototype::provide);
     private final Map<UUID, Fragment> relics;
+    private Map<PickaxeUpgrade, Integer> pickaxeImprovements;
     private CraftPlayer player;
     private PlayerConnection connection;
     private Location lastLocation;
@@ -88,6 +91,9 @@ public class User implements PlayerWrapper {
             maps.put(fragment.getUuid(), fragment);
         }
         this.relics = maps;
+
+        pickaxeImprovements = getImprovements().stream()
+                .collect(Collectors.toMap(string -> PickaxeUpgrade.valueOf(string.split(":")[0]), string -> Integer.parseInt(string.split(":")[1])));
 
         if (info.getLastPosition() != null)
             this.lastLocation = UtilV3.toLocation(info.getLastPosition(), App.getApp().getWorld());
@@ -215,6 +221,9 @@ public class User implements PlayerWrapper {
             list.add(prototypeAddress);
         }
         info.setClaimedRelics(list);
+        info.setImprovements(pickaxeImprovements.entrySet().stream()
+                .map(upgrade -> upgrade.getKey().name() + ":" + upgrade.getValue())
+                .collect(Collectors.toList()));
         return info;
     }
 
@@ -264,8 +273,8 @@ public class User implements PlayerWrapper {
 
     public void giveCosmoCrystal(int crystal, boolean notification) {
         setCosmoCrystal(getCosmoCrystal() + crystal);
-		if (notification)
-        	AnimationUtil.cursorHighlight(this, "§b§l" + (crystal > 0 ? "+" : "-") + crystal + " §f㦶");
+        if (notification)
+            AnimationUtil.cursorHighlight(this, "§b§l" + (crystal > 0 ? "+" : "-") + crystal + " §f㦶");
         AnimationUtil.updateCosmoCrystal(this);
     }
 }

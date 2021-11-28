@@ -16,6 +16,7 @@ import museum.fragment.GemType;
 import museum.fragment.Meteorite;
 import museum.museum.Museum;
 import museum.player.User;
+import museum.player.pickaxe.PickaxeUpgrade;
 import museum.util.LocationUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -139,7 +140,7 @@ public class PreparePlayerBrain implements Prepare {
     public static void givePickaxe(User user) {
         val pickaxe = Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror();
         val meta = pickaxe.getItemMeta();
-        meta.addEnchant(Enchantment.DIG_SPEED, meta.getEnchantLevel(Enchantment.DIG_SPEED) + user.getInfo().getExtraSpeed(), true);
+        meta.addEnchant(Enchantment.DIG_SPEED, (int) (meta.getEnchantLevel(Enchantment.DIG_SPEED) + PickaxeUpgrade.EFFICIENCY.convert(user)), true);
         pickaxe.setItemMeta(meta);
         user.getInventory().addItem(pickaxe);
     }

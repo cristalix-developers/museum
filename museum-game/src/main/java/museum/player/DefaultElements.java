@@ -8,10 +8,7 @@ import museum.data.UserInfo;
 import museum.museum.map.MuseumPrototype;
 import museum.prototype.Managers;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 @UtilityClass
 public class DefaultElements {
@@ -46,16 +43,21 @@ public class DefaultElements {
 				false,
 				0,
 				1,
-				0,
-				0,
-				1,
 				-1L,
 				0,
 				new ArrayList<>(),
 				false,
 				true,
 				0,
-				0
+				0,
+				new ArrayList<>(Arrays.asList(
+						"ADDITIONAL_EXP:0",
+						"EXTRA_HITS:0",
+						"EFFICIENCY:0",
+						"BONE_DETECTION:0",
+						"DETECTION_OF_RELIQUES:0",
+						"DUPLICATE:0"
+				))
 		);
 
 		for (SubjectInfo subject : proto.getDefaultSubjects())

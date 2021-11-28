@@ -3,6 +3,8 @@ package museum.config.gui
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
 import museum.App
+import museum.client_conversation.AnimationUtil
+import museum.player.pickaxe.PickaxeUpgrade
 import museum.util.MessageUtil
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -79,11 +81,25 @@ Guis.register 'pickaxe', { player ->
 
     title 'Улучшение кирки'
     layout """
-        ----F----
-        ----O----
-        ----X----
+        ---RFL---
+        ---------
+        -E-E-E-E-
+        --E-E-X--
     """
     button MuseumGuis.background
+
+    button 'R' icon {
+        item CLAY_BALL
+        text '§bВаша кирка справа'
+        nbt.other = 'arrow_right'
+    }
+
+    button 'L' icon {
+        item CLAY_BALL
+        text '§bВаша кирка слева'
+        nbt.other = 'arrow_left'
+    }
+
     button 'F' icon {
         if (user.pickaxeType.next == null) {
             item CLAY_BALL
@@ -96,6 +112,41 @@ Guis.register 'pickaxe', { player ->
         }
     } leftClick {
         performCommand 'pickaxe'
+    }
+
+    PickaxeUpgrade.values().each { upgrade ->
+        def currentLevel = user.pickaxeImprovements[upgrade]
+        def has = currentLevel == upgrade.maxLevel
+        button 'E' icon {
+            item upgrade.icon
+            nbt.HideFlags = 63
+            if (has) {
+                text '§8У вас максимальный уровень этого улучшения'
+                nbt.other = 'tochka'
+            } else {
+                text """
+                $upgrade.title
+                §7Цена ${MessageUtil.toMoneyFormat(upgrade.cost)}
+
+                &b${currentLevel + 1} &f➠ &b${currentLevel + 2} уровень &fиз $upgrade.maxLevel &a▲▲▲
+
+                §7$upgrade.lore
+
+                §aНажмите чтобы улучшить
+                """
+                def pair = upgrade.nbt.split(':')
+                nbt(pair[0], pair[1])
+            }
+        } leftClick {
+            if (user.money >= upgrade.cost && !has) {
+                user.giveMoney(-upgrade.cost)
+                user.pickaxeImprovements.replace(upgrade, currentLevel + 1)
+                AnimationUtil.glowing(user, 0, 0, 255)
+                Guis.open(player, 'pickaxe', player)
+            } else {
+                AnimationUtil.buyFailure user
+            }
+        }
     }
 
     button 'O' icon {

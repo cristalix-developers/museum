@@ -6,6 +6,7 @@ import lombok.val;
 import museum.client_conversation.ModTransfer;
 import museum.player.State;
 import museum.player.User;
+import museum.player.pickaxe.PickaxeUpgrade;
 import museum.player.prepare.BeforePacketHandler;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.util.ChunkWriter;
@@ -48,7 +49,7 @@ public class Excavation implements State {
                 .set("title", prototype.getTitle())
                 .send(user);
 
-        hitsLeft += user.getInfo().getExtraBreak();
+        hitsLeft += PickaxeUpgrade.EXTRA_HITS.convert(user);
     }
 
     @Override
