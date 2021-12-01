@@ -23,84 +23,85 @@ import static museum.museum.subject.skeleton.Piece.orientedOffset;
 @Getter
 public class SkeletonSubject extends Subject {
 
-	private Skeleton skeleton;
-	private V4 skeletonLocation;
-	@Setter
-	private int level = 1;
+    private Skeleton skeleton;
+    private V4 skeletonLocation;
+    @Setter
+    private int level = 1;
 
-	public SkeletonSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
-		super(prototype, info, owner);
+    public SkeletonSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
+        super(prototype, info, owner);
 
-		V3 origin = prototype.getRelativeOrigin();
-		this.skeletonLocation = V4.fromLocation(prototype.getBox().getMin()).add(origin.getX(), origin.getY(), origin.getZ());
+        V3 origin = prototype.getRelativeOrigin();
+        this.skeletonLocation = V4.fromLocation(prototype.getBox().getMin()).add(origin.getX(), origin.getY(), origin.getZ());
 
-		if (info.metadata == null) return;
-		String[] ss = info.metadata.split(":");
-		try {
-			this.level = Integer.parseInt(ss[2]);
-			this.level = this.level >= 50 ? 50 : this.level;
-		} catch (Exception exception) {
-			this.level = 1;
-		}
-		String skeletonAddress = ss[0];
-		SkeletonPrototype skeletonProto = Managers.skeleton.getPrototype(skeletonAddress);
-		if (skeletonProto == null) return;
-		this.skeleton = owner.getSkeletons().supply(skeletonProto);
-		this.skeletonLocation.rot = Float.parseFloat(ss[1]);
-	}
+        if (info.metadata == null) return;
+        String[] ss = info.metadata.split(":");
+        try {
+            this.level = Integer.parseInt(ss[2]);
+            this.level = this.level >= 50 ? 50 : this.level;
+        } catch (Exception exception) {
+            this.level = 1;
+        }
+        String skeletonAddress = ss[0];
+        SkeletonPrototype skeletonProto = Managers.skeleton.getPrototype(skeletonAddress);
+        if (skeletonProto == null) return;
+        this.skeleton = owner.getSkeletons().supply(skeletonProto);
+        this.skeletonLocation.rot = Float.parseFloat(ss[1]);
+    }
 
-	@Override
-	public void setAllocation(Allocation allocation) {
-		super.setAllocation(allocation);
-		if (allocation == null) skeletonLocation = null;
-		else {
-			float rot = this.skeletonLocation == null ? 0 : this.skeletonLocation.rot;
-			Box box = prototype.getBox();
-			V3 o = prototype.getRelativeOrigin();
-			this.skeletonLocation = V4.fromLocation(box.transpose(
-					V3.of(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ()),
-					Orientation.values()[cachedInfo.getRotation().ordinal()],
-					V3.of(o.getX(), 0, o.getZ()),
-					(int) o.getX(),
-					(int) o.getY(),
-					(int) o.getZ()
-			));
-			this.skeletonLocation.setRot(rot);
+    @Override
+    public void setAllocation(Allocation allocation) {
+        super.setAllocation(allocation);
+        if (allocation == null) skeletonLocation = null;
+        else {
+            float rot = this.skeletonLocation == null ? 0 : this.skeletonLocation.rot;
+            Box box = prototype.getBox();
+            V3 o = prototype.getRelativeOrigin();
+            this.skeletonLocation = V4.fromLocation(box.transpose(
+                    V3.of(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ()),
+                    Orientation.values()[cachedInfo.getRotation().ordinal()],
+                    V3.of(o.getX(), 0, o.getZ()),
+                    (int) o.getX(),
+                    (int) o.getY(),
+                    (int) o.getZ()
+            ));
+            this.skeletonLocation.setRot(rot);
 
-			this.updateSkeleton(false);
-		}
-	}
+            this.updateSkeleton(false);
+        }
+    }
 
-	public void updateSkeleton(boolean sendUpdates) {
-		Allocation allocation = this.getAllocation();
-		this.updateInfo();
-		if (allocation == null || this.skeleton == null) return;
-		V4 absoluteLocation = V4.fromLocation(allocation.getOrigin()).add(this.skeletonLocation);
-		skeleton.getUnlockedFragments().forEach(fragment ->
-				allocation.allocatePiece(fragment, orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment)), sendUpdates));
-		if (owner.getState() == null)
-			return;
-		((Museum) owner.getState()).updateIncrease();
-	}
+    public void updateSkeleton(boolean sendUpdates) {
+        Allocation allocation = this.getAllocation();
+        this.updateInfo();
+        if (allocation == null || this.skeleton == null) return;
+        V4 absoluteLocation = V4.fromLocation(allocation.getOrigin()).add(this.skeletonLocation);
+        skeleton.getUnlockedFragments().forEach(fragment ->
+                allocation.allocatePiece(fragment, orientedOffset(absoluteLocation, skeleton.getPrototype().getOffset(fragment)), sendUpdates));
+        if (owner.getState() == null)
+            return;
+        if (owner.getState() instanceof Museum)
+            ((Museum) owner.getState()).updateIncrease();
+    }
 
-	@Override
-	public void updateInfo() {
-		super.updateInfo();
-		if (skeleton == null) cachedInfo.metadata = "::" + level;
-		else
-			cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot) + ":" + level;
-	}
+    @Override
+    public void updateInfo() {
+        super.updateInfo();
+        if (skeleton == null) cachedInfo.metadata = "::" + level;
+        else
+            cachedInfo.metadata = skeleton.getPrototype().getAddress() + ":" + (skeletonLocation == null ? 0 : skeletonLocation.rot) + ":" + level;
+    }
 
-	@Override
-	public double getIncome() {
-		if (skeleton == null)
-			return 0;
-		return skeleton.getUnlockedFragments().size() * (double) skeleton.getPrototype().getPrice() / 600 * (level / 5F + 1);
-	}
+    @Override
+    public double getIncome() {
+        if (skeleton == null)
+            return 0;
+        return skeleton.getUnlockedFragments().size() * (double) skeleton.getPrototype().getPrice() / 600 * (level / 5F + 1);
+    }
 
-	public void setSkeleton(Skeleton skeleton) {
-		this.skeleton = skeleton;
-		updateInfo();
-	}
+    public void setSkeleton(Skeleton skeleton) {
+        this.skeleton = skeleton;
+        updateInfo();
+    }
 
 }
