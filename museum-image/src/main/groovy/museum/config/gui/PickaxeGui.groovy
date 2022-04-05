@@ -116,15 +116,17 @@ Guis.register 'pickaxe', { player ->
 
     PickaxeUpgrade.values().each { upgrade ->
         def currentLevel = user.pickaxeImprovements[upgrade]
-        def has = currentLevel == upgrade.maxLevel
+        def has = currentLevel > upgrade.maxLevel - 2
         button 'E' icon {
-            item upgrade.icon
             nbt.HideFlags = 63
             if (has) {
                 text '§8У вас максимальный уровень этого улучшения'
+                item CLAY_BALL
                 nbt.other = 'tochka'
             } else {
+                item upgrade.icon
                 text """
+
                 $upgrade.title
                 §7Цена ${MessageUtil.toMoneyFormat(upgrade.cost)}
 

@@ -69,6 +69,7 @@ public class User implements PlayerWrapper {
     private EntityArmorStand riding;
     private long enterTime;
     private long lastTopUpdateTime = -1;
+    boolean debug = false;
 
     public User(UserInfo info) {
         this.enterTime = System.currentTimeMillis();
@@ -123,7 +124,7 @@ public class User implements PlayerWrapper {
     public void showToAllState() {
         val app = App.getApp();
         for (User current : app.getUsers()) {
-            if (current.getConnection() == null)
+            if (current.getConnection() == null || current.player.hasMetadata("vanish"))
                 continue;
             if (current.getState() == this.state || current.getState().getClass().equals(this.state.getClass())) {
                 current.getPlayer().showPlayer(app, player);

@@ -37,3 +37,25 @@ registerCommand 'sell' handle {
         }
     }
 }
+
+registerCommand 'sellall' handle {
+    for (item in player.inventory) {
+        if (item && item.itemMeta) {
+            def user = App.app.getUser player
+            def nmsItem = CraftItemStack.asNMSCopy item
+            if (nmsItem.tag && nmsItem.tag.hasKeyOfType("relic", 8)) {
+                def currentRelic = user.relics.get(UUID.fromString(nmsItem.tag.getString('relic-uuid')))
+                if (currentRelic == null)
+                    break
+                def price = (currentRelic.address.contains("meteor") ? 20 : 1) * currentRelic.price
+                player.inventory.remove(item)
+                user.relics.remove currentRelic.uuid
+                user.giveMoney(price)
+                player.sendMessage(MessageUtil.find('relic-sell')
+                        .set('price', MessageUtil.toMoneyFormat(price))
+                        .getText()
+                )
+            }
+        }
+    }
+}

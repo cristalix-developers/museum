@@ -33,6 +33,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import ru.cristalix.core.formatting.Formatting;
 
 import java.util.List;
 
@@ -202,6 +203,12 @@ public class BeforePacketHandler implements Prepare {
     private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
         if (user.getPlayer() == null || !(user.getState() instanceof Excavation))
             return;
+        // Пишем игрокам с режимом отладки в том же чанке
+        App.app.getUsers().stream()
+                .filter(User::isDebug)
+                .filter(it -> it.getPlayer().getChunk().equals(user.getPlayer().getChunk()))
+                .forEach(it -> it.sendMessage(Formatting.fine(user.getPlayer().getName() + " сломал блок на " + packet.a.toString())));
+
         // С некоторым шансом может выпасть интерактивая вещь
         if (Vector.random.nextFloat() > .9)
             user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));

@@ -180,7 +180,6 @@ Guis.register 'prefixes', {
         button 'X' icon {
             item IRON_INGOT
             text "[ ${prefix.prefix} §f] ${prefix.title} ${have ? '§aВЫБРАТЬ' : ''}"
-            text have ? "" : "§7Можно купить за §e10'000'000\$"
             text """    
                                 
             §7Редкость: §aобычный
@@ -217,6 +216,11 @@ registerCommand 'proccessdonate' handle {
         donate = DonateType.valueOf(args[0]) as DonateType
     } catch (Exception ignored) {
         return ignored.message
+    }
+
+    if (App.app.playerDataManager.getBoosterCount() > 5 && donate.name().contains("BOOSTER")) {
+        player.sendMessage(Formatting.error("Запущено слишком много бустеров! Подождите пожалуйста..."))
+        return
     }
 
     App.app.processDonate(user.getUuid(), donate).thenAccept(transaction -> {

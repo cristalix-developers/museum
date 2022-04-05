@@ -71,7 +71,7 @@ public class MongoAdapter<T extends Unique> {
 
 	public CompletableFuture<Map<UUID, T>> findAll() {
 		CompletableFuture<Map<UUID, T>> future = new CompletableFuture<>();
-		FindIterable<Document> documentFindIterable = data.find(session);
+		FindIterable<Document> documentFindIterable = data.find();
 		Map<UUID, T> map = new ConcurrentHashMap<>();
 		documentFindIterable.forEach(document -> {
 			T object = readDocument(document);
@@ -134,7 +134,7 @@ public class MongoAdapter<T extends Unique> {
 	}
 
 	public void clear(UUID uuid) {
-		data.deleteOne(Filters.eq("uuid", uuid.toString()), this::handle);
+		data.deleteOne(session, Filters.eq("uuid", uuid.toString()), this::handle);
 	}
 
 }

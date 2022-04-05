@@ -238,4 +238,8 @@ public class PlayerDataManager implements Listener {
                 user.setMoney(user.getMoney() + pckg.getSum());
         }
     }
+
+    public int getBoosterCount() {
+        return globalBoosters.size();
+    }
 }

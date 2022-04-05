@@ -63,7 +63,7 @@ public final class App extends JavaPlugin {
     @Getter
     public static App app;
 
-    private PlayerDataManager playerDataManager;
+    public PlayerDataManager playerDataManager;
     private TopManager topManager;
     private ClientSocket clientSocket;
     private WorldMeta map;

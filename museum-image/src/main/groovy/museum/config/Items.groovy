@@ -302,7 +302,7 @@ register 'subject-info', {
 register 'earth', {
     item CLAY_BALL
     text 'Земля'
-    nbt.skyblock = 'earth'
+    nbt.simulators = 'save_crystal'
 }
 
 register 'quantum-helmet', {
