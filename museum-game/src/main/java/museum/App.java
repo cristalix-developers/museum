@@ -8,6 +8,8 @@ import clepto.cristalix.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
 import lombok.val;
+import me.func.mod.Anime;
+import me.func.mod.Kit;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
@@ -111,6 +113,8 @@ public final class App extends JavaPlugin {
         core.unregisterService(IChatService.class);
         core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
         core.registerService(IScoreboardService.class, new ScoreboardService());
+
+        Anime.include(Kit.NPC);
 
         // Регистрация обработчика пакета конфига
         clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);

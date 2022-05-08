@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import me.func.mod.Npc;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
@@ -163,7 +164,10 @@ public class PlayerDataManager implements Listener {
         player.setGameMode(GameMode.ADVENTURE);
         player.setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, false);
 
-        B.postpone(5, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
+        B.postpone(5, () -> {
+            prepares.forEach(prepare -> prepare.execute(user, app));
+            Npc.INSTANCE.getNpcs().values().forEach(npc -> npc.spawn(player));
+        });
 
         event.setJoinMessage(null);
     }
