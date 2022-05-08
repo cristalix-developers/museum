@@ -1,5 +1,28 @@
 apply plugin: 'java'
 
+allprojects {
+    repositories {
+        maven {
+            url 'https://repo.c7x.ru/repository/maven-public/'
+        }
+        maven {
+            url 'https://repo.c7x.ru/repository/maven-snapshots/'
+            credentials {
+                username = project.properties["IMPLARIO_REPO_USER"] as String
+                password = project.properties["IMPLARIO_REPO_PASSWORD"] as String
+            }
+        }
+        maven {
+            url 'https://repo.c7x.ru/repository/maven-releases/'
+            credentials {
+                username = project.properties["IMPLARIO_REPO_USER"] as String
+                password = project.properties["IMPLARIO_REPO_PASSWORD"] as String
+            }
+        }
+        mavenCentral()
+    }
+}
+
 subprojects {
     apply plugin: 'java'
 
