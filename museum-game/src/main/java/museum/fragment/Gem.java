@@ -2,6 +2,8 @@ package museum.fragment;
 
 import lombok.Getter;
 import lombok.val;
+import me.func.mod.data.LootDrop;
+import me.func.protocol.DropRare;
 import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Material;
@@ -17,7 +19,7 @@ import java.util.UUID;
  * @project museum
  */
 @Getter
-public class Gem implements Fragment {
+public class Gem extends LootDrop implements Fragment {
 
 	private final GemType type;
 	private final float rarity;
@@ -27,6 +29,8 @@ public class Gem implements Fragment {
 	private ItemStack item;
 
 	public Gem(String data) {
+		super(new ItemStack(Material.CLAY_BALL), "", DropRare.RARE);
+
 		String[] strings = data.split("\\:");
 		this.type = GemType.valueOf(strings[0]);
 		this.rarity = Float.parseFloat(strings[1]);
@@ -52,6 +56,9 @@ public class Gem implements Fragment {
 		meta.setLore(generateLore());
 
 		this.item.setItemMeta(meta);
+
+		super.setItemStack(this.item);
+		super.setTitle("§f" + type.getTitle() + " §f" + Math.round(rarity * 100) + "%");
 	}
 
 	@Override

@@ -3,9 +3,9 @@ package museum.config.gui
 
 import clepto.bukkit.menu.Guis
 import implario.ListUtils
+import me.func.mod.conversation.ModTransfer
 import museum.App
 import museum.client_conversation.AnimationUtil
-import museum.client_conversation.ModTransfer
 import museum.donate.DonateType
 import museum.fragment.Gem
 import museum.fragment.GemType
@@ -33,7 +33,7 @@ static void giveDrop(User owner) {
         .item(CraftItemStack.asNMSCopy(meteor.item))
         .string(ChatColor.stripColor(meteor.item.getItemMeta().displayName))
         .string(getRare(meteor.item.getItemMeta().displayName))
-        .send("lootbox", owner)
+        .send("lootbox", owner.player)
 }
 
 static String getRare(String string) {

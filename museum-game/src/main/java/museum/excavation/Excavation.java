@@ -3,7 +3,7 @@ package museum.excavation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.val;
-import museum.client_conversation.ModTransfer;
+import me.func.mod.conversation.ModTransfer;
 import museum.player.State;
 import museum.player.User;
 import museum.player.pickaxe.PickaxeUpgrade;
@@ -81,6 +81,6 @@ public class Excavation implements State {
         hitsLeft = setHit;
         new ModTransfer()
                 .integer(hitsLeft)
-                .send("museum:hitcount", user);
+                .send("museum:hitcount", user.handle());
     }
 }

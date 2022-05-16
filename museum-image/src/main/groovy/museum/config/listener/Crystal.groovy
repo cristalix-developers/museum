@@ -3,8 +3,8 @@ package museum.config.listener
 
 import clepto.bukkit.B
 import clepto.bukkit.item.Items
+import me.func.mod.Anime
 import museum.App
-import museum.client_conversation.AnimationUtil
 import museum.fragment.Gem
 import museum.fragment.GemType
 import museum.international.International
@@ -97,7 +97,7 @@ on EntityDamageByEntityEvent, {
         def user = App.app.getUser(damager as Player)
         if (user.state instanceof International && entity.helmet.type == STONE) {
             user.inventory.addItem(item)
-            AnimationUtil.cursorHighlight(user, "§d§l+1 §fруда");
+            Anime.cursorMessage(damager as Player, "§d§l+1 §fруда");
         }
     }
 }
@@ -146,7 +146,7 @@ on PlayerInteractEvent, {
 
                     def type = entity.equipment.helmet.type
                     if (type == REDSTONE_BLOCK || type == EMERALD_BLOCK || type == LAPIS_BLOCK) {
-                        AnimationUtil.cursorHighlight(user, '§c§lБУМ!')
+                        Anime.cursorMessage(user.handle(), '§c§lБУМ!')
 
                         entity.helmet = null
                         entity.glowing = false
@@ -162,7 +162,7 @@ on PlayerInteractEvent, {
 
                         if (Math.random() < 0.4) {
                             user.giveExperience(1)
-                            AnimationUtil.cursorHighlight(user, '§b§l+1 §fопыт')
+                            Anime.cursorMessage(user.handle(), '§b§l+1 §fопыт')
                         }
                         tryGive(user, 0.005)
                         break
@@ -211,11 +211,11 @@ static void tryGive(User user, float chance) {
     if (Math.random() < chance) {
         def gem = new Gem(Config.ACTUAL.name() + ":" + Math.random() / 1.38 + ":500000")
         gem.give(user)
-        AnimationUtil.throwIconMessage(user, gem.item, gem.type.title, "Находка!")
+        Anime.itemTitle(user.handle(), gem.item, gem.type.title, "Находка!")
         App.app.users.forEach { User currentUser ->
             if (currentUser == user)
                 return null
-            AnimationUtil.cursorHighlight(currentUser, "§b" + user.name + " §f" + Config.ACTUAL.title + " §b" + Math.round(gem.rarity * 100) + "%")
+            Anime.cursorMessage(currentUser.handle(), "§b" + user.name + " §f" + Config.ACTUAL.title + " §b" + Math.round(gem.rarity * 100) + "%")
         }
     }
 }

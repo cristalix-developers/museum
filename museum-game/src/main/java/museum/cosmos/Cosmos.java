@@ -6,6 +6,7 @@ import clepto.bukkit.world.Label;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import me.func.mod.Anime;
 import museum.App;
 import museum.client_conversation.AnimationUtil;
 import museum.cosmos.boer.Boer;
@@ -61,16 +62,13 @@ public class Cosmos implements International {
             if (value instanceof Boer)
                 player.getInventory().addItem(value.getItem());
 
-        AnimationUtil.topTitle(user, "Вы покинули землю 㕉");
-        AnimationUtil.throwIconMessage(user, EARTH.asBukkitMirror(), "", "");
-
+        Anime.topMessage(user.handle(), "Вы покинули землю 㕉");
         player.teleport(SPACE);
     }
 
     @Override
     public void leaveState(User user) {
-        AnimationUtil.topTitle(user, "Вы вернулись на землю 㕉");
-        AnimationUtil.throwIconMessage(user, EARTH.asBukkitMirror(), "", "");
+        Anime.topMessage(user.handle(), "Вы вернулись на землю 㕉");
         AnimationUtil.leaveCosmos(user);
     }
 

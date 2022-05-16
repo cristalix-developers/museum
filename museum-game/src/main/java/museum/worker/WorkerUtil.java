@@ -7,14 +7,12 @@ import me.func.protocol.npc.NpcBehaviour;
 import me.func.protocol.npc.NpcData;
 import museum.App;
 import museum.cosmos.Cosmos;
-import museum.player.User;
 import museum.util.StandHelper;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
 /**
  * @author func 17.07.2020
@@ -25,13 +23,7 @@ public class WorkerUtil {
 
     private final Location cosmos = new Location(App.getApp().getWorld(), 278, 90, -147);
 
-    private final static String defaultSkin = App.getApp().getConfig().getString("npc.default.skin");
-    public static final Supplier<NpcWorker> STALL_WORKER_TEMPLATE = () -> new NpcWorker(
-            new Location(App.getApp().getWorld(), 0, 0, 0),
-            defaultSkin,
-            "Работница лавки",
-            User::getExperience
-    );
+    public final static String defaultSkin = App.getApp().getConfig().getString("npc.default.skin");
 
     public void init(App app) {
         // Формат таблички: .p simplenpc <Имя жителя> </команда>

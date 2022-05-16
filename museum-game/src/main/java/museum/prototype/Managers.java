@@ -14,7 +14,6 @@ import museum.museum.map.*;
 import museum.museum.subject.skeleton.Rarity;
 import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.util.LocationUtil;
-import museum.worker.WorkerUtil;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -62,14 +61,8 @@ public class Managers {
 			else if (type == SubjectType.FOUNTAIN)
 				builder = FountainPrototype.builder().source(box.requireLabel("source"));
 
-			else if (type == SubjectType.STALL) {
-				val npc = WorkerUtil.STALL_WORKER_TEMPLATE.get();
-				val npcSpawn = box.requireLabel("npc").toCenterLocation();
-				npc.setLocation(npcSpawn);
-				builder = StallPrototype.builder()
-						.spawn(npcSpawn)
-						.worker(() -> npc);
-			}
+			else if (type == SubjectType.STALL)
+				builder = StallPrototype.builder().spawn(box.requireLabel("npc").toCenterLocation());
 
 			else builder = SubjectPrototype.builder();
 

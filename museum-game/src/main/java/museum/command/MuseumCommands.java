@@ -2,6 +2,8 @@ package museum.command;
 
 import clepto.bukkit.B;
 import lombok.val;
+import me.func.mod.Glow;
+import me.func.protocol.GlowColor;
 import museum.App;
 import museum.client_conversation.AnimationUtil;
 import museum.data.PickaxeType;
@@ -102,7 +104,7 @@ public class MuseumCommands {
 			return null;
 		}
 
-		AnimationUtil.glowing(user, 0, 0, 255);
+		Glow.animate(user.handle(), 0.3, GlowColor.GREEN);
 		user.setMoney(user.getMoney() - prototype.getPrice());
 		// new Subject() писать нельзя - так как нужный класс (CollectorSubject...) не уточнет, и все ломается
 		user.getSubjects().add(prototype.provide(new SubjectInfo(

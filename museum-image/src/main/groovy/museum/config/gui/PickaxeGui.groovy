@@ -2,6 +2,8 @@ package museum.config.gui
 
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
+import me.func.mod.Glow
+import me.func.protocol.GlowColor
 import museum.App
 import museum.client_conversation.AnimationUtil
 import museum.player.pickaxe.PickaxeUpgrade
@@ -143,7 +145,7 @@ Guis.register 'pickaxe', { player ->
             if (user.money >= upgrade.cost && !has) {
                 user.giveMoney(-upgrade.cost)
                 user.pickaxeImprovements.replace(upgrade, currentLevel + 1)
-                AnimationUtil.glowing(user, 0, 0, 255)
+                Glow.animate(user.handle(), 3.0, GlowColor.GREEN)
                 Guis.open(player, 'pickaxe', player)
             } else {
                 AnimationUtil.buyFailure user

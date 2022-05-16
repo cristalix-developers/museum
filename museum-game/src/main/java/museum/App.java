@@ -112,7 +112,7 @@ public final class App extends JavaPlugin {
         core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
         core.registerService(IScoreboardService.class, new ScoreboardService());
 
-        Anime.include(Kit.NPC);
+        Anime.include(Kit.NPC, Kit.STANDARD, Kit.LOOTBOX, Kit.EXPERIMENTAL, Kit.DIALOG);
 
         // Регистрация обработчика пакета конфига
         clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);

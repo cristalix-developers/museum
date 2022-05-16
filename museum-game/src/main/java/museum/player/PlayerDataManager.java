@@ -5,7 +5,8 @@ import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import me.func.mod.Npc;
+import me.func.mod.Anime;
+import me.func.protocol.Indicators;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
@@ -166,7 +167,7 @@ public class PlayerDataManager implements Listener {
 
         B.postpone(5, () -> {
             prepares.forEach(prepare -> prepare.execute(user, app));
-            Npc.INSTANCE.getNpcs().values().forEach(npc -> npc.spawn(player));
+            Anime.hideIndicator(player, Indicators.ARMOR, Indicators.EXP, Indicators.HEALTH, Indicators.HUNGER);
         });
 
         event.setJoinMessage(null);

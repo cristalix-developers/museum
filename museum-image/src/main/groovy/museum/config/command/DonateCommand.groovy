@@ -3,6 +3,7 @@ package museum.config.command
 
 import clepto.bukkit.menu.Guis
 import implario.ListUtils
+import me.func.mod.Anime
 import museum.App
 import museum.client_conversation.AnimationUtil
 import museum.config.gui.LootBox
@@ -126,7 +127,7 @@ Guis.register 'prefixes', {
                 if (prefix.contains(randomPrefix.prefix)) {
                     flag = false
                     user.giveMoney(50000)
-                    AnimationUtil.topTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
+                    Anime.topMessage user.handle(), "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
                     break
                 }
             }
@@ -134,7 +135,7 @@ Guis.register 'prefixes', {
             if (flag) {
                 user.info.prefixes.add(randomPrefix.prefix)
                 user.prefix = randomPrefix.prefix
-                AnimationUtil.topTitle user, "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
+                Anime.topMessage user.handle(), "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
             }
             user.prefixChestOpened = user.prefixChestOpened + 1
             closeInventory()
@@ -246,7 +247,7 @@ registerCommand 'proccessdonate' handle {
                 if (prefix.contains(randomPrefix.prefix)) {
                     flag = false
                     user.giveMoney(50000)
-                    AnimationUtil.topTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
+                    Anime.topMessage user.handle(), "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
                     break
                 }
             }
@@ -254,17 +255,17 @@ registerCommand 'proccessdonate' handle {
             if (flag) {
                 user.info.prefixes.add(randomPrefix.prefix)
                 user.prefix = randomPrefix.prefix
-                AnimationUtil.topTitle user, "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
+                Anime.topMessage user.handle(), "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
             }
             user.prefixChestOpened = user.prefixChestOpened + 1
         } else if (donate == DonateType.PRIVILEGES) {
             user.privileges = true
             user.donates.add(donate as DonateType)
-            AnimationUtil.topTitle user, "Вы избавились от комиссии! Спасибо за поддержку. 㶅"
+            Anime.topMessage user.handle(), "Вы избавились от комиссии! Спасибо за поддержку. 㶅"
         } else if (donate == DonateType.LEGENDARY_PICKAXE) {
             user.pickaxeType = PickaxeType.LEGENDARY
             user.donates.add(donate as DonateType)
-            AnimationUtil.topTitle user, "Вы купили §bлегендарную кирку§f! Спасибо за поддержку. 㶅"
+            Anime.topMessage user.handle(), "Вы купили §bлегендарную кирку§f! Спасибо за поддержку. 㶅"
         } else if (donate == DonateType.STEAM_PUNK_COLLECTOR) {
             def subject = new CollectorSubject(
                     Managers.subject.getPrototype('punk-collector'),
@@ -272,7 +273,7 @@ registerCommand 'proccessdonate' handle {
                     user
             )
             user.getSubjects().add(subject)
-            AnimationUtil.topTitle user, "Вы купили §6сборщик монет§f! Спасибо за поддержку. 㶅"
+            Anime.topMessage user.handle(), "Вы купили §6сборщик монет§f! Спасибо за поддержку. 㶅"
             if (user.state instanceof Museum) {
                 user.getInventory().addItem SubjectLogoUtil.encodeSubjectToItemStack(subject)
             } else {

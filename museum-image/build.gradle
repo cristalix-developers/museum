@@ -6,6 +6,8 @@ dependencies {
     compileOnly 'org.codehaus.groovy:groovy:3.0.5'
     compileOnly 'cristalix:bukkit-core:21.01.30'
     implementation project(':museum-commons')
+    implementation 'me.func:animation-api:cache3-SNAPSHOT'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
     implementation 'clepto:clepto-bukkit:3.4.2'
     implementation 'clepto:clepto-cristalix:3.0.2'
     implementation 'implario:humanize:1.1.3'

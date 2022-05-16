@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import lombok.val;
+import me.func.mod.Anime;
 import museum.App;
-import museum.client_conversation.AnimationUtil;
 import museum.fragment.Fragment;
 import museum.fragment.Meteorite;
 import museum.player.User;
@@ -79,7 +79,7 @@ public class PlacesMechanic {
 				user.getClaimedPlaces().add(place.getTitle());
 				if (place.claimedMoney > 0) {
 					user.setMoney(user.getMoney() + place.claimedMoney);
-					AnimationUtil.cursorHighlight(user, "§6+§l" + place.claimedMoney + "$");
+					Anime.cursorMessage(user.handle(), "§6+§l" + place.claimedMoney + "$");
 				}
 				if (place.fragment instanceof Meteorite) {
 					place.fragment.give(user);

@@ -1,6 +1,7 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.gui
 
+import me.func.mod.Anime
 import museum.App
 import museum.client_conversation.AnimationUtil
 import museum.fragment.Fragment
@@ -76,10 +77,10 @@ register 'polishing', { player ->
             user.giveMoney(-price)
             closeInventory()
             if (Math.random() < chance)
-                AnimationUtil.topTitle(user, '§cКамень был разрушен')
+                Anime.topMessage user.handle(), '§cКамень был разрушен'
             else {
                 new Gem(gem.type.name() + ":" + Math.random() * 1.0 + ":" + gem.price).give user
-                AnimationUtil.topTitle user, '§aКамень был отполирован'
+                Anime.topMessage user.handle(), '§aКамень был отполирован'
             }
         } else
             AnimationUtil.buyFailure user
