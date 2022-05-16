@@ -2,6 +2,9 @@ package museum.worker;
 
 import lombok.experimental.UtilityClass;
 import lombok.val;
+import me.func.mod.Npc;
+import me.func.protocol.npc.NpcBehaviour;
+import me.func.protocol.npc.NpcData;
 import museum.App;
 import museum.cosmos.Cosmos;
 import museum.player.User;
@@ -10,6 +13,7 @@ import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
@@ -30,19 +34,29 @@ public class WorkerUtil {
     );
 
     public void init(App app) {
-        Npcs.init(app);
         // Формат таблички: .p simplenpc <Имя жителя> </команда>
         app.getMap().getLabels("simplenpc").forEach(label -> {
             ConfigurationSection data = app.getConfig().getConfigurationSection("npc." + label.getTag().split("\\s+")[0]);
             val skin = data.getString("skin");
-            Npcs.spawn(Npc.builder()
-                    .location(label.clone().add(.5, 0, .5))
-                    .name(data.getString("title"))
-                    .behaviour(NpcBehaviour.STARE_AT_PLAYER)
-                    .onClick(user -> user.performCommand(data.getString("command")))
-                    .skinUrl(skin)
-                    .skinDigest(skin.substring(skin.length() - 10))
-                    .build());
+            val npc = Npc.npc(new NpcData(
+                    (int) (Math.random() * Integer.MAX_VALUE),
+                    UUID.randomUUID(),
+                    label.x + .5,
+                    label.y,
+                    label.z + .5,
+                    1000,
+                    data.getString("title"),
+                    NpcBehaviour.STARE_AT_PLAYER,
+                    label.pitch,
+                    label.yaw,
+                    skin,
+                    skin.substring(skin.length() - 10),
+                    true,
+                    false,
+                    false,
+                    false
+            ));
+            npc.setClick(event -> event.player.performCommand(data.getString("command")));
         });
 
         new StandHelper(cosmos.clone().add(.5, .4, -.5))
@@ -52,7 +66,7 @@ public class WorkerUtil {
                 .hasGravity(false)
                 .build();
 
-        new StandHelper(cosmos.clone().add(.5, 0,-.5))
+        new StandHelper(cosmos.clone().add(.5, 0, -.5))
                 .customName("§eКЛИК НА МЕНЯ")
                 .isInvisible(true)
                 .isMarker(true)
