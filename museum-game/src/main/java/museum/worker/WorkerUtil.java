@@ -9,9 +9,6 @@ import museum.util.StandHelper;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
-import ru.cristalix.npcs.data.NpcBehaviour;
-import ru.cristalix.npcs.server.Npc;
-import ru.cristalix.npcs.server.Npcs;
 
 import java.util.function.Supplier;
 

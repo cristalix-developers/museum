@@ -17,9 +17,9 @@ import museum.donate.DonateType;
 import museum.international.CrystalExcavations;
 import museum.international.International;
 import museum.international.Market;
+import museum.international.Shop;
 import museum.misc.MuseumChatService;
 import museum.misc.PlacesMechanic;
-import museum.international.Shop;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
 import museum.player.PlayerDataManager;
@@ -40,8 +40,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.codehaus.groovy.runtime.m12n.RuntimeExtensionModules;
-import org.codehaus.groovy.runtime.m12n.SimpleExtensionModule;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.permissions.IPermissionService;
@@ -116,19 +114,6 @@ public final class App extends JavaPlugin {
         clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
 
         requestConfigurations();
-
-        // Определение groovy операций
-        RuntimeExtensionModules.modules.add(new SimpleExtensionModule("museum", "1") {
-            @Override
-            public List<Class> getInstanceMethodsExtensionClasses() {
-                return Collections.singletonList(Extensions.class);
-            }
-
-            @Override
-            public List<Class> getStaticMethodsExtensionClasses() {
-                return new ArrayList<>();
-            }
-        });
 
         // Прогрузка Groovy-скриптов
         try (val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {

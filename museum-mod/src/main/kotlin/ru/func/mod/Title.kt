@@ -2,9 +2,10 @@ package ru.func.mod
 
 import dev.xdark.clientapi.event.network.PluginMessage
 import dev.xdark.feder.NetUtil
+import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.TextElement
-import ru.cristalix.uiengine.element.animate
+import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
 
 class Title {
@@ -26,7 +27,7 @@ class Title {
     init {
         UIEngine.overlayContext.addChild(message)
 
-        UIEngine.registerHandler(PluginMessage::class.java) {
+        registerHandler<PluginMessage> {
             if (channel == "museum:title") {
                 val text = message.children[0] as TextElement
                 text.content = NetUtil.readUtf8(data)
@@ -39,14 +40,14 @@ class Title {
                     scale.x = 2.2
                     scale.y = 2.2
                 }
-                UIEngine.overlayContext.schedule(3.1) {
+                UIEngine.schedule(3.1) {
                     text.animate(3.15) {
                         scale.x = 20.0
                         scale.y = 20.0
                         color.alpha = 0.0
                     }
                 }
-                UIEngine.overlayContext.schedule(3.3) {
+                UIEngine.schedule(3.3) {
                     message.enabled = false
                     text.color.red = 0
                     text.color.green = 0

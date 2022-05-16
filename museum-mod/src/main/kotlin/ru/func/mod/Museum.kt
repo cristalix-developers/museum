@@ -1,6 +1,5 @@
 package ru.func.mod
 
-import KotlinMod
 import com.google.gson.Gson
 import dev.xdark.clientapi.event.input.KeyPress
 import dev.xdark.clientapi.event.lifecycle.GameLoop
@@ -8,15 +7,16 @@ import dev.xdark.clientapi.event.network.PluginMessage
 import dev.xdark.clientapi.event.render.*
 import dev.xdark.clientapi.item.ItemTools
 import dev.xdark.clientapi.opengl.GlStateManager
-import dev.xdark.clientapi.resource.ResourceLocation
 import dev.xdark.feder.NetUtil
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
-import org.lwjgl.opengl.Display
+import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.*
+import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
 import java.util.*
+
+lateinit var mod: Museum
 
 class Museum : KotlinMod() {
 
@@ -36,6 +36,8 @@ class Museum : KotlinMod() {
     override fun onEnable() {
         UIEngine.initialize(this)
 
+        mod = this
+
         RewardManager()
         LevelBar()
         Statistic()
@@ -47,65 +49,21 @@ class Museum : KotlinMod() {
         val minecraft = clientApi.minecraft()
 
         // Отменяю рендер голода
-        UIEngine.registerHandler(HungerRender::class.java) {
+        registerHandler<HungerRender> {
             isCancelled = true
         }
 
-        UIEngine.registerHandler(ArmorRender::class.java) {
+        registerHandler<ArmorRender> {
             isCancelled = true
         }
 
-        UIEngine.registerHandler(HealthRender::class.java) {
+        registerHandler<HealthRender> {
             isCancelled = true
         }
 
-        UIEngine.registerHandler(ExpBarRender::class.java) {
+        registerHandler<ExpBarRender> {
             isCancelled = true
         }
-
-        // Загрузка фотографий
-        val namespace = "museum"
-        val images: MutableList<RemoteTexture> = mutableListOf()
-        images.add(
-            RemoteTexture(
-                ResourceLocation.of(namespace, "2.png"),
-                "http://51.38.128.132/2.png",
-                "3A4D82B6AFC5F289BFFF8384315D6C0478FC1AB5"
-            )
-        )
-        images.add(
-            RemoteTexture(
-                ResourceLocation.of(namespace, "3.png"),
-                "http://51.38.128.132/3.png",
-                "3A4D82B6AFC5F289BFFF8384315D6C0478FC1AB1"
-            )
-        )
-        loadTexture(images)
-
-        val museum = Context3D(V3(314.9, 100.0, -295.7))
-        val cosmo = Context3D(V3(296.05, 104.0, -123.1))
-
-        repeat(2) {
-            cosmo.addChild(rectangle {
-                textureLocation = ResourceLocation.of(namespace, "2.png")
-                size = V3(100.0, 100.0, 100.0)
-                color = WHITE
-                rotation = Rotation(Math.PI, 0.0, 1.0, 0.0)
-                if (it % 2 == 0)
-                    offset.x = -174.0
-            })
-        }
-        repeat(4) {
-            museum.addChild(rectangle {
-                textureLocation = ResourceLocation.of(namespace, "3.png")
-                size = V3(100.0, 100.0, 100.0)
-                color = WHITE
-                offset.z = -it * 150.0
-                rotation = Rotation(Math.PI / 2, 0.0, 1.0, 0.0)
-            })
-        }
-        UIEngine.worldContexts.addAll(listOf(cosmo, museum))
-
 
         // Магазин
         var sell: Array<ToSell>? = null
@@ -211,7 +169,7 @@ class Museum : KotlinMod() {
         }
         UIEngine.overlayContext.addChild(help)
 
-        UIEngine.registerHandler(PluginMessage::class.java) {
+        ru.cristalix.clientapi.registerHandler<PluginMessage> {
             if (channel == "shop")
                 sell = Gson().fromJson(NetUtil.readUtf8(data), Array<ToSell>::class.java)
             else if (channel == "museumcursor") {
@@ -244,7 +202,7 @@ class Museum : KotlinMod() {
                     scale.x = 2.0
                     scale.y = 2.0
                 }
-                UIEngine.overlayContext.schedule(8) {
+                UIEngine.schedule(8) {
                     title.animate(0.25) {
                         scale.x = 0.0
                         scale.y = 0.0
@@ -268,7 +226,7 @@ class Museum : KotlinMod() {
                 localBox.animate(5, Easings.BACK_OUT) {
                     size.y = 60.0
                 }
-                UIEngine.overlayContext.schedule(7) {
+                UIEngine.schedule(7) {
                     localBox.animate(5, Easings.BACK_OUT) {
                         size.y = 0.0
                     }
@@ -278,7 +236,7 @@ class Museum : KotlinMod() {
             }
         }
 
-        UIEngine.registerHandler(GameLoop::class.java) {
+        registerHandler<GameLoop> {
             // Уведомления под курсором
             val time = System.currentTimeMillis()
 
@@ -319,7 +277,7 @@ class Museum : KotlinMod() {
             }
         }
 
-        UIEngine.registerHandler(KeyPress::class.java) {
+        registerHandler<KeyPress> {
             if (key == Keyboard.KEY_RETURN && activeSubject != null) {
                 clientApi.chat().sendChatMessage("/buy ${activeSubject?.address}")
             } else if (key == Keyboard.KEY_N) {

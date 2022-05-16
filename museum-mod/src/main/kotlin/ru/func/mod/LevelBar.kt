@@ -1,10 +1,11 @@
 package ru.func.mod
 
 import dev.xdark.clientapi.event.network.PluginMessage
+import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.RectangleElement
 import ru.cristalix.uiengine.element.TextElement
-import ru.cristalix.uiengine.element.animate
+import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
 
 /**
@@ -39,7 +40,7 @@ class LevelBar {
 
         UIEngine.overlayContext.addChild(online)
 
-        UIEngine.registerHandler(PluginMessage::class.java) {
+        registerHandler<PluginMessage> {
             if (channel == "museum:levelbar") {
                 val level = data.readInt()
                 val experience = data.readInt()

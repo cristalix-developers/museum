@@ -2,10 +2,11 @@ package ru.func.mod
 
 import dev.xdark.clientapi.event.network.PluginMessage
 import dev.xdark.feder.NetUtil
+import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.RectangleElement
 import ru.cristalix.uiengine.element.TextElement
-import ru.cristalix.uiengine.element.animate
+import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
 
 /**
@@ -39,7 +40,7 @@ class TradingTime {
             enabled = false
         }
 
-        UIEngine.registerHandler(PluginMessage::class.java) {
+        registerHandler<PluginMessage> {
             if (channel == "museum:tradingtime") {
                 val text = NetUtil.readUtf8(data)
                 val seconds = data.readInt()
@@ -48,7 +49,7 @@ class TradingTime {
                 (cooldown.children[0] as RectangleElement).animate(seconds - 0.1) {
                     size.x = 0.0
                 }
-                UIEngine.overlayContext.schedule(seconds + 0.1) {
+                UIEngine.schedule(seconds + 0.1) {
                     cooldown.enabled = false
                     (cooldown.children[0] as RectangleElement).size.x = 180.0
                 }

@@ -4,11 +4,10 @@ import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.resource.ResourceLocation
 import org.lwjgl.opengl.GL11
 import ru.cristalix.uiengine.UIEngine
-import ru.cristalix.uiengine.element.animate
+import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.Color
 import ru.cristalix.uiengine.utility.Easings
 import ru.cristalix.uiengine.utility.rectangle
-import java.awt.Color.red
 
 object GlowEffect {
 
@@ -42,7 +41,7 @@ object GlowEffect {
         vignette.animate(duration, Easings.BACK_OUT) {
             vignette.color.alpha = power
         }
-        UIEngine.overlayContext.schedule(duration) {
+        UIEngine.schedule(duration) {
             vignette.animate(duration) {
                 vignette.color.alpha = 0.0
             }

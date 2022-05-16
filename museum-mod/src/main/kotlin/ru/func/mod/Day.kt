@@ -2,7 +2,7 @@ package ru.func.mod
 
 import dev.xdark.clientapi.item.ItemStack
 import ru.cristalix.uiengine.element.RectangleElement
-import ru.cristalix.uiengine.element.animate
+import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
 
 class Day(val day: Int, private val icon: ItemStack, val name: String, private val claimedStatus: String, private val claimed: Boolean) :

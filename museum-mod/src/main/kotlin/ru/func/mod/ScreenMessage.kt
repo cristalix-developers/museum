@@ -4,6 +4,7 @@ import dev.xdark.clientapi.event.network.PluginMessage
 import dev.xdark.clientapi.item.Item
 import dev.xdark.clientapi.item.ItemTools
 import dev.xdark.clientapi.render.model.ItemCameraTransforms
+import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.*
 
@@ -21,7 +22,7 @@ class ScreenMessage {
             enabled = false
         }
 
-        UIEngine.registerHandler(PluginMessage::class.java) {
+        registerHandler<PluginMessage> {
             if (channel == "museum:screenmessage") {
                 item.enabled = true
                 item.addChild(item {

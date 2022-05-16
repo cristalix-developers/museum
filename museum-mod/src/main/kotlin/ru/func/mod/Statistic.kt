@@ -2,6 +2,7 @@ package ru.func.mod
 
 import dev.xdark.clientapi.event.network.PluginMessage
 import dev.xdark.feder.NetUtil
+import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.*
 
@@ -58,7 +59,7 @@ class Statistic {
             )
         }
 
-        UIEngine.registerHandler(PluginMessage::class.java) {
+        registerHandler<PluginMessage> {
             when (channel) {
                 "museum:balance" -> balanceText.content = "Баланс §a${NetUtil.readUtf8(data)}"
                 "museum:online" -> online.content = "Онлайн §b${data.readInt()}"
