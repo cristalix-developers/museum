@@ -303,6 +303,8 @@ public class MuseumCommands {
 		User user = this.app.getUser(player);
 		if (args.length < 1)
 			return "/excavation <место>";
+		if (user.getExperience() < PreparePlayerBrain.EXPERIENCE)
+			return Formatting.error("Сначала нужно завершить туториал!");
 		ExcavationPrototype prototype;
 		try {
 			prototype = Managers.excavation.getPrototype(args[0]);
