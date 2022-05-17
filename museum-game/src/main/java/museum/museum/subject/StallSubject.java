@@ -5,8 +5,8 @@ import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import lombok.val;
 import me.func.mod.Npc;
-import me.func.mod.data.NpcSmart;
 import me.func.protocol.npc.NpcBehaviour;
+import me.func.protocol.npc.NpcData;
 import museum.data.SubjectInfo;
 import museum.museum.map.StallPrototype;
 import museum.museum.map.SubjectPrototype;
@@ -21,6 +21,7 @@ import ru.cristalix.core.util.UtilV3;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static museum.worker.WorkerUtil.defaultSkin;
 
@@ -31,7 +32,6 @@ import static museum.worker.WorkerUtil.defaultSkin;
 public class StallSubject extends Subject implements Incomeble {
 	@Getter
 	private final Map<FoodProduct, Integer> food;
-	private final NpcSmart worker;
 
 	public StallSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
@@ -46,7 +46,27 @@ public class StallSubject extends Subject implements Incomeble {
 				food = savedFood;
 			}
 		}
-		worker = Npc.create("Работница лавки", NpcBehaviour.STARE_AT_PLAYER, defaultSkin, defaultSkin.substring(defaultSkin.length() - 10));
+		val spawn = ((StallPrototype) prototype).getSpawn().clone()
+				.subtract(prototype.getBox().getCenter().clone().subtract(.5, 4, -.5))
+				.add(UtilV3.toVector(cachedInfo.location));
+		Npc.npc(new NpcData(
+				(int) (Math.random() * Integer.MAX_VALUE),
+				UUID.randomUUID(),
+				spawn.x,
+				spawn.y,
+				spawn.z,
+				1000,
+				"Работница лавки",
+				NpcBehaviour.STARE_AT_PLAYER,
+				spawn.pitch,
+				spawn.yaw,
+				defaultSkin,
+				defaultSkin.substring(defaultSkin.length() - 10),
+				true,
+				false,
+				false,
+				false
+		)).show(owner.getPlayer());
 	}
 
 	@Override
@@ -60,20 +80,6 @@ public class StallSubject extends Subject implements Incomeble {
 	@Override
 	public void setAllocation(Allocation allocation) {
 		super.setAllocation(allocation);
-		if (allocation == null) {
-			worker.hide(getOwner().getPlayer());
-		} else if (cachedInfo != null) {
-			// todo: what the fuck this hardcode nums
-			val spawn = ((StallPrototype) prototype).getSpawn().clone()
-					.subtract(prototype.getBox().getCenter().clone().subtract(.5, 4, -.5))
-					.add(UtilV3.toVector(cachedInfo.location));
-			val data = worker.getData();
-			data.setX(spawn.x);
-			data.setY(spawn.y);
-			data.setZ(spawn.z);
-			worker.setData(data);
-			worker.show(owner.getPlayer());
-		}
 	}
 
 	@Override
