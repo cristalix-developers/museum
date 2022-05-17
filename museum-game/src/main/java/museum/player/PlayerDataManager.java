@@ -5,8 +5,11 @@ import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import me.func.mod.Alert;
 import me.func.mod.Anime;
+import me.func.protocol.GlowColor;
 import me.func.protocol.Indicators;
+import me.func.protocol.alert.NotificationButton;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
@@ -39,6 +42,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PlayerDataManager implements Listener {
+
+    private static final NotificationButton BUTTON = Alert.button(
+            "Установить ресурпак",
+            "/resourcepack",
+            GlowColor.GREEN,
+            false,
+            true
+    );
 
     private final App app;
     private final Map<UUID, User> userMap = Maps.newHashMap();
@@ -88,12 +99,12 @@ public class PlayerDataManager implements Listener {
 
                 if (userInfo.getImprovements() == null)
                     userInfo.setImprovements(new ArrayList<>(Arrays.asList(
-							"ADDITIONAL_EXP:0",
-							"EXTRA_HITS:0",
-							"EFFICIENCY:0",
-							"BONE_DETECTION:0",
-							"DETECTION_OF_RELIQUES:0",
-							"DUPLICATE:0"
+                            "ADDITIONAL_EXP:0",
+                            "EXTRA_HITS:0",
+                            "EFFICIENCY:0",
+                            "BONE_DETECTION:0",
+                            "DETECTION_OF_RELIQUES:0",
+                            "DUPLICATE:0"
                     )));
 
                 if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
@@ -168,6 +179,15 @@ public class PlayerDataManager implements Listener {
         B.postpone(5, () -> {
             prepares.forEach(prepare -> prepare.execute(user, app));
             Anime.hideIndicator(player, Indicators.ARMOR, Indicators.EXP, Indicators.HEALTH, Indicators.HUNGER);
+            Alert.send(
+                    player,
+                    "Рекомендуем установить ресурспак",
+                    30000,
+                    GlowColor.GREEN,
+                    GlowColor.BLUE,
+                    "",
+                    BUTTON
+            );
         });
 
         event.setJoinMessage(null);

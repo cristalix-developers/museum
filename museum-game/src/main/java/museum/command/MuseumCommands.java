@@ -57,6 +57,7 @@ public class MuseumCommands {
 		B.regCommand(this::cmdBuy, "buy");
 		B.regCommand(this::cmdPrefix, "prefix");
 		B.regCommand(this::cmdRate, "rate");
+		B.regCommand(this::cmdResourcePack, "resourcepack");
 	}
 
 	private String cmdPrefix(Player player, String[] args) {
@@ -346,6 +347,11 @@ public class MuseumCommands {
 		user.setPickaxeType(pickaxe);
 		player.performCommand("gui pickaxe");
 		return MessageUtil.get("newpickaxe");
+	}
+
+	private String cmdResourcePack(Player player, String[] args) {
+		player.setResourcePack(System.getenv("RESOURCE_PACK"), "666");
+		return Formatting.fine("Установка...");
 	}
 
 	private String cmdRate(Player player, String[] args) {

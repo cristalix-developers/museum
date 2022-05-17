@@ -34,7 +34,7 @@ Guis.register 'excavation', { player ->
 
     button 'C' icon {
         item CLAY_BALL
-        nbt.skyblock = 'earth'
+        nbt.simulators = 'save_crystal'
         text """§bКосмос
 
         §7Вы когда нибудь хотели
