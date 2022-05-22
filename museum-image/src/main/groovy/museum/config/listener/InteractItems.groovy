@@ -23,7 +23,7 @@ import static org.bukkit.event.block.Action.LEFT_CLICK_BLOCK
 import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK
 
 on PAPER use {
-    open player, 'main', null
+    player.performCommand('menu')
 }
 
 on WOOD_DOOR use {

@@ -5,11 +5,9 @@ import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import me.func.mod.Alert;
 import me.func.mod.Anime;
-import me.func.protocol.GlowColor;
+import me.func.mod.selection.Confirmation;
 import me.func.protocol.Indicators;
-import me.func.protocol.alert.NotificationButton;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
@@ -43,13 +41,7 @@ import java.util.stream.Stream;
 
 public class PlayerDataManager implements Listener {
 
-    private static final NotificationButton BUTTON = Alert.button(
-            "Установить ресурпак",
-            "/resourcepack",
-            GlowColor.GREEN,
-            false,
-            true
-    );
+    private static final Confirmation confirmation = new Confirmation(UUID.randomUUID(), "Рекомендуем установить\nресурспак", accept -> accept.performCommand("resourcepack"));
 
     private final App app;
     private final Map<UUID, User> userMap = Maps.newHashMap();
@@ -179,15 +171,7 @@ public class PlayerDataManager implements Listener {
         B.postpone(5, () -> {
             prepares.forEach(prepare -> prepare.execute(user, app));
             Anime.hideIndicator(player, Indicators.ARMOR, Indicators.EXP, Indicators.HEALTH, Indicators.HUNGER);
-            Alert.send(
-                    player,
-                    "Рекомендуем установить ресурспак",
-                    30000,
-                    GlowColor.GREEN,
-                    GlowColor.BLUE,
-                    "",
-                    BUTTON
-            );
+            confirmation.open(player);
         });
 
         event.setJoinMessage(null);
