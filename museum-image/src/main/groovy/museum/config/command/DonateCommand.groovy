@@ -13,7 +13,6 @@ import museum.museum.Museum
 import museum.museum.subject.CollectorSubject
 import museum.packages.SaveUserPackage
 import museum.packages.UserTransactionPackage.TransactionResponse
-import museum.player.User
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
@@ -23,60 +22,11 @@ import java.util.stream.Collectors
 
 import static org.bukkit.Material.*
 
-class Prefix {
-    String prefix
-    String title
-    int rare
-    String bonus
-
-    Prefix(String prefix, String title, int rare, String bonus) {
-        this.prefix = prefix
-        this.title = title
-        this.rare = rare
-        this.bonus = bonus
-    }
-
-    Prefix(String prefix, String title, int rare) {
-        this.prefix = prefix
-        this.title = title
-        this.rare = rare
-        this.bonus = ''
-    }
-}
-
-/*registerCommand 'donate' handle {
-    Guis.open player, 'donate', player
-}*/
-
 registerCommand 'prefixes' handle {
     Guis.open player, 'prefixes', player
 }
 
-void givePrefix(User owner) {
-
-}
-
 def prefixes = [
-        new Prefix('䂋', 'Любовь', 3, '§l40% §fполучить +§b1 опыт'),
-        new Prefix('㧥', 'Бывший бомж', 3, '§f+§620`000\$ §e ежедневной награды'),
-        new Prefix('㕐', '§bПопаду на луну', 3, '§b+20% §fшанса получить камень'),
-        new Prefix('㫐', 'Dead inside', 2),
-        new Prefix('㕄', 'Радуга', 2),
-        new Prefix('㗤', '§eЦирк', 2),
-        new Prefix('㩑', '§lHIT!', 2),
-        new Prefix('䀝', '§aЦель 40рб', 2),
-        new Prefix('㯨', 'Не курю!', 1),
-        new Prefix('㥗', 'Я пришелец', 1),
-        new Prefix('㧵', '§aSTONKS', 1),
-        new Prefix('㧋', '§cБомба', 1),
-        new Prefix('㫩', 'Ок', 1),
-        new Prefix('䀰', 'Спортивный', 1),
-        new Prefix('㕾', '§cМухомор', 1),
-        new Prefix('䀀', '§atoxic', 1),
-        new Prefix('㗨', 'Консольщик', 1),
-        new Prefix('㗧', 'Лицемер', 1),
-        new Prefix('㛳', 'АУ', 1),
-        new Prefix('㗯', 'Люблю музыку', 1),
 ]
 
 Guis.register 'prefixes', {
@@ -90,13 +40,7 @@ Guis.register 'prefixes', {
         XXX-RRRRR
         -EEE-O-L-
         """
-    button 'L' icon {
-        item CLAY_BALL
-        text '§cНазад'
-        nbt.other = "cancel"
-    } leftClick {
-        performCommand("gui main")
-    }
+
     button 'O' icon {
         item END_CRYSTAL
         text """
