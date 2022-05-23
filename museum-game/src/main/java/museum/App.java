@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.val;
 import me.func.mod.Anime;
 import me.func.mod.Kit;
+import me.func.mod.conversation.ModLoader;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
@@ -113,6 +114,7 @@ public final class App extends JavaPlugin {
         core.registerService(IScoreboardService.class, new ScoreboardService());
 
         Anime.include(Kit.NPC, Kit.STANDARD, Kit.LOOTBOX, Kit.EXPERIMENTAL, Kit.DIALOG);
+        ModLoader.loadAll("mods");
 
         // Регистрация обработчика пакета конфига
         clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
