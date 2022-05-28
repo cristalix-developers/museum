@@ -52,6 +52,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import static museum.App.RESOURCE_PACK_URL;
+
 public class MuseumCommands {
 
     private final App app;
@@ -858,8 +860,9 @@ public class MuseumCommands {
     }
 
     private String cmdResourcePack(Player player, String[] args) {
-        player.setResourcePack(System.getenv("RESOURCE_PACK"), "666");
-        return Formatting.fine("Установка...");
+        val resource = System.getenv("RESOURCE_PACK");
+        player.setResourcePack(resource == null ? RESOURCE_PACK_URL : resource, "4");
+        return null;
     }
 
     private String cmdRate(Player player, String[] args) {

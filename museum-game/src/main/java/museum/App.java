@@ -43,7 +43,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.w3c.dom.ls.LSOutput;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.permissions.IPermissionService;
@@ -64,6 +63,7 @@ import java.util.logging.Level;
 public final class App extends JavaPlugin {
     @Getter
     public static App app;
+    public static String RESOURCE_PACK_URL = "https://storage.c7x.dev/func/museum.zip";
 
     public PlayerDataManager playerDataManager;
     private TopManager topManager;

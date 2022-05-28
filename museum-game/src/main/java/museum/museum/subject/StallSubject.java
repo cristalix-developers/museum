@@ -4,11 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import lombok.val;
-import me.func.mod.Npc;
-import me.func.protocol.npc.NpcBehaviour;
-import me.func.protocol.npc.NpcData;
 import museum.data.SubjectInfo;
-import museum.museum.map.StallPrototype;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.product.FoodProduct;
 import museum.player.User;
@@ -16,14 +12,10 @@ import museum.util.MessageUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import ru.cristalix.core.GlobalSerializers;
-import ru.cristalix.core.util.UtilV3;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-
-import static museum.worker.WorkerUtil.defaultSkin;
 
 /**
  * @author func 05.10.2020
@@ -46,27 +38,6 @@ public class StallSubject extends Subject implements Incomeble {
 				food = savedFood;
 			}
 		}
-		val spawn = ((StallPrototype) prototype).getSpawn().clone()
-				.subtract(prototype.getBox().getCenter().clone().subtract(.5, 4, -.5))
-				.add(UtilV3.toVector(cachedInfo.location));
-		Npc.npc(new NpcData(
-				(int) (Math.random() * Integer.MAX_VALUE),
-				UUID.randomUUID(),
-				spawn.x,
-				spawn.y,
-				spawn.z,
-				1000,
-				"Работница лавки",
-				NpcBehaviour.STARE_AT_PLAYER,
-				spawn.pitch,
-				spawn.yaw,
-				defaultSkin,
-				defaultSkin.substring(defaultSkin.length() - 10),
-				true,
-				false,
-				false,
-				false
-		)).show(owner.getPlayer());
 	}
 
 	@Override

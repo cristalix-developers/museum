@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 public class PlayerDataManager implements Listener {
 
 	private static final Confirmation confirmation = new Confirmation(Arrays.asList("Рекомендуем установить", "ресурспак"),
-			player -> player.setResourcePack("https://storage.c7x.dev/func/museum.zip", "4")
+			player -> player.setResourcePack(App.RESOURCE_PACK_URL, "4")
 	);
 
 	private final App app;
