@@ -6,6 +6,7 @@ import implario.ListUtils
 import me.func.mod.Anime
 import museum.App
 import museum.client_conversation.AnimationUtil
+import museum.config.gui.LootBox
 import museum.data.PickaxeType
 import museum.data.SubjectInfo
 import museum.donate.DonateType

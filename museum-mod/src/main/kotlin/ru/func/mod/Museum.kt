@@ -25,7 +25,7 @@ class Museum : KotlinMod() {
         val uuid: UUID,
     )
 
-    private lateinit var shopbox: RectangleElement
+    private lateinit var shopbox: CarvedRectangle
     private lateinit var shoptext: TextElement
     private var hints = ArrayList<Pair<Long, AbstractElement>>()
 
@@ -54,7 +54,7 @@ class Museum : KotlinMod() {
             color = Color(0, 255, 0, 1.0)
         }
 
-        shopbox = rectangle {
+        shopbox = carved {
             size = V3(220.0, 40.0)
             offset = V3(0.5, 0.5)
             align = V3(0.33, 0.7)
@@ -70,14 +70,15 @@ class Museum : KotlinMod() {
                 content = "Чтобы купить нажмите Enter"
             })
         }
-        UIEngine.overlayContext.addChild(shopbox)
+        UIEngine.overlayContext + shopbox
 
         // Подсказки слева
-        val help = rectangle top@{
+        val help = carved top@{
             val padding = 6.0
-            val width = 180.0 + padding
+            val width = 181.0 + padding
             size.y = 2 * padding
             size.x = width
+            offset.x -= 1
             align = Relative.LEFT
             origin = Relative.LEFT
             color = Color(0, 0, 0, 0.62)

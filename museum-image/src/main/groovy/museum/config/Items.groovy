@@ -214,7 +214,7 @@ register 'buy-floor', {
 register 'menu', {
     item PAPER
     text """
-        §f>> §6Меню §f<<
+        §6Меню §f§lПКМ
     
         Это меню, с помощью которого,
         настраивать музей, приглашать
@@ -225,13 +225,13 @@ register 'menu', {
 
 register 'visitor-menu', {
     item WOOD_DOOR
-    text '§6Посмотреть музеи'
+    text '§6Посмотреть музеи §f§lПКМ'
 }
 
 register 'place-menu', {
     item CLAY_BALL
     nbt.other = 'achievements_lock'
-    text '§bГде я был?'
+    text '§bГде я был? §f§lПКМ'
 }
 
 register 'goback', {

@@ -9,7 +9,7 @@ apply plugin: 'dev.implario.bundler'
 
 dependencies {
     compileOnly 'ru.cristalix:client-api:live-SNAPSHOT'
-    implementation 'ru.cristalix:uiengine:live-SNAPSHOT'
+    implementation 'ru.cristalix:uiengine:1.0.2'
     implementation 'ru.cristalix:client-sdk:live-SNAPSHOT'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.4.31'
 }

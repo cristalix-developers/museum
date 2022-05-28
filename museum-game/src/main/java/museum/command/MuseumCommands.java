@@ -713,11 +713,12 @@ public class MuseumCommands {
 				2,
 				2,
 				new Button()
-						.texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
-						.price(39)
-						.title("§сСлучайная посылка")
-						.description("\n\n\n\n§bВы получите случайный §cдрагоценный камень [60%-100%]" +
-								"§b, а так же случайный §cметеорит§b c доходом от 15$ до 100$.")
+						.material(Material.ENDER_CHEST)
+						.price(78)
+						.sale(50)
+						.title("Случайная посылка")
+						.description("Вы §dгарантированно §fполучите случайный драгоценный камень 60%-100% качества и " +
+								"метеорит c доходом от 15$ до 100$")
 						.onClick((click, index, button) -> click.performCommand("proccessdonate ITEM_CASE"))
 		);
 		menu.setVault("donate");
@@ -1064,6 +1065,8 @@ public class MuseumCommands {
 
 		if (user.getState() instanceof Excavation)
 			return MessageUtil.get("museum-first");
+
+		Anime.close(user.handle());
 
 		if (args.length < 1) {
 			user.setState(app.getShop());

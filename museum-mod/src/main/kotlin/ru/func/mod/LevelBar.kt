@@ -3,6 +3,7 @@ package ru.func.mod
 import dev.xdark.clientapi.event.network.PluginMessage
 import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
+import ru.cristalix.uiengine.element.CarvedRectangle
 import ru.cristalix.uiengine.element.RectangleElement
 import ru.cristalix.uiengine.element.TextElement
 import ru.cristalix.uiengine.eventloop.animate
@@ -13,32 +14,33 @@ import ru.cristalix.uiengine.utility.*
  * @project museum
  */
 object LevelBar {
+    lateinit var progress: CarvedRectangle
+    lateinit var hint: TextElement
+
     init {
-        val online = rectangle {
+        val online = carved {
             offset = V3(0.0, -25.0)
             origin = BOTTOM
             align = BOTTOM
             size = V3(180.0, 5.0, 0.0)
             color = Color(0, 0, 0, 0.62)
-            addChild(
-                rectangle {
-                    origin = LEFT
-                    align = LEFT
-                    size = V3(0.0, 5.0, 0.0)
-                    color = Color(42, 102, 189, 1.0)
-                },
-                text {
-                    origin = TOP
-                    align = TOP
-                    color = WHITE
-                    shadow = true
-                    content = "Загрузка... "
-                    offset.y -= 15
-                }
-            )
+            progress = +carved {
+                origin = LEFT
+                align = LEFT
+                size = V3(0.0, 5.0, 0.0)
+                color = Color(42, 102, 189, 1.0)
+            }
+            hint = +text {
+                origin = TOP
+                align = TOP
+                color = WHITE
+                shadow = true
+                content = "Загрузка... "
+                offset.y -= 15
+            }
         }
 
-        UIEngine.overlayContext.addChild(online)
+        UIEngine.overlayContext + online
 
         registerHandler<PluginMessage> {
             if (channel == "museum:levelbar") {
@@ -46,11 +48,9 @@ object LevelBar {
                 val experience = data.readInt()
                 val requiredExperience = data.readInt()
 
-                (online.children[0] as RectangleElement).animate(1) {
-                    size.x = 180.0 / requiredExperience * experience
-                }
+                progress.animate(1) { size.x = 180.0 / requiredExperience * experience }
 
-                (online.children[1] as TextElement).content = "Уровень §b${level} §7$experience из $requiredExperience"
+                hint.content = "Уровень §b${level} §7$experience из $requiredExperience"
             }
         }
     }

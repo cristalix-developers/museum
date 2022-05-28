@@ -22,21 +22,23 @@ object CrystalBar {
             textureLocation = ResourceLocation.of(
                 "minecraft", "mcpatcher/cit/museum/crystal_item.png"
             )
-            addChild(text {
+            +text {
                 align = BOTTOM
                 origin = BOTTOM
                 offset.y += 10
                 shadow = true
-            })
+            }
         }
 
-        UIEngine.overlayContext.addChild(crystal)
+        UIEngine.overlayContext + crystal
 
         val decimalFormat = DecimalFormat("###,###,###,###,###,###")
+
         mod.registerChannel("museum:cosmo-crystal") {
             crystal.enabled = true
             (crystal.children[0] as TextElement).content = decimalFormat.format(readInt())
         }
+
         mod.registerChannel("museum:cosmo-leave") {
             crystal.enabled = false
         }
