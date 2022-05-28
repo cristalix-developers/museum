@@ -1,7 +1,6 @@
 package museum.command;
 
 import clepto.bukkit.B;
-import groovyjarjarantlr4.runtime.tree.BufferedTreeNodeStream;
 import lombok.val;
 import me.func.mod.Anime;
 import me.func.mod.Glow;
@@ -113,7 +112,7 @@ public class MuseumCommands {
                         if (playerHasThisPrefix) {
                             user.setPrefix(prefixType.getPrefix());
                             Anime.close(player);
-                            Anime.title(player, "Вы §aуспешно§f выбрали префикс " + prefixType.getPrefix());
+                            Anime.title(player, "§fВы §aуспешно§f выбрали префикс " + prefixType.getPrefix());
                         }
                     });
             menu.add(btn);
@@ -755,7 +754,10 @@ public class MuseumCommands {
                     .texture("minecraft:mcpatcher/cit/others/hub/guild_shop.png")
                     .title("Магазин")
                     .description("Отправляйтесь за новыми постройками")
-                    .onClick((click, index, button) -> click.performCommand("shop")),
+                    .onClick((click, index, button) -> {
+                        click.performCommand("shop");
+                        Anime.close(click);
+                    }),
             new Button()
                     .item(Items.builder().type(Material.GOLDEN_CARROT).enchantment(Enchantment.LUCK, 1).build())
                     .title("§bДонат")
