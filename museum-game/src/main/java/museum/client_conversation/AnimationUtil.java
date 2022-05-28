@@ -41,8 +41,8 @@ public class AnimationUtil {
 	}
 
 	public static void updateOnlineAll() {
-		val transfer = new ModTransfer().integer(IRealmService.get().getOnlineOnRealms("MUSM"));
-		Bukkit.getOnlinePlayers().forEach(player -> transfer.send("museum:online", player));
+		val online = IRealmService.get().getOnlineOnRealms("MUSM");
+		Bukkit.getOnlinePlayers().forEach(player -> new ModTransfer().integer(online).send("museum:online", player));
 	}
 
 	public static void updateIncome(User user) {

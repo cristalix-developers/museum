@@ -21,8 +21,8 @@ public class PrepareShopBlocks implements Prepare {
 	@Override
 	public void execute(User user, App app) {
 		val now = System.currentTimeMillis();
-		// Обновление позиций в магазине каждые 5 минут
-		if (dataForClients == null || now - lastUpdate > 1000 * 60 * 5) {
+		// Обновление позиций в магазине каждую минуту
+		if (dataForClients == null || now - lastUpdate > 1000 * 60) {
 			lastUpdate = now;
 			dataForClients = new ModTransfer().json(
 					Managers.subject.getMap().values().stream()
