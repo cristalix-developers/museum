@@ -73,11 +73,20 @@ class Museum : KotlinMod() {
         UIEngine.overlayContext.addChild(shopbox)
 
         // Подсказки слева
-        val help = rectangle {
-            size = V3(195.0, 110.0)
+        val help = rectangle top@{
+            val padding = 6.0
+            val width = 180.0 + padding
+            size.y = 2 * padding
+            size.x = width
             align = Relative.LEFT
             origin = Relative.LEFT
             color = Color(0, 0, 0, 0.62)
+            val hints = +flex {
+                flexSpacing = 2.0
+                offset.x += padding
+                offset.y += padding
+                flexDirection = FlexDirection.DOWN
+            }
             arrayOf(
                 "§fГорячие клавиши",
                 "",
@@ -87,14 +96,14 @@ class Museum : KotlinMod() {
                 "§b§lG§f - §fменю префиксов 䁿",
                 "",
                 "§bПриятной игры! §f㶅"
-            ).forEachIndexed { i, line ->
-                addChild(text {
+            ).forEach { line ->
+                hints + text {
                     content = line
-                    align = V3(0.1, 0.12 * i + 0.1, 0.0)
-                    origin = V3(0.1, 0.12 * i + 0.1, 0.0)
+                    size.x = width - padding
                     shadow = true
                     color = WHITE
-                })
+                    this@top.size.y += lineHeight + hints.flexSpacing
+                }
             }
         }
         UIEngine.overlayContext.addChild(help)
