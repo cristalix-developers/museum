@@ -43,12 +43,15 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.spigotmc.AsyncCatcher;
+import ru.cristalix.core.CoreApi;
+import ru.cristalix.core.network.packages.GetAccountBalancePackage;
 import ru.cristalix.core.util.UtilV3;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Data
@@ -205,6 +208,17 @@ public class User implements PlayerWrapper {
 			}
 		}
 		AnimationUtil.updateLevelBar(this);
+	}
+
+	public int getDonateMoney() {
+		val client = CoreApi.get().getSocketClient();
+		val pkg = new GetAccountBalancePackage(getUuid());
+		try {
+			val data = client.<GetAccountBalancePackage>writeAndAwaitResponse(pkg).get(1, TimeUnit.SECONDS).getBalanceData();
+			return data.getCoins() + data.getCrystals();
+		} catch (Exception ignored) {
+			return 0;
+		}
 	}
 
 	public int getLevel() {
