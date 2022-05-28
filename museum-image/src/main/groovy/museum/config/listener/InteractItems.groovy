@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import ru.cristalix.core.formatting.Formatting
 
 import static clepto.bukkit.item.Items.register
-import static clepto.bukkit.menu.Guis.open
 import static museum.App.app
 import static museum.cosmos.Cosmos.ROCKET
 import static org.bukkit.Material.*
@@ -163,10 +162,12 @@ on PlayerInteractAtEntityEvent, {
     if (user.state instanceof Cosmos && clickedEntity.hasMetadata('boer')) {
         def owner = Bukkit.getPlayer(UUID.fromString(clickedEntity.getMetadata('owner')[0].asString()))
         def boer = UUID.fromString(clickedEntity.getMetadata('boer')[0].asString())
-        def fragment = user.relics.get(boer) as Boer
 
-        if (player.uniqueId != owner.uniqueId)
+        if (player.uniqueId != owner.uniqueId) {
             player.sendMessage(Formatting.error('Этот бур не принадлежит вам.'))
-        open(player, 'boer-upgrade', fragment)
+            return
+        }
+
+        player.performCommand("boermenu " + boer)
     }
 }

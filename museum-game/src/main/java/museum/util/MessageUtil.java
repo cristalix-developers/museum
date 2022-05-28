@@ -24,6 +24,12 @@ public class MessageUtil {
 		return MONEY_FORMAT.format(money);
 	}
 
+	private final DecimalFormat COSMOCRYSTAL_FORMAT = new DecimalFormat("###,###,###,###,###,###");
+
+	public String toCrystalFormat(double money) {
+		return COSMOCRYSTAL_FORMAT.format(money);
+	}
+
 	public Message find(String locator) {
 		return new Message(locator);
 	}

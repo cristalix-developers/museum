@@ -5,24 +5,29 @@ import lombok.val;
 import me.func.mod.Anime;
 import me.func.mod.Glow;
 import me.func.mod.selection.Button;
+import me.func.mod.selection.Choicer;
 import me.func.mod.selection.Selection;
 import me.func.protocol.GlowColor;
 import museum.App;
 import museum.client_conversation.AnimationUtil;
+import museum.cosmos.Cosmos;
+import museum.cosmos.boer.Boer;
+import museum.cosmos.boer.BoerType;
 import museum.data.PickaxeType;
 import museum.data.SubjectInfo;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.fragment.Fragment;
 import museum.fragment.Gem;
+import museum.fragment.GemType;
+import museum.fragment.Relic;
 import museum.museum.Museum;
-import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.map.SubjectType;
-import museum.museum.subject.Allocation;
 import museum.museum.subject.Subject;
-import museum.museum.subject.skeleton.Skeleton;
+import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
+import museum.player.pickaxe.PickaxeUpgrade;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
 import museum.util.MessageUtil;
@@ -31,7 +36,6 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -46,6 +50,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 public class MuseumCommands {
 
@@ -55,83 +60,636 @@ public class MuseumCommands {
     public MuseumCommands(App app) {
         this.app = app;
 
-        B.regCommand(this::cmdHome, "home", "leave", "spawn");
-        B.regCommand(this::cmdSubjects, "subjects", "sj");
-        B.regCommand(this::cmdGui, "gui");
-        B.regCommand(this::cmdShop, "shop", "gallery");
-        B.regCommand(this::cmdChangeTitle, "changetitle");
-        B.regCommand(this::cmdInvite, "invite");
-        B.regCommand(this::cmdExcavation, "excavation", "exc");
-        B.regCommand(this::cmdPickaxe, "pickaxe");
-        B.regCommand(this::cmdSkeleton, "skeleton");
-        B.regCommand(this::cmdRunTop, "runtop", "rt");
-        B.regCommand(this::cmdTravel, "travel");
-        B.regCommand(this::cmdVisit, "visit", "museum");
-        B.regCommand(this::cmdBuy, "buy");
-        B.regCommand(this::cmdPrefix, "prefix");
-        B.regCommand(this::cmdRate, "rate");
-        B.regCommand(this::cmdResourcePack, "resourcepack");
-        B.regCommand(this::cmdDonate, "donate");
-        B.regCommand(this::cmdMenu, "menu");
-        B.regCommand(this::cmdLootBox, "lootbox");
-        B.regCommand(this::cmdPolishing, "polishing");
+        B.regCommand(this::cmdBoerMenu, "boermenu");
+        B.regCommand(this::cmdBoer, "boer");
+        B.regCommand(this::cmdExcavationSecondMenu, "excavationsecondmenu");
+        B.regCommand(this::cmdExcavationMenu, "excavationmenu");
+        B.regCommand(this::cmdUpgradeRod, "upgraderod");
+        B.regCommand(this::cmdUpgradePickaxe, "upgradepickaxe");
+        B.regCommand(this::cmdFastUpgradePickaxe, "fastupgradepickaxe");
         B.regCommand(this::cmdTools, "tools");
-        B.regCommand(this::cmdRod, "rod");
+        B.regCommand(this::cmdPolishing, "polishing");
+        B.regCommand(this::cmdLootBox, "lootbox");
+        B.regCommand(this::cmdMenu, "menu");
+        B.regCommand(this::cmdDonate, "donate");
+
+        B.regCommand(this::cmdResourcePack, "resourcepack");
+        B.regCommand(this::cmdRate, "rate");
+        B.regCommand(this::cmdBuy, "buy");
+        B.regCommand(this::cmdGui, "gui");
+        B.regCommand(this::cmdTravel, "travel");
+        B.regCommand(this::cmdExcavation, "excavation", "exc");
+        B.regCommand(this::cmdInvite, "invite");
+        B.regCommand(this::cmdChangeTitle, "changetitle");
+        B.regCommand(this::cmdShop, "shop", "gallery");
+        B.regCommand(this::cmdHome, "home", "leave", "spawn");
     }
-    private String cmdRod(Player player, String[] args) {
+
+    private String cmdBoerMenu(Player player, String[] args) {
+        val user = App.app.getUser(player);
+
+        // Обработка от индивидов которые достанут uuid бура и пихнут его в команду
+        if (args.length != 1) return null;
+        for (Fragment value : user.getRelics().values())
+            if (value instanceof Boer) {
+                if (value.getUuid().toString().equals(args[0]) && ((Boer) value).getOwner().toString().equals(player.getUniqueId().toString())) {
+                    Boer boer = (Boer) value;
+                    BoerType nextBoer = boer.getType().getNext() != null ? boer.getType().getNext() : null;
+
+                    ItemStack boerItem = new ItemStack(Material.CLAY_BALL);
+                    val nmsItem = CraftItemStack.asNMSCopy(boerItem);
+                    nmsItem.tag = new NBTTagCompound();
+                    nmsItem.tag.setString("other", "win2");
+                    boerItem = nmsItem.asBukkitMirror();
+                    ItemStack finalBoerItem = boerItem;
+
+                    val menu = new Selection(
+                            "Настройка бура",
+                            "Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
+                            "",
+                            2,
+                            3,
+                            new Button()
+                                    .texture("minecraft:mcpatcher/cit/others/badges/info1.png")
+                                    .title("Уведомления")
+                                    .description("\n" + (boer.isNotification() ? "§cВыключить" : "§aВключить") + " §fуведомления от бура!")
+                                    .hint("ℹ")
+                                    .onClick((clickUser, index, button) -> {
+                                        boer.setNotification(!boer.isNotification());
+                                        Anime.close(player);
+                                    }),
+                            new Button()
+                                    .texture("minecraft:mcpatcher/cit/others/badges/upgrade.png")
+                                    .title("Улучшить бур")
+                                    .description(nextBoer != null
+                                            ? "Подробнее"
+                                            : "Данный бур §cмаксимального§b уровня, поздравляем!")
+                                    .hint(nextBoer != null ? "Улучшить" : "")
+                                    .onClick((clickUser, index, button) -> {
+                                        if (nextBoer != null) {
+                                            val new_menu = new Selection(
+                                                    "Улучшение бура",
+                                                    "бабки",
+                                                    "Улучшить",
+                                                    1,
+                                                    1,
+                                                    new Button()
+                                                            .texture("minecraft:mcpatcher/cit/others/badges/upgrade.png")
+                                                            .title("Улучшение")
+                                                            .description("\n§b" + boer.getType().getAddress() + "§f ➠ §c" + nextBoer.getAddress() +
+                                                                    "\nСледующий бур работает §b" + nextBoer.getTime() / 3600 +
+                                                                    " часа§f и приносит §b1 опыт §fи §b1 кристалл§f\nкаждые §l§b" + nextBoer.getSpeed() + " §fсекунд.\n\n" +
+                                                                    "Стоимость: §e" + MessageUtil.toMoneyFormat(nextBoer.getPrice()) + "§f и " + "§b10.000§f кристаллов")
+                                                            .onClick((clickUserFromNewMenu, indexFromNewMenu, buttonFromNewMenu) -> {
+                                                                User museumUser = app.getUser(clickUserFromNewMenu);
+
+                                                                if (checkNotEnoughMoney(museumUser, (long) nextBoer.getPrice())) {
+                                                                    return;
+                                                                }
+
+                                                                user.giveMoney(-nextBoer.getPrice());
+                                                                boer.setType(nextBoer);
+                                                                if (boer.isStanding()) {
+                                                                    boer.boerRemove();
+                                                                }
+
+                                                                Anime.itemTitle(clickUserFromNewMenu,
+                                                                        finalBoerItem,
+                                                                        "§aУспешно!",
+                                                                        "§bВы перешли на §c" + boer.getType().getAddress() + "§b уровень!",
+                                                                        2.0);
+                                                                Glow.animate(clickUserFromNewMenu, 2.0, GlowColor.GOLD);
+                                                                Anime.close(player);
+                                                            })
+                                            );
+
+                                            new_menu.open(player);
+                                        }
+                                    }),
+                            new Button()
+                                    .texture("minecraft:mcpatcher/cit/others/badges/remove.png")
+                                    .title("Убрать бур")
+                                    .description("\nСпрятать бур к вам в инвентарь.")
+                                    .hint("❌")
+                                    .onClick((clickUser, index, button) -> {
+                                        boer.boerRemove();
+                                        Anime.close(player);
+                                    })
+                    );
+
+                    B.postpone(1, () -> menu.open(player));
+                }
+            }
+        return null;
+    }
+
+    private String cmdBoer(Player player, String[] args) {
+        val user = App.app.getUser(player);
+
+        boolean maxCountOfBoers = false;
+        int countOfBoers = 0;
+        for (Fragment value : user.getRelics().values())
+            if (value instanceof Boer)
+                ++countOfBoers;
+                if (countOfBoers == 6) maxCountOfBoers = true;
+        boolean finalMaxCountOfBoers = maxCountOfBoers;
+
+        ItemStack boer = new ItemStack(Material.CLAY_BALL);
+        val nmsItem = CraftItemStack.asNMSCopy(boer);
+        nmsItem.tag = new NBTTagCompound();
+        nmsItem.tag.setString("other", "win2");
+        boer = nmsItem.asBukkitMirror();
+        ItemStack finalBoer = boer;
+
+        val menu = new Selection(
+                "Буры",
+                "Кристаллов/Монет " + MessageUtil.toCrystalFormat(user.getCosmoCrystal()) + "/" + MessageUtil.toMoneyFormat(user.getMoney()),
+                "",
+                1,
+                1,
+                new Button()
+                        .texture("minecraft:mcpatcher/cit/others/hub/iconpack/win2.png")
+                        .hint(maxCountOfBoers ? "" : "Купить")
+                        .title("&bКосмический бур")
+                        .description("\n\nДанный бур работает §b1 час§f и приносит §b1 опыт §fи §b1 кристалл§f\nкаждые §l§b" +
+                                BoerType.STANDARD.getSpeed() + " §fсекунд.\n\nУ вас есть: " + countOfBoers + " из 6-ти буров.\n\n" +
+                                "Стоимость: §e" + MessageUtil.toMoneyFormat(10000000) + "§f и " + "§b10.000§f кристаллов")
+                        .onClick((clickUser, index, button) -> {
+                            if (!finalMaxCountOfBoers) {
+                                if (user.getMoney() > 10000000 && user.getCosmoCrystal() > 10000) {
+                                    user.giveMoney(-10000000);
+                                    user.giveCosmoCrystal(-10000, false);
+                                    new Boer("boer_" + BoerType.STANDARD.name(), player.getUniqueId()).give(user);
+                                    Anime.close(player);
+                                    Anime.itemTitle(clickUser,
+                                            finalBoer,
+                                            "§aУспешно!",
+                                            "§bВы приобрели §c" + BoerType.STANDARD.getAddress() + "§b бур 1 уровня!",
+                                            2.0);
+                                    Glow.animate(clickUser, 2.0, GlowColor.GOLD);
+                                } else {
+                                    AnimationUtil.buyFailure(user);
+                                }
+                            }
+                        })
+        );
+
+        B.postpone(1, () -> menu.open(player));
+        return null;
+    }
+
+    private String cmdExcavationSecondMenu(Player player, String[] args) {
+        User museumUser = app.getUser(player);
+
+        val menu = new Selection(
+                "Экспедиции",
+                "",
+                "Путешествие",
+                2,
+                2
+        );
+
+        val excavations = Managers.excavation.stream().sorted(Comparator.comparing(ExcavationPrototype::getPrice)).collect(Collectors.toList());
+
+        for (ExcavationPrototype exc : excavations) {
+            StringBuilder skeletonsText = new StringBuilder();
+            for (SkeletonPrototype skeletonPrototype : exc.getAvailableSkeletonPrototypes()) {
+                skeletonsText.append(skeletonPrototype.getTitle()).append("\n");
+            }
+
+            val relics = Arrays.stream(exc.getRelics()).sorted(Comparator.comparing(Relic::getPrice).reversed()).collect(Collectors.toList());
+            StringBuilder relicText = new StringBuilder();
+            for (Relic relic : relics) {
+                relicText.append(relic.getItem().getI18NDisplayName()).append("\n");
+            }
+
+            Button btnMapUnlocked = new Button()
+                    .item(exc.getIcon())
+                    .title(exc.getTitle() + " " + MessageUtil.toMoneyFormat(exc.getPrice()) + " [" + exc.getHitCount() + "] ")
+                    .description(skeletonsText + relicText.toString())
+                    .onClick((clickUser, index, button) -> {
+                        if (museumUser.getMoney() > exc.getPrice()) {
+                            clickUser.performCommand("excavation " + exc.getAddress());
+                        } else {
+                            AnimationUtil.buyFailure(museumUser);
+                        }
+                    });
+
+            Button btnMapLocked = new Button()
+                    .texture("minecraft:mcpatcher/cit/others/lock.png")
+                    .title(exc.getTitle())
+                    .description("Необходимый уровень: " + exc.getRequiredLevel())
+                    .hint("");
+
+            if (museumUser.getLevel() >= exc.getRequiredLevel()) {
+                menu.add(btnMapUnlocked);
+            } else {
+                menu.add(btnMapLocked);
+            }
+
+        }
+        menu.open(player);
+        return null;
+    }
+
+    private String cmdExcavationMenu(Player player, String[] args) {
+        ItemStack cosmoCrystal = new ItemStack(Material.CLAY_BALL);
+        val nmsItem = CraftItemStack.asNMSCopy(cosmoCrystal);
+        nmsItem.tag = new NBTTagCompound();
+        nmsItem.tag.setString("simulators", "save_crystal");
+        cosmoCrystal = nmsItem.asBukkitMirror();
+
+        GemType dailyCave = GemType.getActualGem();
+        val dailyGem = new Gem(dailyCave.name() + ':' + 1.0 + ":10000").getItem();
+
+        Choicer menu = new Choicer(
+                "Экспедиции",
+                "Выбирайте куда отправиться!",
+                new Button()
+                        .material(Material.NETHER_STAR)
+                        .title("Рынок")
+                        .description("Обменивайтесь\n §cдрагоценными\n§cкамнями§f с другими\n игроками!")
+                        .hint("Путешествие")
+                        .onClick((clickUser, index, button) -> {
+                            clickUser.performCommand("shop poly");
+                            Anime.close(player);
+                        }),
+                new Button()
+                        .texture("minecraft:mcpatcher/cit/others/blocks.png")
+                        .title("Раскопки")
+                        .description("Познавайте\n различные дыры!")
+                        .hint("Путешествие")
+                        .onClick((clickUser, index, button) -> clickUser.performCommand("excavationsecondmenu")),
+                new Button()
+                        .item(dailyGem)
+                        .title("§b" + dailyCave.getDayTag() + "§f " + dailyCave.getLocation())
+                        .description("Там добываются\n" + dailyCave.getTitle())
+                        .hint("Путешествие")
+                        .onClick((clickUser, index, button) -> {
+                            App.app.getUser(clickUser).setState(App.app.getCrystal());
+                            Anime.close(player);
+                        }),
+                new Button()
+                        .item(cosmoCrystal)
+                        .title("Космос")
+                        .description("Вы когда нибудь\n хотели побывать\n в космосе?")
+                        .hint("Путешествие")
+                        .onClick((clickUser, index, button) -> {
+                            Anime.close(player);
+                            player.teleport(Cosmos.ROCKET);
+                        })
+        );
+
+        B.postpone(1, () -> menu.open(player));
+        return null;
+    }
+
+    private String cmdUpgradeRod(Player player, String[] args) {
 		val user = App.app.getUser(player);
+
 		long cost = 0;
-		switch (user.getInfo().getHookLevel() - 1) {
-			case 0: cost = 30000; break;
-			case 1: cost = 1000000; break;
-			case 2: cost = 3000000; break;
-			case 3: cost = 10000000; break;
+		switch (user.getInfo().getHookLevel()) {
+			case 1: cost = 30000; break;
+			case 2: cost = 1000000; break;
+			case 3: cost = 3000000; break;
+			case 4: break;
 		}
         long finalCost = cost;
+
         val menu = new Selection(
                 "Улучшение крюка",
                 "Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
-                "Улучшить",
+                "",
                 1,
                 1,
 				new Button()
-						.texture("minecraft:textures/other/new_lvl_rare_close.png")
+						.material(Material.FISHING_ROD)
 						.price(cost)
-						.title(user.getHookLevel() > 3 ? "§8У вас наилучший крюк" : "§eКрюк УР. " + user.getHookLevel())
+                        .hint(user.getHookLevel() == 4 ? "" : "Улучшить")
+						.title(user.getHookLevel() == 4 ? "§fУ вас крюк §bмаксимального §fуровня" : "§fКрюк УР. §b" + user.getHookLevel())
 						.description("")
-						.onClick((click, index, button) -> {
-                            val clickUser = App.getApp().getUser(click);
-                            if (clickUser.getMoney() < finalCost) {
-                                AnimationUtil.buyFailure(clickUser);
-                                click.sendMessage(MessageUtil.get("nomoney"));
-                                return;
+						.onClick((clickPlayer, index, button) -> {
+                            if (user.getHookLevel() != 4) {
+                                val clickUser = App.getApp().getUser(clickPlayer);
+
+                                if (checkNotEnoughMoney(clickUser, finalCost)) {
+                                    return;
+                                }
+
+                                clickUser.giveMoney(-finalCost);
+                                clickUser.setHookLevel(clickUser.getHookLevel() + 1);
+                                Anime.close(player);
+
+                                Anime.itemTitle(clickPlayer,
+                                        Items.builder().type(Material.FISHING_ROD).enchantment(Enchantment.LUCK, 1).build(),
+                                        "§aУспешно!",
+                                        "§bВы улучшили крюк до " + clickUser.getHookLevel() + " §bуровня!",
+                                        2.0);
+                                Glow.animate(clickPlayer, 2.0, GlowColor.GOLD);
                             }
-                            clickUser.giveMoney(-finalCost);
-                            clickUser.setHookLevel(clickUser.getHookLevel() + 1);
-                            click.closeInventory();
-                            click.sendMessage(MessageUtil.find("buy-hook").set("level", clickUser.getHookLevel()).getText());
                         })
         );
         menu.open(player);
         return null;
     }
 
-    private String cmdPrefix(Player player, String[] args) {
-        if (player != null && !player.isOp()) return "§cНеизвестная команда.";
-        if (args.length < 2) return "§cИспользование: §e/prefix [Игрок] [Префикс]";
-        try {
-            User user = app.getUser(Bukkit.getPlayer(args[0]).getUniqueId());
-            user.setPrefix(args[1].replace('&', '§').replace('#', '¨'));
-            return "§aПрефикс изменён.";
-        } catch (NullPointerException ex) {
-            return "§cИгрок не найден.";
+    private String cmdUpgradePickaxe(Player player, String[] args) {
+        val user = App.app.getUser(player);
+
+        val userHaveLastPickaxe = user.getPickaxeType().equals(PickaxeType.LEGENDARY);
+        val userPickaxeType = user.getPickaxeType();
+
+        long cost = 0;
+        switch (userPickaxeType) {
+            case DEFAULT: cost = 50000; break;
+            case PROFESSIONAL: cost = 3000000; break;
+            case PRESTIGE: cost = 100000000; break;
+            case LEGENDARY: break;
         }
+        long finalPickaxeUpgradeTypeCost = cost;
+
+        val menu = new Selection(
+                "Улучшения кирки",
+                "Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
+                "",
+                3,
+                3,
+                new Button()
+                        .item(getPickaxeImage(userPickaxeType))
+                        .price(finalPickaxeUpgradeTypeCost)
+                        .hint(userHaveLastPickaxe ? "" : "Улучшить")
+                        .title("§fУ вас:")
+                        .description(getPickaxeColor(userPickaxeType) + userPickaxeType.getName() + " §fкирка.")
+                        .onClick((clickPlayer, index, button) -> {
+                            if (!userHaveLastPickaxe) {
+                                val clickUser = App.getApp().getUser(clickPlayer);
+
+                                if (checkNotEnoughMoney(clickUser, finalPickaxeUpgradeTypeCost)) {
+                                    return;
+                                }
+
+                                clickUser.giveMoney(-finalPickaxeUpgradeTypeCost);
+                                clickUser.setPickaxeType(userPickaxeType.getNext());
+                                Anime.close(player);
+
+                                Anime.itemTitle(clickPlayer,
+                                        getPickaxeImage(clickUser.getPickaxeType()),
+                                        "§aУспешно!",
+                                        "§bТеперь вы владеете\n" + getPickaxeColor(clickUser.getPickaxeType()) + clickUser.getPickaxeType().getName().replace("ая", "ой") + "\n§bкиркой!",
+                                        2.0);
+                                Glow.animate(clickPlayer, 2.0, GlowColor.GOLD);
+                            }
+                        })
+        );
+
+        int indexOfElement = 0;
+        for (PickaxeUpgrade pickaxeUpgrade : PickaxeUpgrade.values()) {
+            int finalIndexOfElement = indexOfElement;
+            int currentLevelOfUpgrade = (int) (pickaxeUpgrade.convert(user) / pickaxeUpgrade.getStep());
+            boolean userHaveMaxLevelOfUpgrade = currentLevelOfUpgrade == pickaxeUpgrade.getMaxLevel();
+
+            Button btn = new Button()
+                .texture("minecraft:mcpatcher/cit/museum/wood_pickaxe_upgrade.png")
+                .price(userHaveMaxLevelOfUpgrade ? 0 : pickaxeUpgrade.getCost())
+                .hint(userHaveMaxLevelOfUpgrade ? "" : "Улучшить")
+                .title(pickaxeUpgrade.getTitle())
+                .description("\n" + currentLevelOfUpgrade + "/" + pickaxeUpgrade.getMaxLevel())
+                .onClick((clickPlayer, index, button) -> {
+                    if (!userHaveMaxLevelOfUpgrade) {
+                        val clickUser = App.getApp().getUser(clickPlayer);
+                        if (pickaxeUpgrade.getMaxLevel() < 10) {
+                            upgradePickaxeImprovement(clickUser, clickPlayer, pickaxeUpgrade);
+                        } else {
+                            clickUser.performCommand("fastupgradepickaxe " + finalIndexOfElement);
+                        }
+                    }
+                });
+
+            ++indexOfElement;
+            menu.add(btn);
+        }
+
+        menu.open(player);
+        return null;
     }
 
-    private String cmdRunTop(Player player, String[] args) {
-        User user = app.getUser(player);
-        if (!player.isOp() && user.getLastTopUpdateTime() != 0) return null;
-        user.setLastTopUpdateTime(-1);
+    private String cmdFastUpgradePickaxe(Player player, String[] args) {
+        User user = App.app.getUser(player);
+        PickaxeUpgrade pickaxeUpgrade = PickaxeUpgrade.values()[Integer.parseInt(args[0])];
+
+        int countOfMaxUpgrades = user.getMoney() >= pickaxeUpgrade.getCost() * (long) (pickaxeUpgrade.getMaxLevel() - pickaxeUpgrade.convert(user)) ?
+                (int) (pickaxeUpgrade.getMaxLevel() - (pickaxeUpgrade.convert(user) / pickaxeUpgrade.getStep())) :
+                (int) (user.getMoney() / pickaxeUpgrade.getCost());
+
+        val menu = new Selection(
+                "Мгновенное улучшение",
+                "Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
+                "",
+                2,
+                2,
+                new Button()
+                    .texture("minecraft:mcpatcher/cit/museum/wood_pickaxe_upgrade.png")
+                    .price(pickaxeUpgrade.getCost())
+                    .hint("Улучшить")
+                    .title(pickaxeUpgrade.getTitle())
+                    .description("\nКупить §a1§f улучшение!")
+                    .onClick((clickPlayer, index, button) -> {
+                        val clickUser = App.getApp().getUser(clickPlayer);
+                        upgradePickaxeImprovement(clickUser, clickPlayer, pickaxeUpgrade);
+                    }),
+                new Button()
+                        .texture("minecraft:mcpatcher/cit/museum/wood_pickaxe_upgrade.png")
+                        .price(pickaxeUpgrade.getCost() * 10L)
+                        .hint("Улучшить")
+                        .title(pickaxeUpgrade.getTitle())
+                        .description("Купить сразу §a10§f улучшений!")
+                        .onClick((clickPlayer, index, button) -> {
+                            val clickUser = App.getApp().getUser(clickPlayer);
+                            multiplyUpgradePickaxeImprovement(clickUser, clickPlayer, pickaxeUpgrade, 10L);
+                        }),
+                new Button()
+                        .texture("minecraft:mcpatcher/cit/museum/wood_pickaxe_upgrade.png")
+                        .price(pickaxeUpgrade.getCost() * (long) countOfMaxUpgrades)
+                        .hint("Улучшить")
+                        .title(pickaxeUpgrade.getTitle())
+                        .description("Купить §aвсё§f, что вы можете себе позволить!\n\n§cВнимание§f, вы §cприобретаете §a" + countOfMaxUpgrades + "§f улучшений!")
+                        .onClick((clickPlayer, index, button) -> {
+                            val clickUser = App.getApp().getUser(clickPlayer);
+                            multiplyUpgradePickaxeImprovement(clickUser, clickPlayer, pickaxeUpgrade, (long) countOfMaxUpgrades);
+                        })
+        );
+
+        menu.open(player);
+        return null;
+    }
+
+    private void multiplyUpgradePickaxeImprovement(User museumUser, Player clickPlayer, PickaxeUpgrade pickaxeUpgrade, Long countOfUpgrades) {
+        if (checkNotEnoughMoney(museumUser, pickaxeUpgrade.getCost() * countOfUpgrades)) {
+            return;
+        }
+
+        if (museumUser.getPickaxeImprovements().get(pickaxeUpgrade) + countOfUpgrades > pickaxeUpgrade.getMaxLevel()) {
+            countOfUpgrades = (long) (pickaxeUpgrade.getMaxLevel() - museumUser.getPickaxeImprovements().get(pickaxeUpgrade));
+        }
+        museumUser.giveMoney(-(pickaxeUpgrade.getCost() * countOfUpgrades));
+        museumUser.getPickaxeImprovements().replace(pickaxeUpgrade, museumUser.getPickaxeImprovements().get(pickaxeUpgrade) + countOfUpgrades.intValue());
+        Anime.close(clickPlayer);
+
+        ItemStack itemStack = new ItemStack(Material.CLAY_BALL);
+        val nmsItem = CraftItemStack.asNMSCopy(itemStack);
+        nmsItem.tag = new NBTTagCompound();
+        nmsItem.tag.setString("museum", "wood_pickaxe_upgrade");
+        itemStack = nmsItem.asBukkitMirror();
+
+        Anime.itemTitle(clickPlayer,
+                itemStack,
+                "§aУспешно!",
+                "§bВы перешли на " + museumUser.getPickaxeImprovements().get(pickaxeUpgrade) + " уровень улучшения\n" +
+                        pickaxeUpgrade.getTitle(),
+                2.0);
+        Glow.animate(clickPlayer, 2.0, GlowColor.GREEN);
+    }
+
+    private void upgradePickaxeImprovement(User museumUser, Player clickPlayer, PickaxeUpgrade pickaxeUpgrade) {
+        if (checkNotEnoughMoney(museumUser, (long) pickaxeUpgrade.getCost())) {
+            return;
+        }
+
+        museumUser.giveMoney(-pickaxeUpgrade.getCost());
+        museumUser.getPickaxeImprovements().replace(pickaxeUpgrade, museumUser.getPickaxeImprovements().get(pickaxeUpgrade) + 1);
+        Anime.close(clickPlayer);
+
+        ItemStack itemStack = new ItemStack(Material.CLAY_BALL);
+        val nmsItem = CraftItemStack.asNMSCopy(itemStack);
+        nmsItem.tag = new NBTTagCompound();
+        nmsItem.tag.setString("museum", "wood_pickaxe_upgrade");
+        itemStack = nmsItem.asBukkitMirror();
+
+        Anime.itemTitle(clickPlayer,
+                itemStack,
+                "§aУспешно!",
+                "§bВы перешли на " + museumUser.getPickaxeImprovements().get(pickaxeUpgrade) + " уровень улучшения\n" +
+                        pickaxeUpgrade.getTitle(),
+                2.0);
+        Glow.animate(clickPlayer, 2.0, GlowColor.GREEN);
+    }
+
+    private ItemStack getPickaxeImage(PickaxeType pickaxeType) {
+        val pickaxe = clepto.bukkit.item.Items.render(pickaxeType.name().toLowerCase()).asBukkitMirror();
+        val meta = pickaxe.getItemMeta();
+        meta.addEnchant(Enchantment.DIG_SPEED, meta.getEnchantLevel(Enchantment.DIG_SPEED), true);
+        pickaxe.setItemMeta(meta);
+        return pickaxe;
+    }
+
+    private String getPickaxeColor(PickaxeType pickaxeType) {
+        if (pickaxeType.equals(PickaxeType.DEFAULT)) return "§7";
+        if (pickaxeType.equals(PickaxeType.PROFESSIONAL)) return "§3";
+        if (pickaxeType.equals(PickaxeType.PRESTIGE)) return "§6";
+        if (pickaxeType.equals(PickaxeType.LEGENDARY)) return "§b";
+        return "";
+    }
+
+    private boolean checkNotEnoughMoney(User clickUser, Long finalCost) {
+        if (clickUser.getMoney() < finalCost) {
+            AnimationUtil.buyFailure(clickUser);
+            return true;
+        } else { return false; }
+    }
+
+    private String cmdTools(Player player, String[] args) {
+        val menu = new Selection(
+                "Меню инструментов",
+                "",
+                "Открыть",
+                2,
+                2,
+                new Button()
+                        .texture("minecraft:textures/items/gold_pickaxe.png")
+                        .title("§bКирки")
+                        .description("Приобретите новую кирку и разгадайте тайны песка...")
+                        .onClick((click, index, button) -> click.performCommand("upgradepickaxe")),
+                new Button()
+                        .texture("minecraft:textures/items/fishing_rod_uncast.png")
+                        .title("§bКрюк")
+                        .description("Улучшайте крюк, чтобы быстрее получать опыт на реке международных раскопок кристаллов.")
+                        .onClick((click, index, button) -> click.performCommand("upgraderod"))
+        );
+        menu.open(player);
+        return null;
+    }
+
+    private static final int PRICE = 25000;
+    private static final double CHANCE = 0.40;
+    private String cmdPolishing(Player player, String[] args) {
+        User user = App.getApp().getUser(player);
+
+        val menu = new Selection(
+                "Полировка",
+                "Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
+                "Полировать",
+                1,
+                1,
+                new Button()
+                        .texture("minecraft:mcpatcher/cit/others/anvil.png")
+                        .title("§bЮвелир")
+                        .description("§7Вы можете поменять\n" +
+                                "§7процент драгоценного\n" +
+                                "§7камня (от 0 до 110%).\n" +
+                                "§cШанс потерять камень " + (int) (CHANCE * 100) + "%\n" +
+                                "§eСтоимость услуги " + MessageUtil.toMoneyFormat(PRICE)
+                        ).onClick((click, index, button) -> {
+                            User clickUser = App.getApp().getUser(click);
+                            ItemStack itemInHand = click.getItemInHand();
+                            NBTTagCompound tag = CraftItemStack.asNMSCopy(itemInHand).tag;
+                            Gem gem = null;
+                            for (Fragment currentRelic : clickUser.getRelics().values()) {
+                                if (currentRelic.getUuid().toString().equals(tag.getString("relic-uuid"))) {
+                                    gem = (Gem) currentRelic;
+                                }
+                            }
+                            if (clickUser.getMoney() >= PRICE && gem != null) {
+                                click.getInventory().removeItem(click.getItemInHand());
+                                gem.remove(clickUser);
+                                clickUser.giveMoney(-PRICE);
+                                Anime.close(player);
+                                if (Math.random() < CHANCE)
+                                    Anime.topMessage(clickUser.handle(), "§cКамень был разрушен");
+                                else {
+                                    new Gem(gem.getType().name() + ":" + Math.random() + ":" + gem.getPrice()).give(clickUser);
+                                    Anime.topMessage(clickUser.handle(), "§aКамень был отполирован");
+                                }
+                            } else
+                                AnimationUtil.buyFailure(clickUser);
+                        })
+        );
+        B.postpone(1, () -> menu.open(player));
+        return null;
+    }
+
+    private String cmdLootBox(Player player, String[] args) {
+        GetAccountBalancePackage money;
+        try {
+            money = (GetAccountBalancePackage) ISocketClient.get().writeAndAwaitResponse(new GetAccountBalancePackage(player.getUniqueId())).get(1, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+        val menu = new Selection(
+                "Лутбокс",
+                "Кристаликов " + money.getBalanceData().getCrystals(),
+                "Открыть",
+                1,
+                1,
+                new Button()
+                        .texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
+                        .price(39)
+                        .title("§сСлучайная посылка")
+                        .description("\n\n\n\n§bВы получите случайный §cдрагоценный камень [60%-100%]" +
+                                "§b, а так же случайный §cметеорит§b c доходом от 15$ до 100$.")
+                        .onClick((click, index, button) -> click.performCommand("proccessdonate ITEM_CASE"))
+        );
+        menu.setVault("donate");
+        B.postpone(1, () -> menu.open(player));
         return null;
     }
 
@@ -139,66 +697,59 @@ public class MuseumCommands {
             new Button()
                     .texture("minecraft:textures/items/sign.png")
                     .title("§bПереименовать музей")
-                    .description("§7Если вам не нравится\n" +
-                            "§7название вашего музея\n" +
-                            "§7вы можете его изменить."
-                    ).onClick((click, index, button) -> click.performCommand("changetitle")),
+                    .description("§7Если вам не нравится название вашего музея, то вы можете его изменить.")
+                    .onClick((click, index, button) -> click.performCommand("changetitle")),
             new Button()
                     .texture("minecraft:textures/items/end_crystal.png")
                     .title("§bПрефиксы")
-                    .description("§7Выберите префикс!\n" +
-                            "§7Некоторые редкие префиксы\n" +
-                            "§7дают бонусы."
-                    ).onClick((click, index, button) -> click.performCommand("prefixes")),
+                    .description("§7Купите префикс!\n\n§7Некоторые редкие префиксы дают §bхорошие бонусы§7.")
+                    .onClick((click, index, button) -> click.performCommand("prefixes")),
             new Button()
                     .material(Material.ENDER_PEARL)
                     .title("§bДень/Ночь")
-                    .description("§7Меняйте режим так,", "§7как нравится глазам!"
-                    ).onClick((click, index, button) -> {
+                    .description("§7Меняйте режим так, как будет приятно вашим глазам!")
+                    .onClick((click, index, button) -> {
                         val user = App.getApp().getUser(click);
                         user.getPlayer().setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, true);
                         user.getInfo().setDarkTheme(!user.getInfo().isDarkTheme());
-                        click.closeInventory();
+                        Anime.close(click);
                     }),
             new Button()
-                    .texture("minecraft:textures/items/golden_pickaxe.png")
+                    .texture("minecraft:textures/items/gold_pickaxe.png")
                     .title("§bИнструменты")
-                    .description("§7Улучшайте ваше снаряжение."
-                    ).onClick((click, index, button) -> click.performCommand("tools")),
+                    .description("§7Улучшайте ваше снаряжение.")
+                    .onClick((click, index, button) -> click.performCommand("tools")),
             new Button()
-                    .texture("minecraft:textures/items/compass.png")
+                    .texture("minecraft:textures/items/compass_00.png")
                     .title("§bЭкспедиции")
-                    .description("§7Отправляйтесь на раскопки\n" +
-                            "§7и найдите следы прошлого."
-                    ).onClick((click, index, button) -> click.performCommand("gui excavation")),
+                    .description("§7Отправляйтесь на раскопки и найдите следы прошлого.")
+                    .onClick((click, index, button) -> click.performCommand("excavationmenu")),
             new Button()
-                    .texture("minecraft:textures/items/writable_book.png")
-                    .title("§bПригласить друга")
-                    .description("§7Нажмите и введите\n" +
-                            "§7никнейм приглашенного!"
-                    ).onClick((click, index, button) -> click.performCommand("invite")),
+                    .texture("minecraft:mcpatcher/cit/others/hub/guild_shop.png")
+                    .title("§bМагазин")
+                    .description("§7Отправляйтесь за покупками!")
+                    .onClick((click, index, button) -> click.performCommand("shop")),
             new Button()
-                    .texture("minecraft:textures/items/golden_carrot.png")
+                    .item(Items.builder().type(Material.GOLDEN_CARROT).enchantment(Enchantment.LUCK, 1).build())
                     .title("§bОсобое снаряжение")
-                    .description("§7Тут вы можете купить,\n" +
-                            "§7интересные вещи..."
-                    ).onClick((click, index, button) -> click.performCommand("donate")),
+                    .description("§7Тут вы можете купить интересные вещи...")
+                    .onClick((click, index, button) -> click.performCommand("donate")),
             new Button()
-                    .texture("minecraft:textures/items/chest_minecart.png")
+                    .texture("minecraft:textures/items/minecart_chest.png")
                     .title("§bЗаказать товар §e500$")
-                    .description("§7Закажите фургон с продовольствием,\n" +
-                            "§7он будет вас ждать слева от музея, \n" +
-                            "§7идите к желтому знаку за тем\n" +
-                            "§7отнесите товар в лавку."
-                    ).onClick((click, index, button) -> click.performCommand("wagonbuy")),
+                    .description("§7Закажите фургон с продовольствием.\n" +
+                            "§7Он будет вас ждать слева от музея, идите к желтому знаку, а затем отнесите товар в лавку.")
+                    .onClick((click, index, button) -> click.performCommand("wagonbuy")),
             new Button()
-                    .texture("minecraft:textures/other/new_lvl_rare_close.png")
+                    .texture("minecraft:textures/items/book_writable.png")
+                    .title("§bПригласить друга")
+                    .description("§7Нажмите и введите никнейм приглашенного друга!")
+                    .onClick((click, index, button) -> click.performCommand("invite")),
+            new Button()
+                    .texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
                     .title("§bЛутбокс")
-                    .description("§7㧩 Вы получите случайный" +
-                            "§7драгоценный камень [60%-100%]," +
-                            "§7а так же случайный" +
-                            "§7метеорит доходом от 15$ до 100$."
-                    ).onClick((click, index, button) -> click.performCommand("lootbox"))
+                    .description("§7Все любят кейсы..")
+                    .onClick((click, index, button) -> click.performCommand("lootbox"))
     ));
 
     private String cmdMenu(Player player, String[] args) {
@@ -215,196 +766,74 @@ public class MuseumCommands {
         return null;
     }
 
-    private final List<Button> menuTools = new ArrayList<>(Arrays.asList(
-            new Button()
-                    .texture("minecraft:textures/items/golden_pickaxe.png")
-                    .title("§bКирки")
-                    .description("Приобретите новую кирку" +
-                            "и разгадайте тайны песка..."
-                    ).onClick((click, index, button) -> click.performCommand("changetitle")),
-            new Button()
-                    .texture("minecraft:textures/items/fishing_rod.png")
-                    .title("§bКрюк")
-                    .description("Улучшайте крюк, чтобы\n" +
-                            "быстрее получать опыт на\n" +
-                            "реке международных раскопок\n" +
-                            "кристаллов."
-                    ).onClick((click, index, button) -> click.performCommand("rod"))
-    ));
-
-    private String cmdTools(Player player, String[] args) {
-        val menu = new Selection(
-                "Меню инструментов",
-                "",
-                "Открыть",
-                2,
-                2,
-                new Button()
-        );
-        menu.setStorage(menuTools);
-        menu.open(player);
-        return null;
-    }
-
-    private static final int PRICE = 25000;
-    private static final double CHANCE = 0.40;
-
-    private final List<Button> polishingButton = new ArrayList<>(Collections.singletonList(
-            new Button()
-                    .material(Material.ANVIL)
-                    .title("§bЮвелир")
-                    .description("§7Вы можете поменять\n" +
-                            "§7процент драгоценного\n" +
-                            "§7камня (от 0 до 110%).\n" +
-                            "§cШанс потерять камень " + (int) (CHANCE * 100) + "%\n" +
-                            "§eСтоимость услуги " + MessageUtil.toMoneyFormat(PRICE)
-                    ).onClick((click, index, button) -> {
-                        User user = App.getApp().getUser(click);
-                        ItemStack itemInHand = click.getItemInHand();
-                        NBTTagCompound tag = CraftItemStack.asNMSCopy(itemInHand).tag;
-                        Gem gem = null;
-                        for (Fragment currentRelic : user.getRelics().values()) {
-                            if (currentRelic.getUuid().toString().equals(tag.getString("relic-uuid"))) {
-                                gem = (Gem) currentRelic;
-                            }
-                        }
-                        if (user.getMoney() >= PRICE && gem != null) {
-                            click.getInventory().removeItem(click.getItemInHand());
-                            gem.remove(user);
-                            user.giveMoney(-PRICE);
-                            click.closeInventory();
-                            if (Math.random() < CHANCE)
-                                Anime.topMessage(user.handle(), "§cКамень был разрушен");
-                            else {
-                                new Gem(gem.getType().name() + ":" + Math.random() + ":" + gem.getPrice()).give(user);
-                                Anime.topMessage(user.handle(), "§aКамень был отполирован");
-                            }
-                        } else
-                            AnimationUtil.buyFailure(user);
-                    })
-    ));
-
-    private String cmdPolishing(Player player, String[] args) {
-        val menu = new Selection(
-                "Полировка",
-                "",
-                "Полировать",
-                1,
-                1,
-                new Button()
-        );
-        menu.setStorage(polishingButton);
-        menu.open(player);
-        return null;
-    }
-
-    private final List<Button> lootBoxButtons = new ArrayList<>(Collections.singletonList(
-            new Button()
-                    .texture("minecraft:textures/other/new_lvl_rare_close.png")
-                    .price(39)
-                    .title("§bСлучайная посылка")
-                    .description("§7㧩 Вы получите случайный", "§7драгоценный камень и метеорит!")
-                    .onClick((click, index, button) -> click.performCommand("proccessdonate ITEM_CASE"))
-    ));
-
-    private String cmdLootBox(Player player, String[] args) {
-        GetAccountBalancePackage money;
-        try {
-            money = (GetAccountBalancePackage) ISocketClient.get().writeAndAwaitResponse(new GetAccountBalancePackage(player.getUniqueId())).get(1, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
-        }
-        val menu = new Selection(
-                "Лутбокс",
-                "Кристаликов " + money.getBalanceData().getCrystals(),
-                "Открыть",
-                1,
-                1,
-                new Button()
-        );
-        menu.setVault("donate");
-        menu.setStorage(lootBoxButtons);
-        menu.open(player);
-        return null;
-    }
-
-
     private final List<Button> donateButtons = new ArrayList<>(Arrays.asList(
             new Button()
                     .material(Material.END_CRYSTAL)
                     .price(49)
                     .title("§aСлучайный префикс")
-                    .description("Если такой префикс уже был?\n" +
-                            "- §eВы получите §6§l50`000 $\n" +
-                            "Каждое §dпятое §fоткрытие §dгарантирует\n" +
-                            "§6редкий §fили §dэпичный §fпрефикс"
-                    ).onClick((click, index, button) -> click.performCommand("proccessdonate PREFIX_CASE")),
+                    .description("Такой префикс уже был?\n" +
+                            "§eВы получите §6§l50,000$\n\n" +
+                            "Каждое §dпятое §fоткрытие §dгарантирует §6редкий §fили\n" +
+                            "§dэпичный §fпрефикс.")
+                    .onClick((click, index, button) -> click.performCommand("proccessdonate PREFIX_CASE")),
+            new Button()
+                    .texture("minecraft:mcpatcher/cit/others/hub/coin2.png")
+                    .price(119)
+                    .title("§6Комиссия 0%")
+                    .description("Если вы §aпродаете или покупаете §fдрагоценный камень, то комиссия " +
+                            "§aисчезнет§f, поэтому вы не теряете денег на переводах валюты.")
+                    .onClick((click, index, button) -> click.performCommand("proccessdonate PRIVILEGES")),
+            new Button()
+                    .item(getPickaxeImage(PickaxeType.LEGENDARY))
+                    .price(349)
+                    .title("§b§lЛегендарная кирка")
+                    .description("Особая кирка!\n\n" +
+                            "Приносит §b2 опыта за вскапывание §fи добывает §bбольше §fвсех других!" +
+                            "\n\n§cНе остается §fпосле вайпа")
+                    .onClick((click, index, button) -> click.performCommand("proccessdonate LEGENDARY_PICKAXE")),
+            new Button()
+                    .material(Material.OBSERVER)
+                    .price(249)
+                    .title("§6Стим-панк сборщик монет")
+                    .description("Быстрее всех§f!\n\n" +
+                            "Собирает самые дальние монеты -§b лучший выбор среди коллекторов." +
+                            "\n\n§cНе остается §fпосле вайпа")
+                    .onClick((click, index, button) -> click.performCommand("proccessdonate STEAM_PUNK_COLLECTOR")),
             new Button()
                     .material(Material.EXP_BOTTLE)
                     .price(149)
-                    .title("§bГлобальный бустер опыта §6§lx2")
-                    .description("Общий бустер на §b1 час§f,", "все получат в два раза больше опыта!")
+                    .title("§bБустер опыта §6§lx2")
+                    .description("Общий бустер на §b1 час§f.\n\n" +
+                            "Все получат в §lДВА§f раза больше опыта!")
                     .onClick((click, index, button) -> click.performCommand("proccessdonate GLOBAL_EXP_BOOSTER")),
             new Button()
                     .texture("minecraft:mcpatcher/cit/others/hub/iconpack/win2.png")
                     .price(79)
-                    .title("§aГлобальный бустер бура §6§lx2")
-                    .description("Общий бустер на §b1 час§f,\n" +
-                            "в §lДВА§f раза быстрее работает\n" +
-                            "бур!"
-                    ).onClick((click, index, button) -> click.performCommand("proccessdonate BOER")),
-            new Button()
-                    .texture("minecraft:mcpatcher/cit/others/hub/iconpack/win2.png")
-                    .price(149)
-                    .title("§aБустер посетителей §6§lx3")
-                    .description("Общий бустер на §b1 час§f,\n" +
-                            "в §lТРИ§f раза больше посетителей\n" +
-                            "и §e§lмонет§f!"
-                    ).onClick((click, index, button) -> click.performCommand("proccessdonate GLOBAL_VILLAGER_BOOSTER")),
+                    .title("§aБустер бура §6§lx2")
+                    .description("Общий бустер на §b1 час§f.\n\n" +
+                            "Бур работает в §lДВА§f раза быстрее у всех!")
+                    .onClick((click, index, button) -> click.performCommand("proccessdonate BOER")),
             new Button()
                     .texture("minecraft:mcpatcher/cit/others/hub/iconpack/win2.png")
                     .price(199)
-                    .title("§aГлобальный бустер бура §6§lx5")
-                    .description("Общий бустер на §b1 час§f,\n" +
-                            "в §lПЯТЬ§f раза быстрее работает\n" +
-                            "бур!"
-                    ).onClick((click, index, button) -> click.performCommand("proccessdonate BIG_BOER")),
+                    .title("§aБустер бура §6§lx5")
+                    .description("Общий бустер на §b1 час§f.\n\n" +
+                            "Бур работает в §a§lПЯТЬ§f раз быстрее у всех!")
+                    .onClick((click, index, button) -> click.performCommand("proccessdonate BIG_BOER")),
+            new Button()
+                    .texture("minecraft:mcpatcher/cit/others/villager.png")
+                    .price(149)
+                    .title("§aБустер посетителей §6§lx3")
+                    .description("Общий бустер на §b1 час§f.\n\n" +
+                            "У всех в §lТРИ§f раза больше посетителей и §e§lмонет§f!")
+                    .onClick((click, index, button) -> click.performCommand("proccessdonate GLOBAL_VILLAGER_BOOSTER")),
             new Button()
                     .material(Material.GOLDEN_APPLE)
                     .price(199)
-                    .title("§eГлобальный бустер денег §6§lx2")
-                    .description("Общий бустер на §b1 час§f,\n" +
-                            "все получат в два раза больше денег!"
-                    ).onClick((click, index, button) -> click.performCommand("proccessdonate GLOBAL_MONEY_BOOSTER")),
-            new Button()
-                    .item(Items.builder().type(Material.GOLDEN_APPLE).enchantment(Enchantment.LUCK, 1).build())
-                    .price(119)
-                    .title("§aКомиссия 0%")
-                    .description("Если вы §aпродаете или покупаете\n" +
-                            "драгоценный камень, комиссия\n" +
-                            "§aисчезнет§f, поэтому вы не теряете\n" +
-                            "денег на переводах валюты."
-                    ).onClick((click, index, button) -> click.performCommand("proccessdonate PRIVILEGES")),
-            new Button()
-                    .texture("minecraft:textures/prison/shoveld.png")
-                    .price(349)
-                    .title("§b§lЛегендарная кирка")
-                    .description("Особая кирка, приносит" +
-                            "§b2 опыта за блок§f и" +
-                            "вскапывает §bбольше всех" +
-                            "других!" +
-                            "§7Не остается после вайпа"
-                    ).onClick((click, index, button) -> click.performCommand("proccessdonate LEGENDARY_PICKAXE")),
-            new Button()
-                    .texture("minecraft:textures/museum/porovoz.png")
-                    .price(249)
-                    .title("§6Стим-панк сборщик монет")
-                    .description("§bБыстрее всех§f! Собирает самые\n" +
-                            "дальние монеты -§b лучший выбор\n" +
-                            "среди коллекторов.\n" +
-                            "\n" +
-                            "§7Не остается после вайпа"
-                    ).onClick((click, index, button) -> click.performCommand("proccessdonate STEAM_PUNK_COLLECTOR"))
+                    .title("§eБустер денег §6§lx2")
+                    .description("Общий бустер на §b1 час§f.\n\n" +
+                            "Все получат в §lДВА§f раза больше денег!")
+                    .onClick((click, index, button) -> click.performCommand("proccessdonate GLOBAL_MONEY_BOOSTER"))
     ));
 
     private String cmdDonate(Player player, String[] args) {
@@ -426,6 +855,26 @@ public class MuseumCommands {
         menu.setStorage(donateButtons);
         menu.open(player);
         return null;
+    }
+
+    private String cmdResourcePack(Player player, String[] args) {
+        player.setResourcePack(System.getenv("RESOURCE_PACK"), "666");
+        return Formatting.fine("Установка...");
+    }
+
+    private String cmdRate(Player player, String[] args) {
+        if (args.length == 0)
+            return Formatting.error("/rate <цена>");
+        else if (!app.getPlayerDataManager().isRateBegun())
+            return Formatting.error("Торги ещё не начались.");
+        else if (Integer.parseInt(args[0]) < 10)
+            return Formatting.error("Сумма должна быть больше 10$.");
+        else if (Integer.parseInt(args[0]) > app.getUser(player).getMoney())
+            return Formatting.error("У вас нет таких денег.");
+        else
+            App.getApp().getPlayerDataManager().getMembers().put(player.getUniqueId(), Integer.parseInt(args[0]));
+
+        return Formatting.fine("Ваша ставка была принята.");
     }
 
     private String cmdBuy(Player sender, String[] args) {
@@ -465,39 +914,6 @@ public class MuseumCommands {
         return MessageUtil.get("finally-buy");
     }
 
-    private String cmdVisit(Player sender, String[] args) {
-        val user = app.getUser(sender);
-
-        if (!sender.isOp())
-            return null;
-
-        if (args.length <= 1)
-            return "§cИспользование: §f/museum visit [Игрок] [Музей]";
-
-        val ownerPlayer = Bukkit.getPlayer(args[1]);
-
-        if (ownerPlayer == null || !ownerPlayer.isOnline())
-            return PLAYER_OFFLINE_MESSAGE;
-
-        val ownerUser = app.getUser(ownerPlayer);
-        String address = args.length > 2 ? args[2] : "main";
-
-        MuseumPrototype prototype = Managers.museum.getPrototype(address);
-        Museum museum = prototype == null ? null : ownerUser.getMuseums().get(prototype);
-        if (museum == null)
-            return MessageUtil.get("museum-not-found");
-
-        if (Objects.equals(user.getLastMuseum(), museum))
-            return MessageUtil.get("already-at-home");
-
-        user.setState(museum);
-
-        MessageUtil.find("museum-teleported")
-                .set("visitor", user.getName())
-                .send(ownerUser);
-        return null;
-    }
-
     private String cmdTravel(Player sender, String[] args) {
         val visitor = app.getUser(sender);
         val owner = app.getUser(Bukkit.getPlayer(args[0]));
@@ -525,100 +941,6 @@ public class MuseumCommands {
                     .set("price", MessageUtil.toMoneyFormat(museum.getIncome() / 2))
                     .send(owner);
         }
-        return null;
-    }
-
-    private String cmdHome(Player sender, String[] args) {
-        val user = this.app.getUser(sender);
-        // Не возвращать в музей если игрок возвращается с раскопок
-        if (user.getState() == null || (user.getState() instanceof Excavation && ((Excavation) user.getState()).getHitsLeft() < 0))
-            return null;
-        if (user.getState() instanceof Museum && ((Museum) user.getState()).getOwner().equals(user))
-            return MessageUtil.get("already-at-home");
-
-        user.setState(user.getLastMuseum());
-        return MessageUtil.get("welcome-home");
-    }
-
-    private String cmdSkeleton(Player sender, String[] args) {
-        if (!sender.isOp())
-            return null;
-        Collection<Skeleton> skeletons = this.app.getUser(sender).getSkeletons();
-        skeletons.forEach(skeleton ->
-                sender.sendMessage("§e" + skeleton.getPrototype().getAddress() + "§f: " + skeleton.getUnlockedFragments().size()));
-        return "§e" + skeletons.size() + " in total.";
-    }
-
-    private String cmdSubjects(Player sender, String[] args) {
-        if (!sender.isOp())
-            return null;
-        Collection<Subject> subjects = this.app.getUser(sender).getSubjects();
-        for (Subject subject : subjects) {
-            String allocationInfo = "§cno allocation";
-            Allocation allocation = subject.getAllocation();
-            if (allocation != null) {
-                Location origin = allocation.getOrigin();
-                allocationInfo = allocation.getUpdatePackets().size() + " packets, §f" + origin.getX() + " " + origin.getY() + " " + origin.getZ();
-            }
-            sender.sendMessage("§e" + subject.getPrototype().getAddress() + "§f: " + subject.getOwner().getName() + ", " + allocationInfo);
-        }
-        return "§e" + subjects.size() + " in total.";
-    }
-
-    private String cmdGui(Player sender, String[] args) {
-        this.app.getUser(sender);
-        if (args.length == 0)
-            return "§cИспользование: §e/gui [адрес]";
-        try {
-            if (sender.getPlayer() == null)
-                return null;
-            clepto.bukkit.menu.Guis.open(sender, args[0], args.length > 1 ? args[1] : null);
-        } catch (NoSuchElementException ex) {
-            return MessageUtil.find("no-gui").set("gui", args[0]).getText();
-        }
-        return null;
-    }
-
-    private String cmdShop(Player sender, String[] args) {
-        User user = app.getUser(sender);
-
-        if (user.getPlayer() == null)
-            return null;
-
-        if (user.getExperience() < PreparePlayerBrain.EXPERIENCE)
-            return null;
-
-        if (user.getState() instanceof Excavation)
-            return MessageUtil.get("museum-first");
-        if (args.length < 1) {
-            user.setState(app.getShop());
-            return null;
-        }
-        user.setState(args[0].equals("poly") ? app.getMarket() : app.getShop());
-        return null;
-    }
-
-    private String cmdChangeTitle(Player sender, String[] args) {
-        User user = app.getUser(sender);
-        if (!(user.getState() instanceof Museum))
-            return MessageUtil.get("not-in-museum");
-        if (!((Museum) user.getState()).getOwner().equals(user))
-            return MessageUtil.get("root-refuse");
-        new VirtualSign().openSign(sender, lines -> {
-            if (user.getState() instanceof Museum) {
-                val stringBuilder = new StringBuilder();
-                for (String line : lines) {
-                    if (line != null && !line.isEmpty())
-                        stringBuilder.append(line);
-                    else
-                        break;
-                }
-                ((Museum) user.getState()).setTitle(stringBuilder.toString());
-                MessageUtil.find("museumtitlechange")
-                        .set("title", stringBuilder.toString())
-                        .send(user);
-            }
-        });
         return null;
     }
 
@@ -675,46 +997,80 @@ public class MuseumCommands {
 
         user.setMoney(user.getMoney() - prototype.getPrice());
 
-        player.closeInventory();
+        Anime.close(player);
         user.setState(new Excavation(prototype, prototype.getHitCount()));
         return null;
     }
 
-    private String cmdPickaxe(Player player, String[] args) {
-        User user = this.app.getUser(player);
-        PickaxeType pickaxe = user.getPickaxeType().getNext();
-        if (pickaxe == user.getPickaxeType() || pickaxe == null)
-            return null;
-        player.closeInventory();
+    private String cmdChangeTitle(Player sender, String[] args) {
+        User user = app.getUser(sender);
+        if (!(user.getState() instanceof Museum))
+            return MessageUtil.get("not-in-museum");
+        if (!((Museum) user.getState()).getOwner().equals(user))
+            return MessageUtil.get("root-refuse");
+        new VirtualSign().openSign(sender, lines -> {
+            if (user.getState() instanceof Museum) {
+                val stringBuilder = new StringBuilder();
+                for (String line : lines) {
+                    if (line != null && !line.isEmpty())
+                        stringBuilder.append(line);
+                    else
+                        break;
+                }
+                ((Museum) user.getState()).setTitle(stringBuilder.toString());
+                MessageUtil.find("museumtitlechange")
+                        .set("title", stringBuilder.toString())
+                        .send(user);
+            }
+        });
+        return null;
+    }
 
-        if (user.getMoney() < pickaxe.getPrice()) {
-            AnimationUtil.buyFailure(user);
+    private String cmdShop(Player sender, String[] args) {
+        User user = app.getUser(sender);
+
+        if (user.getPlayer() == null)
+            return null;
+
+        if (user.getExperience() < PreparePlayerBrain.EXPERIENCE)
+            return Formatting.error("Сначала нужно завершить туториал!");
+
+        if (user.getState() instanceof Excavation)
+            return MessageUtil.get("museum-first");
+
+        if (args.length < 1) {
+            user.setState(app.getShop());
             return null;
         }
 
-        user.setMoney(user.getMoney() - pickaxe.getPrice());
-        user.setPickaxeType(pickaxe);
-        player.performCommand("gui pickaxe");
-        return MessageUtil.get("newpickaxe");
+        user.setState(args[0].equals("poly") ? app.getMarket() : app.getShop());
+        return null;
     }
 
-    private String cmdResourcePack(Player player, String[] args) {
-        player.setResourcePack(System.getenv("RESOURCE_PACK"), "666");
-        return Formatting.fine("Установка...");
-    }
-
-    private String cmdRate(Player player, String[] args) {
+    private String cmdGui(Player sender, String[] args) {
+        this.app.getUser(sender);
         if (args.length == 0)
-            return Formatting.error("/rate <цена>");
-        else if (!app.getPlayerDataManager().isRateBegun())
-            return Formatting.error("Торги ещё не начались.");
-        else if (Integer.parseInt(args[0]) < 10)
-            return Formatting.error("Сумма должна быть больше 10$.");
-        else if (Integer.parseInt(args[0]) > app.getUser(player).getMoney())
-            return Formatting.error("У вас нет таких денег.");
-        else
-            App.getApp().getPlayerDataManager().getMembers().put(player.getUniqueId(), Integer.parseInt(args[0]));
-
-        return Formatting.fine("Ваша ставка была принята.");
+            return "§cИспользование: §e/gui [адрес]";
+        try {
+            if (sender.getPlayer() == null)
+                return null;
+            clepto.bukkit.menu.Guis.open(sender, args[0], args.length > 1 ? args[1] : null);
+        } catch (NoSuchElementException ex) {
+            return MessageUtil.find("no-gui").set("gui", args[0]).getText();
+        }
+        return null;
     }
+
+    private String cmdHome(Player sender, String[] args) {
+        val user = this.app.getUser(sender);
+        // Не возвращать в музей если игрок возвращается с раскопок
+        if (user.getState() == null || (user.getState() instanceof Excavation && ((Excavation) user.getState()).getHitsLeft() < 0))
+            return null;
+        if (user.getState() instanceof Museum && ((Museum) user.getState()).getOwner().equals(user))
+            return MessageUtil.get("already-at-home");
+
+        user.setState(user.getLastMuseum());
+        return MessageUtil.get("welcome-home");
+    }
+
 }

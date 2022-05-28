@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 public class PlayerDataManager implements Listener {
 
 	private static final Confirmation confirmation = new Confirmation(Arrays.asList("Рекомендуем установить", "ресурспак"),
-			player -> player.setResourcePack("https://storage.c7x.dev/reidj/Museum.zip", "4")
+			player -> player.setResourcePack("https://storage.c7x.dev/func/museum.zip", "4")
 	);
 
 	private final App app;
@@ -62,7 +62,8 @@ public class PlayerDataManager implements Listener {
 			"307264a1-2c69-11e8-b5ea-1cb72caa35fd", // func
 			"6f3f4a2e-7f84-11e9-8374-1cb72caa35fd", // faelan
 			"bf30a1df-85de-11e8-a6de-1cb72caa35fd", // reidj
-			"e7c13d3d-ac38-11e8-8374-1cb72caa35fd" // delfikpro
+			"e7c13d3d-ac38-11e8-8374-1cb72caa35fd", // delfikpro
+			"80b910b4-5722-11ea-849b-1cb72caa35fd" // GodzillaS
 	).map(UUID::fromString).collect(Collectors.toSet());
 
 	@SuppressWarnings("deprecation")

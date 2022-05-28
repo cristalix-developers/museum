@@ -4,7 +4,7 @@ npc:
   excavation:
     title: '§b§lРАСКОПКИ'
     hint: '§eПравый клик'
-    command: 'gui excavation'
+    command: 'excavationmenu'
     skin: 'http://textures.minecraft.net/texture/3f65acedfe57d35f6bca338127940eaff4ffbec80abd33bff858db3a1a93f82'
   shop:
     title: '§b§lМАГАЗИН'
@@ -34,7 +34,7 @@ npc:
   boer:
     title: '§b§lАСТРОНАВТ'
     hint: '§eПравый клик'
-    command: 'gui boer'
+    command: 'boer'
     skin: 'http://textures.minecraft.net/texture/be1467a71faa590368b2e16d93a87cf390a2b0b70be309c9c1a39561261b2c27'
 
 chat:
@@ -43,8 +43,8 @@ chat:
     sell-crystal: 'fineВы продали §d%CRYSTAL% кристалл(ов) §fза §e%MONEY%§f. 㱺'
     fishing: 'fineВы поймали рыбу! §b+%EXP% опыта. §f㜗'
     leave-crystal: 'fine§dКристаллы §fвместе с вами, они видны на скорборде.'
-    stand-sell: 'fineВы продали перекупщику постройку за §e%PRICE%&f!'
-    relic-sell: 'fineВы продали перекупщику реликвию за §e%PRICE%&f!'
+    stand-sell: 'fineВы продали перекупщику постройку за §e%PRICE%§f!'
+    relic-sell: 'fineВы продали перекупщику реликвию за §e%PRICE%§f!'
     relic-placed: 'fineВы поместили %TITLE%§f.'
     relic-in-hand: 'errorНа витрине уже есть реликвия.'
     relic-tacked: 'fineРеликвия снята с витрины.'
