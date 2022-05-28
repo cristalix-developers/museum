@@ -144,7 +144,7 @@ class Museum : KotlinMod() {
             } else if (key == Keyboard.KEY_N) {
                 help.enabled = !help.enabled
             } else if (key == Keyboard.KEY_M) {
-                clientApi.chat().sendChatMessage("/gui excavation")
+                clientApi.chat().sendChatMessage("/excavationmenu")
             } else if (key == Keyboard.KEY_H) {
                 clientApi.chat().sendChatMessage("/helps")
             } else if (key == Keyboard.KEY_G) {
