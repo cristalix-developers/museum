@@ -20,12 +20,10 @@ import museum.excavation.ExcavationPrototype;
 import museum.fragment.Fragment;
 import museum.fragment.Gem;
 import museum.fragment.GemType;
-import museum.fragment.Relic;
 import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.map.SubjectType;
 import museum.museum.subject.Subject;
-import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.player.User;
 import museum.player.pickaxe.PickaxeUpgrade;
 import museum.player.prepare.PreparePlayerBrain;
@@ -247,28 +245,17 @@ public class MuseumCommands {
                 "Экспедиции",
                 "",
                 "Путешествие",
-                2,
+                4,
                 2
         );
 
         val excavations = Managers.excavation.stream().sorted(Comparator.comparing(ExcavationPrototype::getPrice)).collect(Collectors.toList());
 
         for (ExcavationPrototype exc : excavations) {
-            StringBuilder skeletonsText = new StringBuilder();
-            for (SkeletonPrototype skeletonPrototype : exc.getAvailableSkeletonPrototypes()) {
-                skeletonsText.append(skeletonPrototype.getTitle()).append("\n");
-            }
-
-            val relics = Arrays.stream(exc.getRelics()).sorted(Comparator.comparing(Relic::getPrice).reversed()).collect(Collectors.toList());
-            StringBuilder relicText = new StringBuilder();
-            for (Relic relic : relics) {
-                relicText.append(relic.getItem().getI18NDisplayName()).append("\n");
-            }
-
             Button btnMapUnlocked = new Button()
                     .item(exc.getIcon())
-                    .title(exc.getTitle() + " " + MessageUtil.toMoneyFormat(exc.getPrice()) + " [" + exc.getHitCount() + "] ")
-                    .description(skeletonsText + relicText.toString())
+                    .title(exc.getTitle())
+                    .description("Цена отправления: " + MessageUtil.toMoneyFormat(exc.getPrice()))
                     .onClick((clickUser, index, button) -> {
                         if (museumUser.getMoney() > exc.getPrice()) {
                             clickUser.performCommand("excavation " + exc.getAddress());
@@ -279,8 +266,8 @@ public class MuseumCommands {
 
             Button btnMapLocked = new Button()
                     .texture("minecraft:mcpatcher/cit/others/lock.png")
-                    .title(exc.getTitle())
-                    .description("Необходимый уровень: " + exc.getRequiredLevel())
+                    .title("§cЗакрыто")
+                    .description("§7Необходимый уровень: " + exc.getRequiredLevel())
                     .hint("");
 
             if (museumUser.getLevel() >= exc.getRequiredLevel()) {
