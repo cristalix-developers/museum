@@ -22,9 +22,9 @@ import java.util.stream.Collectors
 
 import static org.bukkit.Material.*
 
-registerCommand 'prefixes' handle {
-    Guis.open player, 'prefixes', player
-}
+//registerCommand 'prefixes' handle {
+//    Guis.open player, 'prefixes', player
+//}
 
 def prefixes = [
 ]

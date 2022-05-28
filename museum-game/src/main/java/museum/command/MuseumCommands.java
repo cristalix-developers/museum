@@ -1,6 +1,7 @@
 package museum.command;
 
 import clepto.bukkit.B;
+import groovyjarjarantlr4.runtime.tree.BufferedTreeNodeStream;
 import lombok.val;
 import me.func.mod.Anime;
 import me.func.mod.Glow;
@@ -10,6 +11,7 @@ import me.func.mod.selection.Selection;
 import me.func.protocol.GlowColor;
 import museum.App;
 import museum.client_conversation.AnimationUtil;
+import museum.content.PrefixType;
 import museum.cosmos.Cosmos;
 import museum.cosmos.boer.Boer;
 import museum.cosmos.boer.BoerType;
@@ -62,6 +64,7 @@ public class MuseumCommands {
     public MuseumCommands(App app) {
         this.app = app;
 
+        B.regCommand(this::cmdPrefixMenu, "prefixes");
         B.regCommand(this::cmdBoerMenu, "boermenu");
         B.regCommand(this::cmdBoer, "boer");
         B.regCommand(this::cmdExcavationSecondMenu, "excavationsecondmenu");
@@ -85,6 +88,41 @@ public class MuseumCommands {
         B.regCommand(this::cmdChangeTitle, "changetitle");
         B.regCommand(this::cmdShop, "shop", "gallery");
         B.regCommand(this::cmdHome, "home", "leave", "spawn");
+    }
+
+    private String cmdPrefixMenu(Player player, String[] args) {
+        val user = App.app.getUser(player);
+
+        val menu = new Selection(
+                "Префиксы",
+                "",
+                "",
+                3,
+                3
+        );
+
+        for (PrefixType prefixType : PrefixType.values()) {
+            val prefixRarity = prefixType.getRare();
+            val prefixHasBonus = !Objects.equals(prefixType.getBonus(), "");
+            val playerHasThisPrefix = user.getPrefixes().contains(prefixType.getPrefix());
+
+            Button btn = new Button()
+                    .material(prefixRarity == 3 ? Material.EMERALD : prefixRarity == 2 ? Material.GOLD_INGOT : Material.IRON_INGOT)
+                    .title(prefixHasBonus ? prefixType.getPrefix() + " " + prefixType.getTitle() : prefixType.getPrefix())
+                    .description(prefixHasBonus ? prefixType.getBonus() : "\n" + prefixType.getTitle())
+                    .hint(playerHasThisPrefix ? "Поставить" : "")
+                    .onClick((clickUser, index, button) -> {
+                        if (playerHasThisPrefix) {
+                            user.setPrefix(prefixType.getPrefix());
+                            Anime.close(player);
+                            Anime.title(player, "Вы §aуспешно§f выбрали префикс " + prefixType.getPrefix());
+                        }
+                    });
+            menu.add(btn);
+        }
+
+        menu.open(player);
+        return null;
     }
 
     private String cmdBoerMenu(Player player, String[] args) {
