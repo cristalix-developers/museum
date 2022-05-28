@@ -698,18 +698,18 @@ public class MuseumCommands {
     private final List<Button> menuButtons = new ArrayList<>(Arrays.asList(
             new Button()
                     .texture("minecraft:textures/items/sign.png")
-                    .title("§bПереименовать музей")
-                    .description("§7Если вам не нравится название вашего музея, то вы можете его изменить.")
+                    .title("Переименовать музей")
+                    .description("Изменить название вашего музея")
                     .onClick((click, index, button) -> click.performCommand("changetitle")),
             new Button()
                     .texture("minecraft:textures/items/end_crystal.png")
-                    .title("§bПрефиксы")
-                    .description("§7Купите префикс!\n\n§7Некоторые редкие префиксы дают §bхорошие бонусы§7.")
+                    .title("Префиксы")
+                    .description("Символ перед ником, некоторые дают особые способности")
                     .onClick((click, index, button) -> click.performCommand("prefixes")),
             new Button()
                     .material(Material.ENDER_PEARL)
-                    .title("§bДень/Ночь")
-                    .description("§7Меняйте режим так, как будет приятно вашим глазам!")
+                    .title("День / Ночь")
+                    .description("Меняйте режим так, как будет приятно вашим глазам")
                     .onClick((click, index, button) -> {
                         val user = App.getApp().getUser(click);
                         user.getPlayer().setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, true);
@@ -718,39 +718,38 @@ public class MuseumCommands {
                     }),
             new Button()
                     .texture("minecraft:textures/items/gold_pickaxe.png")
-                    .title("§bИнструменты")
-                    .description("§7Улучшайте ваше снаряжение.")
+                    .title("Инструменты")
+                    .description("Улучшайте ваше снаряжение")
                     .onClick((click, index, button) -> click.performCommand("tools")),
             new Button()
                     .texture("minecraft:textures/items/compass_00.png")
-                    .title("§bЭкспедиции")
-                    .description("§7Отправляйтесь на раскопки и найдите следы прошлого.")
+                    .title("Экспедиции")
+                    .description("Исследования! Реликвии! Метеориты! Останки динозавров!")
                     .onClick((click, index, button) -> click.performCommand("excavationmenu")),
             new Button()
                     .texture("minecraft:mcpatcher/cit/others/hub/guild_shop.png")
-                    .title("§bМагазин")
-                    .description("§7Отправляйтесь за покупками!")
+                    .title("Магазин")
+                    .description("Отправляйтесь за новыми постройками")
                     .onClick((click, index, button) -> click.performCommand("shop")),
             new Button()
                     .item(Items.builder().type(Material.GOLDEN_CARROT).enchantment(Enchantment.LUCK, 1).build())
-                    .title("§bОсобое снаряжение")
-                    .description("§7Тут вы можете купить интересные вещи...")
+                    .title("§bДонат")
+                    .description("Различные плюшки")
                     .onClick((click, index, button) -> click.performCommand("donate")),
             new Button()
                     .texture("minecraft:textures/items/minecart_chest.png")
-                    .title("§bЗаказать товар §e500$")
-                    .description("§7Закажите фургон с продовольствием.\n" +
-                            "§7Он будет вас ждать слева от музея, идите к желтому знаку, а затем отнесите товар в лавку.")
+                    .title("Заказать товар §e500$")
+                    .description("Заберите товар у фуры и продавайте его в лавке")
                     .onClick((click, index, button) -> click.performCommand("wagonbuy")),
             new Button()
                     .texture("minecraft:textures/items/book_writable.png")
-                    .title("§bПригласить друга")
-                    .description("§7Нажмите и введите никнейм приглашенного друга!")
+                    .title("Пригласить друга")
+                    .description("Нажмите и введите никнейм приглашенного друга")
                     .onClick((click, index, button) -> click.performCommand("invite")),
             new Button()
                     .texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
-                    .title("§bЛутбокс")
-                    .description("§7Все любят кейсы..")
+                    .title("Лутбоксы")
+                    .description("Купите шанс получить топовые предметы")
                     .onClick((click, index, button) -> click.performCommand("lootbox"))
     ));
 
@@ -759,8 +758,8 @@ public class MuseumCommands {
                 "Главное меню",
                 "",
                 "Открыть",
-                2,
-                2,
+                3,
+                3,
                 new Button()
         );
         menu.setStorage(menuButtons);
