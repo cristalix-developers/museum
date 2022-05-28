@@ -43,21 +43,15 @@ object Statistic {
         }
 
         val box = rectangle {
-            color = Color(0,0,0,0.62)
-            align = Relative.BOTTOM_RIGHT
+            align = BOTTOM_RIGHT
             origin = BOTTOM_RIGHT
-            addChild(balanceText, online, coinPrice, hitCount)
+            +balanceText
+            +online
+            +coinPrice
+            +hitCount
         }
 
-        UIEngine.overlayContext.addChild(box)
-
-        repeat(4) {
-            box.children.add(
-                rectangle {
-                    color = TRANSPARENT
-                }
-            )
-        }
+        UIEngine.overlayContext + box
 
         registerHandler<PluginMessage> {
             when (channel) {
