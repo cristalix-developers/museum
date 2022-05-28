@@ -1,7 +1,7 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.listener
 
-
+import clepto.bukkit.B
 import museum.cosmos.Cosmos
 import museum.cosmos.boer.Boer
 import museum.excavation.Excavation
@@ -125,7 +125,7 @@ on PlayerInteractEvent, {
     def direction = player.eyeLocation.direction
 
     if (playerLocation.distanceSquared(ROCKET) < 45 && user.state instanceof Museum)
-        user.setState(new Cosmos())
+        B.postpone(1, () -> user.setState(new Cosmos()))
 
     if (user.state instanceof Cosmos && action != LEFT_CLICK_BLOCK) {
         def cosmos = user.state as Cosmos
