@@ -27,7 +27,6 @@ class Museum : KotlinMod() {
 
     private lateinit var shopbox: CarvedRectangle
     private lateinit var shoptext: TextElement
-    private var hints = ArrayList<Pair<Long, AbstractElement>>()
 
     override fun onEnable() {
         UIEngine.initialize(this)
@@ -46,29 +45,26 @@ class Museum : KotlinMod() {
         var sell: Array<ToSell>? = null
         var activeSubject: ToSell? = null
 
-        shoptext = text {
-            offset = Relative.TOP_LEFT
-            align = Relative.TOP_LEFT
-            align.x += 0.05
-            align.y += 0.05
-            color = Color(0, 255, 0, 1.0)
-        }
-
         shopbox = carved {
-            size = V3(220.0, 40.0)
-            offset = V3(0.5, 0.5)
-            align = V3(0.33, 0.7)
-            color = Color(0, 0, 0, 0.62)
+            size = V3(210.0, 40.0)
+            align = BOTTOM
+            origin = BOTTOM
+            offset.y -= 65.0
+            color = Color(0, 0, 0, 0.52)
             enabled = false
-            addChild(shoptext)
-            addChild(text {
-                offset = Relative.LEFT
-                align = Relative.LEFT
-                align.x += 0.05
-                align.y += 0.05
+            shoptext = +text {
+                origin = TOP
+                align = TOP
+                offset.y += 4.0
+                color = Color(0, 255, 0, 1.0)
+            }
+            +text {
+                origin = BOTTOM
+                align = BOTTOM
+                offset.y -= 4.0
                 color = Color(255, 255, 255, 1.0)
                 content = "Чтобы купить нажмите Enter"
-            })
+            }
         }
         UIEngine.overlayContext + shopbox
 
@@ -81,7 +77,7 @@ class Museum : KotlinMod() {
             offset.x -= 1
             align = Relative.LEFT
             origin = Relative.LEFT
-            color = Color(0, 0, 0, 0.62)
+            color = Color(0, 0, 0, 0.52)
             val hints = +flex {
                 flexSpacing = 2.0
                 offset.x += padding
@@ -107,11 +103,11 @@ class Museum : KotlinMod() {
                 }
             }
         }
-        UIEngine.overlayContext.addChild(help)
+        UIEngine.overlayContext + help
 
-        registerChannel("shop") {
-            sell = Gson().fromJson(NetUtil.readUtf8(this), Array<ToSell>::class.java)
-        }
+        val gson = Gson()
+
+        registerChannel("shop") { sell = gson.fromJson(NetUtil.readUtf8(this), Array<ToSell>::class.java) }
 
         registerHandler<GameLoop> {
             // Магазин
