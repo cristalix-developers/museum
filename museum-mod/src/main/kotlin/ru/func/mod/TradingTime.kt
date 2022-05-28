@@ -13,7 +13,7 @@ import ru.cristalix.uiengine.utility.*
  * @author Рейдж 23.08.2021
  * @project museum
  */
-class TradingTime {
+object TradingTime {
     init {
         val cooldown = rectangle {
             offset = V3(0.0, -50.0)

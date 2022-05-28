@@ -7,7 +7,7 @@ import ru.cristalix.uiengine.utility.*
 import sun.security.jgss.GSSToken.readInt
 import java.text.DecimalFormat
 
-class CrystalBar {
+object CrystalBar {
 
     init {
         val crystal = rectangle {

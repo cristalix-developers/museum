@@ -34,11 +34,11 @@ class Museum : KotlinMod() {
 
         mod = this
 
-        RewardManager()
-        LevelBar()
-        Statistic()
-        TradingTime()
-        CrystalBar()
+        RewardManager
+        LevelBar
+        Statistic
+        TradingTime
+        CrystalBar
 
         val minecraft = clientApi.minecraft()
 

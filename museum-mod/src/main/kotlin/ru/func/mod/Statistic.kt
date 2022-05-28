@@ -10,7 +10,7 @@ import ru.cristalix.uiengine.utility.*
  * @author Рейдж 08.08.2021
  * @project museum
  */
-class Statistic {
+object Statistic {
 
     init {
         val balanceText = text {

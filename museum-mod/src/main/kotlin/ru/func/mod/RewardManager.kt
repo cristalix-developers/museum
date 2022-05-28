@@ -14,7 +14,7 @@ import ru.cristalix.uiengine.element.TextElement
 import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
 
-class RewardManager {
+object RewardManager {
 
     private var currentDay = 0
     lateinit var hint: RectangleElement

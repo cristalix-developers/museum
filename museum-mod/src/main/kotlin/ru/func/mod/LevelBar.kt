@@ -12,7 +12,7 @@ import ru.cristalix.uiengine.utility.*
  * @author Рейдж 08.08.2021
  * @project museum
  */
-class LevelBar {
+object LevelBar {
     init {
         val online = rectangle {
             offset = V3(0.0, -25.0)
