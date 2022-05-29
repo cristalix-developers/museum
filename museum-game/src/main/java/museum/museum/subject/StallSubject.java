@@ -5,17 +5,13 @@ import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import lombok.val;
 import museum.data.SubjectInfo;
-import museum.museum.map.StallPrototype;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.product.FoodProduct;
-import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.util.MessageUtil;
-import museum.worker.NpcWorker;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import ru.cristalix.core.GlobalSerializers;
-import ru.cristalix.core.util.UtilV3;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -28,7 +24,6 @@ import java.util.Set;
 public class StallSubject extends Subject implements Incomeble {
 	@Getter
 	private final Map<FoodProduct, Integer> food;
-	private final NpcWorker worker;
 
 	public StallSubject(SubjectPrototype prototype, SubjectInfo info, User owner) {
 		super(prototype, info, owner);
@@ -43,7 +38,6 @@ public class StallSubject extends Subject implements Incomeble {
 				food = savedFood;
 			}
 		}
-		worker = ((StallPrototype) prototype).getWorker().get();
 	}
 
 	@Override
@@ -57,14 +51,6 @@ public class StallSubject extends Subject implements Incomeble {
 	@Override
 	public void setAllocation(Allocation allocation) {
 		super.setAllocation(allocation);
-		if (cachedInfo != null && allocation != null) {
-			// todo: what the fuck this hardcode nums
-			val spawn = ((StallPrototype) prototype).getSpawn().clone()
-					.subtract(prototype.getBox().getCenter().clone().subtract(.5, 4, -.5))
-					.add(UtilV3.toVector(cachedInfo.location));
-			worker.setLocation(spawn);
-			allocation.allocateDisplayable(worker);
-		}
 	}
 
 	@Override
@@ -91,11 +77,5 @@ public class StallSubject extends Subject implements Incomeble {
 				.set("cost", key.getCost())
 				.send(owner);
 		owner.depositMoneyWithBooster(key.getCost());
-	}
-
-	public void rotateCustomerHead() {
-		if (owner.getPlayer() == null)
-			return;
-		worker.update(owner, V4.fromLocation(owner.getLocation()));
 	}
 }

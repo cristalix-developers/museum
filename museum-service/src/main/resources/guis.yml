@@ -1,11 +1,3 @@
-pickaxes:
-  title: Инструменты
-  layout: ----S---B
-  buttons:
-    - char: S
-      native: upgrade-pickaxe
-      left-click: /pickaxe
-
 skeleton-manipulator:
   title: Настройка витрины
   layout: |

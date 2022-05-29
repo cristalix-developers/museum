@@ -11,9 +11,9 @@ import org.bukkit.inventory.ItemStack;
 @AllArgsConstructor
 public enum BoerType {
 
-    STANDARD("Стандартный", 30, 3600, 0, CraftItemStack.asNMSCopy(new ItemStack(Material.IRON_BLOCK))),
-    PROFESSIONAL("Профессиональный", 25, 7200, 1000000, CraftItemStack.asNMSCopy(new ItemStack(Material.GOLD_BLOCK))),
-    PRESTIGIOUS("Престижный", 10, 21600, 1000000000, CraftItemStack.asNMSCopy(new ItemStack(Material.DIAMOND_BLOCK))),
+    STANDARD("Стандартный", 60, 3600, 0, CraftItemStack.asNMSCopy(new ItemStack(Material.IRON_BLOCK))),
+    PROFESSIONAL("Профессиональный", 40, 3600 * 2, 1000000, CraftItemStack.asNMSCopy(new ItemStack(Material.GOLD_BLOCK))),
+    PRESTIGIOUS("Престижный", 25, 3600 * 4, 1000000000, CraftItemStack.asNMSCopy(new ItemStack(Material.DIAMOND_BLOCK))),
     ;
 
     private final String address;

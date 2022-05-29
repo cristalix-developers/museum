@@ -31,7 +31,7 @@ public class BoerManager implements Ticked {
                     val user = App.getApp().getUser(player);
                     boer.setSecondsLeft(boer.getSecondsLeft() - 1);
                     val seconds = boer.getSecondsLeft();
-                    boer.getHead().setCustomName("§l" + seconds / 60 / 60 % 24 + ":" + seconds / 60 % 60 + ":" + seconds % 60);
+                    boer.getHead().setCustomName(player.getName() + " §l" + seconds / 60 / 60 % 24 + ":" + seconds / 60 % 60 + ":" + seconds % 60);
                     if ((int) (args[0] / 20.0D) % (boer.getType().getSpeed() / finalBooster) == 0) {
                         user.giveExperience(1.0D, boer.isNotification());
                         user.giveCosmoCrystal(1, boer.isNotification());

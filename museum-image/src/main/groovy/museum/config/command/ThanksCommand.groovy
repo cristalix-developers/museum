@@ -8,6 +8,10 @@ import ru.cristalix.core.formatting.Formatting
 registerCommand 'thx' handle {
     App.app.clientSocket.writeAndAwaitResponse(new ThanksExecutePackage(player.uniqueId)).thenAccept {
         def user = App.app.getUser player
+        if (it.boostersCount == 0)  {
+            player.sendMessage(Formatting.error('Нету активных бустеров 㬫'))
+            return
+        }
         player.sendMessage(Formatting.fine("Вы поблагодарили за $it.boostersCount бустер(ов)! + Монеты 㳞"))
         user.giveMoney user.income * it.boostersCount
     }

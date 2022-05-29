@@ -8,27 +8,21 @@ import museum.excavation.Excavation
 import museum.international.International
 import museum.museum.Museum
 import museum.util.TreasureUtil
-import net.minecraft.server.v1_12_R1.EnumMoveType
 import org.bukkit.Bukkit
-import org.bukkit.Particle
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftArmorStand
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
-import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import ru.cristalix.core.formatting.Formatting
 
 import static clepto.bukkit.item.Items.register
-import static clepto.bukkit.menu.Guis.open
 import static museum.App.app
-import static museum.cosmos.Cosmos.JETPACK
 import static museum.cosmos.Cosmos.ROCKET
 import static org.bukkit.Material.*
 import static org.bukkit.event.block.Action.LEFT_CLICK_BLOCK
 import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK
 
 on PAPER use {
-    open player, 'main', null
+    player.performCommand('menu')
 }
 
 on WOOD_DOOR use {
@@ -131,15 +125,10 @@ on PlayerInteractEvent, {
     def direction = player.eyeLocation.direction
 
     if (playerLocation.distanceSquared(ROCKET) < 45 && user.state instanceof Museum)
-        user.setState(new Cosmos())
+        B.postpone(1, () -> user.setState(new Cosmos()))
 
     if (user.state instanceof Cosmos && action != LEFT_CLICK_BLOCK) {
         def cosmos = user.state as Cosmos
-        if (player.vehicle == null && player.itemInHand == JETPACK) {
-            cosmos.useJetpack player
-            return
-        }
-
         def stand = cosmos.stand
 
         if (stand == null) {
@@ -161,41 +150,10 @@ on PlayerInteractEvent, {
             return
         }
 
-        def craftArmorStand = ((CraftArmorStand) stand).getHandle()
-        B.postpone 3, {
-            if (playerLocation.block.type != AIR) {
-                craftArmorStand.killEntity()
-                stand.remove()
-                cosmos.stand = null
-                def teleport = playerLocation.clone()
-                do {
-                    teleport.add(0,1,0)
-                } while (teleport.block.type != AIR)
-                player.teleport(teleport.add(0,2,0))
-                return
-            }
-            craftArmorStand.move(
-                    EnumMoveType.SELF,
-                    direction.x * speed / 2,
-                    direction.y * speed / 2,
-                    direction.z * speed / 2
-            )
-        }
-        craftArmorStand.move(
-                EnumMoveType.SELF,
-                direction.x * speed,
-                direction.y * speed,
-                direction.z * speed
-        )
-        LocationVerification.execute(user, stand)
-        app.world.spawnParticle(Particle.EXPLOSION_LARGE, playerLocation, 5)
+        if (!(user.getState() instanceof Excavation))
+            return
+        TreasureUtil.sellAll(user)
     }
-
-    if (action != RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR)
-        return
-    if (!(user.getState() instanceof Excavation))
-        return
-    TreasureUtil.sellAll(user)
 }
 
 on PlayerInteractAtEntityEvent, {
@@ -204,10 +162,12 @@ on PlayerInteractAtEntityEvent, {
     if (user.state instanceof Cosmos && clickedEntity.hasMetadata('boer')) {
         def owner = Bukkit.getPlayer(UUID.fromString(clickedEntity.getMetadata('owner')[0].asString()))
         def boer = UUID.fromString(clickedEntity.getMetadata('boer')[0].asString())
-        def fragment = user.relics.get(boer) as Boer
 
-        if (player.uniqueId != owner.uniqueId)
+        if (player.uniqueId != owner.uniqueId) {
             player.sendMessage(Formatting.error('Этот бур не принадлежит вам.'))
-        open(player, 'boer-upgrade', fragment)
+            return
+        }
+
+        player.performCommand("boermenu " + boer)
     }
 }

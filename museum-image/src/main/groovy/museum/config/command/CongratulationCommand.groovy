@@ -1,8 +1,8 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.command
 
+import me.func.mod.Anime
 import museum.App
-import museum.client_conversation.AnimationUtil
 import museum.util.MessageUtil
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
@@ -18,7 +18,7 @@ registerCommand 'congr' handle {
             MessageUtil.find 'lonely' send App.app.getUser(sender as CraftPlayer)
         else {
             MessageUtil.find 'congr-send' send App.app.getUser(sender as CraftPlayer)
-            AnimationUtil.cursorHighlight(App.app.getUser(victim), sender.player.name + ' ' + (Math.random() > 0.5f ? '䂋' : '㜑'))
+            Anime.cursorMessage(victim, sender.player.name + ' ' + (Math.random() > 0.5f ? '䂋' : '㜑'))
         }
     }
 }

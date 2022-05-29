@@ -2,9 +2,8 @@ package museum.content;
 
 import lombok.experimental.UtilityClass;
 import lombok.val;
-import museum.client_conversation.ModTransfer;
+import me.func.mod.conversation.ModTransfer;
 import museum.player.User;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 
 import java.util.stream.Stream;
 
@@ -19,9 +18,8 @@ public class DailyRewardManager {
 	public void open(User user) {
 		val transfer = new ModTransfer().integer(user.getDay() + 1);
 		Stream.of(WeekRewards.values()).forEach(rewards ->
-				transfer.item(CraftItemStack.asNMSCopy(rewards.getIcon()))
-						.string("§7Награда: " + rewards.getTitle())
+				transfer.item(rewards.getIcon()).string("§7Награда: " + rewards.getTitle())
 		);
-		transfer.send("museum:weekly-reward", user);
+		transfer.send("museum:weekly-reward", user.handle());
 	}
 }

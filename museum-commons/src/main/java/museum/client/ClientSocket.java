@@ -70,7 +70,7 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
 				.handler(new ChannelInitializer<Channel>() {
 					@Override
-					protected void initChannel(Channel ch) throws Exception {
+					protected void initChannel(Channel ch) {
 						val config = ch.config();
 						config.setOption(ChannelOption.IP_TOS, 24);
 						config.setAllocator(PooledByteBufAllocator.DEFAULT);
@@ -92,8 +92,7 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
 								))
 								.addLast(ClientSocket.this);
 					}
-				})
-				.remoteAddress(host, port)
+				}).remoteAddress(host, port)
 				.connect()
 				.addListener((ChannelFutureListener) future -> {
 					if (future.isSuccess()) {
@@ -123,14 +122,14 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
 	}
 
 	@Override
-	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
 		if (evt == WebSocketClientProtocolHandler.ClientHandshakeStateEvent.HANDSHAKE_COMPLETE) {
 			sendHandshake();
 		}
 	}
 
 	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) throws Exception {
+	protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) {
 		if (msg instanceof TextWebSocketFrame) {
 			TextWebSocketFrame frame = (TextWebSocketFrame) msg;
 			MuseumPackage pckg = UtilNetty.readFrame(frame);
@@ -146,7 +145,7 @@ public class ClientSocket extends SimpleChannelInboundHandler<WebSocketFrame> {
 	}
 
 	@Override
-	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+	public void channelInactive(ChannelHandlerContext ctx) {
 		channel.close();
 		channel = null;
 		responseCache.invalidateAll();

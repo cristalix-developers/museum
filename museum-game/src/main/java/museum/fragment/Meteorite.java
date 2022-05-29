@@ -3,6 +3,8 @@ package museum.fragment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
+import me.func.mod.data.LootDrop;
+import me.func.protocol.DropRare;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
@@ -15,14 +17,17 @@ import java.util.*;
  * @project museum
  */
 @Getter
-public class Meteorite implements Fragment {
+public class Meteorite extends LootDrop implements Fragment {
 
 	private final Meteorites meteorite;
 	private ItemStack cache;
 	private final UUID uuid = UUID.randomUUID();
 
 	public Meteorite(String prototypeAddress) {
+		super(new ItemStack(), "", DropRare.EPIC);
 		meteorite = Meteorites.valueOf(prototypeAddress.split("\\_")[1].toUpperCase());
+		super.setItemStack(meteorite.getItem());
+		super.setTitle(meteorite.getTitle());
 	}
 
 	@Override

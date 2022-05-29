@@ -5,7 +5,6 @@ import clepto.bukkit.LocalArmorStand
 import clepto.bukkit.routine.Do
 import museum.App
 import museum.client_conversation.AnimationUtil
-import museum.command.MuseumCommands
 import museum.museum.Museum
 import museum.museum.map.SubjectType
 import museum.util.MessageUtil
@@ -28,7 +27,7 @@ Do.every 1 ticks {
         if (!user.grabbedArmorstand)
             continue
         Location eyes = user.eyes
-        user.grabbedArmorstand.setLocation eyes + eyes.direction * 1.5 + [0, -1.7, 0], false
+        user.grabbedArmorstand.setLocation eyes.add((eyes.direction * 1.5)).subtract(0, 1.7, 0), false
         user.grabbedArmorstand.handle.yaw = user.location.yaw
     }
 }

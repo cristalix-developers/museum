@@ -6,9 +6,8 @@ import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
 import implario.ListUtils;
 import lombok.val;
+import me.func.mod.Anime;
 import museum.App;
-import museum.client_conversation.AnimationUtil;
-import museum.client_conversation.ModTransfer;
 import museum.content.DailyRewardManager;
 import museum.content.WeekRewards;
 import museum.fragment.Gem;
@@ -16,10 +15,9 @@ import museum.fragment.GemType;
 import museum.fragment.Meteorite;
 import museum.museum.Museum;
 import museum.player.User;
+import museum.player.pickaxe.PickaxeUpgrade;
 import museum.util.LocationUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import ru.cristalix.core.formatting.Formatting;
 
@@ -92,7 +90,7 @@ public class PreparePlayerBrain implements Prepare {
                     reward = reward + 20000;
                 user.giveMoney(reward);
             } else {
-                AnimationUtil.topTitle(user, "Добро пожаловать в ваш §bМузей§f! 㗩");
+                Anime.topMessage(user.handle(), "Добро пожаловать в ваш §bМузей§f! 㗩");
             }
             return;
         }
@@ -121,25 +119,19 @@ public class PreparePlayerBrain implements Prepare {
 
     public static void giveDrop(User owner) {
         val gem = new Gem(ListUtils.random(GemType.values()).name() + ":" + (Math.random() * 1.1) + ":10000");
+        gem.setCustomRare(getRare(gem.getType().getTitle()));
         gem.give(owner);
         val meteor = new Meteorite("meteor_" + ListUtils.random(Meteorite.Meteorites.values()).name());
+        meteor.setCustomRare(getRare(meteor.getItem().getItemMeta().getDisplayName()));
         meteor.give(owner);
 
-        new ModTransfer()
-                .integer(2)
-                .item(CraftItemStack.asNMSCopy(gem.getItem()))
-                .string(ChatColor.stripColor(gem.getType().getTitle() + " " + Math.round(gem.getRarity() * 100F) + "%"))
-                .string(getRare(gem.getType().getTitle()))
-                .item(CraftItemStack.asNMSCopy(meteor.getItem()))
-                .string(ChatColor.stripColor(meteor.getItem().getItemMeta().getDisplayName()))
-                .string(getRare(meteor.getItem().getItemMeta().getDisplayName()))
-                .send("lootbox", owner);
+        Anime.openLootBox(owner.handle(), gem, meteor);
     }
 
     public static void givePickaxe(User user) {
         val pickaxe = Items.render(user.getPickaxeType().name().toLowerCase()).asBukkitMirror();
         val meta = pickaxe.getItemMeta();
-        meta.addEnchant(Enchantment.DIG_SPEED, meta.getEnchantLevel(Enchantment.DIG_SPEED) + user.getInfo().getExtraSpeed(), true);
+        meta.addEnchant(Enchantment.DIG_SPEED, (int) (meta.getEnchantLevel(Enchantment.DIG_SPEED) + PickaxeUpgrade.EFFICIENCY.convert(user)), true);
         pickaxe.setItemMeta(meta);
         user.getInventory().addItem(pickaxe);
     }

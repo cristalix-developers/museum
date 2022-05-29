@@ -4,25 +4,20 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation project(":museum-commons")
     compileOnly 'org.mongodb:mongodb-driver-async:3.7.1'
-    compileOnly 'cristalix:microservice:20.11.04'
     compileOnly 'com.google.guava:guava:21.0'
     compileOnly 'io.netty:netty-all:4.1.37.Final'
-    compileOnly 'cristalix:waterfall-chat:1.0.1'
+    compileOnly 'ru.cristalix:waterfall:1.1'
+    compileOnly 'cristalix:microservice:20.11.04'
 
     testImplementation project(":museum-commons")
     testImplementation 'org.mongodb:mongodb-driver-async:3.7.1'
     testImplementation 'cristalix:microservice:20.11.04'
     testImplementation 'com.google.guava:guava:21.0'
     testImplementation 'io.netty:netty-all:4.1.37.Final'
-    testImplementation 'cristalix:waterfall-chat:1.0.1'
+    testImplementation 'ru.cristalix:waterfall:1.1'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.0.3'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
-}
-
-tasks.withType(Test) {
-    environment 'db_url', 'mongodb+srv://ilyafx:eJ7f3jRinZOpn5WM@cluster0.wkoiz.mongodb.net/admin?retryWrites=true&w=majority&ssl=true&streamType=netty'
-    environment 'db_data', 'museum'
 }
 
 test {

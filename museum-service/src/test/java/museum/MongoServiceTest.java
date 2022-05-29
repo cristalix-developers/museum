@@ -1,3 +1,4 @@
+/*
 package museum;
 
 import com.mongodb.async.SingleResultCallback;
@@ -71,7 +72,7 @@ public class MongoServiceTest {
 //        ThreadUtils.sleep(100L, );
         MongoAdapter<UserInfo> adapter = userData;
         CompletableFuture<Void> dropFuture = new CompletableFuture<>();
-        adapter.getData().drop(adapter.getSession(), wrap(dropFuture));
+        adapter.getData().drop(wrap(dropFuture));
         dropFuture.join();
         List<UserInfo> generated = generateUserInfos(generate);
         pushAll(adapter, generated.stream().map(info -> Document.parse(GlobalSerializers.toJson(info))).collect(Collectors.toList())).join();
@@ -136,18 +137,16 @@ public class MongoServiceTest {
                 Collections.emptyList(),
                 RANDOM.nextInt(1000000),
                 false,
-                0,
                 1,
-                0,
                 0,
                 1,
                 -1,
-                0,
                 Collections.emptyList(),
                 false,
                 true,
                 0,
-                0
+                0,
+                Collections.emptyList()
         );
     }
-}
+}*/

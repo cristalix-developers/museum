@@ -2,7 +2,11 @@ package museum.config.gui
 
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
+import me.func.mod.Glow
+import me.func.protocol.GlowColor
 import museum.App
+import museum.client_conversation.AnimationUtil
+import museum.player.pickaxe.PickaxeUpgrade
 import museum.util.MessageUtil
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -79,11 +83,25 @@ Guis.register 'pickaxe', { player ->
 
     title 'Улучшение кирки'
     layout """
-        ----F----
-        ----O----
-        ----X----
+        ---RFL---
+        ---------
+        -E-E-E-E-
+        --E-E-X--
     """
     button MuseumGuis.background
+
+    button 'R' icon {
+        item CLAY_BALL
+        text '§bВаша кирка справа'
+        nbt.other = 'arrow_right'
+    }
+
+    button 'L' icon {
+        item CLAY_BALL
+        text '§bВаша кирка слева'
+        nbt.other = 'arrow_left'
+    }
+
     button 'F' icon {
         if (user.pickaxeType.next == null) {
             item CLAY_BALL
@@ -96,6 +114,43 @@ Guis.register 'pickaxe', { player ->
         }
     } leftClick {
         performCommand 'pickaxe'
+    }
+
+    PickaxeUpgrade.values().each { upgrade ->
+        def currentLevel = user.pickaxeImprovements[upgrade]
+        def has = currentLevel > upgrade.maxLevel - 2
+        button 'E' icon {
+            nbt.HideFlags = 63
+            if (has) {
+                text '§8У вас максимальный уровень этого улучшения'
+                item CLAY_BALL
+                nbt.other = 'tochka'
+            } else {
+                item upgrade.icon
+                text """
+
+                $upgrade.title
+                §7Цена ${MessageUtil.toMoneyFormat(upgrade.cost)}
+
+                &b${currentLevel + 1} &f➠ &b${currentLevel + 2} уровень &fиз $upgrade.maxLevel &a▲▲▲
+
+                §7$upgrade.lore
+
+                §aНажмите чтобы улучшить
+                """
+                def pair = upgrade.nbt.split(':')
+                nbt(pair[0], pair[1])
+            }
+        } leftClick {
+            if (user.money >= upgrade.cost && !has) {
+                user.giveMoney(-upgrade.cost)
+                user.pickaxeImprovements.replace(upgrade, currentLevel + 1)
+                Glow.animate(user.handle(), 3.0, GlowColor.GREEN)
+                Guis.open(player, 'pickaxe', player)
+            } else {
+                AnimationUtil.buyFailure user
+            }
+        }
     }
 
     button 'O' icon {

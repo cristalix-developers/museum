@@ -1,11 +1,11 @@
 package museum.player.prepare;
 
+import lombok.val;
+import me.func.mod.conversation.ModTransfer;
 import museum.App;
-import museum.client_conversation.ModTransfer;
 import museum.museum.map.SubjectPrototype;
 import museum.player.User;
 import museum.prototype.Managers;
-import ru.cristalix.core.GlobalSerializers;
 
 /**
  * @author func 04.10.2020
@@ -15,17 +15,21 @@ public class PrepareShopBlocks implements Prepare {
 
 	public static final Prepare INSTANCE = new PrepareShopBlocks();
 
-	private String dataForClients;
+	private ModTransfer dataForClients;
+	private long lastUpdate = 0;
 
 	@Override
 	public void execute(User user, App app) {
-		if (dataForClients == null || dataForClients.isEmpty()) {
-			dataForClients = GlobalSerializers.toJson(
+		val now = System.currentTimeMillis();
+		// Обновление позиций в магазине каждую минуту
+		if (dataForClients == null || now - lastUpdate > 1000 * 60) {
+			lastUpdate = now;
+			dataForClients = new ModTransfer().json(
 					Managers.subject.getMap().values().stream()
 							.map(SubjectPrototype::getDataForClient)
 							.toArray(SubjectPrototype.SubjectDataForClient[]::new)
 			);
 		}
-		new ModTransfer().string(dataForClients).send("shop", user);
+		dataForClients.send("shop", user.handle());
 	}
 }

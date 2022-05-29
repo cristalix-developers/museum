@@ -8,22 +8,23 @@ import implario.ListUtils;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.val;
+import me.func.mod.Anime;
 import museum.App;
 import museum.PacketMetrics;
 import museum.boosters.BoosterType;
-import museum.client_conversation.AnimationUtil;
 import museum.excavation.Excavation;
 import museum.fragment.Relic;
 import museum.international.International;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
+import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
-import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.player.pickaxe.PickaxeType;
+import museum.player.pickaxe.PickaxeUpgrade;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
 import museum.util.SubjectLogoUtil;
@@ -33,6 +34,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import ru.cristalix.core.formatting.Formatting;
 
 import java.util.List;
 
@@ -180,7 +182,7 @@ public class BeforePacketHandler implements Prepare {
 
 	private boolean tryReturnPlayer(User user, boolean force) {
 		Excavation excavation = ((Excavation) user.getState());
-		excavation.updateHits(user, excavation.getHitsLeft() -1);
+		excavation.updateHits(user, excavation.getHitsLeft() - 1);
 
 		if (excavation.getHitsLeft() < 0)
 			return true;
@@ -202,11 +204,17 @@ public class BeforePacketHandler implements Prepare {
 	private void acceptedBreak(User user, PacketPlayInBlockDig packet) {
 		if (user.getPlayer() == null || !(user.getState() instanceof Excavation))
 			return;
+		// Пишем игрокам с режимом отладки в том же чанке
+		App.app.getUsers().stream()
+				.filter(User::isDebug)
+				.filter(it -> it.getPlayer().getChunk().equals(user.getPlayer().getChunk()))
+				.forEach(it -> it.sendMessage(Formatting.fine(user.getPlayer().getName() + " сломал блок на " + packet.a.toString())));
+
 		// С некоторым шансом может выпасть интерактивая вещь
 		if (Vector.random.nextFloat() > .9)
 			user.getPlayer().getInventory().addItem(ListUtils.random(INTERACT_ITEMS));
 		// С некоторым шансом может выпасть реликвия
-		if (Vector.random.nextFloat() > .998) {
+		if (Vector.random.nextFloat() > .998 - PickaxeUpgrade.DETECTION_OF_RELIQUES.convert(user)) {
 			val relics = ((Excavation) user.getState()).getPrototype().getRelics();
 			if (relics != null && relics.length > 0) {
 				val randomRelic = new Relic(
@@ -216,7 +224,7 @@ public class BeforePacketHandler implements Prepare {
 				val item = randomRelic.getItem();
 				val relicTitle = item.getItemMeta().getDisplayName();
 
-				AnimationUtil.throwIconMessage(user, item, relicTitle, "Находка!");
+				Anime.itemTitle(user.handle(), item, relicTitle, "Находка!", 1.4);
 				MessageUtil.find("relic-find")
 						.set("title", relicTitle)
 						.send(user);
@@ -227,10 +235,10 @@ public class BeforePacketHandler implements Prepare {
 
 		if (LevelSystem.acceptGiveExp(user, excavationLvl)) {
 			// Бонусы получения опыта
-			int extra = 0;
+			double extra = Math.random() > 1 - PickaxeUpgrade.ADDITIONAL_EXP.convert(user) ? 1 : 0;
 			// Если у игрока есть префикс сердечко - шанс получить один опыт
 			if (user.getPrefix() != null && user.getPrefix().equals("䂋") && Math.random() < .10)
-				extra = 1;
+				extra += 1;
 
 			user.giveExperience(PickaxeType.valueOf(user.getPickaxeType().name()).getExperience() + extra);
 		}
@@ -247,7 +255,7 @@ public class BeforePacketHandler implements Prepare {
 	private void generateFragments(User user, BlockPosition position) {
 		val prototype = ((Excavation) user.getState()).getPrototype();
 		val proto = ListUtils.random(prototype.getAvailableSkeletonPrototypes());
-		val playerChance = user.getInfo().getExtraChance() > 1 ? user.getInfo().getExtraChance() : 1;
+		val playerChance = PickaxeUpgrade.BONE_DETECTION.convert(user) + 1;
 		val bingo = proto.getRarity().getRareScale() * playerChance / 300D;
 		val randomValue = Math.random();
 
@@ -265,17 +273,27 @@ public class BeforePacketHandler implements Prepare {
 			Skeleton skeleton = user.getSkeletons().supply(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
-				double prize = proto.getPrice() * (7.5 + Math.random() * 5.0) / 30;
-				AnimationUtil.cursorHighlight(
-						user,
-						"%s §6§l+%.2f$",
-						fragment.getAddress(),
-						prize * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)
+				double prize = (proto.getPrice() + (proto.getPrice() * PickaxeUpgrade.DUPLICATE.convert(user)))
+						* (7.5 + Math.random() * 5.0) / 30;
+				Anime.cursorMessage(
+						user.handle(),
+						String.format("%s §6§l+%.2f$",
+								fragment.getAddress(),
+								prize * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)
+						)
 				);
 				user.depositMoneyWithBooster(prize);
 			} else {
-				AnimationUtil.cursorHighlight(user, "§lNEW! §b" + fragment.getAddress() + " §f㦶");
+				Anime.cursorMessage(user.handle(), "§lNEW! §b" + fragment.getAddress() + " §f㦶");
 				skeleton.getUnlockedFragments().add(fragment);
+				user.getSubjects().stream()
+						.filter(it -> it instanceof SkeletonSubject)
+						.map(it -> (SkeletonSubject) it)
+						.forEach(it -> {
+							it.setSkeleton(skeleton);
+							it.updateSkeleton(true);
+						});
+				user.updateIncome();
 			}
 		}
 	}

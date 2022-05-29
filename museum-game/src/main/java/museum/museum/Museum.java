@@ -5,9 +5,9 @@ import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import me.func.mod.Anime;
+import me.func.mod.conversation.ModTransfer;
 import museum.App;
-import museum.client_conversation.AnimationUtil;
-import museum.client_conversation.ModTransfer;
 import museum.cosmos.boer.Boer;
 import museum.data.MuseumInfo;
 import museum.fragment.Fragment;
@@ -117,7 +117,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 				if (subject instanceof CollectorSubject && subject.isAllocated())
 					collectorAmount++;
 				if (collectorAmount > 2) {
-					B.postpone(30, () -> AnimationUtil.throwIconMessage(owner, BeforePacketHandler.EMERGENCY_STOP, "Снятие коллекторов", "ОШИБКА"));
+					B.postpone(30, () -> Anime.itemTitle(owner.handle(), BeforePacketHandler.EMERGENCY_STOP, "Снятие коллекторов", "ОШИБКА", 3.0));
 					for (Subject collector : owner.getSubjects())
 						if (collector instanceof CollectorSubject)
 							collector.setAllocation(null);
@@ -147,7 +147,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 							.map(Subject::getDataForClient)
 							.filter(Objects::nonNull)
 							.collect(Collectors.toList())
-					).send("museumsubjects", user);
+					).send("museumsubjects", user.handle());
 		});
 	}
 

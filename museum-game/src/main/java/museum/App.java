@@ -8,6 +8,9 @@ import clepto.cristalix.WorldMeta;
 import groovy.lang.Script;
 import lombok.Getter;
 import lombok.val;
+import me.func.mod.Anime;
+import me.func.mod.Kit;
+import me.func.mod.conversation.ModLoader;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
@@ -17,9 +20,9 @@ import museum.donate.DonateType;
 import museum.international.CrystalExcavations;
 import museum.international.International;
 import museum.international.Market;
+import museum.international.Shop;
 import museum.misc.MuseumChatService;
 import museum.misc.PlacesMechanic;
-import museum.international.Shop;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
 import museum.player.PlayerDataManager;
@@ -40,8 +43,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.codehaus.groovy.runtime.m12n.RuntimeExtensionModules;
-import org.codehaus.groovy.runtime.m12n.SimpleExtensionModule;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.permissions.IPermissionService;
@@ -62,8 +63,9 @@ import java.util.logging.Level;
 public final class App extends JavaPlugin {
     @Getter
     public static App app;
+    public static String RESOURCE_PACK_URL = "https://storage.c7x.dev/func/museum.zip";
 
-    private PlayerDataManager playerDataManager;
+    public PlayerDataManager playerDataManager;
     private TopManager topManager;
     private ClientSocket clientSocket;
     private WorldMeta map;
@@ -112,23 +114,13 @@ public final class App extends JavaPlugin {
         core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
         core.registerService(IScoreboardService.class, new ScoreboardService());
 
+        Anime.include(Kit.NPC, Kit.STANDARD, Kit.LOOTBOX, Kit.EXPERIMENTAL, Kit.DIALOG);
+        ModLoader.loadAll("mods");
+
         // Регистрация обработчика пакета конфига
         clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);
 
         requestConfigurations();
-
-        // Определение groovy операций
-        RuntimeExtensionModules.modules.add(new SimpleExtensionModule("museum", "1") {
-            @Override
-            public List<Class> getInstanceMethodsExtensionClasses() {
-                return Collections.singletonList(Extensions.class);
-            }
-
-            @Override
-            public List<Class> getStaticMethodsExtensionClasses() {
-                return new ArrayList<>();
-            }
-        });
 
         // Прогрузка Groovy-скриптов
         try (val reader = new BufferedReader(new InputStreamReader(getResource("groovyScripts")))) {

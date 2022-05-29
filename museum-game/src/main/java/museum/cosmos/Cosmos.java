@@ -6,6 +6,7 @@ import clepto.bukkit.world.Label;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import me.func.mod.Anime;
 import museum.App;
 import museum.client_conversation.AnimationUtil;
 import museum.cosmos.boer.Boer;
@@ -13,12 +14,10 @@ import museum.fragment.Fragment;
 import museum.international.International;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;
-import museum.util.StandHelper;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.stream.Stream;
@@ -27,8 +26,6 @@ public class Cosmos implements International {
 
     public static final Label ROCKET = App.getApp().getMap().getLabel("cosmos");
     public static final Label SPACE = App.getApp().getMap().getLabel("space");
-
-    public static final ItemStack JETPACK = Items.render("jetpack").asBukkitMirror();
 
     private static final ItemStack[] armor = Stream.of(
                     "quantum-boots",
@@ -51,8 +48,8 @@ public class Cosmos implements International {
 
         AnimationUtil.updateCosmoCrystal(user);
 
-        player.setAllowFlight(false);
-        player.setFlying(false);
+        player.setAllowFlight(true);
+        player.setFlying(true);
 
         val inventory = player.getInventory();
 
@@ -60,22 +57,18 @@ public class Cosmos implements International {
 
         player.getInventory().setArmorContents(armor);
         PreparePlayerBrain.givePickaxe(user);
-        player.getInventory().addItem(JETPACK);
         player.getInventory().setItem(8, BACK_ITEM);
         for (Fragment value : user.getRelics().values())
             if (value instanceof Boer)
                 player.getInventory().addItem(value.getItem());
 
-        AnimationUtil.topTitle(user, "Вы покинули землю 㕉");
-        AnimationUtil.throwIconMessage(user, EARTH.asBukkitMirror(), "", "");
-
+        Anime.topMessage(user.handle(), "Вы покинули землю 㕉");
         player.teleport(SPACE);
     }
 
     @Override
     public void leaveState(User user) {
-        AnimationUtil.topTitle(user, "Вы вернулись на землю 㕉");
-        AnimationUtil.throwIconMessage(user, EARTH.asBukkitMirror(), "", "");
+        Anime.topMessage(user.handle(), "Вы вернулись на землю 㕉");
         AnimationUtil.leaveCosmos(user);
     }
 
@@ -102,19 +95,4 @@ public class Cosmos implements International {
             }
         }
     }
-
-    public void useJetpack(Player player) {
-        if (stand != null)
-            return;
-        stand = new StandHelper(player.getLocation().clone().add(0, 1, 0))
-                .canMove(true)
-                .passenger(player)
-                .isInvisible(true)
-                .isMarker(true)
-                .hasGravity(false)
-                .fixedData("trash", 1)
-                .build();
-    }
-
-
 }

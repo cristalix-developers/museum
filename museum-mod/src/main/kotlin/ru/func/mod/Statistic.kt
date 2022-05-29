@@ -2,6 +2,7 @@ package ru.func.mod
 
 import dev.xdark.clientapi.event.network.PluginMessage
 import dev.xdark.feder.NetUtil
+import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.*
 
@@ -9,7 +10,7 @@ import ru.cristalix.uiengine.utility.*
  * @author Рейдж 08.08.2021
  * @project museum
  */
-class Statistic {
+object Statistic {
 
     init {
         val balanceText = text {
@@ -42,23 +43,17 @@ class Statistic {
         }
 
         val box = rectangle {
-            color = Color(0,0,0,0.62)
-            align = Relative.BOTTOM_RIGHT
+            align = BOTTOM_RIGHT
             origin = BOTTOM_RIGHT
-            addChild(balanceText, online, coinPrice, hitCount)
+            +balanceText
+            +online
+            +coinPrice
+            +hitCount
         }
 
-        UIEngine.overlayContext.addChild(box)
+        UIEngine.overlayContext + box
 
-        repeat(4) {
-            box.children.add(
-                rectangle {
-                    color = TRANSPARENT
-                }
-            )
-        }
-
-        UIEngine.registerHandler(PluginMessage::class.java) {
+        registerHandler<PluginMessage> {
             when (channel) {
                 "museum:balance" -> balanceText.content = "Баланс §a${NetUtil.readUtf8(data)}"
                 "museum:online" -> online.content = "Онлайн §b${data.readInt()}"

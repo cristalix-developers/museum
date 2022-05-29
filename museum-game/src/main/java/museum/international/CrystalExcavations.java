@@ -5,8 +5,8 @@ import clepto.bukkit.item.Items;
 import com.google.common.collect.Maps;
 import implario.ListUtils;
 import lombok.val;
+import me.func.mod.Anime;
 import museum.App;
-import museum.client_conversation.AnimationUtil;
 import museum.fragment.GemType;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
@@ -108,7 +108,7 @@ public class CrystalExcavations implements International {
 			if (block != null && block.getType() == Material.STAINED_GLASS) {
 				block.setType(Material.AIR);
 				user.getInventory().addItem(ore);
-				AnimationUtil.cursorHighlight(user, "§d§l+1 §fруда");
+				Anime.cursorMessage(user.handle(), "§d§l+1 §fруда");
 				B.postpone(50, () -> block.setTypeAndDataFast(Material.STAINED_GLASS.id, (byte) 3));
 			}
 		}

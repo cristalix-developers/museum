@@ -1,13 +1,13 @@
 package ru.func.mod
 
-import dev.xdark.clientapi.event.network.PluginMessage
 import dev.xdark.clientapi.resource.ResourceLocation
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.TextElement
 import ru.cristalix.uiengine.utility.*
+import sun.security.jgss.GSSToken.readInt
 import java.text.DecimalFormat
 
-class CrystalBar {
+object CrystalBar {
 
     init {
         val crystal = rectangle {
@@ -22,23 +22,25 @@ class CrystalBar {
             textureLocation = ResourceLocation.of(
                 "minecraft", "mcpatcher/cit/museum/crystal_item.png"
             )
-            addChild(text {
+            +text {
                 align = BOTTOM
                 origin = BOTTOM
                 offset.y += 10
                 shadow = true
-            })
+            }
         }
 
-        UIEngine.overlayContext.addChild(crystal)
+        UIEngine.overlayContext + crystal
 
         val decimalFormat = DecimalFormat("###,###,###,###,###,###")
-        UIEngine.registerHandler(PluginMessage::class.java) {
-            if (channel == "museum:cosmo-crystal") {
-                crystal.enabled = true
-                (crystal.children[0] as TextElement).content = decimalFormat.format(data.readInt())
-            } else if (channel == "museum:cosmo-leave")
-                crystal.enabled = false
+
+        mod.registerChannel("museum:cosmo-crystal") {
+            crystal.enabled = true
+            (crystal.children[0] as TextElement).content = decimalFormat.format(readInt())
+        }
+
+        mod.registerChannel("museum:cosmo-leave") {
+            crystal.enabled = false
         }
     }
 }

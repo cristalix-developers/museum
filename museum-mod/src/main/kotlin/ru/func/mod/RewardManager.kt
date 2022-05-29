@@ -6,14 +6,15 @@ import dev.xdark.clientapi.item.ItemTools
 import dev.xdark.feder.NetUtil
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
+import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.AbstractElement
 import ru.cristalix.uiengine.element.RectangleElement
 import ru.cristalix.uiengine.element.TextElement
-import ru.cristalix.uiengine.element.animate
+import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
 
-class RewardManager {
+object RewardManager {
 
     private var currentDay = 0
     lateinit var hint: RectangleElement
@@ -30,7 +31,7 @@ class RewardManager {
         val week = arrayListOf<Day>()
 
         UIEngine.overlayContext.addChild(box)
-        UIEngine.registerHandler(PluginMessage::class.java) {
+        registerHandler<PluginMessage> {
             if (channel == "museum:weekly-reward") {
                 currentDay = data.readInt()
 
@@ -62,7 +63,7 @@ class RewardManager {
                         else -> {
                             topElement.content = "§lУРА!\nнаграда"
                             dayBox.color = Color(224, 118, 20, 0.3)
-                            dayBox.onClick = { _, _, _ ->
+                            dayBox.onClick {
                                 UIEngine.overlayContext.removeChild(
                                     box,
                                     topElement,
@@ -76,26 +77,26 @@ class RewardManager {
                         }
                     }
 
-                    dayBox.onHover = { element: AbstractElement, hovered: Boolean ->
+                    dayBox.onHover {
                         if (hovered) {
                             hintText.content = dayBox.name
                             hint.enabled = true
                             hint.size.x = hintText.size.x + 4
                             week.forEach {
-                                if (it != element) {
+                                if (it != this) {
                                     it.normalize()
                                     it.animate(0.1) {
                                         size.x = 50.0
                                         size.y = 150.0
                                     }
                                 }
-                                UIEngine.overlayContext.schedule(0.1) {
+                                UIEngine.schedule(0.1) {
                                     if (it != dayBox) {
                                         it.move(it.day.compareTo(dayBox.day))
                                     }
                                 }
                             }
-                            element.animate(0.1) {
+                            animate(0.1) {
                                 size.x = 55.0
                                 size.y = 175.0
                             }
@@ -106,7 +107,7 @@ class RewardManager {
                                     it.normalize()
                                 }
                             }
-                            element.animate(0.1) {
+                           animate(0.1) {
                                 size.x = 50.0
                                 size.y = 150.0
                             }
@@ -120,7 +121,7 @@ class RewardManager {
             }
         }
 
-        UIEngine.registerHandler(RenderTickPre::class.java) {
+        registerHandler<RenderTickPre> {
             hint.offset.x = (Mouse.getX() / UIEngine.clientApi.resolution().scaleFactor).toDouble()
             hint.offset.y = ((Display.getHeight() - Mouse.getY()) / UIEngine.clientApi.resolution().scaleFactor).toDouble()
         }

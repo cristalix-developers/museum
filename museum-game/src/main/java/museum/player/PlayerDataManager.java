@@ -5,6 +5,9 @@ import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import me.func.mod.Anime;
+import me.func.mod.selection.Confirmation;
+import me.func.protocol.Indicators;
 import museum.App;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
@@ -38,6 +41,10 @@ import java.util.stream.Stream;
 
 public class PlayerDataManager implements Listener {
 
+	private static final Confirmation confirmation = new Confirmation(Arrays.asList("Рекомендуем установить", "ресурспак"),
+			player -> player.setResourcePack(App.RESOURCE_PACK_URL, "4")
+	);
+
 	private final App app;
 	private final Map<UUID, User> userMap = Maps.newHashMap();
 	private final MultiTimeBar timeBar;
@@ -55,7 +62,8 @@ public class PlayerDataManager implements Listener {
 			"307264a1-2c69-11e8-b5ea-1cb72caa35fd", // func
 			"6f3f4a2e-7f84-11e9-8374-1cb72caa35fd", // faelan
 			"bf30a1df-85de-11e8-a6de-1cb72caa35fd", // reidj
-			"e7c13d3d-ac38-11e8-8374-1cb72caa35fd" // delfikpro
+			"e7c13d3d-ac38-11e8-8374-1cb72caa35fd", // delfikpro
+			"80b910b4-5722-11ea-849b-1cb72caa35fd" // GodzillaS
 	).map(UUID::fromString).collect(Collectors.toSet());
 
 	@SuppressWarnings("deprecation")
@@ -83,6 +91,16 @@ public class PlayerDataManager implements Listener {
 				if (userInfo == null) userInfo = DefaultElements.createNewUserInfo(uuid);
 				// Добавление дефолтных значений, которых не было в самом начале
 				if (userInfo.getPrefixes() == null) userInfo.setPrefixes(new ArrayList<>());
+
+				if (userInfo.getImprovements() == null)
+					userInfo.setImprovements(new ArrayList<>(Arrays.asList(
+							"ADDITIONAL_EXP:0",
+							"EXTRA_HITS:0",
+							"EFFICIENCY:0",
+							"BONE_DETECTION:0",
+							"DETECTION_OF_RELIQUES:0",
+							"DUPLICATE:0"
+					)));
 
 				if (userInfo.getDonates() == null) userInfo.setDonates(new ArrayList<>(1));
 
@@ -131,7 +149,6 @@ public class PlayerDataManager implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		val player = (CraftPlayer) event.getPlayer();
 
-		player.setResourcePack("", "");
 		player.setWalkSpeed(.36F);
 		player.setOp(ADMIN_LIST.contains(player.getUniqueId()));
 
@@ -153,7 +170,12 @@ public class PlayerDataManager implements Listener {
 		player.setGameMode(GameMode.ADVENTURE);
 		player.setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, false);
 
-		B.postpone(5, () -> prepares.forEach(prepare -> prepare.execute(user, app)));
+		B.postpone(5, () -> {
+			prepares.forEach(prepare -> prepare.execute(user, app));
+			Anime.hideIndicator(player, Indicators.ARMOR, Indicators.EXP, Indicators.HEALTH, Indicators.HUNGER);
+		});
+
+		B.postpone(100, () -> confirmation.open(player));
 
 		event.setJoinMessage(null);
 	}
@@ -227,5 +249,9 @@ public class PlayerDataManager implements Listener {
 			if (pckg.getSum() != null)
 				user.setMoney(user.getMoney() + pckg.getSum());
 		}
+	}
+
+	public int getBoosterCount() {
+		return globalBoosters.size();
 	}
 }

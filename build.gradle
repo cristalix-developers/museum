@@ -3,21 +3,16 @@ apply plugin: 'java'
 subprojects {
     apply plugin: 'java'
 
-    String user = project.properties["IMPLARIO_REPO_USER"] ?: System.getenv("IMPLARIO_REPO_USER")
-    String key = project.properties["IMPLARIO_REPO_PASSWORD"] ?: System.getenv("IMPLARIO_REPO_PASSWORD")
-
     targetCompatibility = sourceCompatibility = '1.8'
 
     repositories {
         mavenCentral()
         maven {
-            url "https://repo.implario.dev/public"
-        }
-        maven {
-            url 'https://repo.implario.dev/cristalix/'
+            name = "func"
+            url = uri("https://repo.c7x.ru/repository/maven-public/")
             credentials {
-                username user
-                password key
+                username = System.getenv("CRI_REPO_LOGIN") ?: project.properties["CRI_REPO_LOGIN"] as String
+                password = System.getenv("CRI_REPO_PASSWORD") ?: project.properties["CRI_REPO_PASSWORD"] as String
             }
         }
     }
@@ -48,5 +43,18 @@ subprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding 'UTF-8'
+    }
+}
+
+allprojects {
+    repositories {
+        maven {
+            name = "func"
+            url = uri("https://repo.c7x.ru/repository/maven-public/")
+            credentials {
+                username = System.getenv("CRI_REPO_LOGIN") ?: project.properties["CRI_REPO_LOGIN"] as String
+                password = System.getenv("CRI_REPO_PASSWORD") ?: project.properties["CRI_REPO_PASSWORD"] as String
+            }
+        }
     }
 }

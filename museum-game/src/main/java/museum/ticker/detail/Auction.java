@@ -3,9 +3,9 @@ package museum.ticker.detail;
 import clepto.bukkit.B;
 import implario.ListUtils;
 import lombok.val;
+import me.func.mod.Anime;
+import me.func.mod.conversation.ModTransfer;
 import museum.App;
-import museum.client_conversation.AnimationUtil;
-import museum.client_conversation.ModTransfer;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
@@ -61,15 +61,15 @@ public class Auction implements Ticked {
                 proto = ListUtils.random(new ArrayList<>(Managers.skeleton));
 
                 B.bc(Formatting.fine("Житель нашёл кость динозавра §b" + proto.getTitle() + ". §fУчаствовать в торгах §b/rate"));
+                val message = new ModTransfer()
+                        .string("Торги! Сделать ставку §b/rate <сумма>")
+                        .integer(DURATION);
                 Bukkit.getOnlinePlayers().stream()
                         .map(player -> App.getApp().getUser(player))
                         .forEach(user -> {
-                            new ModTransfer()
-                                    .string("Торги! Сделать ставку §b/rate <сумма>")
-                                    .integer(DURATION)
-                                    .send("museum:tradingtime", user);
+                            message.send("museum:tradingtime", user.handle());
                             if (user.isMessages())
-                                AnimationUtil.throwIconMessage(user, itemStack, "Торги!", "Участвовать в торгах /rate");
+                                Anime.itemTitle(user.handle(), itemStack, "Торги!", "Участвовать в торгах /rate");
                         });
             } else if (secondsLeft == 0) {
                 if (beforeStart == WAIT_SECOND) {

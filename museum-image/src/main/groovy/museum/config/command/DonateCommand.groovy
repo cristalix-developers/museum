@@ -3,6 +3,7 @@ package museum.config.command
 
 import clepto.bukkit.menu.Guis
 import implario.ListUtils
+import me.func.mod.Anime
 import museum.App
 import museum.client_conversation.AnimationUtil
 import museum.config.gui.LootBox
@@ -13,7 +14,6 @@ import museum.museum.Museum
 import museum.museum.subject.CollectorSubject
 import museum.packages.SaveUserPackage
 import museum.packages.UserTransactionPackage.TransactionResponse
-import museum.player.User
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
@@ -23,60 +23,11 @@ import java.util.stream.Collectors
 
 import static org.bukkit.Material.*
 
-class Prefix {
-    String prefix
-    String title
-    int rare
-    String bonus
-
-    Prefix(String prefix, String title, int rare, String bonus) {
-        this.prefix = prefix
-        this.title = title
-        this.rare = rare
-        this.bonus = bonus
-    }
-
-    Prefix(String prefix, String title, int rare) {
-        this.prefix = prefix
-        this.title = title
-        this.rare = rare
-        this.bonus = ''
-    }
-}
-
-registerCommand 'donate' handle {
-    Guis.open player, 'donate', player
-}
-
-registerCommand 'prefixes' handle {
-    Guis.open player, 'prefixes', player
-}
-
-void givePrefix(User owner) {
-
-}
+//registerCommand 'prefixes' handle {
+//    Guis.open player, 'prefixes', player
+//}
 
 def prefixes = [
-        new Prefix('䂋', 'Любовь', 3, '§l40% §fполучить +§b1 опыт'),
-        new Prefix('㧥', 'Бывший бомж', 3, '§f+§620`000\$ §e ежедневной награды'),
-        new Prefix('㕐', '§bПопаду на луну', 3, '§b+20% §fшанса получить камень'),
-        new Prefix('㫐', 'Dead inside', 2),
-        new Prefix('㕄', 'Радуга', 2),
-        new Prefix('㗤', '§eЦирк', 2),
-        new Prefix('㩑', '§lHIT!', 2),
-        new Prefix('䀝', '§aЦель 40рб', 2),
-        new Prefix('㯨', 'Не курю!', 1),
-        new Prefix('㥗', 'Я пришелец', 1),
-        new Prefix('㧵', '§aSTONKS', 1),
-        new Prefix('㧋', '§cБомба', 1),
-        new Prefix('㫩', 'Ок', 1),
-        new Prefix('䀰', 'Спортивный', 1),
-        new Prefix('㕾', '§cМухомор', 1),
-        new Prefix('䀀', '§atoxic', 1),
-        new Prefix('㗨', 'Консольщик', 1),
-        new Prefix('㗧', 'Лицемер', 1),
-        new Prefix('㛳', 'АУ', 1),
-        new Prefix('㗯', 'Люблю музыку', 1),
 ]
 
 Guis.register 'prefixes', {
@@ -90,13 +41,7 @@ Guis.register 'prefixes', {
         XXX-RRRRR
         -EEE-O-L-
         """
-    button 'L' icon {
-        item CLAY_BALL
-        text '§cНазад'
-        nbt.other = "cancel"
-    } leftClick {
-        performCommand("gui main")
-    }
+
     button 'O' icon {
         item END_CRYSTAL
         text """
@@ -126,7 +71,7 @@ Guis.register 'prefixes', {
                 if (prefix.contains(randomPrefix.prefix)) {
                     flag = false
                     user.giveMoney(50000)
-                    AnimationUtil.topTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
+                    Anime.topMessage user.handle(), "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
                     break
                 }
             }
@@ -134,7 +79,7 @@ Guis.register 'prefixes', {
             if (flag) {
                 user.info.prefixes.add(randomPrefix.prefix)
                 user.prefix = randomPrefix.prefix
-                AnimationUtil.topTitle user, "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
+                Anime.topMessage user.handle(), "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
             }
             user.prefixChestOpened = user.prefixChestOpened + 1
             closeInventory()
@@ -180,7 +125,6 @@ Guis.register 'prefixes', {
         button 'X' icon {
             item IRON_INGOT
             text "[ ${prefix.prefix} §f] ${prefix.title} ${have ? '§aВЫБРАТЬ' : ''}"
-            text have ? "" : "§7Можно купить за §e10'000'000\$"
             text """    
                                 
             §7Редкость: §aобычный
@@ -219,6 +163,11 @@ registerCommand 'proccessdonate' handle {
         return ignored.message
     }
 
+    if (App.app.playerDataManager.getBoosterCount() > 5 && donate.name().contains("BOOSTER")) {
+        player.sendMessage(Formatting.error("Запущено слишком много бустеров! Подождите пожалуйста..."))
+        return
+    }
+
     App.app.processDonate(user.getUuid(), donate).thenAccept(transaction -> {
         if (!transaction.ok) {
             if (transaction == TransactionResponse.INSUFFICIENT_FUNDS)
@@ -242,7 +191,7 @@ registerCommand 'proccessdonate' handle {
                 if (prefix.contains(randomPrefix.prefix)) {
                     flag = false
                     user.giveMoney(50000)
-                    AnimationUtil.topTitle user, "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
+                    Anime.topMessage user.handle(), "Получен дубликат ${randomPrefix.prefix}, §aваша награда §6§l50`000\$"
                     break
                 }
             }
@@ -250,17 +199,17 @@ registerCommand 'proccessdonate' handle {
             if (flag) {
                 user.info.prefixes.add(randomPrefix.prefix)
                 user.prefix = randomPrefix.prefix
-                AnimationUtil.topTitle user, "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
+                Anime.topMessage user.handle(), "Получен новый ${randomPrefix.prefix} " + (randomPrefix.rare > 1 ? randomPrefix.rare == 2 ? '§6редкий' : '§dэпический' : '') + " §fпрефикс! ${randomPrefix.title}"
             }
             user.prefixChestOpened = user.prefixChestOpened + 1
         } else if (donate == DonateType.PRIVILEGES) {
             user.privileges = true
             user.donates.add(donate as DonateType)
-            AnimationUtil.topTitle user, "Вы избавились от комиссии! Спасибо за поддержку. 㶅"
+            Anime.topMessage user.handle(), "Вы избавились от комиссии! Спасибо за поддержку. 㶅"
         } else if (donate == DonateType.LEGENDARY_PICKAXE) {
             user.pickaxeType = PickaxeType.LEGENDARY
             user.donates.add(donate as DonateType)
-            AnimationUtil.topTitle user, "Вы купили §bлегендарную кирку§f! Спасибо за поддержку. 㶅"
+            Anime.topMessage user.handle(), "Вы купили §bлегендарную кирку§f! Спасибо за поддержку. 㶅"
         } else if (donate == DonateType.STEAM_PUNK_COLLECTOR) {
             def subject = new CollectorSubject(
                     Managers.subject.getPrototype('punk-collector'),
@@ -268,7 +217,7 @@ registerCommand 'proccessdonate' handle {
                     user
             )
             user.getSubjects().add(subject)
-            AnimationUtil.topTitle user, "Вы купили §6сборщик монет§f! Спасибо за поддержку. 㶅"
+            Anime.topMessage user.handle(), "Вы купили §6сборщик монет§f! Спасибо за поддержку. 㶅"
             if (user.state instanceof Museum) {
                 user.getInventory().addItem SubjectLogoUtil.encodeSubjectToItemStack(subject)
             } else {
