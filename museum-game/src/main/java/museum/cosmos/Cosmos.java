@@ -14,6 +14,7 @@ import museum.fragment.Fragment;
 import museum.international.International;
 import museum.player.User;
 import museum.player.prepare.PreparePlayerBrain;
+import museum.util.ItemUtil;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,12 +64,14 @@ public class Cosmos implements International {
                 if (!((Boer) value).isStanding())
                     player.getInventory().addItem(value.getItem());
 
+        Anime.itemTitle(player, ItemUtil.cosmoCrystal(), "", "", 2.0);
         Anime.topMessage(user.handle(), "Вы покинули землю 㕉");
         player.teleport(SPACE);
     }
 
     @Override
     public void leaveState(User user) {
+        Anime.itemTitle(user.handle(), ItemUtil.cosmoCrystal(), "", "", 2.0);
         Anime.topMessage(user.handle(), "Вы вернулись на землю 㕉");
         AnimationUtil.leaveCosmos(user);
     }

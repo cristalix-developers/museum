@@ -29,6 +29,7 @@ import museum.player.User;
 import museum.player.pickaxe.PickaxeUpgrade;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
+import museum.util.ItemUtil;
 import museum.util.MessageUtil;
 import museum.util.VirtualSign;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -314,12 +315,6 @@ public class MuseumCommands {
 	}
 
 	private String cmdExcavationMenu(Player player, String[] args) {
-		ItemStack cosmoCrystal = new ItemStack(Material.CLAY_BALL);
-		val nmsItem = CraftItemStack.asNMSCopy(cosmoCrystal);
-		nmsItem.tag = new NBTTagCompound();
-		nmsItem.tag.setString("simulators", "save_crystal");
-		cosmoCrystal = nmsItem.asBukkitMirror();
-
 		GemType dailyCave = GemType.getActualGem();
 		val dailyGem = new Gem(dailyCave.name() + ':' + 1.0 + ":10000").getItem();
 
@@ -351,7 +346,7 @@ public class MuseumCommands {
 							Anime.close(player);
 						}),
 				new Button()
-						.item(cosmoCrystal)
+						.item(ItemUtil.cosmoCrystal())
 						.title("Космос")
 						.description("Вы когда нибудь\n хотели побывать\n в космосе?")
 						.hint("Путешествие")
