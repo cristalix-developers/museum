@@ -60,7 +60,8 @@ public class Cosmos implements International {
         player.getInventory().setItem(8, BACK_ITEM);
         for (Fragment value : user.getRelics().values())
             if (value instanceof Boer)
-                player.getInventory().addItem(value.getItem());
+                if (!((Boer) value).isStanding())
+                    player.getInventory().addItem(value.getItem());
 
         Anime.topMessage(user.handle(), "Вы покинули землю 㕉");
         player.teleport(SPACE);
