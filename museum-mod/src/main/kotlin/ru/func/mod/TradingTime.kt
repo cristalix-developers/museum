@@ -40,7 +40,7 @@ object TradingTime {
             enabled = false
         }
 
-        registerHandler<PluginMessage> {
+        mod.registerHandler<PluginMessage> {
             if (channel == "museum:tradingtime") {
                 val text = NetUtil.readUtf8(data)
                 val seconds = data.readInt()

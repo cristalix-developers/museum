@@ -31,7 +31,7 @@ object RewardManager {
         val week = arrayListOf<Day>()
 
         UIEngine.overlayContext.addChild(box)
-        registerHandler<PluginMessage> {
+        mod.registerHandler<PluginMessage> {
             if (channel == "museum:weekly-reward") {
                 currentDay = data.readInt()
 
@@ -121,7 +121,7 @@ object RewardManager {
             }
         }
 
-        registerHandler<RenderTickPre> {
+        mod.registerHandler<RenderTickPre> {
             hint.offset.x = (Mouse.getX() / UIEngine.clientApi.resolution().scaleFactor).toDouble()
             hint.offset.y = ((Display.getHeight() - Mouse.getY()) / UIEngine.clientApi.resolution().scaleFactor).toDouble()
         }

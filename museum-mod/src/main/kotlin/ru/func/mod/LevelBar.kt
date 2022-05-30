@@ -42,7 +42,7 @@ object LevelBar {
 
         UIEngine.overlayContext + online
 
-        registerHandler<PluginMessage> {
+        mod.registerHandler<PluginMessage> {
             if (channel == "museum:levelbar") {
                 val level = data.readInt()
                 val experience = data.readInt()

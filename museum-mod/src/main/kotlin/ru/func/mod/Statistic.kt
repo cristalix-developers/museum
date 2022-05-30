@@ -53,7 +53,7 @@ object Statistic {
 
         UIEngine.overlayContext + box
 
-        registerHandler<PluginMessage> {
+        mod.registerHandler<PluginMessage> {
             when (channel) {
                 "museum:balance" -> balanceText.content = "Баланс §a${NetUtil.readUtf8(data)}"
                 "museum:online" -> online.content = "Онлайн §b${data.readInt()}"
