@@ -80,6 +80,10 @@ public class CollectorSubject extends Subject implements Incomeble {
 	public void handle(double... args) {
 		if (args[0] % ((speed > 9 ? 40 : 60) * 20L) != 0)
 			return;
+
+		if (owner.getSubjects().stream().filter(subject -> subject.getAllocation() != null).count() > 2)
+			return;
+
 		val museumIncome = owner.getLastMuseum().getIncome();
 		val income = 0.7 * Math.random() * museumIncome + museumIncome;
 		MessageUtil.find("collector-income")

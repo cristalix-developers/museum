@@ -4,7 +4,6 @@ import dev.xdark.clientapi.resource.ResourceLocation
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.TextElement
 import ru.cristalix.uiengine.utility.*
-import sun.security.jgss.GSSToken.readInt
 import java.text.DecimalFormat
 
 object CrystalBar {
