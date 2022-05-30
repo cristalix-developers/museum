@@ -18,7 +18,7 @@ registerCommand 'vanish' handle {
     def user = app.getUser(player.uniqueId)
     def real = player as Player
 
-    if (user.prefix && user.prefix.contains('㗒')) {
+    if ((user.prefix && user.prefix.contains('㗒')) || player.op) {
         if (vanishList.contains(real)) {
             vanishList.remove(real)
 

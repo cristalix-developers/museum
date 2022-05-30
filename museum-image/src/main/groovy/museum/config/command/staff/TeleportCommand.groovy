@@ -11,7 +11,7 @@ static def getIfLS(CommandContext context) {
     if (context.args.length == 0)
         return null
     def user = App.app.getUser(context.player.uniqueId)
-    if (user.prefix && user.prefix.contains('㗒'))
+    if ((user.prefix && user.prefix.contains('㗒')) || context.player.op)
         return user
     return null
 }

@@ -29,6 +29,7 @@ import museum.player.User;
 import museum.player.pickaxe.PickaxeUpgrade;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
+import museum.util.ItemUtil;
 import museum.util.MessageUtil;
 import museum.util.VirtualSign;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -84,13 +85,26 @@ public class MuseumCommands {
 
 	private String cmdPrefixMenu(Player player, String[] args) {
 		val user = App.app.getUser(player);
+		val userHaveEnoughMoney = user.getMoney() >= 10000000;
 
 		val menu = new Selection(
 				"Префиксы",
-				"",
+				"Монет: " + MessageUtil.toMoneyFormat(user.getMoney()),
 				"",
 				3,
-				3
+				3,
+				new Button()
+						.material(Material.END_CRYSTAL)
+						.price(10000000)
+						.hint(userHaveEnoughMoney ? "Открыть" : "")
+						.title("§aСлучайный префикс")
+						.description("Вы получите случайный префикс!")
+						.onClick((clickPlayer, index, button) -> {
+							if (userHaveEnoughMoney) {
+								Anime.close(clickPlayer);
+								clickPlayer.performCommand("prefixbox");
+							}
+						})
 		);
 
 		for (PrefixType prefixType : PrefixType.values()) {
@@ -314,12 +328,6 @@ public class MuseumCommands {
 	}
 
 	private String cmdExcavationMenu(Player player, String[] args) {
-		ItemStack cosmoCrystal = new ItemStack(Material.CLAY_BALL);
-		val nmsItem = CraftItemStack.asNMSCopy(cosmoCrystal);
-		nmsItem.tag = new NBTTagCompound();
-		nmsItem.tag.setString("simulators", "save_crystal");
-		cosmoCrystal = nmsItem.asBukkitMirror();
-
 		GemType dailyCave = GemType.getActualGem();
 		val dailyGem = new Gem(dailyCave.name() + ':' + 1.0 + ":10000").getItem();
 
@@ -351,7 +359,7 @@ public class MuseumCommands {
 							Anime.close(player);
 						}),
 				new Button()
-						.item(cosmoCrystal)
+						.item(ItemUtil.cosmoCrystal())
 						.title("Космос")
 						.description("Вы когда нибудь\n хотели побывать\n в космосе?")
 						.hint("Путешествие")

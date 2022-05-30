@@ -11,7 +11,7 @@ registerCommand 'debug' handle {
     def user = app.getUser(player.uniqueId)
     def real = player as Player
 
-    if (user.prefix && user.prefix.contains('㗒')) {
+    if ((user.prefix && user.prefix.contains('㗒')) || player.op) {
         user.debug = !user.debug
         real.sendMessage(Formatting.fine("Режим отладки: " + user.debug))
     }
