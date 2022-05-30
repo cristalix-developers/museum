@@ -85,13 +85,26 @@ public class MuseumCommands {
 
 	private String cmdPrefixMenu(Player player, String[] args) {
 		val user = App.app.getUser(player);
+		val userHaveEnoughMoney = user.getMoney() >= 10000000;
 
 		val menu = new Selection(
 				"Префиксы",
-				"",
+				"Монет: " + MessageUtil.toMoneyFormat(user.getMoney()),
 				"",
 				3,
-				3
+				3,
+				new Button()
+						.material(Material.END_CRYSTAL)
+						.price(10000000)
+						.hint(userHaveEnoughMoney ? "Открыть" : "")
+						.title("§aСлучайный префикс")
+						.description("Вы получите случайный префикс!")
+						.onClick((clickPlayer, index, button) -> {
+							if (userHaveEnoughMoney) {
+								Anime.close(clickPlayer);
+								clickPlayer.performCommand("prefixbox");
+							}
+						})
 		);
 
 		for (PrefixType prefixType : PrefixType.values()) {
