@@ -83,13 +83,7 @@ registerCommand 'go' handle {
     if (state instanceof Museum && !user.grabbedArmorstand) {
         for (stall in state.getSubjects(SubjectType.STALL)) {
             if (stall.food.isEmpty() && stall.allocation) {
-
-                def location = new Location(player.world,
-                        stall.allocation.origin.x,
-                        stall.allocation.origin.y,
-                        stall.allocation.origin.z - 4)
-
-                user.teleport(location)
+                user.teleport(stall.allocation.clone().substruct(0.0, 0.0, 4.0))
                 user.location.yaw = 0
                 user.location.pitch = 0
                 return
