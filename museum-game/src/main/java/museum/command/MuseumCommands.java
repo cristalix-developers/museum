@@ -89,7 +89,7 @@ public class MuseumCommands {
 
 		val menu = new Selection(
 				"Префиксы",
-				"Монет: " + MessageUtil.toMoneyFormat(user.getMoney()),
+				"Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
 				"",
 				3,
 				3,
