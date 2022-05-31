@@ -785,17 +785,26 @@ public class MuseumCommands {
 		val menu = new Selection(
 				"Лутбокс",
 				"Кристаликов " + user.getDonateMoney(),
-				"Открыть",
+				"",
 				2,
 				2,
 				new Button()
 						.material(Material.ENDER_CHEST)
 						.price(78)
 						.sale(50)
+						.hint("Открыть")
 						.title("Случайная посылка")
 						.description("Вы §dгарантированно §fполучите случайный драгоценный камень 60%-100% качества и " +
 								"метеорит c доходом от 15$ до 100$")
-						.onClick((click, index, button) -> click.performCommand("proccessdonate ITEM_CASE"))
+						.onClick((click, index, button) -> click.performCommand("proccessdonate ITEM_CASE")),
+				new Button()
+						.material(Material.ENDER_CHEST)
+						.price(10000000)
+						.hint(user.getMoney() >= 10000000 ? "Открыть" : "")
+						.title("Случайная посылка")
+						.description("Вы §dгарантированно §fполучите случайный драгоценный камень 60%-100% качества и " +
+								"метеорит c доходом от 15$ до 100$")
+						.onClick((click, index, button) -> click.performCommand("lootboxopen"))
 		);
 		menu.setVault("donate");
 		B.postpone(1, () -> menu.open(player));
