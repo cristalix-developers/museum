@@ -6,6 +6,7 @@ import me.func.mod.Anime;
 import me.func.mod.Glow;
 import me.func.mod.selection.Button;
 import me.func.mod.selection.Choicer;
+import me.func.mod.selection.Confirmation;
 import me.func.mod.selection.Selection;
 import me.func.protocol.GlowColor;
 import museum.App;
@@ -57,6 +58,7 @@ public class MuseumCommands {
 	public MuseumCommands(App app) {
 		this.app = app;
 
+		B.regCommand(this::cmdVisitor, "visitor");
 		B.regCommand(this::cmdPrefixMenu, "prefixes");
 		B.regCommand(this::cmdBoerMenu, "boermenu");
 		B.regCommand(this::cmdBoer, "boer");
@@ -81,6 +83,44 @@ public class MuseumCommands {
 		B.regCommand(this::cmdChangeTitle, "changetitle");
 		B.regCommand(this::cmdShop, "shop", "gallery");
 		B.regCommand(this::cmdHome, "home", "leave", "spawn");
+	}
+
+	private String cmdVisitor(Player player, String[] args) {
+		val user = App.getApp().getUser(player);
+		val userMoney = user.getMoney();
+
+		val menu = new Selection(
+				"Посещение других музеев",
+				"Монет " + MessageUtil.toMoneyFormat(userMoney),
+				"",
+				5,
+				2
+		);
+
+		for (User userOnServer : app.getUsers()) {
+			if (userOnServer != user ) {
+				ItemStack userSkull = ItemUtil.getPlayerSkull(userOnServer);
+				val userMuseumCost = userOnServer.getIncome() / 2;
+				val canVisit = userMoney >= userMuseumCost;
+
+				Button btn = new Button()
+						.item(userSkull)
+						.price((long) userMuseumCost)
+						.title(userOnServer.getName())
+						.hint(canVisit ? "Посетить" : "")
+						.onClick((clickUser, button, index) -> {
+							if (canVisit) {
+								user.performCommand("travel " + userOnServer.getName());
+								Anime.close(player);
+							}
+						});
+
+				menu.add(btn);
+			}
+		}
+
+		menu.open(player);
+		return null;
 	}
 
 	private String cmdPrefixMenu(Player player, String[] args) {
@@ -806,6 +846,7 @@ public class MuseumCommands {
 		return null;
 	}
 
+	private static final int DONATE_SALE = 25;
 	private final List<Button> donateButtons = new ArrayList<>(Arrays.asList(
 			new Button()
 					.material(Material.END_CRYSTAL)
@@ -815,14 +856,24 @@ public class MuseumCommands {
 							"§eВы получите §6§l50,000$\n\n" +
 							"Каждое §dпятое §fоткрытие §dгарантирует §6редкий §fили\n" +
 							"§dэпичный §fпрефикс.")
-					.onClick((click, index, button) -> click.performCommand("proccessdonate PREFIX_CASE")),
+					.onClick((click, index, button) -> {
+						Confirmation menu = new Confirmation(Arrays.asList("Купить §aСлучайный префикс", "за &b" + (49 - (49 * DONATE_SALE / 100)) + " кристаллика(ов)"),
+								player -> player.performCommand("proccessdonate PREFIX_CASE"));
+						menu.open(click);
+					})
+					.sale(DONATE_SALE),
 			new Button()
 					.texture("minecraft:mcpatcher/cit/others/hub/coin2.png")
 					.price(119)
 					.title("§6Комиссия 0%")
 					.description("Если вы §aпродаете или покупаете §fдрагоценный камень, то комиссия " +
 							"§aисчезнет§f, поэтому вы не теряете денег на переводах валюты.")
-					.onClick((click, index, button) -> click.performCommand("proccessdonate PRIVILEGES")),
+					.onClick((click, index, button) -> {
+						Confirmation menu = new Confirmation(Arrays.asList("Купить §6Комиссия 0%", "за &b" + (119 - (119 * DONATE_SALE / 100)) + " кристаллика(ов)"),
+								player -> player.performCommand("proccessdonate PRIVILEGES"));
+						menu.open(click);
+					})
+					.sale(DONATE_SALE),
 			new Button()
 					.item(getPickaxeImage(PickaxeType.LEGENDARY))
 					.price(349)
@@ -830,7 +881,12 @@ public class MuseumCommands {
 					.description("Особая кирка!\n\n" +
 							"Приносит §b2 опыта за вскапывание §fи добывает §bбольше §fвсех других!" +
 							"\n\n§cНе остается §fпосле вайпа")
-					.onClick((click, index, button) -> click.performCommand("proccessdonate LEGENDARY_PICKAXE")),
+					.onClick((click, index, button) -> {
+						Confirmation menu = new Confirmation(Arrays.asList("Купить §b§lЛегендарная кирка", "за &b" + (349 - (349 * DONATE_SALE / 100)) + " кристаллика(ов)"),
+								player -> player.performCommand("proccessdonate LEGENDARY_PICKAXE"));
+						menu.open(click);
+					})
+					.sale(DONATE_SALE),
 			new Button()
 					.material(Material.OBSERVER)
 					.price(249)
@@ -838,42 +894,72 @@ public class MuseumCommands {
 					.description("Быстрее всех§f!\n\n" +
 							"Собирает самые дальние монеты -§b лучший выбор среди коллекторов." +
 							"\n\n§cНе остается §fпосле вайпа")
-					.onClick((click, index, button) -> click.performCommand("proccessdonate STEAM_PUNK_COLLECTOR")),
+					.onClick((click, index, button) -> {
+						Confirmation menu = new Confirmation(Arrays.asList("Купить §6Стим-панк сборщик монет", "за &b" + (249 - (249 * DONATE_SALE / 100)) + " кристаллика(ов)"),
+								player -> player.performCommand("proccessdonate STEAM_PUNK_COLLECTOR"));
+						menu.open(click);
+					})
+					.sale(DONATE_SALE),
 			new Button()
 					.material(Material.EXP_BOTTLE)
 					.price(149)
 					.title("§bБустер опыта §6§lx2")
 					.description("Общий бустер на §b1 час§f.\n\n" +
 							"Все получат в §lДВА§f раза больше опыта!")
-					.onClick((click, index, button) -> click.performCommand("proccessdonate GLOBAL_EXP_BOOSTER")),
+					.onClick((click, index, button) -> {
+						Confirmation menu = new Confirmation(Arrays.asList("Купить §bБустер опыта §6§lx2", "за &b" + (149 - (149 * DONATE_SALE / 100)) + " кристаллика(ов)"),
+								player -> player.performCommand("proccessdonate GLOBAL_EXP_BOOSTER"));
+						menu.open(click);
+					})
+					.sale(DONATE_SALE),
 			new Button()
 					.texture("minecraft:mcpatcher/cit/others/hub/iconpack/win2.png")
 					.price(79)
 					.title("§aБустер бура §6§lx2")
 					.description("Общий бустер на §b1 час§f.\n\n" +
 							"Бур работает в §lДВА§f раза быстрее у всех!")
-					.onClick((click, index, button) -> click.performCommand("proccessdonate BOER")),
+					.onClick((click, index, button) -> {
+						Confirmation menu = new Confirmation(Arrays.asList("Купить §bБустер опыта §6§lx2", "за &b" + (79 - (79 * DONATE_SALE / 100)) + " кристаллика(ов)"),
+								player -> player.performCommand("proccessdonate BOER"));
+						menu.open(click);
+					})
+					.sale(DONATE_SALE),
 			new Button()
 					.texture("minecraft:mcpatcher/cit/others/hub/iconpack/win2.png")
 					.price(199)
 					.title("§aБустер бура §6§lx5")
 					.description("Общий бустер на §b1 час§f.\n\n" +
 							"Бур работает в §a§lПЯТЬ§f раз быстрее у всех!")
-					.onClick((click, index, button) -> click.performCommand("proccessdonate BIG_BOER")),
+					.onClick((click, index, button) -> {
+						Confirmation menu = new Confirmation(Arrays.asList("Купить §bБустер опыта §6§lx5", "за &b" + (199 - (199 * DONATE_SALE / 100)) + " кристаллика(ов)"),
+								player -> player.performCommand("proccessdonate BIG_BOER"));
+						menu.open(click);
+					})
+					.sale(DONATE_SALE),
 			new Button()
 					.texture("minecraft:mcpatcher/cit/others/villager.png")
 					.price(149)
 					.title("§aБустер посетителей §6§lx3")
 					.description("Общий бустер на §b1 час§f.\n\n" +
 							"У всех в §lТРИ§f раза больше посетителей и §e§lмонет§f!")
-					.onClick((click, index, button) -> click.performCommand("proccessdonate GLOBAL_VILLAGER_BOOSTER")),
+					.onClick((click, index, button) -> {
+						Confirmation menu = new Confirmation(Arrays.asList("Купить §aБустер посетителей §6§lx3", "за &b" + (149 - (149 * DONATE_SALE / 100)) + " кристаллика(ов)"),
+								player -> player.performCommand("proccessdonate GLOBAL_VILLAGER_BOOSTER"));
+						menu.open(click);
+					})
+					.sale(DONATE_SALE),
 			new Button()
 					.material(Material.GOLDEN_APPLE)
 					.price(199)
 					.title("§eБустер денег §6§lx2")
 					.description("Общий бустер на §b1 час§f.\n\n" +
 							"Все получат в §lДВА§f раза больше денег!")
-					.onClick((click, index, button) -> click.performCommand("proccessdonate GLOBAL_MONEY_BOOSTER"))
+					.onClick((click, index, button) -> {
+						Confirmation menu = new Confirmation(Arrays.asList("Купить §eБустер денег §6§lx2", "за &b" + (199 - (199 * DONATE_SALE / 100)) + " кристаллика(ов)"),
+								player -> player.performCommand("proccessdonate GLOBAL_MONEY_BOOSTER"));
+						menu.open(click);
+					})
+					.sale(DONATE_SALE)
 	));
 
 	private String cmdDonate(Player player, String[] args) {
@@ -969,13 +1055,19 @@ public class MuseumCommands {
 				return null;
 			}
 
-			visitor.setMoney(visitor.getMoney() - museum.getIncome() / 2);
-			owner.setMoney(owner.getMoney() + museum.getIncome() / 2);
+			visitor.giveMoney(-(museum.getIncome() / 2));
+			owner.giveMoney(museum.getIncome() / 2);
 			visitor.setState(state);
-			MessageUtil.find("traveler")
-					.set("visitor", visitor.getName())
-					.set("price", MessageUtil.toMoneyFormat(museum.getIncome() / 2))
-					.send(owner);
+
+			ItemStack ownerSkull = ItemUtil.getPlayerSkull(owner);
+
+			Anime.itemTitle(sender,
+					ownerSkull,
+					"",
+					"§bВы посетили музей игрока " + owner.getDisplayName(),
+					2.0);
+
+			Anime.killboardMessage(owner.getPlayer(), "§bВаш музей посетили, вы получили &6" + museum.getIncome() / 2 + "$");
 		}
 		return null;
 	}

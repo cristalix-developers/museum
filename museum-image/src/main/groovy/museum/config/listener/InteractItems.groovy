@@ -26,7 +26,7 @@ on PAPER use {
 }
 
 on WOOD_DOOR use {
-    player.performCommand 'gui visitor'
+    player.performCommand 'visitor'
 }
 
 on SADDLE use {
@@ -115,14 +115,12 @@ register 'sink-treasure', {
     """
 }
 
-def speed = 3
 def MAX_BOER_COUNT = 6
 on PlayerInteractEvent, {
     def user = app.getUser player
     def playerLocation = player.location
     playerLocation.yaw = 0
     playerLocation.pitch = 0
-    def direction = player.eyeLocation.direction
 
     if (playerLocation.distanceSquared(ROCKET) < 45 && user.state instanceof Museum)
         B.postpone(1, () -> user.setState(new Cosmos()))

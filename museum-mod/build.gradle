@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.6.20' apply false
     id 'dev.implario.bundler' version '4.0.1'
+    id 'org.hidetake.ssh' version '2.10.1'
 }
 
 apply plugin: 'kotlin'
@@ -27,4 +28,29 @@ bundle {
      author 'func'
      keep('class ru.cristalix.data.** { *; }')
      keep('class ru.cristalix.** { *; }')
+}
+
+remotes {
+    webServer {
+        host = System.getenv("CRI_HOST")
+        user = System.getenv("CRI_HOST_USER")
+        knownHosts = allowAnyHosts
+        identity = file(System.getenv("CRI_HOST_PRIVATE_KEY"))
+        passphrase = System.getenv("CRI_HOST_PASSPHRASE")
+    }
+}
+
+// Поменять into на нужный путь
+task upload() {
+    doLast {
+        ssh.run {
+            session(remotes.webServer) {
+                put from: project(':museum-mod').tasks.jar.getArchiveFile().get().asFile.path, into: "/home/arcade/godzillas/museum-test/server/mods"
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.upload.dependsOn(bundle)
 }

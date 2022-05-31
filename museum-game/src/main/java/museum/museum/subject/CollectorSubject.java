@@ -81,7 +81,7 @@ public class CollectorSubject extends Subject implements Incomeble {
 		if (args[0] % ((speed > 9 ? 40 : 60) * 20L) != 0)
 			return;
 
-		if (owner.getSubjects().stream().filter(subject -> subject.getAllocation() != null).count() > 2)
+		if (owner.getSubjects().stream().filter(subject -> subject.getAllocation() != null && subject instanceof CollectorSubject).count() > 2)
 			return;
 
 		val museumIncome = owner.getLastMuseum().getIncome();
