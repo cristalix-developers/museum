@@ -71,6 +71,7 @@ public class MuseumCommands {
 		B.regCommand(this::cmdFastUpgradePickaxe, "fastupgradepickaxe");
 		B.regCommand(this::cmdTools, "tools");
 		B.regCommand(this::cmdPolishing, "polishing");
+		B.regCommand(this::cmdDonateLootBox, "donatelootbox");
 		B.regCommand(this::cmdLootBox, "lootbox");
 		B.regCommand(this::cmdMenu, "menu");
 		B.regCommand(this::cmdDonate, "donate");
@@ -153,26 +154,13 @@ public class MuseumCommands {
 
 	private String cmdPrefixMenu(Player player, String[] args) {
 		val user = App.app.getUser(player);
-		val userHaveEnoughMoney = user.getMoney() >= 10000000;
 
 		val menu = new Selection(
 				"Префиксы",
 				"Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
 				"",
 				3,
-				3,
-				new Button()
-						.material(Material.END_CRYSTAL)
-						.price(10000000)
-						.hint(userHaveEnoughMoney ? "Открыть" : "")
-						.title("§aСлучайный префикс")
-						.description("Вы получите случайный префикс!")
-						.onClick((clickPlayer, index, button) -> {
-							if (userHaveEnoughMoney) {
-								Anime.close(clickPlayer);
-								clickPlayer.performCommand("prefixbox");
-							}
-						})
+				3
 		);
 
 		for (PrefixType prefixType : PrefixType.values()) {
@@ -780,33 +768,88 @@ public class MuseumCommands {
 		return null;
 	}
 
+	private String cmdDonateLootBox(Player player, String[] args) {
+		val user = app.getUser(player);
+		int SALE_PREFIX_LOOTBOX = 25;
+		int SALE_LOOTBOX = 50;
+
+		val menu = new Selection(
+				"Донатные лутбоксы",
+				"Кристаликов " + user.getDonateMoney(),
+				"Открыть",
+				2,
+				2,
+				new Button()
+						.material(Material.END_CRYSTAL)
+						.price(49)
+						.sale(SALE_PREFIX_LOOTBOX)
+						.title("§aСлучайный префикс")
+						.description("Такой префикс уже был?\n" +
+								"§eВы получите §6§l50,000$\n\n" +
+								"Каждое §dпятое §fоткрытие §dгарантирует §6редкий §fили\n" +
+								"§dэпичный §fпрефикс.")
+						.onClick((click, index, button) -> {
+							Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aСлучайный префикс", "за &b" + (49 - (49 * SALE_PREFIX_LOOTBOX / 100)) + " кристаллика(ов)"),
+									clickPlayer -> clickPlayer.performCommand("proccessdonate PREFIX_CASE"));
+							menuConfirm.open(click);
+						}),
+				new Button()
+						.material(Material.ENDER_CHEST)
+						.price(78)
+						.sale(SALE_LOOTBOX)
+						.title("Случайная посылка")
+						.description("Вы §dгарантированно §fполучите случайный драгоценный камень 60%-100% качества и " +
+								"метеорит c доходом от 15$ до 100$")
+						.onClick((click, index, button) -> {
+							Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aСлучайный префикс", "за &b" + (78 - (78 * SALE_LOOTBOX / 100)) + " кристаллика(ов)"),
+									clickPlayer -> clickPlayer.performCommand("proccessdonate ITEM_CASE"));
+							menuConfirm.open(click);
+						})
+		);
+		menu.setVault("donate");
+		B.postpone(1, () -> menu.open(player));
+		return null;
+	}
+
 	private String cmdLootBox(Player player, String[] args) {
 		val user = app.getUser(player);
+		val userHaveEnoughMoney = user.getMoney() >= 10000000;
+
 		val menu = new Selection(
-				"Лутбокс",
-				"Кристаликов " + user.getDonateMoney(),
+				"Лутбоксы",
+				"Монет " + user.getMoney(),
 				"",
 				2,
 				2,
 				new Button()
-						.material(Material.ENDER_CHEST)
-						.price(78)
-						.sale(50)
-						.hint("Открыть")
-						.title("Случайная посылка")
-						.description("Вы §dгарантированно §fполучите случайный драгоценный камень 60%-100% качества и " +
-								"метеорит c доходом от 15$ до 100$")
-						.onClick((click, index, button) -> click.performCommand("proccessdonate ITEM_CASE")),
+						.material(Material.END_CRYSTAL)
+						.price(10000000)
+						.hint(userHaveEnoughMoney ? "Открыть" : "")
+						.title("§aСлучайный префикс")
+						.description("Такой префикс уже был?\n" +
+								"§eВы получите §6§l50,000$\n\n" +
+								"Каждое §dпятое §fоткрытие §dгарантирует §6редкий §fили\n" +
+								"§dэпичный §fпрефикс.")
+						.onClick((clickPlayer, index, button) -> {
+							if (userHaveEnoughMoney) {
+								Anime.close(clickPlayer);
+								clickPlayer.performCommand("prefixbox");
+							}
+						}),
 				new Button()
 						.material(Material.ENDER_CHEST)
 						.price(10000000)
-						.hint(user.getMoney() >= 10000000 ? "Открыть" : "")
+						.hint(userHaveEnoughMoney ? "Открыть" : "")
 						.title("Случайная посылка")
 						.description("Вы §dгарантированно §fполучите случайный драгоценный камень 60%-100% качества и " +
 								"метеорит c доходом от 15$ до 100$")
-						.onClick((click, index, button) -> click.performCommand("lootboxopen"))
+						.onClick((clickPlayer, index, button) -> {
+							if (userHaveEnoughMoney) {
+								Anime.close(clickPlayer);
+								clickPlayer.performCommand("lootboxopen");
+							}
+						})
 		);
-		menu.setVault("donate");
 		B.postpone(1, () -> menu.open(player));
 		return null;
 	}
@@ -864,6 +907,11 @@ public class MuseumCommands {
 					.onClick((click, index, button) -> click.performCommand("invite")),
 			new Button()
 					.texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
+					.title("Донатные лутбоксы")
+					.description("Купите шанс получить топовые предметы")
+					.onClick((click, index, button) -> click.performCommand("donatelootbox")),
+			new Button()
+					.texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
 					.title("Лутбоксы")
 					.description("Купите шанс получить топовые предметы")
 					.onClick((click, index, button) -> click.performCommand("lootbox"))
@@ -885,20 +933,6 @@ public class MuseumCommands {
 
 	private static final int DONATE_SALE = 25;
 	private final List<Button> donateButtons = new ArrayList<>(Arrays.asList(
-			new Button()
-					.material(Material.END_CRYSTAL)
-					.price(49)
-					.title("§aСлучайный префикс")
-					.description("Такой префикс уже был?\n" +
-							"§eВы получите §6§l50,000$\n\n" +
-							"Каждое §dпятое §fоткрытие §dгарантирует §6редкий §fили\n" +
-							"§dэпичный §fпрефикс.")
-					.onClick((click, index, button) -> {
-						Confirmation menu = new Confirmation(Arrays.asList("Купить §aСлучайный префикс", "за &b" + (49 - (49 * DONATE_SALE / 100)) + " кристаллика(ов)"),
-								player -> player.performCommand("proccessdonate PREFIX_CASE"));
-						menu.open(click);
-					})
-					.sale(DONATE_SALE),
 			new Button()
 					.texture("minecraft:mcpatcher/cit/others/hub/coin2.png")
 					.price(119)
