@@ -129,6 +129,7 @@ public class MuseumCommands {
 		);
 
 		for (User userOnServer : app.getUsers()) {
+			if (userOnServer != user) {
 				ItemStack userSkull = ItemUtil.getPlayerSkull(userOnServer);
 				val userMuseumCost = userOnServer.getIncome() / 2;
 				val canVisit = userMoney >= userMuseumCost;
@@ -146,6 +147,7 @@ public class MuseumCommands {
 						});
 
 				menu.add(btn);
+			}
 		}
 
 		menu.open(player);
