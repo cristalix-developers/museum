@@ -22,7 +22,7 @@ import static org.bukkit.event.block.Action.LEFT_CLICK_BLOCK
 import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK
 
 on PAPER use {
-    B.postpone(1, () -> player.performCommand('menu'))
+    player.performCommand('menu')
 }
 
 on WOOD_DOOR use {

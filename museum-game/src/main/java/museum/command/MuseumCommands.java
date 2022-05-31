@@ -22,6 +22,7 @@ import museum.excavation.ExcavationPrototype;
 import museum.fragment.Fragment;
 import museum.fragment.Gem;
 import museum.fragment.GemType;
+import museum.misc.PlacesMechanic;
 import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.map.SubjectType;
@@ -58,6 +59,7 @@ public class MuseumCommands {
 	public MuseumCommands(App app) {
 		this.app = app;
 
+		B.regCommand(this::cmdAchievements, "achievements");
 		B.regCommand(this::cmdVisitor, "visitor");
 		B.regCommand(this::cmdPrefixMenu, "prefixes");
 		B.regCommand(this::cmdBoerMenu, "boermenu");
@@ -85,6 +87,34 @@ public class MuseumCommands {
 		B.regCommand(this::cmdHome, "home", "leave", "spawn");
 	}
 
+	private String cmdAchievements(Player player, String[] args) {
+		val user = App.getApp().getUser(player);
+
+		val menu = new Selection(
+				"Найденные места",
+				"",
+				"",
+				5,
+				4
+		);
+
+		ItemStack claimedPlaceItem = ItemUtil.getAgreeItem();
+
+		for (String placeName : user.getClaimedPlaces()) {
+			PlacesMechanic.Place place = PlacesMechanic.getPlaceByTitle(placeName);
+
+			Button btn = new Button()
+					.item(claimedPlaceItem)
+					.title(place.getTitle())
+					.description("§6" + place.getClaimedExp() + " опыта");
+
+			menu.add(btn);
+		}
+
+		menu.open(player);
+		return null;
+	}
+
 	private String cmdVisitor(Player player, String[] args) {
 		val user = App.getApp().getUser(player);
 		val userMoney = user.getMoney();
@@ -98,7 +128,6 @@ public class MuseumCommands {
 		);
 
 		for (User userOnServer : app.getUsers()) {
-			if (userOnServer != user ) {
 				ItemStack userSkull = ItemUtil.getPlayerSkull(userOnServer);
 				val userMuseumCost = userOnServer.getIncome() / 2;
 				val canVisit = userMoney >= userMuseumCost;
@@ -106,7 +135,7 @@ public class MuseumCommands {
 				Button btn = new Button()
 						.item(userSkull)
 						.price((long) userMuseumCost)
-						.title(userOnServer.getName())
+						.title(userOnServer.getName() + " §fФрагментов: " + userOnServer.getSkeletons().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum())
 						.hint(canVisit ? "Посетить" : "")
 						.onClick((clickUser, button, index) -> {
 							if (canVisit) {
@@ -116,7 +145,6 @@ public class MuseumCommands {
 						});
 
 				menu.add(btn);
-			}
 		}
 
 		menu.open(player);
