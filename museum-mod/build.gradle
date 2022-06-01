@@ -45,12 +45,12 @@ task upload() {
     doLast {
         ssh.run {
             session(remotes.webServer) {
-                put from: project(':museum-mod').tasks.jar.getArchiveFile().get().asFile.path, into: "/home/arcade/godzillas/museum-test/server/mods"
+                put from: file("build/libs/museum-mod-bundle.jar"), into: "/home/arcade/godzillas/museum-test/server/mods"
             }
         }
     }
 }
 
 afterEvaluate {
-    tasks.upload.dependsOn(bundle)
+    tasks.upload.dependsOn(tasks.bundle)
 }

@@ -41,10 +41,6 @@ import java.util.stream.Stream;
 
 public class PlayerDataManager implements Listener {
 
-	private static final Confirmation confirmation = new Confirmation(Arrays.asList("Рекомендуем установить", "ресурспак"),
-			player -> player.setResourcePack(App.RESOURCE_PACK_URL, "4")
-	);
-
 	private final App app;
 	private final Map<UUID, User> userMap = Maps.newHashMap();
 	private final MultiTimeBar timeBar;
@@ -175,8 +171,18 @@ public class PlayerDataManager implements Listener {
 			Anime.hideIndicator(player, Indicators.ARMOR, Indicators.EXP, Indicators.HEALTH, Indicators.HUNGER);
 		});
 
-		B.postpone(100, () -> confirmation.open(player));
-
+		UserInfo userInfo = user.getInfo();
+		if (!userInfo.isApprovedResourcepack()) {
+			B.postpone(100, () -> {
+				Confirmation confirmation = new Confirmation(Arrays.asList("Рекомендуем установить", "ресурспак"),
+						playerConfirmation -> {
+							userInfo.setApprovedResourcepack(true);
+							playerConfirmation.setResourcePack(App.RESOURCE_PACK_URL, "4");
+						}
+					);
+				confirmation.open(player);
+			});
+		}
 		event.setJoinMessage(null);
 	}
 

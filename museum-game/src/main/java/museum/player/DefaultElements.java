@@ -57,7 +57,8 @@ public class DefaultElements {
 						"BONE_DETECTION:0",
 						"DETECTION_OF_RELIQUES:0",
 						"DUPLICATE:0"
-				))
+				)),
+				false
 		);
 
 		for (SubjectInfo subject : proto.getDefaultSubjects())
