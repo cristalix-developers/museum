@@ -2,6 +2,7 @@ package museum.misc;
 
 import lombok.val;
 import museum.App;
+import museum.discord.Bot;
 import museum.packages.UserChatPackage;
 import museum.player.User;
 import net.md_5.bungee.api.ChatColor;
@@ -46,6 +47,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 			e.printStackTrace();
 		}
 		val eventExecutor = IServerPlatform.get().getPlatformEventExecutor();
+
 		eventExecutor.registerListener(AsyncPlayerChatEvent.class, this, event -> {
 			event.setCancelled(true);
 			val toRemove = event.getRecipients();
@@ -59,8 +61,12 @@ public final class MuseumChatService extends ChatService implements Listener {
 			val components = extended.getMessage();
 			if (components == null)
 				return;
-			components.thenAccept(comp -> App.getApp().getClientSocket().write(new UserChatPackage(ComponentSerializer.toString(comp))));
+			components.thenAccept(comp -> {
+				App.getApp().getClientSocket().write(new UserChatPackage(ComponentSerializer.toString(comp)));
+				Bot.sendMessage(comp);
+			});
 		}, EventPriority.HIGH, true);
+
 		eventExecutor.registerListener(ru.cristalix.core.event.AsyncPlayerChatEvent.class, this, event -> {
 			val player = event.getPlayer();
 			val uuid = player.getUniqueId();

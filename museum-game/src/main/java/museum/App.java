@@ -16,6 +16,7 @@ import museum.client.ClientSocket;
 import museum.command.AdminCommand;
 import museum.command.MuseumCommands;
 import museum.cosmos.boer.BoerManager;
+import museum.discord.Bot;
 import museum.donate.DonateType;
 import museum.international.CrystalExcavations;
 import museum.international.International;
@@ -43,6 +44,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import ru.cristalix.core.CoreApi;
 import ru.cristalix.core.chat.IChatService;
 import ru.cristalix.core.permissions.IPermissionService;
@@ -58,6 +61,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+
+import static clepto.bukkit.B.plugin;
 
 @Getter
 public final class App extends JavaPlugin {
@@ -77,7 +82,7 @@ public final class App extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        B.plugin = App.app = this;
+        plugin = App.app = this;
         B.events(new PhysicsDisabler());
 
         // Добавление админ-команд
@@ -190,6 +195,18 @@ public final class App extends JavaPlugin {
         realm.setStatus(RealmStatus.WAITING_FOR_PLAYERS);
         realm.setGroupName("Музей");
         IScoreboardService.get().getServerStatusBoard().setDisplayName("§fМузей #§b" + realm.getRealmId().getId());
+
+        // Включение дискорд бота
+        new Thread(Bot::init).start();
+
+        // Запуск автообновляемого сообщения раз в 30 минут
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Bukkit.broadcastMessage("§8[§bCristalix§8] §bДискорд сервер §chttps://discord.gg/fmpwuGKcaP");
+            }
+        }.runTaskTimer(plugin, 0, 20L * (60L * 30L));
+
     }
 
     @Override
