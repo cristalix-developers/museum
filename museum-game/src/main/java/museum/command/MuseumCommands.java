@@ -15,6 +15,7 @@ import museum.content.PrefixType;
 import museum.cosmos.Cosmos;
 import museum.cosmos.boer.Boer;
 import museum.cosmos.boer.BoerType;
+import museum.data.MuseumInfo;
 import museum.data.PickaxeType;
 import museum.data.SubjectInfo;
 import museum.excavation.Excavation;
@@ -46,6 +47,7 @@ import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Formatting;
 import ru.cristalix.core.item.Items;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,6 +61,7 @@ public class MuseumCommands {
 	public MuseumCommands(App app) {
 		this.app = app;
 
+		B.regCommand(this::cmdPlayerStats, "playerstats");
 		B.regCommand(this::cmdAchievements, "achievements");
 		B.regCommand(this::cmdVisitor, "visitor");
 		B.regCommand(this::cmdPrefixMenu, "prefixes");
@@ -86,6 +89,38 @@ public class MuseumCommands {
 		B.regCommand(this::cmdChangeTitle, "changetitle");
 		B.regCommand(this::cmdShop, "shop", "gallery");
 		B.regCommand(this::cmdHome, "home", "leave", "spawn");
+	}
+
+	private String cmdPlayerStats(Player player, String[] args) {
+		val user = App.getApp().getUser(player);
+		MuseumInfo museumInfo = user.getMuseumInfos().get(0);
+
+		val menu = new Selection(
+				"Ваша статистика",
+				"Кристалликов " + user.getDonateMoney(),
+				"",
+				1,
+				1,
+				new Button()
+						.texture("minecraft:mcpatcher/cit/others/hub/guild_world.png")
+						.title("")
+						.description("§6Доход:§f " + MessageUtil.toMoneyFormat(user.getIncome()) + "\n" +
+								"§6Монет:§f " + MessageUtil.toMoneyFormat(user.getMoney()) + "\n" +
+								"§bКосмических кристаллов:§f " + MessageUtil.toCrystalFormat(user.getCosmoCrystal()) + "\n" +
+								"§bУровень:§f " + user.getLevel() + "\n" +
+								"§cОпыт:§f " + MessageUtil.toCrystalFormat(user.getExperience()) + "\n" +
+								"§bРаскопок:§f " + user.getExcavationCount() + "\n" +
+								"§bКирка:§f " + getPickaxeColor(user.getPickaxeType()) + user.getPickaxeType().getName() + "\n\n" +
+								"§bНазвание музея:§f " + museumInfo.title + "\n" +
+								"§bПосещений музея:§f " + museumInfo.views + "\n" +
+								"§bСоздан:§f " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(museumInfo.creationDate.getTime())) + "\n" +
+								"§bФрагментов:§f " + user.getSkeletons().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum() + "\n" +
+								"§bПодобрано монет:§f " + user.getPickedCoinsCount() + "\n")
+		);
+
+		menu.setVault("donate");
+		menu.open(player);
+		return null;
 	}
 
 	private String cmdAchievements(Player player, String[] args) {
@@ -137,7 +172,9 @@ public class MuseumCommands {
 				Button btn = new Button()
 						.item(userSkull)
 						.price((long) userMuseumCost)
-						.title(userOnServer.getName() + " §fФрагментов: " + userOnServer.getSkeletons().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum())
+						.title(userOnServer.getName() +
+								userOnServer.getLastMuseum().getTitle() +
+								" §fФрагментов: " + userOnServer.getSkeletons().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum())
 						.hint(canVisit ? "Посетить" : "")
 						.onClick((clickUser, button, index) -> {
 							if (canVisit) {

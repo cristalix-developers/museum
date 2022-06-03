@@ -8,8 +8,11 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import ru.cristalix.core.permissions.IPermissionService;
 
 public class ItemUtil {
+
+    private static final IPermissionService permissionService = IPermissionService.get();
 
     public static ItemStack cosmoCrystal() {
         ItemStack cosmoCrystal = new ItemStack(Material.CLAY_BALL);
@@ -23,6 +26,7 @@ public class ItemUtil {
         ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
         meta.setPlayerProfile(Bukkit.getPlayer(user.getName()).getPlayerProfile());
+        meta.setDisplayName(permissionService.getNameColor(user.getUuid()).join() + user.getName());
         skull.setItemMeta(meta);
         return skull;
     }

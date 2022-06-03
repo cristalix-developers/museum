@@ -24,6 +24,7 @@ import museum.player.prepare.BeforePacketHandler;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Storable;
 import museum.util.ChunkWriter;
+import museum.util.ItemUtil;
 import museum.util.LocationUtil;
 import museum.util.SubjectLogoUtil;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -159,6 +160,7 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 		inventory.setItem(0, menu);
 		inventory.setItem(3, visitorMenu);
 		inventory.setItem(5, placeMenu);
+		inventory.setItem(8, ItemUtil.getPlayerSkull(user));
 	}
 
 	@Override

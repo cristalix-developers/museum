@@ -35,6 +35,10 @@ on SADDLE use {
     player.performCommand 'home'
 }
 
+on SKULL_ITEM use {
+    player.performCommand 'playerstats'
+}
+
 register 'sugar-treasure', {
     item SUGAR
     nbt.cost = 120
