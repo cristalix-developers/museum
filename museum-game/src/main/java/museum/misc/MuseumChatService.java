@@ -23,6 +23,7 @@ import ru.cristalix.core.chat.ChatContext;
 import ru.cristalix.core.chat.ChatService;
 import ru.cristalix.core.formatting.Formatting;
 import ru.cristalix.core.permissions.IPermissionService;
+import ru.cristalix.core.realm.IRealmService;
 
 import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
@@ -47,6 +48,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 			e.printStackTrace();
 		}
 		val eventExecutor = IServerPlatform.get().getPlatformEventExecutor();
+		val realm = IRealmService.get().getCurrentRealmInfo().getRealmId();
 
 		eventExecutor.registerListener(AsyncPlayerChatEvent.class, this, event -> {
 			event.setCancelled(true);
@@ -63,7 +65,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 				return;
 			components.thenAccept(comp -> {
 				App.getApp().getClientSocket().write(new UserChatPackage(ComponentSerializer.toString(comp)));
-				Bot.sendMessage(comp);
+				Bot.sendGlobalMessage(realm.getRealmName(), comp);
 			});
 		}, EventPriority.HIGH, true);
 
@@ -123,7 +125,10 @@ public final class MuseumChatService extends ChatService implements Listener {
 		eventExecutor.registerListener(
 				PlayerJoinEvent.class,
 				this,
-				event -> event.setJoinMessage(null),
+				event -> {
+					Bot.sendNormalMessage(realm.getRealmName(), "`" + event.getPlayer().getDisplayName() + " зашёл в игру`");
+					event.setJoinMessage(null);
+				},
 				EventPriority.HIGH,
 				true
 		);
@@ -131,6 +136,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 				PlayerQuitEvent.class,
 				this,
 				event -> {
+					Bot.sendNormalMessage(realm.getRealmName(), "`" + event.getPlayer().getDisplayName() + " вышел из игры`");
 					event.setQuitMessage(null);
 					setChatView(event.getPlayer().getUniqueId(), null);
 				},
