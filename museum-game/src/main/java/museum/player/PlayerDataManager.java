@@ -144,6 +144,7 @@ public class PlayerDataManager implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		val player = (CraftPlayer) event.getPlayer();
+		ClientSocket client = app.getClientSocket();
 
 		player.setWalkSpeed(.36F);
 		player.setOp(ADMIN_LIST.contains(player.getUniqueId()));
@@ -178,6 +179,7 @@ public class PlayerDataManager implements Listener {
 						playerConfirmation -> {
 							userInfo.setApprovedResourcepack(true);
 							playerConfirmation.setResourcePack(App.RESOURCE_PACK_URL, "4");
+							client.write(new SaveUserPackage(player.getUniqueId(), userInfo));
 						}
 					);
 				confirmation.open(player);
