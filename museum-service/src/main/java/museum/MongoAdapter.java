@@ -69,6 +69,19 @@ public class MongoAdapter<T extends Unique> {
 		return future;
 	}
 
+	public CompletableFuture<T> findDiscord(String discordID) {
+		CompletableFuture<T> future = new CompletableFuture<>();
+		data.find(session, Filters.eq("discordID", discordID))
+				.first((result, throwable) -> {
+					try {
+						future.complete(readDocument(result));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
+		return future;
+	}
+
 	public CompletableFuture<Map<UUID, T>> findAll() {
 		CompletableFuture<Map<UUID, T>> future = new CompletableFuture<>();
 		FindIterable<Document> documentFindIterable = data.find();

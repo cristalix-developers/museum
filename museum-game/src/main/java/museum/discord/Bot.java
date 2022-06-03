@@ -1,5 +1,6 @@
 package museum.discord;
 
+import museum.discord.events.OnMessageReceivedEvent;
 import museum.discord.events.OnReadyEvent;
 import museum.util.DiscordUtil;
 import net.dv8tion.jda.api.JDA;
@@ -18,6 +19,7 @@ public class Bot {
         JDABuilder builder = JDABuilder.createDefault("OTgxMjYxMzk3NzM0MzMwMzY4.G_kvi6.D4z0EZdg0luSa4BCxQrjKQptiD5h5zA8wdMEBU");
         builder.setStatus(OnlineStatus.DO_NOT_DISTURB);
         builder.addEventListeners(new OnReadyEvent());
+        builder.addEventListeners(new OnMessageReceivedEvent());
 
         try {
             jda = builder.build();

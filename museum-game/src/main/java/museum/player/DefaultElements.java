@@ -58,7 +58,8 @@ public class DefaultElements {
 						"DETECTION_OF_RELIQUES:0",
 						"DUPLICATE:0"
 				)),
-				false
+				false,
+				""
 		);
 
 		for (SubjectInfo subject : proto.getDefaultSubjects())

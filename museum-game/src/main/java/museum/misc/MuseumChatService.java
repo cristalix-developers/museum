@@ -71,6 +71,8 @@ public final class MuseumChatService extends ChatService implements Listener {
 
 		eventExecutor.registerListener(ru.cristalix.core.event.AsyncPlayerChatEvent.class, this, event -> {
 			val player = event.getPlayer();
+			if (player == null)
+				return;
 			val uuid = player.getUniqueId();
 			val chatView = getChatView(uuid);
 			String error = null;

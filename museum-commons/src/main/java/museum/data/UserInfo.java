@@ -42,4 +42,5 @@ public class UserInfo implements Unique {
 	private Integer cosmoCrystal;
 	private List<String> improvements;
 	private boolean approvedResourcepack;
+	private String discordID;
 }

@@ -118,6 +118,18 @@ public class MuseumService {
 				answer(channel, pckg);
 			});
 		});
+		registerHandler(DiscordUserInfoPackage.class, (channel, source, pckg) -> {
+			if (Objects.equals(pckg.getDiscordID(), "")) {
+				System.out.println("Received DiscordUserInfoPackage from " + source + " with null discordID");
+				return;
+			}
+			System.out.println("Received DiscordUserInfoPackage from " + source + " for " + pckg.getDiscordID());
+
+			userData.findDiscord(pckg.getDiscordID()).thenAccept(info -> {
+				pckg.setUserInfo(info);
+				answer(channel, pckg);
+			});
+		});
 		registerHandler(SaveUserPackage.class, (channel, source, pckg) -> {
 			System.out.println("Received SaveUserPackage from " + source + " for " + pckg.getUser().toString());
 			userData.save(pckg.getUserInfo());
