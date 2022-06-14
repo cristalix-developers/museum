@@ -20,9 +20,7 @@ import museum.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -56,32 +54,27 @@ public class AdminCommand {
 				return "§bИспользование: §c/get_data [Игрок]";
 
 			val player = Bukkit.getPlayer(args[0]);
+
+			if (player == null || !player.isOnline())
+				return "§bИгрок не найден";
+
 			val user = app.getUser(player);
 
-			List<String> allGemsInInventory = new ArrayList<>();
+			sender.sendMessage("§bВсе реликвии у игрока в инвентаре §c" + user.getDisplayName() + "§b:§r");
 			for (Fragment fragment : user.getRelics().values())
 				if (fragment instanceof Gem)
-					allGemsInInventory.add(fragment.getAddress());
-			
-			player.sendMessage("§bВсе реликвии у игрока в инвентаре §c" + user.getDisplayName() + "§b:§r");
-			for (String relicData : allGemsInInventory)
-				player.sendMessage(relicData + "\n");
+					sender.sendMessage(fragment.getAddress() + "\n");
 
-			List<String> allStandsWithGem = new ArrayList<>();
+			sender.sendMessage("§bВсе стенды у игрока §c" + user.getDisplayName() + "§b с чем-либо:§r");
 			val a1 = user.getSubjects();
 			for (Subject dataForClient : a1)
 				if (dataForClient instanceof RelicShowcaseSubject) {
 					val relicCase = ((RelicShowcaseSubject) dataForClient);
-					val coords = ((RelicShowcaseSubject) dataForClient).getAbsoluteLocation();
 					try {
-						allStandsWithGem.add("\nIncome: §c" + relicCase.getIncome() + "§r\n" +
-											"Relic: §c" + relicCase.getFragment().getAddress() + "§r");
+						sender.sendMessage("\nIncome: §c" + relicCase.getIncome() + "§r\n" +
+												"Relic: §c" + relicCase.getFragment().getAddress() + "§r" + "\n");
 					} catch (Exception ignored) { }
 				}
-
-			player.sendMessage("§bВсе стенды у игрока §c" + user.getDisplayName() + "§b с чем-либо:§r");
-			for (String standData : allStandsWithGem)
-				player.sendMessage((standData) + "\n");
 
 			return null;
 		}, "get_data");
