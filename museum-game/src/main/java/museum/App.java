@@ -202,7 +202,9 @@ public final class App extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage("§8[§bCristalix§8] §bДискорд сервер §chttps://discord.gg/fmpwuGKcaP");
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    player.sendMessage("§8[§bCristalix§8] §bДискорд сервер §chttps://discord.gg/fmpwuGKcaP");
+                }
             }
         }.runTaskTimer(plugin, 0, 20L * (60L * 30L));
 
