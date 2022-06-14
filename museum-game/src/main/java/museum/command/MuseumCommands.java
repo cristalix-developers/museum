@@ -173,7 +173,6 @@ public class MuseumCommands {
 						.item(userSkull)
 						.price((long) userMuseumCost)
 						.title(userOnServer.getName() +
-								userOnServer.getLastMuseum().getTitle() +
 								" §fФрагментов: " + userOnServer.getSkeletons().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum())
 						.hint(canVisit ? "Посетить" : "")
 						.onClick((clickUser, button, index) -> {
