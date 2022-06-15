@@ -14,9 +14,7 @@ import museum.prototype.Managers;
 public class PrepareShopBlocks implements Prepare {
 
 	public static final Prepare INSTANCE = new PrepareShopBlocks();
-	private static final SubjectPrototype.SubjectDataForClient[] SHOP_DATA = Managers.subject.getMap().values().stream().map(SubjectPrototype::getDataForClient).toArray(SubjectPrototype.SubjectDataForClient[]::new);
-
-	private ModTransfer dataForClients;
+	private SubjectPrototype.SubjectDataForClient[] dataForClients;
 	private long lastUpdate = 0;
 
 	@Override
@@ -25,8 +23,12 @@ public class PrepareShopBlocks implements Prepare {
 		// Обновление позиций в магазине каждую минуту
 		if (dataForClients == null || now - lastUpdate > 1000 * 60) {
 			lastUpdate = now;
-			dataForClients = new ModTransfer().json(SHOP_DATA);
+			dataForClients = Managers.subject.getMap()
+					.values()
+					.stream()
+					.map(SubjectPrototype::getDataForClient)
+					.toArray(SubjectPrototype.SubjectDataForClient[]::new);
 		}
-		dataForClients.send("shop", user.handle());
+		new ModTransfer().json(dataForClients).send("shop", user.handle());
 	}
 }

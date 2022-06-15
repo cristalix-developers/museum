@@ -26,7 +26,7 @@ public class ItemUtil {
         ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
         meta.setPlayerProfile(Bukkit.getPlayer(user.getName()).getPlayerProfile());
-        meta.setDisplayName(user.getName());
+        meta.setDisplayName("§bПерсонализация §f§lПКМ");
         skull.setItemMeta(meta);
         return skull;
     }

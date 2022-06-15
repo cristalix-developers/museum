@@ -10,7 +10,6 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.val;
 import me.func.mod.Anime;
 import museum.App;
-import museum.PacketMetrics;
 import museum.boosters.BoosterType;
 import museum.excavation.Excavation;
 import museum.fragment.Relic;
@@ -62,7 +61,6 @@ public class BeforePacketHandler implements Prepare {
 
 	@Override
 	public void execute(User user, App app) {
-		PacketMetrics.inject(user.getConnection().networkManager.channel);
 		user.getConnection().networkManager.channel.pipeline().addBefore("packet_handler", user.getName(), new ChannelDuplexHandler() {
 			@Override
 			public void channelRead(ChannelHandlerContext channelHandlerContext, Object packetObj) throws Exception {

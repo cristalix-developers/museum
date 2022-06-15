@@ -36,8 +36,6 @@ public class TickTimerHandler extends BukkitRunnable {
 	@Override
 	public void run() {
 		savePlayers();
-		if (counter % 50 == 0)
-			App.getApp().getClientSocket().write(getFreshMetrics());
 
 		// Вызов обработки тиков у всех побочных обработчиков
 		for (Ticked tickUnit : ticked)
@@ -89,30 +87,4 @@ public class TickTimerHandler extends BukkitRunnable {
 		});
 	}
 
-	private MuseumMetricsPackage getFreshMetrics() {
-		val tps = Bukkit.getTPS()[1];
-		val runtime = Runtime.getRuntime();
-		return new MuseumMetricsPackage(
-				IRealmService.get().getCurrentRealmInfo().getRealmId().getRealmName(),
-				Bukkit.getOnlinePlayers().size(),
-				Math.round(tps * 100F) / 100F,
-				runtime.freeMemory(),
-				runtime.totalMemory(),
-				runtime.maxMemory(),
-				PacketMetrics.METRICS.entrySet().stream().collect(Collectors.toMap(
-						entry -> entry.getKey().getName(),
-						entry -> {
-							val value = entry.getValue();
-							return new MuseumMetricsPackage.PacketMetric(
-									value.received.longValue(),
-									value.receivedBytes.longValue(),
-									value.sent.longValue(),
-									value.sentBytes.longValue(),
-									value.decompressedBytes.longValue(),
-									value.compressedBytes.longValue()
-							);
-						}
-				))
-		);
-	}
 }
