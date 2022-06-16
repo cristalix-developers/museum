@@ -30,6 +30,12 @@ public class MessageUtil {
 		return COSMOCRYSTAL_FORMAT.format(money);
 	}
 
+	public String getFormattedState(boolean param) {
+		if (param)
+			return "включён";
+		return "выключен";
+	}
+
 	public Message find(String locator) {
 		return new Message(locator);
 	}

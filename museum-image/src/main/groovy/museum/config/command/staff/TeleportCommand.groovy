@@ -5,13 +5,16 @@ import clepto.bukkit.command.CommandContext
 import clepto.cristalix.Cristalix
 import museum.App
 import org.bukkit.Bukkit
+import ru.cristalix.core.formatting.Formatting
+import ru.cristalix.core.permissions.IPermissionService
 import ru.cristalix.core.realm.RealmId
 
 static def getIfLS(CommandContext context) {
     if (context.args.length == 0)
         return null
     def user = App.app.getUser(context.player.uniqueId)
-    if ((user.prefix && user.prefix.contains('㗒')) || context.player.op)
+    def isStaffPlayer = IPermissionService.get().isStaffMember(context.player.uniqueId)
+    if ((user.prefix && user.prefix.contains('㗒')) || context.player.op || isStaffPlayer)
         return user
     return null
 }
@@ -23,6 +26,7 @@ registerCommand 'tpshow' handle {
         if (player && player.online) {
             user.player.showPlayer App.app, player
             user.teleport player.location
+            user.sendMessage(Formatting.fine("§bТелепортирован к §c" + player.name))
         }
     }
 }
@@ -34,6 +38,7 @@ registerCommand 'get' handle {
         if (player && player.online) {
             user.player.showPlayer(App.app, player)
             player.teleport user.location
+            user.sendMessage(Formatting.fine("§bК вам телепортирован §c" + player.name))
         }
     }
 }

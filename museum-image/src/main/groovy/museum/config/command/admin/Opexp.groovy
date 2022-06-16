@@ -1,5 +1,5 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
-package museum.config.command.staff
+package museum.config.command.admin
 
 import museum.App
 import museum.packages.SaveUserPackage

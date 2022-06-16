@@ -2,17 +2,18 @@
 package museum.config.command.staff
 
 import museum.App
-import org.bukkit.entity.Player
+import museum.util.MessageUtil
 import ru.cristalix.core.formatting.Formatting
+import ru.cristalix.core.permissions.IPermissionService
 
 def app = App.app
 
 registerCommand 'debug' handle {
     def user = app.getUser(player.uniqueId)
-    def real = player as Player
+    def isStaffPlayer = IPermissionService.get().isStaffMember(player.uniqueId)
 
-    if ((user.prefix && user.prefix.contains('㗒')) || player.op) {
+    if ((user.prefix && user.prefix.contains('㗒')) || player.op || isStaffPlayer) {
         user.debug = !user.debug
-        real.sendMessage(Formatting.fine("Режим отладки: " + user.debug))
+        player.sendMessage(Formatting.fine("§bРежим отладки §c" + MessageUtil.getFormattedState(user.debug)))
     }
 }

@@ -1,5 +1,5 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
-package museum.config.command
+package museum.config.command.admin
 
 import me.func.mod.conversation.ModTransfer
 import museum.App

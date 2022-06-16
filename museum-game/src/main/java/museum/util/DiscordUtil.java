@@ -53,7 +53,8 @@ public class DiscordUtil {
         String date = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
                 .format(new Date(System.currentTimeMillis() + 3600 * 1000));
 
-        return "[" + date + "] " + readyMsg;
+        return "[" + date + "] " + readyMsg.replace("_", "\\_").replace("*", "\\*")
+                .replace("|", "\\|");
     }
 
     public static String createNormalMessage(String message) {
@@ -61,7 +62,8 @@ public class DiscordUtil {
         String date = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
                 .format(new Date(System.currentTimeMillis() + 3600 * 1000));
 
-        return "[" + date + "] " + message;
+        return "[" + date + "] " + message.replace("_", "\\_").replace("*", "\\*")
+                .replace("|", "\\|");
     }
 
 }
