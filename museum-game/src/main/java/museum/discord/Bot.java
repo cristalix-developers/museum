@@ -2,6 +2,8 @@ package museum.discord;
 
 import museum.discord.events.OnMessageReceivedEvent;
 import museum.discord.events.OnReadyEvent;
+import museum.discord.events.onMessageReactionAddEvent;
+import museum.discord.events.onMessageReactionRemoveEvent;
 import museum.util.DiscordUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -20,12 +22,18 @@ public class Bot {
         builder.setStatus(OnlineStatus.DO_NOT_DISTURB);
         builder.addEventListeners(new OnReadyEvent());
         builder.addEventListeners(new OnMessageReceivedEvent());
+        builder.addEventListeners(new onMessageReactionAddEvent());
+        builder.addEventListeners(new onMessageReactionRemoveEvent());
 
         try {
             jda = builder.build();
         } catch (LoginException e) {
             e.printStackTrace();
         }
+    }
+
+    public static JDA getJda() {
+        return jda;
     }
 
     public static User getSelfUser() {

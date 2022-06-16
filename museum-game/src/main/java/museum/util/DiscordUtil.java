@@ -4,6 +4,8 @@ import lombok.SneakyThrows;
 import museum.client.ClientSocket;
 import museum.data.UserInfo;
 import museum.packages.DiscordUserInfoPackage;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -63,7 +65,17 @@ public class DiscordUtil {
                 .format(new Date(System.currentTimeMillis() + 3600 * 1000));
 
         return "[" + date + "] " + message.replace("_", "\\_").replace("*", "\\*")
-                .replace("|", "\\|");
+                .replace("|", "\\|").replaceAll("§.", "");
     }
 
+    public static Role getRoleForReactionMessage(Guild guild, String reaction) {
+
+        if (reaction.equals("boost")) {
+            return guild.getRoleById("986624230374387812");
+        } else if (reaction.equals("\uD83D\uDCD1")) {
+            return guild.getRoleById("986910270481903636");
+        }
+
+        return guild.getRoleById("1");
+    }
 }

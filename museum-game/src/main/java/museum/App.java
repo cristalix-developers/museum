@@ -36,6 +36,7 @@ import museum.ticker.top.TopManager;
 import museum.util.MapLoader;
 import museum.visitor.VisitorHandler;
 import museum.worker.WorkerUtil;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
@@ -59,6 +60,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import static clepto.bukkit.B.plugin;
 
@@ -102,8 +104,19 @@ public final class App extends JavaPlugin {
 			String[] data = pckg.getData();
 			Bukkit.getOnlinePlayers().forEach(pl -> pl.sendTitle(data[0], data[1], pckg.getFadeIn(), pckg.getStay(), pckg.getFadeOut()));
 		});
-		this.clientSocket.registerHandler(BroadcastMessagePackage.class, pckg -> Bukkit.getOnlinePlayers()
-				.forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage()))));
+		val realm = IRealmService.get().getCurrentRealmInfo();
+		this.clientSocket.registerHandler(BroadcastMessagePackage.class, pckg -> {
+			Bukkit.getOnlinePlayers().forEach(pl -> pl.sendMessage(ComponentSerializer.parse(pckg.getJsonMessage())));
+
+			val message = Arrays.stream(ComponentSerializer.parse(pckg.getJsonMessage()))
+					.map(TextComponent::toLegacyText)
+					.collect(Collectors.joining(""))
+					.replaceAll("§.", "")
+					.replaceAll("!.+", "!");
+
+			if (message.startsWith("i Игрок ") && message.contains(" активировал глобальный бустер ") && message.contains(" на час!"))
+				Bot.sendNormalMessage(realm.getRealmId().getRealmName(), "<@&986624230374387812> " + message);
+		});
 		this.clientSocket.registerHandler(TargetMessagePackage.class, pckg -> {
 			pckg.getUsers().stream()
 					.map(Bukkit::getPlayer)
@@ -188,7 +201,6 @@ public final class App extends JavaPlugin {
 		VisitorHandler.init(this, () -> (int) Math.ceil(3F * playerDataManager.calcGlobalMultiplier(BoosterType.VILLAGER)));
 
 		// Вывод сервера меню
-		val realm = IRealmService.get().getCurrentRealmInfo();
 		realm.setLobbyServer(true);
 		realm.setStatus(RealmStatus.WAITING_FOR_PLAYERS);
 		realm.setGroupName("Музей");
@@ -198,11 +210,11 @@ public final class App extends JavaPlugin {
 		new Thread(Bot::init).start();
 
 		// Запуск авто-обновляемого сообщения раз в 30 минут
-		Bukkit.getScheduler().runTaskTimer(this, () -> {
-			B.bc("");
-			B.bc("§7Дискорд сервер §bhttps://discord.gg/fmpwuGKcaP §7[ ЛКМ ]");
-			B.bc("");
-		}, 20, 20L * 60 * 30);
+		Bukkit.getScheduler().runTaskTimer(this, () -> Bukkit.getOnlinePlayers().forEach(player -> {
+			player.sendMessage("");
+			player.sendMessage("§7Дискорд сервер§b https://discord.gg/fmpwuGKcaP §7[ ЛКМ ]");
+			player.sendMessage("");
+		}), 20, 20L * 60 * 30);
 	}
 
 	@Override
