@@ -63,7 +63,7 @@ public class MuseumCommands {
 
 		B.regCommand(this::cmdPlayerStats, "playerstats");
 		B.regCommand(this::cmdAchievements, "achievements");
-		B.regCommand(this::cmdVisitor, "visitor");
+		B.regCommand(this::cmdMuseums, "museums");
 		B.regCommand(this::cmdPrefixMenu, "prefixes");
 		B.regCommand(this::cmdBoerMenu, "boermenu");
 		B.regCommand(this::cmdBoer, "boer");
@@ -151,7 +151,7 @@ public class MuseumCommands {
 		return null;
 	}
 
-	private String cmdVisitor(Player player, String[] args) {
+	private String cmdMuseums(Player player, String[] args) {
 		val user = App.getApp().getUser(player);
 		val userMoney = user.getMoney();
 
@@ -200,6 +200,7 @@ public class MuseumCommands {
 				3,
 				3
 		);
+		menu.setVault("dollar");
 
 		for (PrefixType prefixType : PrefixType.values()) {
 			val prefixRarity = prefixType.getRare();
@@ -269,7 +270,7 @@ public class MuseumCommands {
 										if (nextBoer != null) {
 											val new_menu = new Selection(
 													"Улучшение бура",
-													"бабки",
+													"Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
 													"Улучшить",
 													1,
 													1,
@@ -302,7 +303,7 @@ public class MuseumCommands {
 																Anime.close(player);
 															})
 											);
-
+											new_menu.setVault("dollar");
 											new_menu.open(player);
 										}
 									}),
@@ -316,7 +317,7 @@ public class MuseumCommands {
 										Anime.close(player);
 									})
 					);
-
+					menu.setVault("dollar");
 					B.postpone(1, () -> menu.open(player));
 				}
 			}
@@ -343,7 +344,7 @@ public class MuseumCommands {
 
 		val menu = new Selection(
 				"Буры",
-				"Кристаллов/Монет " + MessageUtil.toCrystalFormat(user.getCosmoCrystal()) + "/" + MessageUtil.toMoneyFormat(user.getMoney()),
+				"Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
 				"",
 				1,
 				1,
@@ -373,7 +374,7 @@ public class MuseumCommands {
 							}
 						})
 		);
-
+		menu.setVault("dollar");
 		B.postpone(1, () -> menu.open(player));
 		return null;
 	}
@@ -470,7 +471,7 @@ public class MuseumCommands {
 	private String cmdUpgradeRod(Player player, String[] args) {
 		val user = App.app.getUser(player);
 
-		long cost = 0;
+		long cost = -1;
 		switch (user.getInfo().getHookLevel()) {
 			case 1:
 				cost = 30000;
@@ -519,6 +520,7 @@ public class MuseumCommands {
 							}
 						})
 		);
+		menu.setVault("dollar");
 		menu.open(player);
 		return null;
 	}
@@ -529,7 +531,7 @@ public class MuseumCommands {
 		val userHaveLastPickaxe = user.getPickaxeType().equals(PickaxeType.LEGENDARY);
 		val userPickaxeType = user.getPickaxeType();
 
-		long cost = 0;
+		long cost = -1;
 		switch (userPickaxeType) {
 			case DEFAULT:
 				cost = 50000;
@@ -578,7 +580,7 @@ public class MuseumCommands {
 							}
 						})
 		);
-
+		menu.setVault("dollar");
 		int indexOfElement = 0;
 		for (PickaxeUpgrade pickaxeUpgrade : PickaxeUpgrade.values()) {
 			int finalIndexOfElement = indexOfElement;
@@ -587,7 +589,7 @@ public class MuseumCommands {
 
 			Button btn = new Button()
 					.texture("minecraft:mcpatcher/cit/museum/wood_pickaxe_upgrade.png")
-					.price(userHaveMaxLevelOfUpgrade ? 0 : pickaxeUpgrade.getCost())
+					.price(userHaveMaxLevelOfUpgrade ? -1 : pickaxeUpgrade.getCost())
 					.hint(userHaveMaxLevelOfUpgrade ? "" : "Улучшить")
 					.title(pickaxeUpgrade.getTitle())
 					.description("\n" + currentLevelOfUpgrade + "/" + pickaxeUpgrade.getMaxLevel())
@@ -655,7 +657,7 @@ public class MuseumCommands {
 							multiplyUpgradePickaxeImprovement(clickUser, clickPlayer, pickaxeUpgrade, (long) countOfMaxUpgrades);
 						})
 		);
-
+		menu.setVault("dollar");
 		menu.open(player);
 		return null;
 	}
@@ -802,6 +804,7 @@ public class MuseumCommands {
 								AnimationUtil.buyFailure(clickUser);
 						})
 		);
+		menu.setVault("dollar");
 		B.postpone(1, () -> menu.open(player));
 		return null;
 	}
@@ -855,7 +858,7 @@ public class MuseumCommands {
 
 		val menu = new Selection(
 				"Лутбоксы",
-				"Монет " + user.getMoney(),
+				"Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
 				"",
 				2,
 				2,
@@ -888,6 +891,7 @@ public class MuseumCommands {
 							}
 						})
 		);
+		menu.setVault("dollar");
 		B.postpone(1, () -> menu.open(player));
 		return null;
 	}

@@ -21,6 +21,10 @@ import static museum.App.app;
 public class DiscordUtil {
 
     static ClientSocket client = app.getClientSocket();
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private static final String ID_OF_BOOST_ROLE = "986624230374387812";
+    private static final String ID_OF_NEWS_ROLE = "986910270481903636";
+    private static final String ID_OF_EVERYONE_ROLE = "981260794920583188";
 
     @SneakyThrows
     public static UserInfo getGameUser(String discordID) {
@@ -44,7 +48,8 @@ public class DiscordUtil {
                 .collect(Collectors.joining(""))
                 .replaceAll("┃", "|")
                 .replaceAll("§.", "")
-                .replaceAll("¨......", "");
+                .replaceAll("¨......", "")
+                .replaceAll("<@.+>", "");
 
         for (String str : readyMsg.split(" ")) {
             if ((int) readyMsg.charAt(readyMsg.indexOf(str)) > 10000) {
@@ -52,30 +57,21 @@ public class DiscordUtil {
             }
         }
 
-        String date = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
-                .format(new Date(System.currentTimeMillis() + 3600 * 1000));
+        String date = DATE_FORMAT.format(new Date(System.currentTimeMillis() + 3600 * 1000));
 
         return "[" + date + "] " + readyMsg.replace("_", "\\_").replace("*", "\\*")
-                .replace("|", "\\|");
+                .replace("|", "\\|").replace("@everyone", "").replace("@here", "")
+                .replace(ID_OF_EVERYONE_ROLE, "");
     }
 
     public static String createNormalMessage(String message) {
 
-        String date = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
-                .format(new Date(System.currentTimeMillis() + 3600 * 1000));
+        String date = DATE_FORMAT.format(new Date(System.currentTimeMillis() + 3600 * 1000));
 
-        return "[" + date + "] " + message.replace("_", "\\_").replace("*", "\\*")
-                .replace("|", "\\|").replaceAll("§.", "");
+        return "[" + date + "] " + message.replaceAll("§.", "");
     }
 
     public static Role getRoleForReactionMessage(Guild guild, String reaction) {
-
-        if (reaction.equals("boost")) {
-            return guild.getRoleById("986624230374387812");
-        } else if (reaction.equals("\uD83D\uDCD1")) {
-            return guild.getRoleById("986910270481903636");
-        }
-
-        return guild.getRoleById("1");
+        return "boost".equals(reaction) ? guild.getRoleById(ID_OF_BOOST_ROLE) : guild.getRoleById(ID_OF_NEWS_ROLE);
     }
 }

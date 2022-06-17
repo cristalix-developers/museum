@@ -26,7 +26,7 @@ on PAPER use {
 }
 
 on WOOD_DOOR use {
-    player.performCommand 'visitor'
+    player.performCommand 'museums'
 }
 
 on SADDLE use {
