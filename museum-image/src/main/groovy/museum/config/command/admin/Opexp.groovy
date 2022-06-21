@@ -20,7 +20,6 @@ registerCommand 'opstat' handle {
             def data = app.clientSocket.writeAndAwaitResponse(new UserInfoPackage(uuid)).get(5L, TimeUnit.SECONDS)
 
             player.sendMessage(Formatting.fine("Данные игрока успешно получены."))
-
             if (args[0] == "money") data.userInfo.setMoney(value)
             else if (args[0] == "exp") data.userInfo.setExperience(value)
 

@@ -16,7 +16,6 @@ import museum.fragment.Relic;
 import museum.international.International;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
-import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
@@ -284,13 +283,6 @@ public class BeforePacketHandler implements Prepare {
 			} else {
 				Anime.cursorMessage(user.handle(), "§lNEW! §b" + fragment.getAddress() + " §f㦶");
 				skeleton.getUnlockedFragments().add(fragment);
-				user.getSubjects().stream()
-						.filter(it -> it instanceof SkeletonSubject)
-						.map(it -> (SkeletonSubject) it)
-						.forEach(it -> {
-							it.setSkeleton(skeleton);
-							it.updateSkeleton(true);
-						});
 				user.updateIncome();
 			}
 		}

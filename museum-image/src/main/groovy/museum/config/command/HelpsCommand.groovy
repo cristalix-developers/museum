@@ -2,8 +2,14 @@
 package museum.config.command
 
 import clepto.bukkit.menu.Guis
+import museum.App
 
 import static org.bukkit.Material.PAPER
+
+registerCommand 'rp' handle {
+    player.performCommand("resourcepack")
+    App.app.getUser(player).approvedResourcepack = true
+}
 
 registerCommand 'helps' handle {
     Guis.open player, 'helps', player
