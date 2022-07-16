@@ -19,6 +19,7 @@ public enum DonateType {
 	STEAM_PUNK_COLLECTOR("Стим-панк сборщик монет", 249, true),
 	BOER("Глобальный бустер бура x2", 79, false),
 	BIG_BOER("Глобальный бустер бура х5", 199,false),
+	MUSEUM_ADVERTISEMENT("Реклама музея", 149, false),
 	;
 
 	private final String name;

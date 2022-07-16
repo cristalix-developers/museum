@@ -1,8 +1,10 @@
 package museum.worker;
 
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import me.func.mod.Npc;
+import me.func.mod.data.NpcSmart;
 import me.func.protocol.npc.NpcBehaviour;
 import me.func.protocol.npc.NpcData;
 import museum.App;
@@ -11,6 +13,7 @@ import museum.util.StandHelper;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -22,8 +25,8 @@ import java.util.UUID;
 public class WorkerUtil {
 
     private final Location cosmos = new Location(App.getApp().getWorld(), 278, 90, -147);
-
-    public final static String defaultSkin = App.getApp().getConfig().getString("npc.default.skin");
+    private final Location ADVERTISING_LOCATION = App.getApp().getMap().getLabel("advertising");
+    private final String WEB_DATA = "https://webdata.c7x.dev/textures/skin/";
 
     public void init(App app) {
         // Формат таблички: .p simplenpc <Имя жителя> </команда>
@@ -65,5 +68,47 @@ public class WorkerUtil {
                 .hasGravity(false)
                 .slot(EnumItemSlot.HEAD, Cosmos.EARTH)
                 .build();
+    }
+
+    @Getter
+    private final NpcSmart npc = new NpcSmart(new NpcData(
+            (int) (Math.random() * Integer.MAX_VALUE),
+            UUID.randomUUID(),
+            ADVERTISING_LOCATION.x + 0.5,
+            ADVERTISING_LOCATION.y,
+            ADVERTISING_LOCATION.z + 0.5,
+            1000,
+            "",
+            NpcBehaviour.STARE_AT_PLAYER,
+            ADVERTISING_LOCATION.pitch,
+            ADVERTISING_LOCATION.yaw,
+            "",
+            "",
+            true,
+            false,
+            false,
+            false
+    ),
+            null,
+            App.getApp().getWorld().getUID(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+    );
+
+    public NpcSmart advertisingNpc(Player player) {
+        val skin = WEB_DATA + player.getUniqueId();
+        npc.getData().setName(player.getName());
+        npc.getData().setSkinUrl(skin);
+        npc.getData().setSkinDigest(skin.substring(skin.length() - 10));
+        npc.setClick(event -> {
+            if (player.isOnline())
+                event.getPlayer().performCommand("travel " + player.getName())
+        });
+        Npc.npc(npc.getData());
+        return npc;
     }
 }
