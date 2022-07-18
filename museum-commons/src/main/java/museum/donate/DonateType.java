@@ -12,7 +12,7 @@ public enum DonateType {
 	METEORITES("Лутбокс с метеоритами", 39, false),
 	BONES("Лутбокс с костями", 49, false),
 	GEM("Лутбокс с камнями", 39, false),
-	MULTI_BOX("Мультибокс", 59, false),
+	MULTI_BOX("Мультибокс", 99, false),
 	PRIVILEGES("Комиссия 0%", 119, true),
 	GLOBAL_MONEY_BOOSTER("Глобальный бустер денег", 199, false),
 	GLOBAL_VILLAGER_BOOSTER("Глобальный бустер посетителей", 149, false),

@@ -851,13 +851,13 @@ public class MuseumCommands {
                         }),
                 new Button()
                         .material(Material.ENDER_CHEST)
-                        .price(39)
+                        .price(99)
                         .sale(SALE_LOOTBOX)
                         .title("Случайная посылка")
-                        .description("Вы §dгарантированно §fполучите случайный камень")
+                        .description("Вы §dс шансом 10% §fполучите §bЛегендарную кирку")
                         .onClick((click, index, button) -> {
-                            Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aСлучайный камень", "за &b" + (39 - (39 * SALE_LOOTBOX / 100)) + " кристаллика(ов)"),
-                                    clickPlayer -> clickPlayer.performCommand("proccessdonate GEM"));
+                            Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aШанс 10% получить Легендарную кирку", "за &b" + (99 - (99 * SALE_LOOTBOX / 100)) + " кристаллика(ов)"),
+                                    clickPlayer -> clickPlayer.performCommand("proccessdonate MULTI_BOX"));
                             menuConfirm.open(click);
                         })
         );
