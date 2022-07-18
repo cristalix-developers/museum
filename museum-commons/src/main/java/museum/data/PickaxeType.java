@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 public enum PickaxeType {
 
 	DEFAULT("любительская", 0),
-	PROFESSIONAL("профессиональная", 50000),
-	PRESTIGE("престижная", 3000000),
-	LEGENDARY("легендарная", 100000000);
+	PROFESSIONAL("профессиональная", 90000),
+	PRESTIGE("престижная", 8000000),
+	LEGENDARY("легендарная", 200000000);
 
 	private final String name;
 	private final double price;
