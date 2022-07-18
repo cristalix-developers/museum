@@ -47,10 +47,16 @@ registerCommand 'proccessdonate' handle {
             user.sendMessage(Formatting.error(transaction.name))
             return
         }
-        if (donate == DonateType.ITEM_CASE) {
-            LootBox.giveDrop(user)
+        if (donate == DonateType.METEORITES) {
+            LootBox.giveMeteorite user
+        } else if (donate == DonateType.BONES) {
+            LootBox.giveBone user
+        } else if (donate == DonateType.GEM) {
+            LootBox.giveGem user
         } else if (donate == DonateType.PREFIX_CASE) {
-            PrefixBox.givePrefix(user)
+            PrefixBox.givePrefix user
+        } else if (donate == DonateType.MULTI_BOX) {
+            LootBox.giveMultiBox user
         } else if (donate == DonateType.PRIVILEGES) {
             user.privileges = true
             user.donates.add(donate as DonateType)

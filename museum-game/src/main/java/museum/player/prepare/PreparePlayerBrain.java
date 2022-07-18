@@ -11,6 +11,7 @@ import me.func.mod.Anime;
 import museum.App;
 import museum.content.DailyRewardManager;
 import museum.content.WeekRewards;
+import museum.data.PickaxeType;
 import museum.fragment.Gem;
 import museum.fragment.GemType;
 import museum.fragment.Meteorite;
@@ -120,6 +121,14 @@ public class PreparePlayerBrain implements Prepare {
 
     private static String getRare(String string) {
         return string.contains("⭐⭐⭐") ? "LEGENDARY" : string.contains("⭐⭐") ? "EPIC" : "RARE";
+    }
+
+    public static ItemStack getPickaxeImage(PickaxeType pickaxeType) {
+        val pickaxe = clepto.bukkit.item.Items.render(pickaxeType.name().toLowerCase()).asBukkitMirror();
+        val meta = pickaxe.getItemMeta();
+        meta.addEnchant(Enchantment.DIG_SPEED, meta.getEnchantLevel(Enchantment.DIG_SPEED), true);
+        pickaxe.setItemMeta(meta);
+        return pickaxe;
     }
 
     public static void giveDrop(User owner) {
