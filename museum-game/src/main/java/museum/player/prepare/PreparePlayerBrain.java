@@ -5,6 +5,7 @@ import clepto.bukkit.item.Items;
 import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
 import implario.ListUtils;
+import lombok.Getter;
 import lombok.val;
 import me.func.mod.Anime;
 import museum.App;
@@ -19,6 +20,7 @@ import museum.player.pickaxe.PickaxeUpgrade;
 import museum.util.LocationUtil;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Formatting;
 
 import java.util.ArrayList;
@@ -40,6 +42,9 @@ public class PreparePlayerBrain implements Prepare {
 
     private final List<Label> dots;
     private final List<Title> titles = new ArrayList<>();
+
+    @Getter
+    public final static ItemStack hook = Items.render("hook").asBukkitMirror();
 
     public PreparePlayerBrain() {
         dots = App.getApp().getMap().getLabels("guide");
