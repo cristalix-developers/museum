@@ -106,7 +106,7 @@ public class MuseumCommands {
 						.title("")
 						.description("§6Доход:§f " + MessageUtil.toMoneyFormat(user.getIncome()) + "\n" +
 								"§6Монет:§f " + MessageUtil.toMoneyFormat(user.getMoney()) + "\n" +
-								"§bКосмических кристаллов:§f " + MessageUtil.toCrystalFormat(user.getCosmoCrystal()) + "\n" +
+								"§bКоспической руды:§f " + MessageUtil.toCrystalFormat(user.getCosmoCrystal()) + "\n" +
 								"§bУровень:§f " + user.getLevel() + "\n" +
 								"§cОпыт:§f " + MessageUtil.toCrystalFormat(user.getExperience()) + "\n" +
 								"§bРаскопок:§f " + user.getExcavationCount() + "\n" +
@@ -280,7 +280,7 @@ public class MuseumCommands {
 															.description("\n§b" + boer.getType().getAddress() + "§f ➠ §c" + nextBoer.getAddress() +
 																	"\nСледующий бур работает §b" + nextBoer.getTime() / 3600 +
 																	" часа§f и приносит §b1 опыт §fи §b1 кристалл§f\nкаждые §l§b" + nextBoer.getSpeed() + " §fсекунд.\n\n" +
-																	"Стоимость: §e" + MessageUtil.toMoneyFormat(nextBoer.getPrice()) + "§f и " + "§b10.000§f кристаллов")
+																	"Стоимость: §e" + MessageUtil.toMoneyFormat(nextBoer.getPrice()) + "§f и " + "§b10.000§f Коспической руды")
 															.onClick((clickUserFromNewMenu, indexFromNewMenu, buttonFromNewMenu) -> {
 																User museumUser = app.getUser(clickUserFromNewMenu);
 
@@ -354,7 +354,7 @@ public class MuseumCommands {
 						.title("&bКосмический бур")
 						.description("\n\nДанный бур работает §b1 час§f и приносит §b1 опыт §fи §b1 кристалл§f\nкаждые §l§b" +
 								BoerType.STANDARD.getSpeed() + " §fсекунд.\n\nУ вас есть: " + countOfBoers + " из 6-ти буров.\n\n" +
-								"Стоимость: §e" + MessageUtil.toMoneyFormat(10000000) + "§f и " + "§b10.000§f кристаллов")
+								"Стоимость: §e" + MessageUtil.toMoneyFormat(10000000) + "§f и " + "§b10.000§f Коспической руды")
 						.onClick((clickUser, index, button) -> {
 							if (!finalMaxCountOfBoers) {
 								if (user.getMoney() > 10000000 && user.getCosmoCrystal() > 10000) {
@@ -752,7 +752,7 @@ public class MuseumCommands {
 				new Button()
 						.texture("minecraft:textures/items/fishing_rod_uncast.png")
 						.title("§bКрюк")
-						.description("Улучшайте крюк, чтобы быстрее получать опыт на реке международных раскопок кристаллов.")
+						.description("Улучшайте крюк, чтобы быстрее получать опыт на реке международных раскопок Коспической руды.")
 						.onClick((click, index, button) -> click.performCommand("upgraderod"))
 		);
 		menu.open(player);

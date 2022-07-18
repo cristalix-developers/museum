@@ -10,6 +10,7 @@ import museum.App;
 import museum.fragment.GemType;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
+import museum.player.prepare.PreparePlayerBrain;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,7 +27,6 @@ import java.util.Map;
  */
 public class CrystalExcavations implements International {
 	private final Map<GemType, List<Location>> spawnPoints = Maps.newHashMap();
-	private final ItemStack hook = Items.render("hook").asBukkitMirror();
 	private final ItemStack ore = Items.render("ore").asBukkitMirror();
 
 	public CrystalExcavations(App app) {
@@ -58,7 +58,7 @@ public class CrystalExcavations implements International {
 		val inventory = user.getInventory();
 		inventory.clear();
 		// Предметы кешируются
-		val userHook = hook.clone();
+		val userHook = PreparePlayerBrain.getHook().clone();
 		val hookMeta = userHook.getItemMeta();
 		val hookLevel = user.getInfo().getHookLevel();
 		if (hookLevel > 1)

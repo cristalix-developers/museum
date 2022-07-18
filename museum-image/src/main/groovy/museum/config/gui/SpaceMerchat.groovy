@@ -26,7 +26,7 @@ register 'boer', { player ->
         text """
         &bКосмический бур
         
-        &7Стоимость &a${MessageUtil.toMoneyFormat(money)} &7и &b$crystal &7кристаллов
+        &7Стоимость &a${MessageUtil.toMoneyFormat(money)} &7и &b$crystal &7Коспической руды
 
         &7Данный бур работает
         &7${BoerType.STANDARD.time / 3600 as int} час и приносит
