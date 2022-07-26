@@ -64,7 +64,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 			if (components == null)
 				return;
 			components.thenAccept(comp -> {
-				App.getApp().getClientSocket().write(new UserChatPackage(ComponentSerializer.toString(comp)));
+				//App.getApp().getClientSocket().write(new UserChatPackage(ComponentSerializer.toString(comp)));
 				Bot.sendGlobalMessage(realm.getRealmName(), comp);
 			});
 		}, EventPriority.HIGH, true);

@@ -30,15 +30,15 @@ bundle {
      keep('class ru.cristalix.** { *; }')
 }
 
-remotes {
-    webServer {
-        host = System.getenv("CRI_HOST")
-        user = System.getenv("CRI_HOST_USER")
-        knownHosts = allowAnyHosts
-        identity = file(System.getenv("CRI_HOST_PRIVATE_KEY"))
-        passphrase = System.getenv("CRI_HOST_PASSPHRASE")
-    }
-}
+//remotes {
+//    webServer {
+//        host = System.getenv("CRI_HOST")
+//        user = System.getenv("CRI_HOST_USER")
+//        knownHosts = allowAnyHosts
+//        identity = file(System.getenv("CRI_HOST_PRIVATE_KEY"))
+//        passphrase = System.getenv("CRI_HOST_PASSPHRASE")
+//    }
+//}
 
 // Поменять into на нужный путь
 task upload() {

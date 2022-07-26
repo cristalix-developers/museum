@@ -11,6 +11,7 @@ import lombok.val;
 import me.func.mod.Anime;
 import me.func.mod.Kit;
 import me.func.mod.conversation.ModLoader;
+import me.func.nightingale.Nightingale;
 import museum.boosters.BoosterType;
 import museum.client.ClientSocket;
 import museum.command.AdminCommand;
@@ -87,6 +88,11 @@ public final class App extends JavaPlugin {
 
 		// Добавление админ-команд
 		AdminCommand.init(this);
+
+		Nightingale.Companion
+				.subscribe("museum")
+				.useP2p()
+				.start();
 
 		// Подкючение к Netty сервису / Управляет конфигами, кастомными пакетами, всей data
 		String museumServiceHost = getEnv("MUSEUM_SERVICE_HOST", "127.0.0.1");
