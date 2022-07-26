@@ -20,6 +20,8 @@ dependencies {
     implementation 'clepto:clepto-bukkit:3.4.2'
     implementation 'clepto:clepto-cristalix:3.0.2'
     implementation 'implario:humanize:1.1.3'
+    implementation 'me.func:nightingale-protocol:1.0.12'
+    implementation fileTree('jars')
     implementation project(':museum-commons')
 }
 
@@ -35,15 +37,15 @@ bukkitPluginTask.with imageTask as Jar
 
 tasks.build.dependsOn bukkitPluginTask
 
-remotes {
-    webServer {
-        host = System.getenv("CRI_HOST")
-        user = System.getenv("CRI_HOST_USER")
-        knownHosts = allowAnyHosts
-        identity = file(System.getenv("CRI_HOST_PRIVATE_KEY"))
-        passphrase = System.getenv("CRI_HOST_PASSPHRASE")
-    }
-}
+//remotes {
+//    webServer {
+//        host = System.getenv("CRI_HOST")
+//        user = System.getenv("CRI_HOST_USER")
+//        knownHosts = allowAnyHosts
+//        identity = file(System.getenv("CRI_HOST_PRIVATE_KEY"))
+//        passphrase = System.getenv("CRI_HOST_PASSPHRASE")
+//    }
+//}
 
 // Поменять into на нужный путь
 task upload() {
