@@ -8,7 +8,7 @@ import ru.cristalix.core.formatting.Formatting
 registerCommand 'thx' handle {
     App.app.clientSocket.writeAndAwaitResponse(new ThanksExecutePackage(player.uniqueId)).thenAccept {
         def user = App.app.getUser player
-        if (new RequestGlobalBoostersPackage().boosters.empty)  {
+        if (App.app.playerDataManager.getBoosterCount() == 0)  {
             player.sendMessage(Formatting.error('Нету активных бустеров 㬫'))
             return
         } else if (it.boostersCount == 0) {
