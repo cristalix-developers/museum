@@ -126,7 +126,7 @@ on PlayerInteractEvent, {
     playerLocation.yaw = 0
     playerLocation.pitch = 0
 
-    if (playerLocation.distanceSquared(ROCKET) < 45 && user.state instanceof Museum)
+    if (playerLocation.distanceSquared(ROCKET) < 45 && user.state instanceof Museum && user.getLevel() >= 300)
         B.postpone(1, () -> user.setState(new Cosmos()))
 
     if (user.state instanceof Cosmos && action != LEFT_CLICK_BLOCK) {

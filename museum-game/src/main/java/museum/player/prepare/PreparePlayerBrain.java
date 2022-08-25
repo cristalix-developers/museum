@@ -5,11 +5,13 @@ import clepto.bukkit.item.Items;
 import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
 import implario.ListUtils;
+import lombok.Getter;
 import lombok.val;
 import me.func.mod.Anime;
 import museum.App;
 import museum.content.DailyRewardManager;
 import museum.content.WeekRewards;
+import museum.data.PickaxeType;
 import museum.fragment.Gem;
 import museum.fragment.GemType;
 import museum.fragment.Meteorite;
@@ -19,6 +21,7 @@ import museum.player.pickaxe.PickaxeUpgrade;
 import museum.util.LocationUtil;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 import ru.cristalix.core.formatting.Formatting;
 
 import java.util.ArrayList;
@@ -40,6 +43,9 @@ public class PreparePlayerBrain implements Prepare {
 
     private final List<Label> dots;
     private final List<Title> titles = new ArrayList<>();
+
+    @Getter
+    public final static ItemStack hook = Items.render("hook").asBukkitMirror();
 
     public PreparePlayerBrain() {
         dots = App.getApp().getMap().getLabels("guide");
@@ -115,6 +121,14 @@ public class PreparePlayerBrain implements Prepare {
 
     private static String getRare(String string) {
         return string.contains("⭐⭐⭐") ? "LEGENDARY" : string.contains("⭐⭐") ? "EPIC" : "RARE";
+    }
+
+    public static ItemStack getPickaxeImage(PickaxeType pickaxeType) {
+        val pickaxe = clepto.bukkit.item.Items.render(pickaxeType.name().toLowerCase()).asBukkitMirror();
+        val meta = pickaxe.getItemMeta();
+        meta.addEnchant(Enchantment.DIG_SPEED, meta.getEnchantLevel(Enchantment.DIG_SPEED), true);
+        pickaxe.setItemMeta(meta);
+        return pickaxe;
     }
 
     public static void giveDrop(User owner) {

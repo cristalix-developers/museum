@@ -34,7 +34,7 @@ register 'daily-reward', { Player player ->
     button reward('Награда за пятый вход в игру', 5, userStatistic,
             user -> user.giveMoney(50000))
     button reward('Награда за шестой вход в игру', 6, userStatistic,
-            user -> LootBox.giveDrop(user))
+            user -> LootBox.giveMeteorite(user))
     button reward('Награда за седьмой вход в игру', 7, userStatistic,
             user -> new Gem(GemType.BRILLIANT.name() + ':' + 1.0 + ':10000'))
 }

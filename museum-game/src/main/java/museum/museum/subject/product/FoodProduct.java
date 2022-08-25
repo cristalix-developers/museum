@@ -7,18 +7,18 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FoodProduct {
 
-	SHAWARMA("§aШаверма", 160),
-	CHOCOLATE("§dШоколадка Milka", 120),
-	CHIPS("§6Чипсы Pringles", 300),
-	HOT_DOG("§cХотдог", 120),
-	HOLY_SPRING("§bСвятой источник", 80),
-	COCA_COLA("§4Кока-кола §f2Л", 200),
-	PEPSI("§bПепси §f0.33Л", 75),
-	CREAM("§fПломбир", 100),
-	MAGNATE("§eМагнат", 120),
-	TWIX("§6Твикс", 70),
-	COTTON_CANDY("§dСладкая вата", 60),
-	HORN("§eРожок", 30);
+	SHAWARMA("§aШаверма", 190),
+	CHOCOLATE("§dШоколадка Milka", 160),
+	CHIPS("§6Чипсы Pringles", 370),
+	HOT_DOG("§cХотдог", 180),
+	HOLY_SPRING("§bСвятой источник", 100),
+	COCA_COLA("§4Кока-кола §f2Л", 230),
+	PEPSI("§bПепси §f0.33Л", 105),
+	CREAM("§fПломбир", 135),
+	MAGNATE("§eМагнат", 160),
+	TWIX("§6Твикс", 100),
+	COTTON_CANDY("§dСладкая вата", 90),
+	HORN("§eРожок", 60);
 
 	private final String name;
 	private final int cost;

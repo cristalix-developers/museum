@@ -9,7 +9,7 @@ registerCommand 'lootboxopen' handle {
     def user = App.app.getUser player
     if (user.money > 10000000) {
         user.giveMoney(-10000000)
-        LootBox.giveDrop(user)
+        LootBox.giveMeteorite(user)
     } else {
         AnimationUtil.buyFailure(user)
     }

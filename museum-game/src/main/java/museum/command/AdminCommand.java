@@ -182,7 +182,7 @@ public class AdminCommand {
 				return null;
 			val user = app.getUser(player);
 			user.setCosmoCrystal((int) (user.getCosmoCrystal() + Double.parseDouble(args[1])));
-			return "§bТеперь у " + player.getDisplayName() + "§c " + MessageUtil.toCrystalFormat(user.getCosmoCrystal()) + "§b кристаллов!";
+			return "§bТеперь у " + player.getDisplayName() + "§c " + MessageUtil.toCrystalFormat(user.getCosmoCrystal()) + "§b Коспической руды!";
 		}, "crystal");
 	}
 

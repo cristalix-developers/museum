@@ -1,6 +1,7 @@
 @groovy.transform.BaseScript(museum.MuseumScript)
 package museum.config.command
 
+import clepto.bukkit.Cycle
 import me.func.mod.Anime
 import museum.App
 import museum.client_conversation.AnimationUtil
@@ -15,6 +16,8 @@ import museum.packages.SaveUserPackage
 import museum.packages.UserTransactionPackage.TransactionResponse
 import museum.prototype.Managers
 import museum.util.SubjectLogoUtil
+import museum.worker.WorkerUtil
+import org.bukkit.Bukkit
 import ru.cristalix.core.formatting.Formatting
 
 registerCommand 'proccessdonate' handle {
@@ -27,8 +30,13 @@ registerCommand 'proccessdonate' handle {
         return ignored.message
     }
 
+    def hasAdvertisement = donate == DonateType.MUSEUM_ADVERTISEMENT
+
     if (App.app.playerDataManager.getBoosterCount() > 5 && donate.name().contains("BOOSTER")) {
         player.sendMessage(Formatting.error("Запущено слишком много бустеров! Подождите пожалуйста..."))
+        return
+    } else if (hasAdvertisement && App.app.playerDataManager.advertising != null) {
+        player.sendMessage Formatting.error("Другой игрок уже купил рекламу!")
         return
     }
 
@@ -39,10 +47,16 @@ registerCommand 'proccessdonate' handle {
             user.sendMessage(Formatting.error(transaction.name))
             return
         }
-        if (donate == DonateType.ITEM_CASE) {
-            LootBox.giveDrop(user)
+        if (donate == DonateType.METEORITES) {
+            LootBox.giveMeteorite user
+        } else if (donate == DonateType.BONES) {
+            LootBox.giveBone user
+        } else if (donate == DonateType.GEM) {
+            LootBox.giveGem user
         } else if (donate == DonateType.PREFIX_CASE) {
-            PrefixBox.givePrefix(user)
+            PrefixBox.givePrefix user
+        } else if (donate == DonateType.MULTI_BOX) {
+            LootBox.giveMultiBox user
         } else if (donate == DonateType.PRIVILEGES) {
             user.privileges = true
             user.donates.add(donate as DonateType)
@@ -65,6 +79,19 @@ registerCommand 'proccessdonate' handle {
                 user.sendMessage(Formatting.fine("Что бы получить его, перейдите в музей."))
             }
             user.donates.add(donate as DonateType)
+        } else if (hasAdvertisement) {
+            App.app.playerDataManager.advertising = user.uuid
+            WorkerUtil.advertisingNpc player
+            Anime.topMessage user.handle(), "Вы купили §eрекламу музея§f! Спасибо за поддержку. 㶅"
+            Cycle.run(20, 60 * 60) {
+                if (App.app.playerDataManager.advertising == null) {
+                    Cycle.exit()
+                } else if (it == 3600) {
+                    App.app.playerDataManager.advertising = null
+                    Bukkit.getPlayer(App.app.playerDataManager.advertising).sendMessage(Formatting.error("Реклама музея закончилась!"))
+                    Cycle.exit()
+                }
+            }
         }
         App.app.clientSocket.write(new SaveUserPackage(user.getUuid(), user.generateUserInfo()))
     })
