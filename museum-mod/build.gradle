@@ -29,28 +29,3 @@ bundle {
      keep('class ru.cristalix.data.** { *; }')
      keep('class ru.cristalix.** { *; }')
 }
-
-remotes {
-    webServer {
-        host = System.getenv("CRI_HOST")
-        user = System.getenv("CRI_HOST_USER")
-        knownHosts = allowAnyHosts
-        identity = file(System.getenv("CRI_HOST_PRIVATE_KEY"))
-        passphrase = System.getenv("CRI_HOST_PASSPHRASE")
-    }
-}
-
-// Поменять into на нужный путь
-task upload() {
-    doLast {
-        ssh.run {
-            session(remotes.webServer) {
-                put from: file("build/libs/museum-mod-bundle.jar"), into: "/home/arcade/godzillas/museum-test/server/mods"
-            }
-        }
-    }
-}
-
-afterEvaluate {
-    tasks.upload.dependsOn(tasks.bundle)
-}

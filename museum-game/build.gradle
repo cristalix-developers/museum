@@ -34,28 +34,3 @@ bukkitPluginTask.dependsOn imageTask
 bukkitPluginTask.with imageTask as Jar
 
 tasks.build.dependsOn bukkitPluginTask
-
-remotes {
-    webServer {
-        host = System.getenv("CRI_HOST")
-        user = System.getenv("CRI_HOST_USER")
-        knownHosts = allowAnyHosts
-        identity = file(System.getenv("CRI_HOST_PRIVATE_KEY"))
-        passphrase = System.getenv("CRI_HOST_PASSPHRASE")
-    }
-}
-
-// Поменять into на нужный путь
-task upload() {
-    doLast {
-        ssh.run {
-            session(remotes.webServer) {
-                put from: project(':museum-game').tasks.jar.getArchiveFile().get().asFile.path, into: "/home/arcade/godzillas/museum-test/server/plugins"
-            }
-        }
-    }
-}
-
-afterEvaluate {
-    tasks.upload.dependsOn(bukkitPluginTask)
-}
