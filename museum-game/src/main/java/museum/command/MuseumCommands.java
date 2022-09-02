@@ -494,7 +494,7 @@ public class MuseumCommands {
                 1,
                 1,
                 new Button()
-                        .material(Material.FISHING_ROD)
+                        .texture("minecraft:textures/items/fishing_rod_uncast.png")
                         .price(cost)
                         .hint(user.getHookLevel() == 4 ? "" : "Улучшить")
                         .title(user.getHookLevel() == 4 ? "§fУ вас крюк §bмаксимального §fуровня" : "§fКрюк УР. §b" + user.getHookLevel())

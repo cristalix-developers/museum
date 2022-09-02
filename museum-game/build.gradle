@@ -15,7 +15,7 @@ dependencies {
     compileOnly 'dev.xdark:feder:live-SNAPSHOT'
     compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
     implementation 'net.dv8tion:JDA:5.0.0-alpha.12'
-    implementation 'me.func:animation-api:2.6.12'
+    implementation 'me.func:animation-api:2.4.13'
     implementation 'ru.cristalix:boards-bukkit-api:3.0.15'
     implementation 'clepto:clepto-bukkit:3.4.2'
     implementation 'clepto:clepto-cristalix:3.0.2'

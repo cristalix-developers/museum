@@ -40,7 +40,7 @@ static void giveBone(User owner) {
 }
 
 static void giveGem(User owner) {
-    def gem = new Gem(ListUtils.random(GemType.values()).name() + ":" + (Math.random() * 1.1) + ":10000")
+    def gem = new Gem(ListUtils.random(GemType.values()).name() + ":" + (0.6 + (1.0 - 0.6) * Math.random()) + ":10000")
     gem.give(owner)
     new ModTransfer()
             .integer(1)
