@@ -3,6 +3,8 @@ package museum.config.gui
 
 import implario.ListUtils
 import me.func.mod.Anime
+import me.func.mod.Glow
+import me.func.protocol.GlowColor
 import me.func.mod.conversation.ModTransfer
 import museum.data.PickaxeType
 import museum.fragment.Gem
@@ -10,6 +12,7 @@ import museum.fragment.GemType
 import museum.fragment.Meteorite
 import museum.museum.subject.skeleton.Fragment
 import museum.player.User
+import museum.player.prepare.BeforePacketHandler
 import museum.player.prepare.PreparePlayerBrain
 import museum.prototype.Managers
 import org.bukkit.ChatColor
@@ -51,7 +54,7 @@ static void giveGem(User owner) {
 }
 
 static void giveMultiBox(User owner) {
-    if (Math.random() < 0.10) {
+    if (Math.random() < 0.1) {
         owner.pickaxeType = PickaxeType.LEGENDARY
         museum.player.pickaxe.PickaxeType.valueOf(owner.pickaxeType.name)
         new ModTransfer()
@@ -61,7 +64,8 @@ static void giveMultiBox(User owner) {
                 .string(getRare("⭐⭐⭐ §b§lЛегендарная кирка"))
                 .send("lootbox", owner.handle())
     } else {
-        Anime.bigTitle(owner.getPlayer(), "Вам не повезло :(")
+        Anime.itemTitle(owner.handle(), BeforePacketHandler.EMERGENCY_STOP, "Не удача", "Эх..Вам не повезло :(", 3.0);
+        Glow.animate(owner.getPlayer(), 3.5, GlowColor.RED)
     }
 }
 

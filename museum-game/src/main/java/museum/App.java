@@ -208,13 +208,6 @@ public final class App extends JavaPlugin {
 
 		// Включение дискорд бота
 		new Thread(Bot::init).start();
-
-		// Запуск авто-обновляемого сообщения раз в 30 минут
-		Bukkit.getScheduler().runTaskTimer(this, () -> Bukkit.getOnlinePlayers().forEach(player -> {
-			player.sendMessage("");
-			player.sendMessage("§7Дискорд сервер§b https://discord.gg/fmpwuGKcaP §7[ ЛКМ ]");
-			player.sendMessage("");
-		}), 20, 20L * 60 * 30);
 	}
 
 	@Override

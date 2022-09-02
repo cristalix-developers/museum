@@ -827,19 +827,19 @@ public class MuseumCommands {
                             menuConfirm.open(click);
                         }),
                 new Button()
-                        .material(Material.ENDER_CHEST)
+                        .material(Material.CHEST)
                         .price(39)
                         .sale(SALE_LOOTBOX)
                         .title("Случайная посылка")
                         .description("Вы §dгарантированно §fполучите случайный метеорит c доходом от 15$ до 100$")
                         .onClick((click, index, button) -> {
                             Confirmation menuConfirm = new Confirmation(Collections.singletonList("Купить §aслучайный " +
-                                    "метеорит c доходом от 15$ до 100$, за &b" + (39 - (39 * SALE_LOOTBOX / 100)) +  "кристаллика(ов)"),
+                                    "метеорит \nc доходом от 15$ до 100$,\n за &b" + (39 - (39 * SALE_LOOTBOX / 100)) +  "кристаллика(ов)"),
                                     clickPlayer -> clickPlayer.performCommand("proccessdonate METEORITES"));
                             menuConfirm.open(click);
                         }),
                 new Button()
-                        .material(Material.ENDER_CHEST)
+                        .texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
                         .price(49)
                         .sale(SALE_LOOTBOX)
                         .title("Случайная посылка")
@@ -856,7 +856,7 @@ public class MuseumCommands {
                         .title("Случайная посылка")
                         .description("Вы §dс шансом 10% §fполучите §bЛегендарную кирку")
                         .onClick((click, index, button) -> {
-                            Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aШанс 10% получить Легендарную кирку", "за &b" + (99 - (99 * SALE_LOOTBOX / 100)) + " кристаллика(ов)"),
+                            Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aШанс 10% \nполучить Легендарную кирку", "за &b" + (99 - (99 * SALE_LOOTBOX / 100)) + " кристаллика(ов)"),
                                     clickPlayer -> clickPlayer.performCommand("proccessdonate MULTI_BOX"));
                             menuConfirm.open(click);
                         })

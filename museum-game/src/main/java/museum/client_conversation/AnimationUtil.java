@@ -2,7 +2,9 @@ package museum.client_conversation;
 
 import lombok.val;
 import me.func.mod.Anime;
+import me.func.mod.Glow;
 import me.func.mod.conversation.ModTransfer;
+import me.func.protocol.GlowColor;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
 import museum.util.LevelSystem;
@@ -65,6 +67,7 @@ public class AnimationUtil {
 
 	public static void buyFailure(User user) {
 		Anime.itemTitle(user.handle(), BeforePacketHandler.EMERGENCY_STOP, "Ошибка", "Недостаточно средств", 3.0);
+		Glow.animate(user.getPlayer(), 2.0, GlowColor.RED);
 		user.closeInventory();
 	}
 }

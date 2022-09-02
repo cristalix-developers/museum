@@ -27,7 +27,7 @@ public class EntityVisitor extends EntityVillager {
 			return;
 		}
 
-		this.goalSelector.a(1, new PathfinderGoalFollowGuide(this, 0.55, 7, 5));
+		//this.goalSelector.a(1, new PathfinderGoalFollowGuide(this, 0.55, 7, 5));
 	}
 
 }

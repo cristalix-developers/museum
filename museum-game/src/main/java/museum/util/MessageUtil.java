@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 @UtilityClass
 public class MessageUtil {
 
-	private final DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###,###.##$");
+	private final DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###,###.##");
 
 	public String toMoneyFormat(double money) {
 		return MONEY_FORMAT.format(money);
