@@ -10,6 +10,7 @@ registerCommand 'lootboxopen' handle {
     if (user.money > 10000000) {
         user.giveMoney(-10000000)
         LootBox.giveMeteorite(user)
+        LootBox.giveGem(user)
     } else {
         AnimationUtil.buyFailure(user)
     }
