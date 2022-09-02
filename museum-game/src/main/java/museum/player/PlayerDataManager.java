@@ -176,7 +176,6 @@ public class PlayerDataManager implements Listener {
         B.postpone(5, () -> {
             prepares.forEach(prepare -> prepare.execute(user, app));
             Anime.hideIndicator(player, Indicators.ARMOR, Indicators.EXP, Indicators.HEALTH, Indicators.HUNGER);
-            WorkerUtil.fillNpc(user);
         });
 
         UserInfo userInfo = user.getInfo();

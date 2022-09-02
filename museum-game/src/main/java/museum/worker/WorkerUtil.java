@@ -20,6 +20,7 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 
+import java.util.Collections;
 import java.util.UUID;
 
 /**
@@ -33,54 +34,39 @@ public class WorkerUtil {
     private final Location ADVERTISING_LOCATION = App.getApp().getMap().getLabel("advertising");
     private final String WEB_DATA = "https://webdata.c7x.dev/textures/skin/";
 
-    private NpcSmart menuNpc;
-
     public void init(App app) {
         // Формат таблички: .p simplenpc <Имя жителя> </команда>
         app.getMap().getLabels("simplenpc").forEach(label -> {
             ConfigurationSection data = app.getConfig().getConfigurationSection("npc." + label.getTag().split("\\s+")[0]);
-            val skin = data.getString("skin");
-            val npc = Npc.npc(new NpcData(
-                    (int) (Math.random() * Integer.MAX_VALUE),
-                    UUID.randomUUID(),
-                    label.x + .5,
-                    label.y,
-                    label.z + .5,
-                    1000,
-                    data.getString("title"),
-                    NpcBehaviour.STARE_AT_PLAYER,
-                    label.pitch,
-                    label.yaw,
-                    skin,
-                    skin.substring(skin.length() - 10),
-                    true,
-                    false,
-                    false,
-                    false
-            ));
-            npc.setClick(event -> event.player.performCommand(data.getString("command")));
+            try {
+                val skin = data.getString("skin");
+                NpcSmart npc = Npc.npc(new NpcData(
+                        (int) (Math.random() * Integer.MAX_VALUE),
+                        UUID.randomUUID(),
+                        label.x + .5,
+                        label.y,
+                        label.z + .5,
+                        1000,
+                        data.getString("title"),
+                        NpcBehaviour.STARE_AT_PLAYER,
+                        label.pitch,
+                        label.yaw,
+                        skin,
+                        skin.substring(skin.length() - 10),
+                        "",
+                        "",
+                        true,
+                        false,
+                        false,
+                        false,
+                        -1
+                ));
+                npc.setClick(event -> event.player.performCommand(data.getString("command")));
+            } catch (Exception exception) {
+                System.out.println("Label at " + label.getCoords());
+                exception.printStackTrace();
+            }
         });
-        val location = app.getMap().getLabel("menu");
-        menuNpc = Npc.npc(new NpcData(
-                (int) (Math.random() * Integer.MAX_VALUE),
-                UUID.randomUUID(),
-                location.x + .5,
-                location.y,
-                location.z + .5,
-                1000,
-                "§b§lМЕНЮ",
-                NpcBehaviour.STARE_AT_PLAYER,
-                137f,
-                0f,
-                "",
-                "",
-                true,
-                false,
-                false,
-                false
-        ));
-        menuNpc.setClick(event -> event.getPlayer().performCommand("menu"));
-
         new StandHelper(cosmos.clone().add(.5, .8, -.5))
                 .customName("§b§lКОСМОС")
                 .isInvisible(true)
@@ -116,13 +102,17 @@ public class WorkerUtil {
             ADVERTISING_LOCATION.yaw,
             "",
             "",
+            "",
+            "",
             true,
             false,
             false,
-            false
+            false,
+            -1
     ),
             null,
             App.getApp().getWorld().getUID(),
+            Collections.emptySet(),
             null,
             null,
             null,
@@ -142,13 +132,5 @@ public class WorkerUtil {
         });
         Npc.npc(npc.getData());
         return npc;
-    }
-
-    public void fillNpc(User user) {
-        val skin = WEB_DATA + user.getUuid();
-        menuNpc.getData().setSkinUrl(skin);
-        menuNpc.getData().setSkinDigest(skin.substring(skin.length() - 10));
-        menuNpc.slot(EquipmentSlot.HAND, Items.render(user.getPickaxeType().name().toLowerCase()));
-        menuNpc.slot(EquipmentSlot.OFF_HAND, CraftItemStack.asNMSCopy(PreparePlayerBrain.getHook()));
     }
 }
