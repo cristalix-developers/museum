@@ -4,6 +4,7 @@ import dev.xdark.clientapi.event.network.PluginMessage
 import dev.xdark.feder.NetUtil
 import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
+import ru.cristalix.uiengine.element.CarvedRectangle
 import ru.cristalix.uiengine.element.RectangleElement
 import ru.cristalix.uiengine.element.TextElement
 import ru.cristalix.uiengine.eventloop.animate
@@ -46,12 +47,12 @@ object TradingTime {
                 val seconds = data.readInt()
                 cooldown.enabled = true
                 (cooldown.children[1] as TextElement).content = text
-                (cooldown.children[0] as RectangleElement).animate(seconds - 0.1) {
+                (cooldown.children[0] as CarvedRectangle).animate(seconds - 0.1) {
                     size.x = 0.0
                 }
                 UIEngine.schedule(seconds + 0.1) {
                     cooldown.enabled = false
-                    (cooldown.children[0] as RectangleElement).size.x = 180.0
+                    (cooldown.children[0] as CarvedRectangle).size.x = 180.0
                 }
             }
         }

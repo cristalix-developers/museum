@@ -4,7 +4,7 @@ npc:
   excavation:
     title: '§b§lРАСКОПКИ'
     hint: '§eПравый клик'
-    command: 'excavationmenu'
+    command: 'excavationmenu npc'
     skin: 'http://textures.minecraft.net/texture/43e0568efe8ffd307a5cb7ff0a38f021dbd172604860cdb2c26313cdbbb0c5ff'
   shop:
     title: '§b§lМАГАЗИН'
@@ -19,7 +19,7 @@ npc:
   loot:
     title: '§b§lЛУТБОКС'
     hint: '§eПравый клик'
-    command: 'lootbox'
+    command: 'lootbox npc'
     skin: 'http://textures.minecraft.net/texture/e839df4ab41baefb1c09761220ffa9a128af2c96044aedc621db033d6d7'
   default:
     title: ' '

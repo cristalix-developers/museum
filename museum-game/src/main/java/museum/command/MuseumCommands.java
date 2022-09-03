@@ -425,7 +425,6 @@ public class MuseumCommands {
     private String cmdExcavationMenu(Player player, String[] args) {
         GemType dailyCave = GemType.getActualGem();
         val dailyGem = new Gem(dailyCave.name() + ':' + 1.0 + ":10000").getItem();
-        Anime.close(player);
 
         Choicer menu = new Choicer(
                 "Экспедиции",
@@ -465,7 +464,13 @@ public class MuseumCommands {
                         })
         );
 
-        B.postpone(1, () -> menu.open(player));
+        B.postpone(1, () -> {
+            if (args.length > 0) {
+                if (Objects.equals(args[0], "npc"))
+                    Anime.close(player);
+            }
+            menu.open(player);
+        });
         return null;
     }
 
@@ -871,7 +876,6 @@ public class MuseumCommands {
     private String cmdLootBox(Player player, String[] args) {
         val user = app.getUser(player);
         val userHaveEnoughMoney = user.getMoney() >= 10000000;
-        Anime.close(player);
 
         val menu = new Selection(
                 "Лутбоксы",
@@ -909,7 +913,13 @@ public class MuseumCommands {
                         })
         );
         menu.setVault("dollar");
-        B.postpone(1, () -> menu.open(player));
+        B.postpone(1, () -> {
+            if (args.length > 0) {
+                if (args[0] == "npc")
+                    Anime.close(player);
+            }
+            menu.open(player);
+        });
         return null;
     }
 
