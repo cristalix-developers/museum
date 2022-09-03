@@ -425,6 +425,7 @@ public class MuseumCommands {
     private String cmdExcavationMenu(Player player, String[] args) {
         GemType dailyCave = GemType.getActualGem();
         val dailyGem = new Gem(dailyCave.name() + ':' + 1.0 + ":10000").getItem();
+        Anime.close(player);
 
         Choicer menu = new Choicer(
                 "Экспедиции",
@@ -870,6 +871,7 @@ public class MuseumCommands {
     private String cmdLootBox(Player player, String[] args) {
         val user = app.getUser(player);
         val userHaveEnoughMoney = user.getMoney() >= 10000000;
+        Anime.close(player);
 
         val menu = new Selection(
                 "Лутбоксы",
@@ -975,6 +977,7 @@ public class MuseumCommands {
     ));
 
     private String cmdMenu(Player player, String[] args) {
+        Anime.close(player);
         val menu = new Selection(
                 "Главное меню",
                 "",

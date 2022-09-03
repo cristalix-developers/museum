@@ -5,7 +5,7 @@ npc:
     title: '§b§lРАСКОПКИ'
     hint: '§eПравый клик'
     command: 'excavationmenu'
-    skin: 'http://textures.minecraft.net/texture/3f65acedfe57d35f6bca338127940eaff4ffbec80abd33bff858db3a1a93f82'
+    skin: 'http://textures.minecraft.net/texture/43e0568efe8ffd307a5cb7ff0a38f021dbd172604860cdb2c26313cdbbb0c5ff'
   shop:
     title: '§b§lМАГАЗИН'
     hint: '§eПравый клик'

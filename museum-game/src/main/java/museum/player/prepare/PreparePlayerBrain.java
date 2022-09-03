@@ -101,7 +101,7 @@ public class PreparePlayerBrain implements Prepare {
             return;
         }
 
-        Cycle.run(5 * 20, titles.size(), iteration -> {
+        /*Cycle.run(5 * 20, titles.size(), iteration -> {
             if (!player.isOnline()) {
                 exit();
                 return;
@@ -116,7 +116,7 @@ public class PreparePlayerBrain implements Prepare {
             }
             player.sendTitle(titles.get(iteration));
             player.teleport(dots.get(iteration).toCenterLocation());
-        });
+        });*/
     }
 
     private static String getRare(String string) {

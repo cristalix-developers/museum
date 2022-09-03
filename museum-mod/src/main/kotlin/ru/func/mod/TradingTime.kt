@@ -15,14 +15,14 @@ import ru.cristalix.uiengine.utility.*
  */
 object TradingTime {
     init {
-        val cooldown = rectangle {
+        val cooldown = carved {
             offset = V3(0.0, -50.0)
             origin = BOTTOM
             align = BOTTOM
             size = V3(180.0, 5.0, 0.0)
             color = Color(0, 0, 0, 0.62)
             addChild(
-                rectangle {
+                carved {
                     origin = LEFT
                     align = LEFT
                     size = V3(180.0, 5.0, 0.0)
