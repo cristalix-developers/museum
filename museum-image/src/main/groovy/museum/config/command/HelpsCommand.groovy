@@ -9,6 +9,7 @@ import static org.bukkit.Material.PAPER
 registerCommand 'rp' handle {
     player.performCommand("resourcepack")
     App.app.getUser(player).approvedResourcepack = true
+    return null
 }
 
 registerCommand 'helps' handle {
