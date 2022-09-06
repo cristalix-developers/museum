@@ -113,6 +113,7 @@ Guis.register 'manipulator', { player ->
                 user.relics.put(subjectRelic.uuid, subjectRelic)
                 subject.updateFragment()
                 ((Museum) user.state).updateIncrease()
+                BannerUtil.updateBanners(subject);
                 MessageUtil.find 'relic-tacked' send user
             }
         }
@@ -248,6 +249,7 @@ Guis.register 'manipulator', { player ->
                         Glow.animate(user.handle(), 3.0, GlowColor.GREEN)
                         user.sendMessage(Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
                         Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
+                        BannerUtil.updateBanners(subject)
                     } else {
                         MessageUtil.find('nomoney').send(user)
                         closeInventory()
