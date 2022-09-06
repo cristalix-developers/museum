@@ -38,12 +38,4 @@ public class ItemUtil {
         nmsItem.tag.setString("other", "access");
         return nmsItem.asBukkitMirror();
     }
-
-    public static ItemStack getNBTItem(String nbtKey, String nbtValue) {
-        ItemStack agree = new ItemStack(Material.CLAY_BALL);
-        val nmsItem = CraftItemStack.asNMSCopy(agree);
-        nmsItem.tag = new NBTTagCompound();
-        nmsItem.tag.setString(nbtKey, nbtValue);
-        return nmsItem.asBukkitMirror();
-    }
 }
