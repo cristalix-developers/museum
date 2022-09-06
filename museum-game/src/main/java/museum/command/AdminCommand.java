@@ -3,7 +3,6 @@ package museum.command;
 import clepto.bukkit.B;
 import lombok.experimental.UtilityClass;
 import lombok.val;
-import me.func.mod.Anime;
 import me.func.mod.conversation.ModTransfer;
 import museum.App;
 import museum.data.PickaxeType;
@@ -21,6 +20,7 @@ import museum.prototype.Managers;
 import museum.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import ru.cristalix.core.formatting.Formatting;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -44,21 +44,19 @@ public class AdminCommand {
 		registerSkeletonCmd(app);
 		registerVisitCmd(app);
 		registerGetDataCmd(app);
-		registerTradingTimeCmd(app);
+		registerTradingTimeCmd();
 	}
 
-	private void registerTradingTimeCmd(App app) {
+	private void registerTradingTimeCmd() {
 		B.regCommand((sender, args) -> {
-
 			if (!sender.isOp())
 				return null;
 			new ModTransfer()
 					.string("Тест")
 					.integer(10)
 					.send("museum:tradingtime", App.getApp().getUser(sender).handle());
-
-			return null;
-		}, "trading_time");
+			return Formatting.fine("Сообщение отправлено");
+		}, "trade-animation");
 	}
 
 	private void registerGetDataCmd(App app) {
