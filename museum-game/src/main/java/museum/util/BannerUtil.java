@@ -1,9 +1,12 @@
 package museum.util;
 
 import lombok.val;
+import lombok.var;
 import me.func.mod.Banners;
 import me.func.protocol.element.Banner;
 import me.func.protocol.element.MotionType;
+import museum.museum.subject.CollectorSubject;
+import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -39,24 +42,29 @@ public class BannerUtil {
                     yaw = 180.0;
                     break;
             }
+            val height = 16;
+            var width = 16;
+            if (subject instanceof SkeletonSubject) {
+                width = 48;
+            }
             val banner = new Banner.Builder()
                     .motionType(MotionType.CONSTANT)
                     .watchingOnPlayer(false)
                     .yaw((float) yaw)
                     .pitch(0.0f)
-                    .content("\n§6Доход: §f\n" + String.format("%.2f", subject.getIncome()))
-                    .resizeLine(0, 0.3)
+                    .content("§b" + subject.getPrototype().getTitle() + "\n§6Доход: §f\n" + String.format("%.2f", subject.getIncome()))
+                    .resizeLine(0, (width > 16.0) ? 0.3 : 0.2)
                     .resizeLine(1, 0.3)
                     .resizeLine(2, 0.3)
-                    .height(16)
-                    .weight(16)
+                    .height(height)
+                    .weight(width)
                     .x(origin.toCenterLocation().x + vec.x + face.modX * Math.abs(origin.x - alloc.getMin().getX()))
                     .y(origin.y + 1)
                     .z(origin.toCenterLocation().z + vec.z + face.modZ * Math.abs(origin.z - alloc.getMin().getZ()))
                     .red(0)
                     .green(0)
                     .blue(0)
-                    .opacity(0.83)
+                    .opacity(0.62)
                     .build();
             subject.getBannerUUIDs().add(banner.getUuid());
             Banners.add(banner);
