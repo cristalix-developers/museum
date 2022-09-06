@@ -58,10 +58,10 @@ public class TickTimerHandler extends BukkitRunnable {
 	private void savePlayers() {
 		val now = counter.get();
 		if (now % AUTO_SAVE_PERIOD == 0) {
-			counter.set(0);
+			counter.set(1);
 			clientSocket.write(dataManager.bulk(false));
 		} else
-			counter.decrementAndGet();
+			counter.incrementAndGet();
 	}
 
 	private void process(Museum museum, User user, long currentTime) {
