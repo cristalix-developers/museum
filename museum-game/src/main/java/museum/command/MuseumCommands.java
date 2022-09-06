@@ -98,50 +98,58 @@ public class MuseumCommands {
 
         val info = new Selection(
                 "Ваша статистика",
-                "Кристаликов " + user.getDonateMoney(),
                 "",
-                1,
-                7
+                "",
+                6,
+                2
         );
         info.add(new Button()
-                    .title("§6Монет:§f\n" + MessageUtil.toMoneyFormat(user.getMoney()) + "\n" +
-                        "§6Доход:§f\n" + MessageUtil.toMoneyFormat(user.getIncome())
-                    )
-                    .texture("minecraft:mcpatcher/cit/others/hub/coin3.png")
+                .title("§6Монет:§f " + MessageUtil.toMoneyFormat(user.getMoney()))
+                .texture("minecraft:mcpatcher/cit/others/hub/coin3.png")
         );
         info.add(new Button()
-                    .title("§bУровень:§f\n" + user.getLevel() + "\n" +
-                            "§cОпыт:§f\n" + MessageUtil.toCrystalFormat(user.getExperience())
-                    )
-                    .texture("minecraft:mcpatcher/cit/others/hub/guild_lvl.png")
+                .title("§6Доход:§f " + MessageUtil.toMoneyFormat(user.getIncome()))
+                .texture("minecraft:mcpatcher/cit/others/hub/iconpack/donate.png")
         );
         info.add(new Button()
-                    .title("§bКирка:§f\n" + getPickaxeColor(user.getPickaxeType()) + user.getPickaxeType().getName() + "\n" +
-                            "§bРаскопок:§f\n" + user.getExcavationCount()
-                    )
-                    .texture("minecraft:mcpatcher/cit/others/anvil.png")
+                .title("§bУровень:§f " + user.getLevel())
+                .texture("minecraft:mcpatcher/cit/others/hub/guild_lvl.png")
         );
         info.add(new Button()
-                    .title("§bРаскопок:§f\n" + user.getExcavationCount())
-                    .texture("minecraft:mcpatcher/cit/others/bag1.png")
+                .title("§cОпыт:§f " + MessageUtil.toCrystalFormat(user.getExperience()))
+                .texture("minecraft:mcpatcher/cit/others/pets1.png")
         );
         info.add(new Button()
-                    .title("§bНазвание музея:§f\n" + museumInfo.title + "\n" +
-                            "§bСоздан:§f\n" + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(museumInfo.creationDate.getTime()))
-                    )
-                    .texture("minecraft:mcpatcher/cit/others/hub/achievements.png")
+                .title("§bКирка:§f " + getPickaxeColor(user.getPickaxeType()) + user.getPickaxeType().getName())
+                .texture("minecraft:mcpatcher/cit/weapons/other/60.png")
         );
         info.add(new Button()
-                    .title("§bКоспической руды:§f\n" + MessageUtil.toCrystalFormat(user.getCosmoCrystal()) + "\n" +
-                            "§bФрагментов:§f\n" + user.getSkeletons().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum()
-                    )
-                    .texture("minecraft:mcpatcher/cit/others/bag.png")
+                .title("§bРаскопок:§f " + user.getExcavationCount())
+                .texture("minecraft:mcpatcher/cit/others/blocks.png")
         );
         info.add(new Button()
-                    .title("§bПосещений музея:§f\n" + museumInfo.views + "\n" +
-                            "§bПодобрано монет:§f\n" + user.getPickedCoinsCount()
-                    )
-                    .texture("minecraft:mcpatcher/cit/others/villager.png")
+                .title("§bНазвание музея:§f " + museumInfo.title)
+                .texture("minecraft:mcpatcher/cit/others/hub/guild_bank.png")
+        );
+        info.add(new Button()
+                .title("§bКоспической руды:§f " + MessageUtil.toCrystalFormat(user.getCosmoCrystal()))
+                .texture("minecraft:mcpatcher/cit/others/anvil.png")
+        );
+        info.add(new Button()
+                .title("§bПосещений музея:§f " + museumInfo.views)
+                .texture("minecraft:mcpatcher/cit/others/villager.png")
+        );
+        info.add(new Button()
+                .title("§bСоздан:§f " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(museumInfo.creationDate.getTime())))
+                .texture("minecraft:mcpatcher/cit/others/hub/iconpack/calendar2.png")
+        );
+        info.add(new Button()
+                .title("§bФрагментов:§f " + user.getSkeletons().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum())
+                .texture("minecraft:mcpatcher/cit/others/hub/achievements_many.png")
+        );
+        info.add(new Button()
+                .title("§bПодобрано монет:§f " + user.getPickedCoinsCount())
+                .texture("minecraft:mcpatcher/cit/others/hub/coin2.png")
         );
 
         info.setVault("donate");
