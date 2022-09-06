@@ -44,7 +44,7 @@ public class BannerUtil {
                     .watchingOnPlayer(false)
                     .yaw((float) yaw)
                     .pitch(0.0f)
-                    .content("\n§6Доход : §f\n" + String.format("%.2f", subject.getIncome()))
+                    .content("\n§6Доход: §f\n" + String.format("%.2f", subject.getIncome()))
                     .resizeLine(0, 0.3)
                     .resizeLine(1, 0.3)
                     .resizeLine(2, 0.3)

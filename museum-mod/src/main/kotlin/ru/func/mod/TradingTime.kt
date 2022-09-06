@@ -23,12 +23,6 @@ object TradingTime {
             size = V3(180.0, 5.0, 0.0)
             color = Color(0, 0, 0, 0.62)
             addChild(
-                carved {
-                    origin = LEFT
-                    align = LEFT
-                    size = V3(180.0, 5.0, 0.0)
-                    color = Color(244, 148, 198, 1.0)
-                },
                 text {
                     origin = TOP
                     align = TOP
@@ -40,19 +34,28 @@ object TradingTime {
             )
             enabled = false
         }
+        val carvedRec = carved {
+            origin = LEFT
+            align = LEFT
+            size = V3(180.0, 5.0, 0.0)
+            color = Color(244, 148, 198, 1.0)
+            enabled = false
+        }
 
         mod.registerHandler<PluginMessage> {
             if (channel == "museum:tradingtime") {
                 val text = NetUtil.readUtf8(data)
                 val seconds = data.readInt()
                 cooldown.enabled = true
-                (cooldown.children[1] as TextElement).content = text
-                (cooldown.children[0] as CarvedRectangle).animate(seconds - 0.1) {
+                carvedRec.enabled = true
+                (cooldown.children[0] as TextElement).content = text
+                carvedRec.animate(seconds - 0.1) {
                     size.x = 0.0
                 }
                 UIEngine.schedule(seconds + 0.1) {
                     cooldown.enabled = false
-                    (cooldown.children[0] as CarvedRectangle).size.x = 180.0
+                    carvedRec.enabled = false
+                    carvedRec.size.x = 180.0
                 }
             }
         }
