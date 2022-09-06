@@ -13,6 +13,7 @@ import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.AtomPiece;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
+import museum.util.BannerUtil;
 import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
@@ -67,6 +68,7 @@ public class RelicShowcaseSubject extends Subject {
 		if (owner.getState() == null)
 			return;
 		((Museum) owner.getState()).updateIncrease();
+		BannerUtil.updateBanners(this);
 	}
 
 	public void rotate() {

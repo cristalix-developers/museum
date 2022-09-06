@@ -8,6 +8,9 @@ import museum.prototype.Storable;
 import ru.cristalix.core.math.D2;
 import ru.cristalix.core.util.UtilV3;
 
+import java.util.ArrayList;
+import java.util.UUID;
+
 /**
  * @author func 22.05.2020
  * @project Museum
@@ -16,6 +19,7 @@ import ru.cristalix.core.util.UtilV3;
 public class Subject extends Storable<SubjectInfo, SubjectPrototype> {
 
 	private Allocation allocation;
+	private final ArrayList<UUID> bannerUUIDs = new ArrayList<>();
 	private SubjectPrototype.SubjectDataForClient dataForClient;
 
 	public Subject(SubjectPrototype prototype, SubjectInfo info, User owner) {

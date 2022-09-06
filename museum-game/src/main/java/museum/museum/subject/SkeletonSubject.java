@@ -13,6 +13,7 @@ import museum.museum.subject.skeleton.SkeletonPrototype;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
 import museum.prototype.Managers;
+import museum.util.BannerUtil;
 
 import static museum.museum.subject.skeleton.Piece.orientedOffset;
 
@@ -82,6 +83,7 @@ public class SkeletonSubject extends Subject {
             return;
         if (owner.getState() instanceof Museum)
             ((Museum) owner.getState()).updateIncrease();
+        BannerUtil.updateBanners(this);
     }
 
     @Override

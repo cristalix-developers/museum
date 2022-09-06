@@ -13,6 +13,7 @@ import museum.museum.subject.*
 import museum.museum.subject.product.FoodProduct
 import museum.museum.subject.skeleton.Skeleton
 import museum.prototype.Managers
+import museum.util.BannerUtil
 import museum.util.MessageUtil
 import museum.util.SubjectLogoUtil
 import org.bukkit.entity.Player
@@ -123,6 +124,7 @@ Guis.register 'manipulator', { player ->
             def allocation = abstractSubject.allocation
             if (!allocation) return
             allocation.perform PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES, DESTROY_DISPLAYABLE
+            BannerUtil.deleteBanners(abstractSubject)
             abstractSubject.allocation = null
 
             inventory.addItem SubjectLogoUtil.encodeSubjectToItemStack(abstractSubject)
@@ -150,6 +152,7 @@ Guis.register 'manipulator', { player ->
         def allocation = abstractSubject.allocation
         if (!allocation) return
         allocation.perform PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES, DESTROY_DISPLAYABLE
+        BannerUtil.deleteBanners(abstractSubject)
         abstractSubject.allocation = null
 
         inventory.addItem SubjectLogoUtil.encodeSubjectToItemStack(abstractSubject)

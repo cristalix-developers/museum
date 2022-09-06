@@ -14,19 +14,13 @@ import museum.fragment.Fragment;
 import museum.museum.collector.CollectorNavigator;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.map.SubjectType;
-import museum.museum.subject.Allocation;
-import museum.museum.subject.CollectorSubject;
-import museum.museum.subject.MarkerSubject;
-import museum.museum.subject.Subject;
+import museum.museum.subject.*;
 import museum.player.State;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Storable;
-import museum.util.ChunkWriter;
-import museum.util.ItemUtil;
-import museum.util.LocationUtil;
-import museum.util.SubjectLogoUtil;
+import museum.util.*;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.IBlockData;
@@ -241,6 +235,9 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	public boolean addSubject(Subject subject, Location location) {
 		Allocation allocation = Allocation.allocate(this, subject.getCachedInfo().getColor(), subject.getPrototype(), location);
 		subject.setAllocation(allocation);
+		if (subject instanceof RelicShowcaseSubject || subject instanceof SkeletonSubject || subject instanceof CollectorSubject) {
+			BannerUtil.createBanners(subject);
+		}
 		return allocation != null;
 	}
 
