@@ -3,10 +3,10 @@ apply plugin: 'groovy'
 dependencies {
     compileOnly project(':museum-game')
     compileOnly 'cristalix:dark-paper:21.02.03'
-    compileOnly 'org.codehaus.groovy:groovy:3.0.5'
+    compileOnly 'org.codehaus.groovy:groovy:3.0.7'
     compileOnly 'cristalix:bukkit-core:21.01.30'
     implementation project(':museum-commons')
-    implementation 'me.func:animation-api:cache3-SNAPSHOT'
+    implementation 'me.func:animation-api:2.4.13'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
     implementation 'clepto:clepto-bukkit:3.4.2'
     implementation 'clepto:clepto-cristalix:3.0.2'
