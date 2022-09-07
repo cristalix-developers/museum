@@ -25,6 +25,8 @@ import museum.fragment.Fragment;
 import museum.fragment.Gem;
 import museum.fragment.GemType;
 import museum.misc.PlacesMechanic;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.museum.Museum;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.map.SubjectType;
@@ -452,11 +454,19 @@ public class MuseumCommands {
             }
 
         }
+        if (args.length > 0) {
+            if (Objects.equals(args[0], "npc"))
+                Anime.close(player);
+        }
         menu.open(player);
         return null;
     }
 
     private String cmdExcavationMenu(Player player, String[] args) {
+        if (args.length > 0) {
+            if (Objects.equals(args[0], "npc"))
+                player.performCommand("excavationsecondmenu npc");
+        }
         GemType dailyCave = GemType.getActualGem();
         val dailyGem = new Gem(dailyCave.name() + ':' + 1.0 + ":10000").getItem();
 
@@ -499,10 +509,6 @@ public class MuseumCommands {
         );
 
         B.postpone(1, () -> {
-            if (args.length > 0) {
-                if (Objects.equals(args[0], "npc"))
-                    Anime.close(player);
-            }
             menu.open(player);
         });
         return null;
@@ -1269,7 +1275,7 @@ public class MuseumCommands {
                     MessageUtil.find("playeroffline").send(user);
                     return;
                 } else if (invited.equals(sender)) {
-                    user.sendMessage(PLAYER_OFFLINE_MESSAGE);
+                    MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, (PLAYER_OFFLINE_MESSAGE));
                     return;
                 }
                 MessageUtil.find("invited").send(user);

@@ -6,6 +6,8 @@ import lombok.val;
 import me.func.mod.Anime;
 import me.func.mod.conversation.ModTransfer;
 import museum.App;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
@@ -84,7 +86,7 @@ public class Auction implements Ticked {
 
                         user.setMoney(user.getMoney() - maxEntry.getValue());
 
-                        user.getPlayer().sendMessage(Formatting.fine("Вы победили в торгах и выиграли кость динозавра§b" + proto.getTitle() + "§f."));
+                        MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, Formatting.fine("Вы победили в торгах и выиграли кость динозавра§b" + proto.getTitle() + "§f."));
                         skeleton.getUnlockedFragments().add(fragment);
 
                         playerDataManager.getMembers().clear();

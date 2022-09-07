@@ -3,6 +3,8 @@ package museum.config.command.staff
 
 import museum.App
 import museum.discord.Bot
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
@@ -29,7 +31,7 @@ registerCommand 'vanish' handle {
 
             Bot.sendNormalMessage(realm.getRealmName(), "`" + player.getDisplayName() + " зашёл в игру`")
 
-            real.sendMessage(Formatting.fine("§bВас снова §cвидно§b!"))
+            MultiChatUtil.sendMessage(real.player, ChatType.SYSTEM, Formatting.fine("§bВас снова §cвидно§b!"))
             real.removeMetadata("vanish", app)
 
             PacketPlayOutPlayerInfo add = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, player.handle)
@@ -43,7 +45,7 @@ registerCommand 'vanish' handle {
 
             Bot.sendNormalMessage(realm.getRealmName(), "`" + player.getDisplayName() + " вышел из игры`")
 
-            real.sendMessage(Formatting.fine("§bВы были §cскрыты§b!"))
+            MultiChatUtil.sendMessage(real.player, ChatType.SYSTEM, Formatting.fine("§bВы были §cскрыты§b!"))
             real.setMetadata("vanish", new FixedMetadataValue(app, 1))
 
             PacketPlayOutPlayerInfo remove = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, player.handle)

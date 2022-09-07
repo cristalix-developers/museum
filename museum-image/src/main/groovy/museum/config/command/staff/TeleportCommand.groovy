@@ -4,6 +4,8 @@ package museum.config.command.staff
 import clepto.bukkit.command.CommandContext
 import clepto.cristalix.Cristalix
 import museum.App
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import org.bukkit.Bukkit
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.permissions.IPermissionService
@@ -26,7 +28,7 @@ registerCommand 'tpshow' handle {
         if (player && player.online) {
             user.player.showPlayer App.app, player
             user.teleport player.location
-            user.sendMessage(Formatting.fine("§bТелепортирован к §c" + player.name))
+            MultiChatUtil.sendMessage(user.player, ChatType.SYSTEM, Formatting.fine("§bТелепортирован к §c" + player.name))
         }
     }
 }
@@ -38,7 +40,7 @@ registerCommand 'get' handle {
         if (player && player.online) {
             user.player.showPlayer(App.app, player)
             player.teleport user.location
-            user.sendMessage(Formatting.fine("§bК вам телепортирован §c" + player.name))
+            MultiChatUtil.sendMessage(user.player, ChatType.SYSTEM, Formatting.fine("§bК вам телепортирован §c" + player.name))
         }
     }
 }

@@ -4,6 +4,8 @@ package museum.config.listener
 
 import museum.cosmos.Cosmos
 import museum.misc.PlacesMechanic
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import museum.museum.Museum
 import museum.museum.map.SubjectType
 import museum.museum.subject.product.FoodProduct
@@ -31,7 +33,7 @@ on InventoryOpenEvent, {
 
 on AsyncPlayerChatEvent, {
     if (message.contains("visit") || message.contains("museum visit") || message.contains("посетите мой")) {
-        player.sendMessage MessageUtil.get("no-spam")
+        MultiChatUtil.sendMessage(player, ChatType.SYSTEM, MessageUtil.get("no-spam"))
         setCancelled true
     }
 }
@@ -70,9 +72,9 @@ on PlayerMoveEvent, {
                         if (!stall.food.containsKey(food))
                             stall.food.put food, 1
                         summary = summary + food.cost
-                        user.sendMessage(" x $food.name | §a$food.cost\$")
+                        MultiChatUtil.sendMessage(user.player, ChatType.SYSTEM, " x $food.name | §a$food.cost\$")
                     }
-                    user.sendMessage("§e§lИтого: $summary\$")
+                    MultiChatUtil.sendMessage(user.player, ChatType.SYSTEM, "§e§lИтого: $summary\$")
                 }
             })
         } else if ((292 - to.x)**2 + (87 - to.y)**2 + (-400 - to.z)**2 < 25) {

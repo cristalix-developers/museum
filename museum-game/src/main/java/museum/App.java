@@ -24,6 +24,8 @@ import museum.international.Market;
 import museum.international.Shop;
 import museum.misc.MuseumChatService;
 import museum.misc.PlacesMechanic;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.museum.map.SubjectType;
 import museum.packages.*;
 import museum.player.PlayerDataManager;
@@ -130,8 +132,11 @@ public final class App extends JavaPlugin {
 		core.registerService(IChatService.class, new MuseumChatService(IPermissionService.get(), getServer()));
 		core.registerService(IScoreboardService.class, new ScoreboardService());
 
-		Anime.include(Kit.NPC, Kit.STANDARD, Kit.LOOTBOX, Kit.EXPERIMENTAL, Kit.DIALOG);
+		Anime.include(Kit.NPC, Kit.STANDARD, Kit.LOOTBOX, Kit.EXPERIMENTAL, Kit.MULTI_CHAT, Kit.DIALOG);
 		ModLoader.loadAll("mods");
+
+		//Мульти чат
+		MultiChatUtil.createChats();
 
 		// Регистрация обработчика пакета конфига
 		clientSocket.registerHandler(ConfigurationsPackage.class, this::fillConfigurations);

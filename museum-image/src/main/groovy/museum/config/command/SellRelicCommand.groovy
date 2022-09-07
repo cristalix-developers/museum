@@ -2,6 +2,8 @@
 package museum.config.command
 
 import museum.App
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import museum.util.MessageUtil
 import museum.util.SubjectLogoUtil
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
@@ -51,7 +53,7 @@ registerCommand 'sellall' handle {
                 player.inventory.remove(item)
                 user.relics.remove currentRelic.uuid
                 user.giveMoney(price)
-                player.sendMessage(MessageUtil.find('relic-sell')
+                MultiChatUtil.sendMessage(player, ChatType.SYSTEM, MessageUtil.find('relic-sell')
                         .set('price', MessageUtil.toMoneyFormat(price))
                         .getText()
                 )

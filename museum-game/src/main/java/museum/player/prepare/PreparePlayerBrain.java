@@ -15,6 +15,8 @@ import museum.data.PickaxeType;
 import museum.fragment.Gem;
 import museum.fragment.GemType;
 import museum.fragment.Meteorite;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.museum.Museum;
 import museum.player.User;
 import museum.player.pickaxe.PickaxeUpgrade;
@@ -73,7 +75,7 @@ public class PreparePlayerBrain implements Prepare {
     public void execute(User user, App app) {
         final CraftPlayer player = user.getPlayer();
 
-        user.sendMessage((user.isMessages() ? "Отключить" : "Включить") + " экранные сообщения игроков /con");
+        MultiChatUtil.sendMessage(player, ChatType.SYSTEM, (user.isMessages() ? "Отключить" : "Включить") + " экранные сообщения игроков /con");
 
         if (player.hasPlayedBefore() || user.getExperience() >= EXPERIENCE) {
             val now = System.currentTimeMillis();
@@ -86,7 +88,7 @@ public class PreparePlayerBrain implements Prepare {
                 DailyRewardManager.open(user);
 
                 val dailyReward = WeekRewards.values()[user.getDay()];
-                user.getPlayer().sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.getTitle()));
+                MultiChatUtil.sendMessage(player, ChatType.SYSTEM, Formatting.fine("Ваша ежедневная награда: " + dailyReward.getTitle()));
                 dailyReward.getGive().accept(user);
                 user.setDay(user.getDay() + 1);
 

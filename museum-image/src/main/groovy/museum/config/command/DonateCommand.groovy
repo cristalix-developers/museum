@@ -10,6 +10,8 @@ import museum.config.gui.PrefixBox
 import museum.data.PickaxeType
 import museum.data.SubjectInfo
 import museum.donate.DonateType
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import museum.museum.Museum
 import museum.museum.subject.CollectorSubject
 import museum.packages.SaveUserPackage
@@ -33,10 +35,10 @@ registerCommand 'proccessdonate' handle {
     def hasAdvertisement = donate == DonateType.MUSEUM_ADVERTISEMENT
 
     if (App.app.playerDataManager.getBoosterCount() > 5 && donate.name().contains("BOOSTER")) {
-        player.sendMessage(Formatting.error("Запущено слишком много бустеров! Подождите пожалуйста..."))
+        MultiChatUtil.sendMessage(player, ChatType.SYSTEM, Formatting.error("Запущено слишком много бустеров! Подождите пожалуйста..."))
         return
     } else if (hasAdvertisement && App.app.playerDataManager.advertising != null) {
-        player.sendMessage Formatting.error("Другой игрок уже купил рекламу!")
+        MultiChatUtil.sendMessage(player, ChatType.SYSTEM, Formatting.error("Другой игрок уже купил рекламу!"))
         return
     }
 
@@ -44,7 +46,7 @@ registerCommand 'proccessdonate' handle {
         if (!transaction.ok) {
             if (transaction == TransactionResponse.INSUFFICIENT_FUNDS)
                 AnimationUtil.buyFailure(user)
-            user.sendMessage(Formatting.error(transaction.name))
+            MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, Formatting.error(transaction.name))
             return
         }
         if (donate == DonateType.METEORITES) {
@@ -76,7 +78,7 @@ registerCommand 'proccessdonate' handle {
             if (user.state instanceof Museum) {
                 user.getInventory().addItem SubjectLogoUtil.encodeSubjectToItemStack(subject)
             } else {
-                user.sendMessage(Formatting.fine("Что бы получить его, перейдите в музей."))
+                MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, Formatting.fine("Что бы получить его, перейдите в музей."))
             }
             user.donates.add(donate as DonateType)
         } else if (hasAdvertisement) {
@@ -88,7 +90,7 @@ registerCommand 'proccessdonate' handle {
                     Cycle.exit()
                 } else if (it == 3600) {
                     App.app.playerDataManager.advertising = null
-                    Bukkit.getPlayer(App.app.playerDataManager.advertising).sendMessage(Formatting.error("Реклама музея закончилась!"))
+                    MultiChatUtil.sendMessage(Bukkit.getPlayer(App.app.playerDataManager.advertising), ChatType.SYSTEM, Formatting.error("Реклама музея закончилась!"))
                     Cycle.exit()
                 }
             }

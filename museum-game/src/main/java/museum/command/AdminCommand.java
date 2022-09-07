@@ -8,6 +8,8 @@ import museum.App;
 import museum.data.PickaxeType;
 import museum.fragment.Fragment;
 import museum.fragment.Gem;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.museum.Museum;
 import museum.museum.map.MuseumPrototype;
 import museum.museum.subject.Allocation;
@@ -75,18 +77,19 @@ public class AdminCommand {
 
 			val user = app.getUser(player);
 
-			sender.sendMessage("§bВсе реликвии у игрока в инвентаре §c" + user.getDisplayName() + "§b:§r");
+
+			MultiChatUtil.sendMessage(sender, ChatType.SYSTEM, ("§bВсе реликвии у игрока в инвентаре §c" + user.getDisplayName() + "§b:§r"));
 			for (Fragment fragment : user.getRelics().values())
 				if (fragment instanceof Gem)
-					sender.sendMessage(fragment.getAddress() + "\n");
+					MultiChatUtil.sendMessage(sender, ChatType.SYSTEM, fragment.getAddress() + "\n");
 
-			sender.sendMessage("§bВсе стенды у игрока §c" + user.getDisplayName() + "§b с чем-либо:§r");
+			MultiChatUtil.sendMessage(sender, ChatType.SYSTEM, "§bВсе стенды у игрока §c" + user.getDisplayName() + "§b с чем-либо:§r");
 			val a1 = user.getSubjects();
 			for (Subject dataForClient : a1)
 				if (dataForClient instanceof RelicShowcaseSubject) {
 					val relicCase = ((RelicShowcaseSubject) dataForClient);
 					try {
-						sender.sendMessage("\nIncome: §c" + relicCase.getIncome() + "§r\n" +
+						MultiChatUtil.sendMessage(sender, ChatType.SYSTEM, "\nIncome: §c" + relicCase.getIncome() + "§r\n" +
 												"Relic: §c" + relicCase.getFragment().getAddress() + "§r" + "\n");
 					} catch (Exception ignored) { }
 				}
@@ -142,7 +145,7 @@ public class AdminCommand {
 					Location origin = allocation.getOrigin();
 					allocationInfo = allocation.getUpdatePackets().size() + " packets, §f" + origin.getX() + " " + origin.getY() + " " + origin.getZ();
 				}
-				sender.sendMessage("§e" + subject.getPrototype().getAddress() + "§f: " + subject.getOwner().getName() + ", " + allocationInfo);
+				MultiChatUtil.sendMessage(sender, ChatType.SYSTEM, "§e" + subject.getPrototype().getAddress() + "§f: " + subject.getOwner().getName() + ", " + allocationInfo);
 			}
 			return "§e" + subjects.size() + " in total.";
 		}, "subjects", "sj");
@@ -237,7 +240,7 @@ public class AdminCommand {
 				return null;
 			Collection<Skeleton> skeletons = app.getUser(sender).getSkeletons();
 			skeletons.forEach(skeleton ->
-					sender.sendMessage("§e" + skeleton.getPrototype().getAddress() + "§f: " + skeleton.getUnlockedFragments().size()));
+					MultiChatUtil.sendMessage(sender, ChatType.SYSTEM, "§e" + skeleton.getPrototype().getAddress() + "§f: " + skeleton.getUnlockedFragments().size()));
 			return "§e" + skeletons.size() + " in total.";
 		}, "skeleton");
 	}

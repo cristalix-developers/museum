@@ -7,6 +7,8 @@ import museum.App
 import museum.config.command.WagonConfig
 import museum.fragment.GemType
 import museum.fragment.Meteorite
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import museum.museum.Museum
 import museum.museum.map.SkeletonSubjectPrototype
 import museum.museum.subject.*
@@ -247,7 +249,7 @@ Guis.register 'manipulator', { player ->
                         user.giveMoney(-upgradeCost)
                         subject.level = subject.level + 1
                         Glow.animate(user.handle(), 3.0, GlowColor.GREEN)
-                        user.sendMessage(Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
+                        MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
                         Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
                         BannerUtil.updateBanners(subject)
                     } else {

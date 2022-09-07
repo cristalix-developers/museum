@@ -3,6 +3,8 @@ package museum.misc;
 import lombok.val;
 import museum.App;
 import museum.discord.Bot;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.packages.UserChatPackage;
 import museum.player.User;
 import net.md_5.bungee.api.ChatColor;
@@ -82,7 +84,7 @@ public final class MuseumChatService extends ChatService implements Listener {
 				error = "Погоди перед отправкой следующего сообщения";
 
 			if (error != null) {
-				player.sendMessage(Formatting.error(error));
+				MultiChatUtil.sendMessage(player, ChatType.SYSTEM, Formatting.error(error));
 				event.setCancelled(true);
 				return;
 			}

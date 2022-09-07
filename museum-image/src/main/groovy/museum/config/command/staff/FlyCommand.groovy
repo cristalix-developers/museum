@@ -2,6 +2,8 @@
 package museum.config.command.staff
 
 import museum.App
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import museum.util.MessageUtil
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.permissions.IPermissionService
@@ -20,6 +22,6 @@ registerCommand 'fly' handle {
             user.player.allowFlight = false
             user.player.flying = false
         }
-        player.sendMessage(Formatting.fine("§bПолёт §c" + MessageUtil.getFormattedState(user.player.flying)))
+        MultiChatUtil.sendMessage(player, ChatType.SYSTEM, Formatting.fine("§bПолёт §c" + MessageUtil.getFormattedState(user.player.flying)))
     }
 }

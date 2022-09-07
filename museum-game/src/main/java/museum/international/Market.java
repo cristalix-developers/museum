@@ -4,6 +4,8 @@ import lombok.val;
 import museum.App;
 import museum.fragment.Fragment;
 import museum.fragment.Gem;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.player.User;
 import museum.util.LocationUtil;
 import net.minecraft.server.v1_12_R1.PacketPlayInBlockDig;
@@ -34,7 +36,7 @@ public class Market implements International {
 			if (fragment instanceof Gem)
 				user.getInventory().addItem(fragment.getItem());
 
-		user.sendMessage(
+		MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM,
 				"⟼  §6§lРынок",
 				"",
 				"    Обменивайтесь камнями с другими",

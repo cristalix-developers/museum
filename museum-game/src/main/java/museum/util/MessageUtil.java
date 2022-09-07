@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import museum.App;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.player.User;
 import org.bukkit.Bukkit;
 import ru.cristalix.core.formatting.Formatting;
@@ -78,7 +80,7 @@ public class MessageUtil {
 		}
 
 		public void send(User user) {
-			user.getPlayer().sendMessage(text);
+			MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, text);
 		}
 
 	}

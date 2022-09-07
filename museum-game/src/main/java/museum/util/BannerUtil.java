@@ -5,6 +5,8 @@ import lombok.var;
 import me.func.mod.Banners;
 import me.func.protocol.element.Banner;
 import me.func.protocol.element.MotionType;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
@@ -53,7 +55,7 @@ public class BannerUtil {
                     .yaw((float) yaw)
                     .pitch(0.0f)
                     .content("§b" + subject.getPrototype().getTitle() + "\n§6Доход: §f\n" + String.format("%.2f", subject.getIncome()))
-                    .resizeLine(0, (width > 16.0) ? 0.3 : 0.2)
+                    .resizeLine(0, (width > 16.0) ? 0.3 : 0.15)
                     .resizeLine(1, 0.3)
                     .resizeLine(2, 0.3)
                     .height(height)
@@ -64,7 +66,7 @@ public class BannerUtil {
                     .red(0)
                     .green(0)
                     .blue(0)
-                    .opacity(0.62)
+                    .opacity(0.47)
                     .build();
             subject.getBannerUUIDs().add(banner.getUuid());
             Banners.add(banner);
@@ -76,6 +78,7 @@ public class BannerUtil {
         for (UUID uuid : subject.getBannerUUIDs()) {
             Banners.hide(subject.getOwner().getPlayer(), uuid);
             Banners.remove(uuid);
+            MultiChatUtil.sendMessage(subject.getOwner().getPlayer(), ChatType.SYSTEM, "убрали");
         }
         subject.getBannerUUIDs().clear();
     }

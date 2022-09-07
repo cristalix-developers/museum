@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import museum.fragment.Fragment;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.player.User;
 import museum.util.StandHelper;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
@@ -86,7 +88,7 @@ public class Boer implements Fragment {
 
     public void view(User user, Location location) {
         if (isStanding()) {
-            user.sendMessage(Formatting.error("У вас уже стоит этот бур!"));
+            MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, Formatting.error("У вас уже стоит этот бур!"));
             return;
         }
         val player = user.getPlayer();
@@ -181,7 +183,7 @@ public class Boer implements Fragment {
             getStands().clear();
         if (player != null && player.isOnline()) {
             player.getInventory().addItem(item);
-            player.sendMessage(Formatting.fine("Ваш бур прекратил работу."));
+            MultiChatUtil.sendMessage(player, ChatType.SYSTEM, Formatting.fine("Ваш бур прекратил работу."));
         }
         return this;
     }

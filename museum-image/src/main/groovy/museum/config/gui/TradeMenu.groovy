@@ -5,6 +5,8 @@ import clepto.bukkit.menu.Guis
 import museum.client_conversation.AnimationUtil
 import museum.fragment.Gem
 import museum.international.Market
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import museum.player.User
 import museum.util.MessageUtil
 import org.bukkit.Material
@@ -101,7 +103,7 @@ Guis.register 'trade', { player ->
 
             if (victim.money <= cost) {
                 owner.getInventory().addItem(gem.getItem())
-                owner.sendMessage(Formatting.error("У оппонента недостаточно средств."))
+                MultiChatUtil.sendMessage(owner.player, ChatType.SYSTEM, Formatting.error("У оппонента недостаточно средств."))
                 AnimationUtil.buyFailure(victim)
                 return null
             }
@@ -121,8 +123,8 @@ Guis.register 'trade', { player ->
 
             def message = Formatting.fine("Сделка совершена.")
 
-            owner.sendMessage(message)
-            victim.sendMessage(message)
+            MultiChatUtil.sendMessage(owner.player, ChatType.SYSTEM, sendMessage(message))
+            MultiChatUtil.sendMessage(victim.player, ChatType.SYSTEM, message)
         }
     }
 }

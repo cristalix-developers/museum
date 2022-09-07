@@ -104,6 +104,7 @@ public class SkeletonSubject extends Subject {
     public void setSkeleton(Skeleton skeleton) {
         this.skeleton = skeleton;
         updateInfo();
+        BannerUtil.updateBanners(this);
     }
 
 }

@@ -8,6 +8,8 @@ import lombok.val;
 import me.func.mod.Anime;
 import museum.App;
 import museum.fragment.GemType;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.player.User;
 import museum.player.prepare.BeforePacketHandler;
 import museum.player.prepare.PreparePlayerBrain;
@@ -70,7 +72,7 @@ public class CrystalExcavations implements International {
 		inventory.setItem(8, BeforePacketHandler.EMERGENCY_STOP);
 
 		user.sendTitle("§7Прибытие!\n\n\n§bударяйте камни");
-		user.sendMessage(
+		MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM,
 				"⟼  §6§l" + actual.getLocation(),
 				"",
 				"    §bУдаряйте камни §fв земле.",

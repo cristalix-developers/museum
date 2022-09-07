@@ -15,6 +15,7 @@ import museum.client.ClientSocket;
 import museum.client_conversation.AnimationUtil;
 import museum.data.BoosterInfo;
 import museum.data.UserInfo;
+import museum.multi_chat.MultiChatUtil;
 import museum.packages.*;
 import museum.player.prepare.*;
 import museum.prototype.Managers;
@@ -176,6 +177,7 @@ public class PlayerDataManager implements Listener {
         B.postpone(5, () -> {
             prepares.forEach(prepare -> prepare.execute(user, app));
             Anime.hideIndicator(player, Indicators.ARMOR, Indicators.EXP, Indicators.HEALTH, Indicators.HUNGER);
+            MultiChatUtil.sendChats(player);
         });
 
         UserInfo userInfo = user.getInfo();

@@ -2,6 +2,8 @@
 package museum.config.command.admin
 
 import museum.App
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import museum.museum.subject.SkeletonSubject
 import org.bukkit.Bukkit
 import ru.cristalix.core.formatting.Formatting
@@ -16,6 +18,6 @@ registerCommand 'clearsubjects' handle {
                     it.skeleton = null
                     it.updateInfo()
                 }
-        player.sendMessage(Formatting.fine("Успешно!"))
+        MultiChatUtil.sendMessage(player, ChatType.SYSTEM, Formatting.fine("Успешно!"))
     }
 }

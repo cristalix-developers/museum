@@ -2,6 +2,8 @@
 package museum.config.command
 
 import museum.App
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import museum.museum.Museum
 import museum.util.SubjectLogoUtil
 import ru.cristalix.core.formatting.Formatting
@@ -15,7 +17,7 @@ registerCommand 'remove' handle {
         if (subject) {
             user.getInventory().setItemInHand(null)
             user.subjects.remove(subject)
-            user.sendMessage(Formatting.fine("Постройка успешно удалена."))
+            MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, Formatting.fine("Постройка успешно удалена."))
         }
     }
 }

@@ -14,6 +14,8 @@ import museum.boosters.BoosterType;
 import museum.excavation.Excavation;
 import museum.fragment.Relic;
 import museum.international.International;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
 import museum.museum.subject.Subject;
@@ -205,7 +207,7 @@ public class BeforePacketHandler implements Prepare {
 		App.app.getUsers().stream()
 				.filter(User::isDebug)
 				.filter(it -> it.getPlayer().getChunk().equals(user.getPlayer().getChunk()))
-				.forEach(it -> it.sendMessage(Formatting.fine(user.getPlayer().getName() + " сломал блок на " + packet.a.toString())));
+				.forEach(it -> MultiChatUtil.sendMessage(it.getPlayer(), ChatType.SYSTEM, Formatting.fine(user.getPlayer().getName() + " сломал блок на " + packet.a.toString())));
 
 		// С некоторым шансом может выпасть интерактивая вещь
 		if (Vector.random.nextFloat() > .9)

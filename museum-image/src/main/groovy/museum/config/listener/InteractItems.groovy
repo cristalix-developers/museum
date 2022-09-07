@@ -6,6 +6,8 @@ import museum.cosmos.Cosmos
 import museum.cosmos.boer.Boer
 import museum.excavation.Excavation
 import museum.international.International
+import museum.multi_chat.ChatType
+import museum.multi_chat.MultiChatUtil
 import museum.museum.Museum
 import museum.util.TreasureUtil
 import org.bukkit.Bukkit
@@ -144,7 +146,7 @@ on PlayerInteractEvent, {
                 if (user.relics.values().stream()
                         .filter { it instanceof Boer }
                         .filter { (it as Boer).isStanding() }.count() >= MAX_BOER_COUNT) {
-                    player.sendMessage Formatting.error('Вы не можете установить ещё один бур.')
+                    MultiChatUtil.sendMessage(player, ChatType.SYSTEM, Formatting.error('Вы не можете установить ещё один бур.'))
                     return
                 }
                 currentRelic.view(user, clickedBlock.location.clone().add(0.0D, 1.0D, 0.0D))
@@ -166,7 +168,7 @@ on PlayerInteractAtEntityEvent, {
         def boer = UUID.fromString(clickedEntity.getMetadata('boer')[0].asString())
 
         if (player.uniqueId != owner.uniqueId) {
-            player.sendMessage(Formatting.error('Этот бур не принадлежит вам.'))
+            MultiChatUtil.sendMessage(player, ChatType.SYSTEM, Formatting.error('Этот бур не принадлежит вам.'))
             return
         }
 
