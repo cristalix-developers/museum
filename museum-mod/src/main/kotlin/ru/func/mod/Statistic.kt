@@ -27,13 +27,6 @@ object Statistic {
             content = ""
         }
 
-        val coinPrice = text {
-            offset = V3(-3.0, -34.0)
-            origin = BOTTOM_RIGHT
-            shadow = true
-            content = ""
-        }
-
         val hitCount = text {
             offset = V3(-3.0, -44.0)
             origin = BOTTOM_RIGHT
@@ -42,12 +35,19 @@ object Statistic {
             enabled = false
         }
 
+        val income = text {
+            offset = V3(-3.0, -34.0)
+            origin = BOTTOM_RIGHT
+            shadow = true
+            content = ""
+        }
+
         val box = rectangle {
             align = BOTTOM_RIGHT
             origin = BOTTOM_RIGHT
             +balanceText
             +online
-            +coinPrice
+            +income
             +hitCount
         }
 
@@ -57,7 +57,7 @@ object Statistic {
             when (channel) {
                 "museum:balance" -> balanceText.content = "Баланс §a${NetUtil.readUtf8(data)}"
                 "museum:online" -> online.content = "Онлайн §b${data.readInt()}"
-                "museum:coinprice" -> coinPrice.content = "Цена монеты §e${NetUtil.readUtf8(data)}"
+                "museum:income" -> income.content = "Доход в секунду §e${NetUtil.readUtf8(data)}"
                 "museum:hitcount" -> {
                     val hit = data.readInt()
                     if (hit > 0) {

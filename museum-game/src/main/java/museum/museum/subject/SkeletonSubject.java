@@ -84,6 +84,7 @@ public class SkeletonSubject extends Subject {
         if (owner.getState() instanceof Museum)
             ((Museum) owner.getState()).updateIncrease();
         BannerUtil.updateBanners(this);
+        owner.updateIncome();
     }
 
     @Override
@@ -105,6 +106,7 @@ public class SkeletonSubject extends Subject {
         this.skeleton = skeleton;
         updateInfo();
         BannerUtil.updateBanners(this);
+        this.getOwner().updateIncome();
     }
 
 }

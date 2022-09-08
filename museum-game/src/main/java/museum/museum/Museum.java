@@ -33,6 +33,7 @@ import ru.cristalix.core.util.UtilV3;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static museum.museum.subject.Allocation.Action.*;
@@ -235,9 +236,11 @@ public class Museum extends Storable<MuseumInfo, MuseumPrototype> implements Sta
 	public boolean addSubject(Subject subject, Location location) {
 		Allocation allocation = Allocation.allocate(this, subject.getCachedInfo().getColor(), subject.getPrototype(), location);
 		subject.setAllocation(allocation);
-		if (subject instanceof RelicShowcaseSubject || subject instanceof SkeletonSubject || subject instanceof CollectorSubject) {
+		if (subject instanceof RelicShowcaseSubject || subject instanceof SkeletonSubject ||
+				subject instanceof CollectorSubject || subject instanceof FountainSubject) {
 			BannerUtil.createBanners(subject);
 		}
+		subject.getOwner().updateIncome();
 		return allocation != null;
 	}
 

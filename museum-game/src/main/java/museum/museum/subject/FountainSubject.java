@@ -39,6 +39,11 @@ public class FountainSubject extends Subject {
 	}
 
 	@Override
+	public double getIncome() {
+		return ((Museum) getAllocation().getState()).getIncome()*0.05;
+	}
+
+	@Override
 	public void setAllocation(Allocation allocation) {
 		super.setAllocation(allocation);
 		if (cachedInfo == null || cachedInfo.location == null || prototype == null || allocation == null)

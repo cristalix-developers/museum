@@ -69,6 +69,7 @@ public class RelicShowcaseSubject extends Subject {
 			return;
 		((Museum) owner.getState()).updateIncrease();
 		BannerUtil.updateBanners(this);
+		owner.updateIncome();
 	}
 
 	public void rotate() {

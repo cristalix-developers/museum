@@ -115,7 +115,8 @@ Guis.register 'manipulator', { player ->
                 user.relics.put(subjectRelic.uuid, subjectRelic)
                 subject.updateFragment()
                 ((Museum) user.state).updateIncrease()
-                BannerUtil.updateBanners(subject);
+                BannerUtil.updateBanners(subject)
+                user.updateIncome()
                 MessageUtil.find 'relic-tacked' send user
             }
         }
@@ -128,6 +129,7 @@ Guis.register 'manipulator', { player ->
             if (!allocation) return
             allocation.perform PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES, DESTROY_DISPLAYABLE
             BannerUtil.deleteBanners(abstractSubject)
+            abstractSubject.owner.updateIncome()
             abstractSubject.allocation = null
 
             inventory.addItem SubjectLogoUtil.encodeSubjectToItemStack(abstractSubject)
@@ -156,6 +158,7 @@ Guis.register 'manipulator', { player ->
         if (!allocation) return
         allocation.perform PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES, DESTROY_DISPLAYABLE
         BannerUtil.deleteBanners(abstractSubject)
+        abstractSubject.owner.updateIncome()
         abstractSubject.allocation = null
 
         inventory.addItem SubjectLogoUtil.encodeSubjectToItemStack(abstractSubject)
@@ -252,6 +255,7 @@ Guis.register 'manipulator', { player ->
                         MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
                         Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
                         BannerUtil.updateBanners(subject)
+                        user.updateIncome()
                     } else {
                         MessageUtil.find('nomoney').send(user)
                         closeInventory()

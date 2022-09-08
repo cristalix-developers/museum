@@ -272,8 +272,10 @@ public class User implements PlayerWrapper {
 
 	public void updateIncome() {
 		setIncome(0);
-		for (Museum museum : getMuseums())
+		for (Museum museum : getMuseums()) {
+			museum.updateIncrease();
 			setIncome(getIncome() + museum.getIncome());
+		}
 		AnimationUtil.updateIncome(this);
 	}
 

@@ -50,7 +50,7 @@ public class AnimationUtil {
 	public static void updateIncome(User user) {
 		new ModTransfer()
 				.string(new DecimalFormat("#00.0").format(user.getIncome()))
-				.send("museum:coinprice", user.handle());
+				.send("museum:income", user.handle());
 	}
 
 	public static void updateCosmoCrystal(User user) {

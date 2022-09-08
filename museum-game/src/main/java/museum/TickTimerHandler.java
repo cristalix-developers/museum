@@ -77,6 +77,10 @@ public class TickTimerHandler extends BukkitRunnable {
 			if (subject instanceof Incomeble && now % 20 == 0) // else добавлять не нужно
 				((Incomeble) subject).handle(now);
 		}
+		if (counter.get() % 20 == 0) {
+			user.giveMoney(user.getIncome());
+			System.out.println(user.getIncome());
+		}
 		// Если монеты устарели, что бы не копились на клиенте, удаляю
 		museum.getCoins().removeIf(coin -> {
 			if (coin.getTimestamp() + Coin.SECONDS_LIVE * 1000 < currentTime) {

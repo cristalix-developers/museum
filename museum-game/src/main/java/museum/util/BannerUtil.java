@@ -5,9 +5,6 @@ import lombok.var;
 import me.func.mod.Banners;
 import me.func.protocol.element.Banner;
 import me.func.protocol.element.MotionType;
-import museum.multi_chat.ChatType;
-import museum.multi_chat.MultiChatUtil;
-import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import org.bukkit.Location;
@@ -78,7 +75,6 @@ public class BannerUtil {
         for (UUID uuid : subject.getBannerUUIDs()) {
             Banners.hide(subject.getOwner().getPlayer(), uuid);
             Banners.remove(uuid);
-            MultiChatUtil.sendMessage(subject.getOwner().getPlayer(), ChatType.SYSTEM, "убрали");
         }
         subject.getBannerUUIDs().clear();
     }
