@@ -182,6 +182,8 @@ public class PlayerDataManager implements Listener {
             BannerUtil.showBanners(player);
         });
 
+        player.performCommand("rp");
+
         UserInfo userInfo = user.getInfo();
         if (!userInfo.isApprovedResourcepack()) {
             B.postpone(100, () -> {
