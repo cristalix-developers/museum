@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.val;
 import me.func.mod.Anime;
 import me.func.mod.Npc;
-import me.func.mod.selection.Confirmation;
+import me.func.mod.menu.confirmation.Confirmation;
 import me.func.protocol.Indicators;
 import museum.App;
 import museum.boosters.BoosterType;

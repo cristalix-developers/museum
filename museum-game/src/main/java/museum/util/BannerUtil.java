@@ -6,6 +6,7 @@ import me.func.mod.Banners;
 import me.func.protocol.element.Banner;
 import me.func.protocol.element.MotionType;
 import museum.App;
+import museum.museum.subject.CollectorSubject;
 import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import org.bukkit.Location;
@@ -45,7 +46,7 @@ public class BannerUtil {
             }
             val height = 16;
             var width = 16;
-            if (subject instanceof SkeletonSubject) {
+            if (subject instanceof SkeletonSubject || subject instanceof CollectorSubject) {
                 width = 48;
             }
             val banner = new Banner.Builder()

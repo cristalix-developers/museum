@@ -5,10 +5,10 @@ import clepto.bukkit.item.ItemBuilder;
 import lombok.val;
 import me.func.mod.Anime;
 import me.func.mod.Glow;
-import me.func.mod.selection.Button;
-import me.func.mod.selection.Choicer;
-import me.func.mod.selection.Confirmation;
-import me.func.mod.selection.Selection;
+import me.func.mod.menu.ReactiveButton;
+import me.func.mod.menu.choicer.Choicer;
+import me.func.mod.menu.confirmation.Confirmation;
+import me.func.mod.menu.selection.Selection;
 import me.func.protocol.GlowColor;
 import museum.App;
 import museum.client_conversation.AnimationUtil;
@@ -19,6 +19,7 @@ import museum.cosmos.boer.BoerType;
 import museum.data.MuseumInfo;
 import museum.data.PickaxeType;
 import museum.data.SubjectInfo;
+import museum.donate.DonateType;
 import museum.excavation.Excavation;
 import museum.excavation.ExcavationPrototype;
 import museum.fragment.Fragment;
@@ -107,56 +108,56 @@ public class MuseumCommands {
                 6,
                 2
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§6Монет:§f " + MessageUtil.toMoneyFormat(user.getMoney()))
                 .texture("minecraft:mcpatcher/cit/others/hub/coin3.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§6Доход:§f " + MessageUtil.toMoneyFormat(user.getIncome()))
                 .texture("minecraft:mcpatcher/cit/others/hub/iconpack/donate.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§bУровень:§f " + user.getLevel())
                 .texture("minecraft:mcpatcher/cit/others/hub/guild_lvl.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§cОпыт:§f " + MessageUtil.toCrystalFormat(user.getExperience()))
                 .texture("minecraft:mcpatcher/cit/others/pets1.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§bКирка:§f " + getPickaxeColor(user.getPickaxeType()) + user.getPickaxeType().getName())
                 .texture("minecraft:mcpatcher/cit/weapons/other/60.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§bРаскопок:§f " + user.getExcavationCount())
                 .texture("minecraft:mcpatcher/cit/others/blocks.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§bНазвание музея:§f " + museumInfo.title)
                 .texture("minecraft:mcpatcher/cit/others/hub/guild_bank.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§bКоспической руды:§f " + MessageUtil.toCrystalFormat(user.getCosmoCrystal()))
                 .texture("minecraft:mcpatcher/cit/others/anvil.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§bПосещений музея:§f " + museumInfo.views)
                 .texture("minecraft:mcpatcher/cit/others/villager.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§bСоздан:§f " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date(museumInfo.creationDate.getTime())))
                 .texture("minecraft:mcpatcher/cit/others/hub/iconpack/calendar2.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§bФрагментов:§f " + user.getSkeletons().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum())
                 .texture("minecraft:mcpatcher/cit/others/hub/achievements_many.png")
         );
-        info.add(new Button()
+        info.add(new ReactiveButton()
                 .title("§bПодобрано монет:§f " + user.getPickedCoinsCount())
                 .texture("minecraft:mcpatcher/cit/others/hub/coin2.png")
         );
 
-        info.setVault("donate");
+        info.setVault("\uE03F");
         info.open(player);
         return null;
     }
@@ -177,7 +178,7 @@ public class MuseumCommands {
         for (String placeName : user.getClaimedPlaces()) {
             PlacesMechanic.Place place = PlacesMechanic.getPlaceByTitle(placeName);
 
-            Button btn = new Button()
+            ReactiveButton btn = new ReactiveButton()
                     .item(claimedPlaceItem)
                     .title(place.getTitle())
                     .description("§6" + place.getClaimedExp() + " опыта");
@@ -193,6 +194,8 @@ public class MuseumCommands {
         val user = App.getApp().getUser(player);
         val userMoney = user.getMoney();
 
+        if (app.getUsers().size() < 2) return null;
+
         val menu = new Selection(
                 "Посещение других музеев",
                 "Монет " + MessageUtil.toMoneyFormat(userMoney),
@@ -200,6 +203,7 @@ public class MuseumCommands {
                 5,
                 2
         );
+        menu.setVault("\uE03F");
 
         for (User userOnServer : app.getUsers()) {
             if (userOnServer != user) {
@@ -207,13 +211,13 @@ public class MuseumCommands {
                 val userMuseumCost = userOnServer.getIncome() / 2;
                 val canVisit = userMoney >= userMuseumCost;
 
-                Button btn = new Button()
+                ReactiveButton btn = new ReactiveButton()
                         .item(userSkull)
                         .price((long) userMuseumCost)
                         .title(userOnServer.getName() +
                                 " §fФрагментов: " + userOnServer.getSkeletons().stream().mapToInt(s -> s.getUnlockedFragments().size()).sum())
                         .hint(canVisit ? "Посетить" : "")
-                        .onClick((clickUser, button, index) -> {
+                        .onClick((clickUser, ReactiveButton, index) -> {
                             if (canVisit) {
                                 user.performCommand("travel " + userOnServer.getName());
                                 Anime.close(player);
@@ -235,22 +239,22 @@ public class MuseumCommands {
                 "Префиксы",
                 "Монет " + MessageUtil.toMoneyFormat(user.getMoney()),
                 "",
-                3,
+                5,
                 3
         );
-        menu.setVault("dollar");
+        menu.setVault("\uE03F");
 
         for (PrefixType prefixType : PrefixType.values()) {
             val prefixRarity = prefixType.getRare();
             val prefixHasBonus = !Objects.equals(prefixType.getBonus(), "");
             val playerHasThisPrefix = user.getPrefixes().contains(prefixType.getPrefix());
 
-            Button btn = new Button()
-                    .material(prefixRarity == 3 ? Material.EMERALD : prefixRarity == 2 ? Material.GOLD_INGOT : Material.IRON_INGOT)
-                    .title(prefixHasBonus ? prefixType.getPrefix() + " " + prefixType.getTitle() : prefixType.getPrefix())
+            ReactiveButton btn = new ReactiveButton()
+                    .texture("core_font_mod:textures/standard/e_" + (prefixType.getPrefix().charAt(0) - 13312) + ".png")
+                    .title(prefixType.getTitle())
                     .description(prefixHasBonus ? prefixType.getBonus() : "\n" + prefixType.getTitle())
                     .hint(playerHasThisPrefix ? "Поставить" : "")
-                    .onClick((clickUser, index, button) -> {
+                    .onClick((clickUser, index, ReactiveButton) -> {
                         if (playerHasThisPrefix) {
                             user.setPrefix(prefixType.getPrefix());
                             Anime.close(player);
@@ -288,23 +292,23 @@ public class MuseumCommands {
                             "",
                             2,
                             3,
-                            new Button()
+                            new ReactiveButton()
                                     .texture("minecraft:mcpatcher/cit/others/badges/info1.png")
                                     .title("Уведомления")
                                     .description("\n" + (boer.isNotification() ? "§cВыключить" : "§aВключить") + " §fуведомления от бура!")
                                     .hint("ℹ")
-                                    .onClick((clickUser, index, button) -> {
+                                    .onClick((clickUser, index, ReactiveButton) -> {
                                         boer.setNotification(!boer.isNotification());
                                         Anime.close(player);
                                     }),
-                            new Button()
+                            new ReactiveButton()
                                     .texture("minecraft:mcpatcher/cit/others/badges/upgrade.png")
                                     .title("Улучшить бур")
                                     .description(nextBoer != null
                                             ? "Подробнее"
                                             : "Данный бур §cмаксимального§b уровня, поздравляем!")
                                     .hint(nextBoer != null ? "Улучшить" : "")
-                                    .onClick((clickUser, index, button) -> {
+                                    .onClick((clickUser, index, ReactiveButton) -> {
                                         if (nextBoer != null) {
                                             val new_menu = new Selection(
                                                     "Улучшение бура",
@@ -312,14 +316,14 @@ public class MuseumCommands {
                                                     "Улучшить",
                                                     1,
                                                     1,
-                                                    new Button()
+                                                    new ReactiveButton()
                                                             .texture("minecraft:mcpatcher/cit/others/badges/upgrade.png")
                                                             .title("Улучшение")
                                                             .description("\n§b" + boer.getType().getAddress() + "§f ➠ §c" + nextBoer.getAddress() +
                                                                     "\nСледующий бур работает §b" + nextBoer.getTime() / 3600 +
                                                                     " часа§f и приносит §b1 опыт §fи §b1 кристалл§f\nкаждые §l§b" + nextBoer.getSpeed() + " §fсекунд.\n\n" +
                                                                     "Стоимость: §e" + MessageUtil.toMoneyFormat(nextBoer.getPrice()) + "§f и " + "§b10.000§f Коспической руды")
-                                                            .onClick((clickUserFromNewMenu, indexFromNewMenu, buttonFromNewMenu) -> {
+                                                            .onClick((clickUserFromNewMenu, indexFromNewMenu, ReactiveButtonFromNewMenu) -> {
                                                                 User museumUser = app.getUser(clickUserFromNewMenu);
 
                                                                 if (checkNotEnoughMoney(museumUser, (long) nextBoer.getPrice())) {
@@ -341,21 +345,21 @@ public class MuseumCommands {
                                                                 Anime.close(player);
                                                             })
                                             );
-                                            new_menu.setVault("dollar");
+                                            new_menu.setVault("");
                                             new_menu.open(player);
                                         }
                                     }),
-                            new Button()
+                            new ReactiveButton()
                                     .texture("minecraft:mcpatcher/cit/others/badges/remove.png")
                                     .title("Убрать бур")
                                     .description("\nСпрятать бур к вам в инвентарь.")
                                     .hint("❌")
-                                    .onClick((clickUser, index, button) -> {
+                                    .onClick((clickUser, index, ReactiveButton) -> {
                                         boer.boerRemove();
                                         Anime.close(player);
                                     })
                     );
-                    menu.setVault("dollar");
+                    menu.setVault("");
                     B.postpone(1, () -> menu.open(player));
                 }
             }
@@ -386,14 +390,14 @@ public class MuseumCommands {
                 "",
                 1,
                 1,
-                new Button()
+                new ReactiveButton()
                         .texture("minecraft:mcpatcher/cit/others/hub/iconpack/win2.png")
                         .hint(maxCountOfBoers ? "" : "Купить")
                         .title("&bКосмический бур")
                         .description("\n\nДанный бур работает §b1 час§f и приносит §b1 опыт §fи §b1 кристалл§f\nкаждые §l§b" +
                                 BoerType.STANDARD.getSpeed() + " §fсекунд.\n\nУ вас есть: " + countOfBoers + " из 6-ти буров.\n\n" +
                                 "Стоимость: §e" + MessageUtil.toMoneyFormat(10000000) + "§f и " + "§b10.000§f Коспической руды")
-                        .onClick((clickUser, index, button) -> {
+                        .onClick((clickUser, index, ReactiveButton) -> {
                             if (!finalMaxCountOfBoers) {
                                 if (user.getMoney() > 10000000 && user.getCosmoCrystal() > 10000) {
                                     user.giveMoney(-10000000);
@@ -412,7 +416,7 @@ public class MuseumCommands {
                             }
                         })
         );
-        menu.setVault("dollar");
+        menu.setVault("");
         B.postpone(1, () -> menu.open(player));
         return null;
     }
@@ -427,15 +431,17 @@ public class MuseumCommands {
                 4,
                 2
         );
+        menu.setVault("\uE03F");
+        menu.setMoney(MessageUtil.toMoneyFormat(museumUser.getMoney()));
 
         val excavations = Managers.excavation.stream().sorted(Comparator.comparing(ExcavationPrototype::getPrice)).collect(Collectors.toList());
 
         for (ExcavationPrototype exc : excavations) {
-            Button btnMapUnlocked = new Button()
+            ReactiveButton btnMapUnlocked = new ReactiveButton()
                     .item(exc.getIcon())
                     .title(exc.getTitle())
-                    .description("Цена отправления: " + MessageUtil.toMoneyFormat(exc.getPrice()))
-                    .onClick((clickUser, index, button) -> {
+                    .price((long)Math.ceil(exc.getPrice()))
+                    .onClick((clickUser, index, ReactiveButton) -> {
                         if (museumUser.getMoney() > exc.getPrice()) {
                             clickUser.performCommand("excavation " + exc.getAddress());
                         } else {
@@ -443,7 +449,7 @@ public class MuseumCommands {
                         }
                     });
 
-            Button btnMapLocked = new Button()
+            ReactiveButton btnMapLocked = new ReactiveButton()
                     .texture("minecraft:mcpatcher/cit/others/lock.png")
                     .title("§cЗакрыто")
                     .description("§7Необходимый уровень: " + exc.getRequiredLevel())
@@ -477,36 +483,36 @@ public class MuseumCommands {
         Choicer menu = new Choicer(
                 "Экспедиции",
                 "Выбирайте куда отправиться!",
-                new Button()
+                new ReactiveButton()
                         .material(Material.NETHER_STAR)
                         .title("Рынок")
                         .description("Обменивайтесь\n §cдрагоценными\n§cкамнями§f с другими\n игроками!")
                         .hint("Путешествие")
-                        .onClick((clickUser, index, button) -> {
+                        .onClick((clickUser, index, ReactiveButton) -> {
                             clickUser.performCommand("shop poly");
                             Anime.close(player);
                         }),
-                new Button()
+                new ReactiveButton()
                         .texture("minecraft:mcpatcher/cit/others/blocks.png")
                         .title("Раскопки")
                         .description("Познавайте\n различные дыры!")
                         .hint("Путешествие")
-                        .onClick((clickUser, index, button) -> clickUser.performCommand("excavationsecondmenu")),
-                new Button()
+                        .onClick((clickUser, index, ReactiveButton) -> clickUser.performCommand("excavationsecondmenu")),
+                new ReactiveButton()
                         .item(dailyGem)
                         .title("§b" + dailyCave.getDayTag() + "§f " + dailyCave.getLocation())
                         .description("Там добываются\n" + dailyCave.getTitle())
                         .hint("Путешествие")
-                        .onClick((clickUser, index, button) -> {
+                        .onClick((clickUser, index, ReactiveButton) -> {
                             App.app.getUser(clickUser).setState(App.app.getCrystal());
                             Anime.close(player);
                         }),
-                new Button()
+                new ReactiveButton()
                         .item(ItemUtil.cosmoCrystal())
                         .title("Космос")
                         .description("Вы когда нибудь\n хотели побывать\n в космосе?")
                         .hint("Путешествие")
-                        .onClick((clickUser, index, button) -> {
+                        .onClick((clickUser, index, ReactiveButton) -> {
                             Anime.close(player);
                             player.teleport(Cosmos.ROCKET);
                         })
@@ -543,13 +549,13 @@ public class MuseumCommands {
                 "",
                 1,
                 1,
-                new Button()
+                new ReactiveButton()
                         .texture("minecraft:textures/items/fishing_rod_uncast.png")
                         .price(cost)
                         .hint(user.getHookLevel() == 4 ? "" : "Улучшить")
                         .title(user.getHookLevel() == 4 ? "§fУ вас крюк §bмаксимального §fуровня" : "§fКрюк УР. §b" + user.getHookLevel())
                         .description("")
-                        .onClick((clickPlayer, index, button) -> {
+                        .onClick((clickPlayer, index, ReactiveButton) -> {
                             if (user.getHookLevel() != 4) {
                                 val clickUser = App.getApp().getUser(clickPlayer);
 
@@ -570,7 +576,7 @@ public class MuseumCommands {
                             }
                         })
         );
-        menu.setVault("dollar");
+        menu.setVault("\uE03F");
         menu.open(player);
         return null;
     }
@@ -603,13 +609,13 @@ public class MuseumCommands {
                 "",
                 3,
                 3,
-                new Button()
+                new ReactiveButton()
                         .item(PreparePlayerBrain.getPickaxeImage(userPickaxeType))
                         .price(finalPickaxeUpgradeTypeCost)
                         .hint(userHaveLastPickaxe ? "" : "Улучшить")
                         .title("§fУ вас:")
                         .description(getPickaxeColor(userPickaxeType) + userPickaxeType.getName() + " §fкирка.")
-                        .onClick((clickPlayer, index, button) -> {
+                        .onClick((clickPlayer, index, ReactiveButton) -> {
                             if (!userHaveLastPickaxe) {
                                 val clickUser = App.getApp().getUser(clickPlayer);
 
@@ -630,20 +636,20 @@ public class MuseumCommands {
                             }
                         })
         );
-        menu.setVault("dollar");
+        menu.setVault("\uE03F");
         int indexOfElement = 0;
         for (PickaxeUpgrade pickaxeUpgrade : PickaxeUpgrade.values()) {
             int finalIndexOfElement = indexOfElement;
             int currentLevelOfUpgrade = (int) (pickaxeUpgrade.convert(user) / pickaxeUpgrade.getStep());
             boolean userHaveMaxLevelOfUpgrade = currentLevelOfUpgrade == pickaxeUpgrade.getMaxLevel();
 
-            Button btn = new Button()
+            ReactiveButton btn = new ReactiveButton()
                     .texture("minecraft:mcpatcher/cit/museum/wood_pickaxe_upgrade.png")
                     .price(userHaveMaxLevelOfUpgrade ? -1 : pickaxeUpgrade.getCost())
                     .hint(userHaveMaxLevelOfUpgrade ? "" : "Улучшить")
                     .title(pickaxeUpgrade.getTitle())
                     .description("\n" + currentLevelOfUpgrade + "/" + pickaxeUpgrade.getMaxLevel())
-                    .onClick((clickPlayer, index, button) -> {
+                    .onClick((clickPlayer, index, ReactiveButton) -> {
                         if (!userHaveMaxLevelOfUpgrade) {
                             val clickUser = App.getApp().getUser(clickPlayer);
                             if (pickaxeUpgrade.getMaxLevel() < 10) {
@@ -676,38 +682,38 @@ public class MuseumCommands {
                 "",
                 2,
                 2,
-                new Button()
+                new ReactiveButton()
                         .texture("minecraft:mcpatcher/cit/museum/wood_pickaxe_upgrade.png")
                         .price(pickaxeUpgrade.getCost())
                         .hint("Улучшить")
                         .title(pickaxeUpgrade.getTitle())
                         .description("\nКупить §a1§f улучшение!")
-                        .onClick((clickPlayer, index, button) -> {
+                        .onClick((clickPlayer, index, ReactiveButton) -> {
                             val clickUser = App.getApp().getUser(clickPlayer);
                             upgradePickaxeImprovement(clickUser, clickPlayer, pickaxeUpgrade);
                         }),
-                new Button()
+                new ReactiveButton()
                         .texture("minecraft:mcpatcher/cit/museum/wood_pickaxe_upgrade.png")
                         .price(pickaxeUpgrade.getCost() * 10L)
                         .hint("Улучшить")
                         .title(pickaxeUpgrade.getTitle())
                         .description("Купить сразу §a10§f улучшений!")
-                        .onClick((clickPlayer, index, button) -> {
+                        .onClick((clickPlayer, index, ReactiveButton) -> {
                             val clickUser = App.getApp().getUser(clickPlayer);
                             multiplyUpgradePickaxeImprovement(clickUser, clickPlayer, pickaxeUpgrade, 10L);
                         }),
-                new Button()
+                new ReactiveButton()
                         .texture("minecraft:mcpatcher/cit/museum/wood_pickaxe_upgrade.png")
                         .price(pickaxeUpgrade.getCost() * (long) countOfMaxUpgrades)
                         .hint("Улучшить")
                         .title(pickaxeUpgrade.getTitle())
                         .description("Купить §aвсё§f, что вы можете себе позволить!\n\n§cВнимание§f, вы §cприобретаете §a" + countOfMaxUpgrades + "§f улучшений!")
-                        .onClick((clickPlayer, index, button) -> {
+                        .onClick((clickPlayer, index, ReactiveButton) -> {
                             val clickUser = App.getApp().getUser(clickPlayer);
                             multiplyUpgradePickaxeImprovement(clickUser, clickPlayer, pickaxeUpgrade, (long) countOfMaxUpgrades);
                         })
         );
-        menu.setVault("dollar");
+        menu.setVault("\uE03F");
         menu.open(player);
         return null;
     }
@@ -786,16 +792,16 @@ public class MuseumCommands {
                 "Открыть",
                 2,
                 2,
-                new Button()
+                new ReactiveButton()
                         .texture("minecraft:textures/items/gold_pickaxe.png")
                         .title("§bКирки")
                         .description("Приобретите новую кирку и разгадайте тайны песка...")
-                        .onClick((click, index, button) -> click.performCommand("upgradepickaxe")),
-                new Button()
+                        .onClick((click, index, ReactiveButton) -> click.performCommand("upgradepickaxe")),
+                new ReactiveButton()
                         .texture("minecraft:textures/items/fishing_rod_uncast.png")
                         .title("§bКрюк")
                         .description("Улучшайте крюк, чтобы быстрее получать опыт на реке международных раскопок Коспической руды.")
-                        .onClick((click, index, button) -> click.performCommand("upgraderod"))
+                        .onClick((click, index, ReactiveButton) -> click.performCommand("upgraderod"))
         );
         menu.open(player);
         return null;
@@ -813,7 +819,7 @@ public class MuseumCommands {
                 "Полировать",
                 1,
                 1,
-                new Button()
+                new ReactiveButton()
                         .texture("minecraft:mcpatcher/cit/others/anvil.png")
                         .title("§bЮвелир")
                         .description("§7Вы можете поменять\n" +
@@ -821,7 +827,7 @@ public class MuseumCommands {
                                 "§7камня (от 0 до 110%).\n" +
                                 "§cШанс потерять камень " + (int) (CHANCE * 100) + "%\n" +
                                 "§eСтоимость услуги " + MessageUtil.toMoneyFormat(PRICE)
-                        ).onClick((click, index, button) -> {
+                        ).onClick((click, index, ReactiveButton) -> {
                             User clickUser = App.getApp().getUser(click);
                             ItemStack itemInHand = click.getItemInHand();
                             NBTTagCompound tag = CraftItemStack.asNMSCopy(itemInHand).tag;
@@ -846,7 +852,7 @@ public class MuseumCommands {
                                 AnimationUtil.buyFailure(clickUser);
                         })
         );
-        menu.setVault("dollar");
+        menu.setVault("\uE03F");
         B.postpone(1, () -> menu.open(player));
         return null;
     }
@@ -862,56 +868,56 @@ public class MuseumCommands {
                 "Открыть",
                 2,
                 2,
-                new Button()
+                new ReactiveButton()
                         .material(Material.END_CRYSTAL)
-                        .price(49)
+                        .price(DonateType.PREFIX_CASE.getPrice())
                         .sale(SALE_PREFIX_LOOTBOX)
                         .title("§aСлучайный префикс")
                         .description("Такой префикс уже был?\n" +
                                 "§eВы получите §6§l50,000$\n\n" +
                                 "Каждое §dпятое §fоткрытие §dгарантирует §6редкий §fили\n" +
                                 "§dэпичный §fпрефикс.")
-                        .onClick((click, index, button) -> {
-                            Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aСлучайный префикс", "за &b" + (49 - (49 * SALE_PREFIX_LOOTBOX / 100)) + " кристаллика(ов)"),
+                        .onClick((click, index, ReactiveButton) -> {
+                            Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aСлучайный префикс", "за &b" + (DonateType.PREFIX_CASE.getPrice() - (DonateType.PREFIX_CASE.getPrice() * SALE_PREFIX_LOOTBOX / 100)) + " кристаллика(ов)"),
                                     clickPlayer -> clickPlayer.performCommand("proccessdonate PREFIX_CASE"));
                             menuConfirm.open(click);
                         }),
-                new Button()
+                new ReactiveButton()
                         .material(Material.CHEST)
-                        .price(39)
+                        .price(DonateType.METEORITES.getPrice())
                         .sale(SALE_LOOTBOX)
                         .title("Случайная посылка")
                         .description("Вы §dгарантированно §fполучите случайный метеорит c доходом от 15$ до 100$")
-                        .onClick((click, index, button) -> {
+                        .onClick((click, index, ReactiveButton) -> {
                             Confirmation menuConfirm = new Confirmation(Collections.singletonList("Купить §aслучайный " +
-                                    "метеорит \nc доходом от 15$ до 100$,\n за &b" + (39 - (39 * SALE_LOOTBOX / 100)) +  "кристаллика(ов)"),
+                                    "метеорит \nc доходом от 15$ до 100$,\n за &b" + (DonateType.METEORITES.getPrice() - (DonateType.METEORITES.getPrice() * SALE_LOOTBOX / 100)) +  "кристаллика(ов)"),
                                     clickPlayer -> clickPlayer.performCommand("proccessdonate METEORITES"));
                             menuConfirm.open(click);
                         }),
-                new Button()
+                new ReactiveButton()
                         .texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
-                        .price(49)
+                        .price(DonateType.BONES.getPrice())
                         .sale(SALE_LOOTBOX)
                         .title("Случайная посылка")
                         .description("Вы §dгарантированно §fполучите случайную кость")
-                        .onClick((click, index, button) -> {
-                            Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aСлучайную кость", "за &b" + (49 - (49 * SALE_LOOTBOX / 100)) + " кристаллика(ов)"),
+                        .onClick((click, index, ReactiveButton) -> {
+                            Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aСлучайную кость", "за &b" + (DonateType.BONES.getPrice() - (DonateType.BONES.getPrice() * SALE_LOOTBOX / 100)) + " кристаллика(ов)"),
                                     clickPlayer -> clickPlayer.performCommand("proccessdonate BONES"));
                             menuConfirm.open(click);
                         }),
-                new Button()
+                new ReactiveButton()
                         .material(Material.ENDER_CHEST)
-                        .price(99)
+                        .price(DonateType.MULTI_BOX.getPrice())
                         .sale(SALE_LOOTBOX)
-                        .title("Случайная посылка")
+                        .title("Легендарная посылка")
                         .description("Вы §dс шансом 10% §fполучите §bЛегендарную кирку")
-                        .onClick((click, index, button) -> {
-                            Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aШанс 10% \nполучить Легендарную кирку", "за &b" + (99 - (99 * SALE_LOOTBOX / 100)) + " кристаллика(ов)"),
+                        .onClick((click, index, ReactiveButton) -> {
+                            Confirmation menuConfirm = new Confirmation(Arrays.asList("Купить §aШанс 10% \nполучить Легендарную кирку", "за &b" + (DonateType.MULTI_BOX.getPrice() - (DonateType.MULTI_BOX.getPrice() * SALE_LOOTBOX / 100)) + " кристаллика(ов)"),
                                     clickPlayer -> clickPlayer.performCommand("proccessdonate MULTI_BOX"));
                             menuConfirm.open(click);
                         })
         );
-        menu.setVault("donate");
+        menu.setVault("\uE03D");
         B.postpone(1, () -> menu.open(player));
         return null;
     }
@@ -927,7 +933,7 @@ public class MuseumCommands {
                 "",
                 2,
                 2,
-                new Button()
+                new ReactiveButton()
                         .material(Material.END_CRYSTAL)
                         .price(10000000)
                         .hint(userHaveEnoughMoney ? "Открыть" : "")
@@ -936,27 +942,27 @@ public class MuseumCommands {
                                 "§eВы получите §6§l50,000$\n\n" +
                                 "Каждое §dпятое §fоткрытие §dгарантирует §6редкий §fили\n" +
                                 "§dэпичный §fпрефикс.")
-                        .onClick((clickPlayer, index, button) -> {
+                        .onClick((clickPlayer, index, ReactiveButton) -> {
                             if (userHaveEnoughMoney) {
                                 Anime.close(clickPlayer);
                                 clickPlayer.performCommand("prefixbox");
                             }
                         }),
-                new Button()
+                new ReactiveButton()
                         .material(Material.ENDER_CHEST)
                         .price(10000000)
                         .hint(userHaveEnoughMoney ? "Открыть" : "")
                         .title("Случайная посылка")
                         .description("Вы §dгарантированно §fполучите случайный драгоценный камень 60%-100% качества и " +
                                 "метеорит c доходом от 15$ до 100$")
-                        .onClick((clickPlayer, index, button) -> {
+                        .onClick((clickPlayer, index, ReactiveButton) -> {
                             if (userHaveEnoughMoney) {
                                 Anime.close(clickPlayer);
                                 clickPlayer.performCommand("lootboxopen");
                             }
                         })
         );
-        menu.setVault("dollar");
+        menu.setVault("\uE03F");
         B.postpone(1, () -> {
             menu.open(player);
         });
@@ -981,14 +987,16 @@ public class MuseumCommands {
                 "Открыть",
                 3,
                 2,
-                new Button()
+                new ReactiveButton()
                         .item(icon1)
                         .title("Донатные лутбоксы")
-                        .onClick((click, index, button) -> click.performCommand("donatelootbox")),
-                new Button()
+                        .description("Тут выпадают §bлегендарная кирка§f,", "префиксы, метеориты, кости")
+                        .onClick((click, index, ReactiveButton) -> click.performCommand("donatelootbox")),
+                new ReactiveButton()
                         .item(icon2)
-                        .title("Лутбоксы")
-                        .onClick((click, index, button) -> click.performCommand("lootbox"))
+                        .title("Обычные лутбоксы")
+                        .description("Тут выпадают префиксы,", "драгоценные камни")
+                        .onClick((click, index, ReactiveButton) -> click.performCommand("lootbox"))
         );
         B.postpone(1, () -> {
             if (args.length > 0) {
@@ -1000,62 +1008,62 @@ public class MuseumCommands {
         return null;
     }
 
-    private final List<Button> menuButtons = new ArrayList<>(Arrays.asList(
-            new Button()
+    private final List<ReactiveButton> menuReactiveButtons = new ArrayList<>(Arrays.asList(
+            new ReactiveButton()
                     .texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
                     .title("Лутбоксы")
                     .description("Купите шанс получить топовые предметы")
-                    .onClick((click, index, button) -> click.performCommand("lootboxmenu")),
-            new Button()
+                    .onClick((click, index, ReactiveButton) -> click.performCommand("lootboxmenu")),
+            new ReactiveButton()
                     .item(Items.builder().type(Material.GOLDEN_CARROT).enchantment(Enchantment.LUCK, 1).build())
                     .title("§bДонат")
                     .description("Различные плюшки")
-                    .onClick((click, index, button) -> click.performCommand("donate")),
-            new Button()
+                    .onClick((click, index, ReactiveButton) -> click.performCommand("donate")),
+            new ReactiveButton()
                     .texture("minecraft:textures/items/end_crystal.png")
                     .title("Префиксы")
                     .description("Символ перед ником, некоторые дают особые способности")
-                    .onClick((click, index, button) -> click.performCommand("prefixes")),
-            new Button()
+                    .onClick((click, index, ReactiveButton) -> click.performCommand("prefixes")),
+            new ReactiveButton()
                     .texture("minecraft:textures/items/gold_pickaxe.png")
                     .title("Инструменты")
                     .description("Улучшайте ваше снаряжение")
-                    .onClick((click, index, button) -> click.performCommand("tools")),
-            new Button()
+                    .onClick((click, index, ReactiveButton) -> click.performCommand("tools")),
+            new ReactiveButton()
                     .texture("minecraft:textures/items/compass_00.png")
                     .title("Экспедиции")
                     .description("Исследования! Реликвии! Метеориты! Останки динозавров!")
-                    .onClick((click, index, button) -> click.performCommand("excavationmenu")),
-            new Button()
+                    .onClick((click, index, ReactiveButton) -> click.performCommand("excavationmenu")),
+            new ReactiveButton()
                     .texture("minecraft:mcpatcher/cit/others/hub/guild_shop.png")
                     .title("Магазин")
                     .description("Отправляйтесь за новыми постройками")
-                    .onClick((click, index, button) -> click.performCommand("shop")),
-            new Button()
+                    .onClick((click, index, ReactiveButton) -> click.performCommand("shop")),
+            new ReactiveButton()
                     .material(Material.ENDER_PEARL)
                     .title("День / Ночь")
                     .description("Меняйте режим так, как будет приятно вашим глазам")
-                    .onClick((click, index, button) -> {
+                    .onClick((click, index, ReactiveButton) -> {
                         val user = App.getApp().getUser(click);
                         user.getPlayer().setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, true);
                         user.getInfo().setDarkTheme(!user.getInfo().isDarkTheme());
                         Anime.close(click);
                     }),
-            new Button()
+            new ReactiveButton()
                     .texture("minecraft:textures/items/minecart_chest.png")
                     .title("Заказать товар §e500$")
                     .description("Заберите товар у фуры и продавайте его в лавке")
-                    .onClick((click, index, button) -> click.performCommand("wagonbuy")),
-            new Button()
+                    .onClick((click, index, ReactiveButton) -> click.performCommand("wagonbuy")),
+            new ReactiveButton()
                     .texture("minecraft:textures/items/book_writable.png")
                     .title("Пригласить друга")
                     .description("Нажмите и введите никнейм приглашенного друга")
-                    .onClick((click, index, button) -> click.performCommand("invite")),
-            new Button()
+                    .onClick((click, index, ReactiveButton) -> click.performCommand("invite")),
+            new ReactiveButton()
                     .texture("minecraft:textures/items/sign.png")
                     .title("Переименовать музей")
                     .description("Изменить название вашего музея")
-                    .onClick((click, index, button) -> click.performCommand("changetitle"))
+                    .onClick((click, index, ReactiveButton) -> click.performCommand("changetitle"))
     ));
 
     private String cmdMenu(Player player, String[] args) {
@@ -1066,119 +1074,119 @@ public class MuseumCommands {
                 "Открыть",
                 3,
                 3,
-                new Button()
+                new ReactiveButton()
         );
-        menu.setStorage(menuButtons);
+        menu.setStorage(menuReactiveButtons);
         menu.open(player);
         return null;
     }
 
     private static final int DONATE_SALE = 25;
-    private final List<Button> donateButtons = new ArrayList<>(Arrays.asList(
-            new Button()
+    private final List<ReactiveButton> donateReactiveButtons = new ArrayList<>(Arrays.asList(
+            new ReactiveButton()
                     .texture("minecraft:mcpatcher/cit/others/hub/coin2.png")
                     .price(149)
                     .title("§aРеклама музея")
                     .description("Если вы §aпродаете или покупаете §fдрагоценный камень, то комиссия " +
                             "§aисчезнет§f, поэтому вы не теряете денег на переводах валюты.")
-                    .onClick((click, index, button) -> {
+                    .onClick((click, index, ReactiveButton) -> {
                         Confirmation menu = new Confirmation(Arrays.asList("Купить §aРекламу музея", "за &b 149 кристаллика(ов)"),
                                 player -> player.performCommand("proccessdonate MUSEUM_ADVERTISEMENT"));
                         menu.open(click);
                     }),
-            new Button()
+            new ReactiveButton()
                     .texture("minecraft:mcpatcher/cit/others/hub/coin2.png")
                     .price(119)
                     .title("§6Комиссия 0%")
                     .description("Если вы §aпродаете или покупаете §fдрагоценный камень, то комиссия " +
                             "§aисчезнет§f, поэтому вы не теряете денег на переводах валюты.")
-                    .onClick((click, index, button) -> {
+                    .onClick((click, index, ReactiveButton) -> {
                         Confirmation menu = new Confirmation(Arrays.asList("Купить §6Комиссия 0%", "за &b" + (119 - (119 * DONATE_SALE / 100)) + " кристаллика(ов)"),
                                 player -> player.performCommand("proccessdonate PRIVILEGES"));
                         menu.open(click);
                     })
                     .sale(DONATE_SALE),
-            new Button()
+            new ReactiveButton()
                     .item(PreparePlayerBrain.getPickaxeImage(PickaxeType.LEGENDARY))
                     .price(349)
                     .title("§b§lЛегендарная кирка")
                     .description("Особая кирка!\n\n" +
                             "Приносит §b2 опыта за вскапывание §fи добывает §bбольше §fвсех других!" +
                             "\n\n§cНе остается §fпосле вайпа")
-                    .onClick((click, index, button) -> {
+                    .onClick((click, index, ReactiveButton) -> {
                         Confirmation menu = new Confirmation(Arrays.asList("Купить §b§lЛегендарная кирка", "за &b" + (349 - (349 * DONATE_SALE / 100)) + " кристаллика(ов)"),
                                 player -> player.performCommand("proccessdonate LEGENDARY_PICKAXE"));
                         menu.open(click);
                     })
                     .sale(DONATE_SALE),
-            new Button()
+            new ReactiveButton()
                     .material(Material.OBSERVER)
                     .price(249)
                     .title("§6Стим-панк сборщик монет")
                     .description("Быстрее всех§f!\n\n" +
                             "Собирает самые дальние монеты -§b лучший выбор среди коллекторов." +
                             "\n\n§cНе остается §fпосле вайпа")
-                    .onClick((click, index, button) -> {
+                    .onClick((click, index, ReactiveButton) -> {
                         Confirmation menu = new Confirmation(Arrays.asList("Купить §6Стим-панк сборщик монет", "за &b" + (249 - (249 * DONATE_SALE / 100)) + " кристаллика(ов)"),
                                 player -> player.performCommand("proccessdonate STEAM_PUNK_COLLECTOR"));
                         menu.open(click);
                     })
                     .sale(DONATE_SALE),
-            new Button()
+            new ReactiveButton()
                     .material(Material.EXP_BOTTLE)
                     .price(149)
                     .title("§bБустер опыта §6§lx2")
                     .description("Общий бустер на §b1 час§f.\n\n" +
                             "Все получат в §lДВА§f раза больше опыта!")
-                    .onClick((click, index, button) -> {
+                    .onClick((click, index, ReactiveButton) -> {
                         Confirmation menu = new Confirmation(Arrays.asList("Купить §bБустер опыта §6§lx2", "за &b" + (149 - (149 * DONATE_SALE / 100)) + " кристаллика(ов)"),
                                 player -> player.performCommand("proccessdonate GLOBAL_EXP_BOOSTER"));
                         menu.open(click);
                     })
                     .sale(DONATE_SALE),
-            new Button()
+            new ReactiveButton()
                     .texture("minecraft:mcpatcher/cit/others/hub/iconpack/win2.png")
                     .price(79)
                     .title("§aБустер бура §6§lx2")
                     .description("Общий бустер на §b1 час§f.\n\n" +
                             "Бур работает в §lДВА§f раза быстрее у всех!")
-                    .onClick((click, index, button) -> {
+                    .onClick((click, index, ReactiveButton) -> {
                         Confirmation menu = new Confirmation(Arrays.asList("Купить §bБустер опыта §6§lx2", "за &b" + (79 - (79 * DONATE_SALE / 100)) + " кристаллика(ов)"),
                                 player -> player.performCommand("proccessdonate BOER"));
                         menu.open(click);
                     })
                     .sale(DONATE_SALE),
-            new Button()
+            new ReactiveButton()
                     .texture("minecraft:mcpatcher/cit/others/hub/iconpack/win2.png")
                     .price(199)
                     .title("§aБустер бура §6§lx5")
                     .description("Общий бустер на §b1 час§f.\n\n" +
                             "Бур работает в §a§lПЯТЬ§f раз быстрее у всех!")
-                    .onClick((click, index, button) -> {
+                    .onClick((click, index, ReactiveButton) -> {
                         Confirmation menu = new Confirmation(Arrays.asList("Купить §bБустер опыта §6§lx5", "за &b" + (199 - (199 * DONATE_SALE / 100)) + " кристаллика(ов)"),
                                 player -> player.performCommand("proccessdonate BIG_BOER"));
                         menu.open(click);
                     })
                     .sale(DONATE_SALE),
-            new Button()
+            new ReactiveButton()
                     .texture("minecraft:mcpatcher/cit/others/villager.png")
                     .price(149)
                     .title("§aБустер посетителей §6§lx3")
                     .description("Общий бустер на §b1 час§f.\n\n" +
                             "У всех в §lТРИ§f раза больше посетителей и §e§lмонет§f!")
-                    .onClick((click, index, button) -> {
+                    .onClick((click, index, ReactiveButton) -> {
                         Confirmation menu = new Confirmation(Arrays.asList("Купить §aБустер посетителей §6§lx3", "за &b" + (149 - (149 * DONATE_SALE / 100)) + " кристаллика(ов)"),
                                 player -> player.performCommand("proccessdonate GLOBAL_VILLAGER_BOOSTER"));
                         menu.open(click);
                     })
                     .sale(DONATE_SALE),
-            new Button()
+            new ReactiveButton()
                     .material(Material.GOLDEN_APPLE)
                     .price(199)
                     .title("§eБустер денег §6§lx2")
                     .description("Общий бустер на §b1 час§f.\n\n" +
                             "Все получат в §lДВА§f раза больше денег!")
-                    .onClick((click, index, button) -> {
+                    .onClick((click, index, ReactiveButton) -> {
                         Confirmation menu = new Confirmation(Arrays.asList("Купить §eБустер денег §6§lx2", "за &b" + (199 - (199 * DONATE_SALE / 100)) + " кристаллика(ов)"),
                                 player -> player.performCommand("proccessdonate GLOBAL_MONEY_BOOSTER"));
                         menu.open(click);
@@ -1194,10 +1202,10 @@ public class MuseumCommands {
                 "Купить",
                 2,
                 2,
-                new Button()
+                new ReactiveButton()
         );
-        menu.setVault("donate");
-        menu.setStorage(donateButtons);
+        menu.setVault("\uE03D");
+        menu.setStorage(donateReactiveButtons);
         menu.open(player);
         return null;
     }
