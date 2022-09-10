@@ -3,7 +3,6 @@ package museum.player.prepare;
 import clepto.bukkit.B;
 import clepto.bukkit.Cycle;
 import clepto.bukkit.item.Items;
-import clepto.bukkit.menu.Guis;
 import implario.ListUtils;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -18,7 +17,9 @@ import museum.multi_chat.ChatType;
 import museum.multi_chat.MultiChatUtil;
 import museum.museum.Museum;
 import museum.museum.subject.Allocation;
+import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
+import museum.museum.subject.SubjectGui;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.V4;
@@ -139,7 +140,9 @@ public class BeforePacketHandler implements Prepare {
 						MessageUtil.find("non-root").send(user);
 					else {
 						subject.acceptClick();
-						Guis.open(user.getPlayer(), "manipulator", subject.getCachedInfo().getUuid());
+						//Guis.open(user.getPlayer(), "manipulator", subject.getCachedInfo().getUuid());
+						if (subject instanceof SkeletonSubject) SubjectGui.showSketelonGui(user, (SkeletonSubject)subject);
+						else SubjectGui.showSimpleGui(user.getPlayer(), subject);
 					}
 					break;
 				}
