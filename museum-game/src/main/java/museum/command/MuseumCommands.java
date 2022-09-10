@@ -35,6 +35,7 @@ import museum.player.User;
 import museum.player.pickaxe.PickaxeUpgrade;
 import museum.player.prepare.PreparePlayerBrain;
 import museum.prototype.Managers;
+import museum.util.BannerUtil;
 import museum.util.ItemUtil;
 import museum.util.MessageUtil;
 import museum.util.VirtualSign;
@@ -79,6 +80,7 @@ public class MuseumCommands {
         B.regCommand(this::cmdPolishing, "polishing");
         B.regCommand(this::cmdDonateLootBox, "donatelootbox");
         B.regCommand(this::cmdLootBox, "lootbox");
+        B.regCommand(this::cmdLootBoxMenu, "lootboxmenu");
         B.regCommand(this::cmdMenu, "menu");
         B.regCommand(this::cmdDonate, "donate");
 
@@ -464,8 +466,10 @@ public class MuseumCommands {
 
     private String cmdExcavationMenu(Player player, String[] args) {
         if (args.length > 0) {
-            if (Objects.equals(args[0], "npc"))
+            if (args[0].equals("npc")) {
                 player.performCommand("excavationsecondmenu npc");
+                return null;
+            }
         }
         GemType dailyCave = GemType.getActualGem();
         val dailyGem = new Gem(dailyCave.name() + ':' + 1.0 + ":10000").getItem();
@@ -954,8 +958,41 @@ public class MuseumCommands {
         );
         menu.setVault("dollar");
         B.postpone(1, () -> {
+            menu.open(player);
+        });
+        return null;
+    }
+
+    private String cmdLootBoxMenu(Player player, String[] args) {
+        val icon1 = new ItemBuilder()
+                .item(Material.CLAY_BALL)
+                .nbt("other", "new_lvl_rare_close")
+                .enchant(Enchantment.LUCK, 1)
+                .build()
+                .asBukkitMirror();
+        val icon2 = new ItemBuilder()
+                .item(Material.CLAY_BALL)
+                .nbt("other", "new_lvl_rare_close")
+                .build()
+                .asBukkitMirror();
+        val menu = new Selection(
+                "Лутбоксы",
+                "",
+                "Открыть",
+                3,
+                2,
+                new Button()
+                        .item(icon1)
+                        .title("Донатные лутбоксы")
+                        .onClick((click, index, button) -> click.performCommand("donatelootbox")),
+                new Button()
+                        .item(icon2)
+                        .title("Лутбоксы")
+                        .onClick((click, index, button) -> click.performCommand("lootbox"))
+        );
+        B.postpone(1, () -> {
             if (args.length > 0) {
-                if (args[0] == "npc")
+                if (args[0].equals("npc"))
                     Anime.close(player);
             }
             menu.open(player);
@@ -965,25 +1002,20 @@ public class MuseumCommands {
 
     private final List<Button> menuButtons = new ArrayList<>(Arrays.asList(
             new Button()
-                    .texture("minecraft:textures/items/sign.png")
-                    .title("Переименовать музей")
-                    .description("Изменить название вашего музея")
-                    .onClick((click, index, button) -> click.performCommand("changetitle")),
+                    .texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
+                    .title("Лутбоксы")
+                    .description("Купите шанс получить топовые предметы")
+                    .onClick((click, index, button) -> click.performCommand("lootboxmenu")),
+            new Button()
+                    .item(Items.builder().type(Material.GOLDEN_CARROT).enchantment(Enchantment.LUCK, 1).build())
+                    .title("§bДонат")
+                    .description("Различные плюшки")
+                    .onClick((click, index, button) -> click.performCommand("donate")),
             new Button()
                     .texture("minecraft:textures/items/end_crystal.png")
                     .title("Префиксы")
                     .description("Символ перед ником, некоторые дают особые способности")
                     .onClick((click, index, button) -> click.performCommand("prefixes")),
-            new Button()
-                    .material(Material.ENDER_PEARL)
-                    .title("День / Ночь")
-                    .description("Меняйте режим так, как будет приятно вашим глазам")
-                    .onClick((click, index, button) -> {
-                        val user = App.getApp().getUser(click);
-                        user.getPlayer().setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, true);
-                        user.getInfo().setDarkTheme(!user.getInfo().isDarkTheme());
-                        Anime.close(click);
-                    }),
             new Button()
                     .texture("minecraft:textures/items/gold_pickaxe.png")
                     .title("Инструменты")
@@ -1000,10 +1032,15 @@ public class MuseumCommands {
                     .description("Отправляйтесь за новыми постройками")
                     .onClick((click, index, button) -> click.performCommand("shop")),
             new Button()
-                    .item(Items.builder().type(Material.GOLDEN_CARROT).enchantment(Enchantment.LUCK, 1).build())
-                    .title("§bДонат")
-                    .description("Различные плюшки")
-                    .onClick((click, index, button) -> click.performCommand("donate")),
+                    .material(Material.ENDER_PEARL)
+                    .title("День / Ночь")
+                    .description("Меняйте режим так, как будет приятно вашим глазам")
+                    .onClick((click, index, button) -> {
+                        val user = App.getApp().getUser(click);
+                        user.getPlayer().setPlayerTime(user.getInfo().isDarkTheme() ? 12000 : 21000, true);
+                        user.getInfo().setDarkTheme(!user.getInfo().isDarkTheme());
+                        Anime.close(click);
+                    }),
             new Button()
                     .texture("minecraft:textures/items/minecart_chest.png")
                     .title("Заказать товар §e500$")
@@ -1015,15 +1052,10 @@ public class MuseumCommands {
                     .description("Нажмите и введите никнейм приглашенного друга")
                     .onClick((click, index, button) -> click.performCommand("invite")),
             new Button()
-                    .texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
-                    .title("Донатные лутбоксы")
-                    .description("Купите шанс получить топовые предметы")
-                    .onClick((click, index, button) -> click.performCommand("donatelootbox")),
-            new Button()
-                    .texture("minecraft:mcpatcher/cit/others/hub/new_lvl_rare_close.png")
-                    .title("Лутбоксы")
-                    .description("Купите шанс получить топовые предметы")
-                    .onClick((click, index, button) -> click.performCommand("lootbox"))
+                    .texture("minecraft:textures/items/sign.png")
+                    .title("Переименовать музей")
+                    .description("Изменить название вашего музея")
+                    .onClick((click, index, button) -> click.performCommand("changetitle"))
     ));
 
     private String cmdMenu(Player player, String[] args) {
@@ -1259,7 +1291,8 @@ public class MuseumCommands {
                     "§bВы посетили музей игрока " + owner.getDisplayName(),
                     2.0);
 
-            Anime.killboardMessage(owner.getPlayer(), "§bВаш музей посетили, вы получили &6" + museum.getIncome() / 2 + "$");
+            Anime.killboardMessage(owner.getPlayer(), "§bВаш музей посетили, вы получили §6" + String.format("%.2f", museum.getIncome() / 2) + "$");
+            BannerUtil.hideBanners(visitor.getPlayer());
         }
         return null;
     }
@@ -1392,6 +1425,7 @@ public class MuseumCommands {
             return MessageUtil.get("already-at-home");
 
         user.setState(user.getLastMuseum());
+        BannerUtil.showBanners(sender);
         return MessageUtil.get("welcome-home");
     }
 

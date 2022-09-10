@@ -189,7 +189,8 @@ register 'punk-collector', {
 }
 
 register 'back', {
-    item SADDLE
+    item CLAY_BALL
+    nbt.other = "cancel"
     text """
         &bВернуться
 
@@ -212,7 +213,8 @@ register 'buy-floor', {
 }
 
 register 'menu', {
-    item PAPER
+    item CLAY_BALL
+    nbt.other = "quest_month"
     text """
         §6Меню §f§lПКМ
     
@@ -224,13 +226,14 @@ register 'menu', {
 }
 
 register 'visitor-menu', {
-    item WOOD_DOOR
+    item CLAY_BALL
+    nbt.other = "search"
     text '§6Посмотреть музеи §f§lПКМ'
 }
 
 register 'place-menu', {
     item CLAY_BALL
-    nbt.other = 'achievements_lock'
+    nbt.other = 'achievements_many_lock'
     text '§bГде я был? §f§lПКМ'
 }
 

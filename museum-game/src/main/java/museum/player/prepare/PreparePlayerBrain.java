@@ -8,6 +8,7 @@ import implario.ListUtils;
 import lombok.Getter;
 import lombok.val;
 import me.func.mod.Anime;
+import me.func.mod.conversation.ModTransfer;
 import museum.App;
 import museum.content.DailyRewardManager;
 import museum.content.WeekRewards;
@@ -102,6 +103,11 @@ public class PreparePlayerBrain implements Prepare {
             }
             return;
         }
+
+        new ModTransfer()
+                .string("Привет, добро пожаловать на музей!")
+                .string("Понятно")
+                .send("museum:tutorial");
 
         /*Cycle.run(5 * 20, titles.size(), iteration -> {
             if (!player.isOnline()) {

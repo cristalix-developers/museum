@@ -1,5 +1,6 @@
 package museum.util;
 
+import clepto.bukkit.item.ItemBuilder;
 import lombok.val;
 import museum.player.User;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
@@ -23,12 +24,12 @@ public class ItemUtil {
     }
 
     public static ItemStack getPlayerSkull(User user) {
-        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
-        SkullMeta meta = (SkullMeta) skull.getItemMeta();
-        meta.setPlayerProfile(Bukkit.getPlayer(user.getName()).getPlayerProfile());
-        meta.setDisplayName("§bПерсонализация §f§lПКМ");
-        skull.setItemMeta(meta);
-        return skull;
+        return new ItemBuilder()
+                .item(Material.CLAY_BALL)
+                .text("§bПерсонализация §f§lПКМ")
+                .nbt("other", "stats")
+                .build()
+                .asBukkitMirror();
     }
 
     public static ItemStack getAgreeItem() {

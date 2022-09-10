@@ -23,24 +23,6 @@ import static org.bukkit.Material.*
 import static org.bukkit.event.block.Action.LEFT_CLICK_BLOCK
 import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK
 
-on PAPER use {
-    player.performCommand('menu')
-}
-
-on WOOD_DOOR use {
-    player.performCommand 'museums'
-}
-
-on SADDLE use {
-    if (app.getUser(player).state instanceof International)
-        return
-    player.performCommand 'home'
-}
-
-on SKULL_ITEM use {
-    player.performCommand 'playerstats'
-}
-
 register 'sugar-treasure', {
     item SUGAR
     nbt.cost = 120

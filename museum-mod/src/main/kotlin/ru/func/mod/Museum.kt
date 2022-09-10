@@ -38,6 +38,7 @@ class Museum : KotlinMod() {
         Statistic
         TradingTime
         CrystalBar
+        Tutorial
 
         val minecraft = clientApi.minecraft()
 

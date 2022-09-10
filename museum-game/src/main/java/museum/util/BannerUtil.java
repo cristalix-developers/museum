@@ -5,10 +5,12 @@ import lombok.var;
 import me.func.mod.Banners;
 import me.func.protocol.element.Banner;
 import me.func.protocol.element.MotionType;
+import museum.App;
 import museum.museum.subject.SkeletonSubject;
 import museum.museum.subject.Subject;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -66,7 +68,6 @@ public class BannerUtil {
                     .opacity(0.47)
                     .build();
             subject.getBannerUUIDs().add(banner.getUuid());
-            Banners.add(banner);
             Banners.show(subject.getOwner().getPlayer(), banner);
         }
     }
@@ -82,5 +83,20 @@ public class BannerUtil {
     public static void updateBanners(Subject subject) {
         deleteBanners(subject);
         createBanners(subject);
+    }
+
+    public static void showBanners(Player player) {
+        for (val s : App.getApp().getUser(player).getSubjects()) {
+            if (s.getAllocation() != null)
+                BannerUtil.updateBanners(s);
+        }
+    }
+
+    public static void hideBanners(Player player) {
+        for (val s : App.getApp().getUser(player).getSubjects()) {
+            if (s.getAllocation() != null) {
+                Banners.hide(player, s.getBannerUUIDs().toArray(new UUID[0]));
+            }
+        }
     }
 }

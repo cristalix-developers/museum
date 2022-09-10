@@ -19,6 +19,7 @@ import museum.multi_chat.MultiChatUtil;
 import museum.packages.*;
 import museum.player.prepare.*;
 import museum.prototype.Managers;
+import museum.util.BannerUtil;
 import museum.utils.MultiTimeBar;
 import museum.worker.WorkerUtil;
 import net.minecraft.server.v1_12_R1.PacketPlayOutPlayerInfo;
@@ -178,6 +179,7 @@ public class PlayerDataManager implements Listener {
             prepares.forEach(prepare -> prepare.execute(user, app));
             Anime.hideIndicator(player, Indicators.ARMOR, Indicators.EXP, Indicators.HEALTH, Indicators.HUNGER);
             MultiChatUtil.sendChats(player);
+            BannerUtil.showBanners(player);
         });
 
         UserInfo userInfo = user.getInfo();
