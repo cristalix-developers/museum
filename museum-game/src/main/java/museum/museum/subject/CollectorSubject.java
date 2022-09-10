@@ -3,7 +3,6 @@ package museum.museum.subject;
 import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
 import museum.App;
 import museum.data.SubjectInfo;
 import museum.museum.Museum;
@@ -13,12 +12,11 @@ import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.skeleton.AtomPiece;
 import museum.museum.subject.skeleton.V4;
 import museum.player.User;
-import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.EntityArmorStand;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
 
-public class CollectorSubject extends Subject implements Incomeble {
+public class CollectorSubject extends Subject {
 
 	@Getter
 	private final int id;
@@ -77,18 +75,7 @@ public class CollectorSubject extends Subject implements Incomeble {
 	}
 
 	@Override
-	public void handle(double... args) {
-		if (args[0] % ((speed > 9 ? 40 : 60) * 20L) != 0)
-			return;
-
-		if (owner.getSubjects().stream().filter(subject -> subject.getAllocation() != null && subject instanceof CollectorSubject).count() > 2)
-			return;
-
-		val museumIncome = owner.getLastMuseum().getIncome();
-		val income = 0.7 * Math.random() * museumIncome + museumIncome;
-		MessageUtil.find("collector-income")
-				.set("income", MessageUtil.toMoneyFormat(income))
-				.send(owner);
-		owner.depositMoneyWithBooster(income);
+	public double getIncome() {
+		return Math.pow(2.0, speed - 4) * 175;
 	}
 }

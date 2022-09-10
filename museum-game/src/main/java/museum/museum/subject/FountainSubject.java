@@ -40,7 +40,7 @@ public class FountainSubject extends Subject {
 
 	@Override
 	public double getIncome() {
-		return ((Museum) getAllocation().getState()).getIncome()*0.05;
+		return ((Museum) getAllocation().getState()).getIncome() * 0.05;
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class FountainSubject extends Subject {
 				acceptedSource.getZ() + .5
 		);
 		entity = new EntityFallingBlock(
-				world, spawnLocation.getX(),  spawnLocation.getY(),  spawnLocation.getZ(),
+				world, spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(),
 				Colorizer.applyColor(CraftMagicNumbers.getBlock(icon.getType()).getBlockData(), cachedInfo.getColor())
 		);
 		entity.id = NEG_ID_BOUND;

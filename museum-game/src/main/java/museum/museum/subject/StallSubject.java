@@ -5,12 +5,12 @@ import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import lombok.val;
 import museum.data.SubjectInfo;
+import museum.multi_chat.ChatType;
+import museum.multi_chat.MultiChatUtil;
 import museum.museum.map.SubjectPrototype;
 import museum.museum.subject.product.FoodProduct;
 import museum.player.User;
 import museum.util.MessageUtil;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import ru.cristalix.core.GlobalSerializers;
 
 import java.util.ArrayList;
@@ -61,9 +61,7 @@ public class StallSubject extends Subject implements Incomeble {
 			return;
 		Set<FoodProduct> potentialFood = food.keySet();
 		if (potentialFood.isEmpty()) {
-			TextComponent message = new TextComponent(MessageUtil.get("no-product"));
-			message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/go"));
-			owner.getPlayer().sendMessage(message);
+			MultiChatUtil.sendMessage(owner.getPlayer(), ChatType.SYSTEM, MessageUtil.get("no-product"));
 			return;
 		}
 		int randomFoodIndex = (int) (Math.random() * potentialFood.size());
