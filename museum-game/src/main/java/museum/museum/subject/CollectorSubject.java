@@ -76,6 +76,6 @@ public class CollectorSubject extends Subject {
 
 	@Override
 	public double getIncome() {
-		return speed * 50;
+		return speed * 27;
 	}
 }
