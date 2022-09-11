@@ -6,10 +6,7 @@ import me.func.mod.Banners;
 import me.func.protocol.element.Banner;
 import me.func.protocol.element.MotionType;
 import museum.App;
-import museum.museum.subject.CollectorSubject;
-import museum.museum.subject.RelicShowcaseSubject;
-import museum.museum.subject.SkeletonSubject;
-import museum.museum.subject.Subject;
+import museum.museum.subject.*;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -89,8 +86,11 @@ public class BannerUtil {
 
     public static void showBanners(Player player) {
         for (val s : App.getApp().getUser(player).getSubjects()) {
-            if (s.getAllocation() != null)
-                BannerUtil.updateBanners(s);
+            if (s instanceof RelicShowcaseSubject || s instanceof SkeletonSubject ||
+                s instanceof CollectorSubject || s instanceof FountainSubject) {
+                if (s.getAllocation() != null)
+                    BannerUtil.updateBanners(s);
+            }
         }
     }
 

@@ -10,8 +10,11 @@ import me.func.mod.menu.ReactiveButton;
 import me.func.mod.menu.selection.Selection;
 import me.func.protocol.GlowColor;
 import me.func.protocol.menu.Button;
+import museum.fragment.Fragment;
+import museum.fragment.Meteorite;
 import museum.multi_chat.ChatType;
 import museum.multi_chat.MultiChatUtil;
+import museum.museum.Museum;
 import museum.museum.map.SkeletonSubjectPrototype;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.SkeletonPrototype;
@@ -23,6 +26,7 @@ import museum.util.SubjectLogoUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -49,21 +53,18 @@ public class SubjectGui {
         val player = user.getPlayer();
         Anime.close(player);
 
-        val buttons = new ArrayList<ReactiveButton>();
-        buttons.add(getInformationFragment(subject));
-        buttons.add(getSkeletonsListButton(user, subject));
-        buttons.add(getColorChangeButton(player, subject));
-        buttons.add(getRemoveSubjectButton(player, subject));
-        buttons.add(getUpgradeButton(user, subject));
-
         val menu = new Selection(
                 subject.getPrototype().getTitle(),
                 "",
                 "Открыть",
                 3,
-                3
+                3,
+                getInformationFragment(subject),
+                getSkeletonsListButton(user, subject),
+                getColorChangeButton(player, subject),
+                getRemoveSubjectButton(player, subject),
+                getUpgradeButton(user, subject)
         );
-        menu.setStorage(buttons);
         menu.setVault("\uE03F");
         menu.setMoney(MessageUtil.toMoneyFormat(user.getMoney()));
 
@@ -104,9 +105,51 @@ public class SubjectGui {
         menu.open(player);
     }
 
+    public static void showRelicGui(User user, RelicShowcaseSubject subject) {
+        val player = user.getPlayer();
+        Anime.close(player);
+
+        val buttons = new ArrayList<ReactiveButton>();
+
+        val button = new ReactiveButton();
+        if (subject.getFragment() != null) {
+            val item = subject.getFragment().getItem();
+            StringBuilder description = new StringBuilder();
+            if (item.getLore() != null) for (val it : item.getLore()) description.append(it).append("\n");
+            button.setItem(item);
+            button.setTitle(item.getI18NDisplayName());
+            button.setDescription(description.toString());
+        } else {
+            button.setTexture("minecraft:mcpatcher/cit/others/search.png");
+            button.setTitle("Пусто");
+            button.setDescription("Возьмите в руку реликвию \nи нажмите ПКМ на стенд\nдля её установки");
+        }
+        buttons.add(button);
+
+        if (subject.getFragment() != null) {
+            buttons.add(new ReactiveButton()
+                    .texture("minecraft:mcpatcher/cit/others/badges/cancel.png")
+                    .title("Убрать реликвию")
+                    .hint("Убрать")
+                    .onClick((click, index, __) -> removeRelic(user, subject)));
+        } else {
+            buttons.add(getRemoveSubjectButton(player, subject));
+        }
+
+        val menu = new Selection(
+                subject.getPrototype().getTitle(),
+                "",
+                "Информация",
+                2,
+                2
+        );
+        menu.setStorage(buttons);
+
+        menu.open(player);
+    }
+
     public static void getSkeletonListGui(User user, SkeletonSubject subject) {
         val availableButtons = new ArrayList<ReactiveButton>();
-        val reservedbuttons = new ArrayList<ReactiveButton>();
         val lockedbuttons = new ArrayList<ReactiveButton>();
 
         for (val it : Managers.skeleton.stream().sorted(Comparator.comparing(SkeletonPrototype::getTitle)).toArray()) {
@@ -135,18 +178,14 @@ public class SubjectGui {
             else if (skeleton.getPrototype().getSize() > ((SkeletonSubjectPrototype)subject.getPrototype()).getSize()) {
                 button.setHint("Слишком\nбольшой");
                 button.setHover("Скелет cлишком большой для этого стенда");
-            }
-            else if (placedOn.isPresent() && skeleton == placedOn.get().getSkeleton() && !skeleton.equals(subject.getSkeleton()) ) {
-                button.setHint("Уже\nиспользуется");
-                button.setHover("Уже используется на другом стенде");
-                reservedbuttons.add(button);
-                continue;
-            }
-            else {
+            } else {
                 if (skeleton == subject.getSkeleton()) {
                     button.item(new Items.Builder().type(Material.BONE).build());
                     button.setTitle("§b" + button.getTitle());
                     button.setHint("Убрать");
+                } else if (placedOn.isPresent() && skeleton == placedOn.get().getSkeleton()) {
+                    button.setHint("Уже\nиспользуется");
+                    button.setHover("Уже используется на другом стенде");
                 } else {
                     button.setHint("Поставить");
                 }
@@ -194,7 +233,6 @@ public class SubjectGui {
                 2
         );
 
-        availableButtons.addAll(reservedbuttons);
         availableButtons.addAll(lockedbuttons);
         menu.setStorage(availableButtons);
 
@@ -253,7 +291,8 @@ public class SubjectGui {
         var description = "Доход: " + String.format("%.2f", subject.getIncome());
         if (subject instanceof SkeletonSubject) {
             val skeletonSubject = ((SkeletonSubject)subject);
-            if (skeletonSubject.getSkeleton() != null) description += "\n§b" + skeletonSubject.getSkeleton().getPrototype().getTitle();
+            if (skeletonSubject.getSkeleton() != null && skeletonSubject.getSkeleton().getPrototype() != null)
+                description += "\n§b" + skeletonSubject.getSkeleton().getPrototype().getTitle();
         }
 
         return new ReactiveButton()
@@ -290,9 +329,23 @@ public class SubjectGui {
                 allocation.perform(PLAY_EFFECTS, HIDE_BLOCKS, HIDE_PIECES, DESTROY_DISPLAYABLE);
                 BannerUtil.deleteBanners(subject);
                 subject.setAllocation(null);
+                subject.getOwner().updateIncome();
 
                 player.getInventory().addItem(SubjectLogoUtil.encodeSubjectToItemStack(subject));
                 Anime.close(player);
             });
+    }
+
+    private static void removeRelic(User user, RelicShowcaseSubject subject) {
+        val subjectRelic = subject.getFragment();
+        subject.setFragment(null);
+        user.getInventory().addItem(subjectRelic.getItem());
+        user.getRelics().put(subjectRelic.getUuid(), subjectRelic);
+        subject.updateFragment();
+        ((Museum) user.getState()).updateIncrease();
+        BannerUtil.updateBanners(subject);
+        user.updateIncome();
+        MessageUtil.find("relic-tacked").send(user);
+        Anime.close(user.getPlayer());
     }
 }

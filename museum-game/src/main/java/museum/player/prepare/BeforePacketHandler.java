@@ -16,10 +16,7 @@ import museum.international.International;
 import museum.multi_chat.ChatType;
 import museum.multi_chat.MultiChatUtil;
 import museum.museum.Museum;
-import museum.museum.subject.Allocation;
-import museum.museum.subject.SkeletonSubject;
-import museum.museum.subject.Subject;
-import museum.museum.subject.SubjectGui;
+import museum.museum.subject.*;
 import museum.museum.subject.skeleton.Fragment;
 import museum.museum.subject.skeleton.Skeleton;
 import museum.museum.subject.skeleton.V4;
@@ -142,6 +139,7 @@ public class BeforePacketHandler implements Prepare {
 						subject.acceptClick();
 						//Guis.open(user.getPlayer(), "manipulator", subject.getCachedInfo().getUuid());
 						if (subject instanceof SkeletonSubject) SubjectGui.showSketelonGui(user, (SkeletonSubject)subject);
+						else if (subject instanceof RelicShowcaseSubject) SubjectGui.showRelicGui(user, (RelicShowcaseSubject)subject);
 						else SubjectGui.showSimpleGui(user.getPlayer(), subject);
 					}
 					break;

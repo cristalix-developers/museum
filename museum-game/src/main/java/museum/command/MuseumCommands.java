@@ -1085,17 +1085,6 @@ public class MuseumCommands {
     private final List<ReactiveButton> donateReactiveButtons = new ArrayList<>(Arrays.asList(
             new ReactiveButton()
                     .texture("minecraft:mcpatcher/cit/others/hub/coin2.png")
-                    .price(149)
-                    .title("§aРеклама музея")
-                    .description("Если вы §aпродаете или покупаете §fдрагоценный камень, то комиссия " +
-                            "§aисчезнет§f, поэтому вы не теряете денег на переводах валюты.")
-                    .onClick((click, index, ReactiveButton) -> {
-                        Confirmation menu = new Confirmation(Arrays.asList("Купить §aРекламу музея", "за &b 149 кристаллика(ов)"),
-                                player -> player.performCommand("proccessdonate MUSEUM_ADVERTISEMENT"));
-                        menu.open(click);
-                    }),
-            new ReactiveButton()
-                    .texture("minecraft:mcpatcher/cit/others/hub/coin2.png")
                     .price(119)
                     .title("§6Комиссия 0%")
                     .description("Если вы §aпродаете или покупаете §fдрагоценный камень, то комиссия " +
