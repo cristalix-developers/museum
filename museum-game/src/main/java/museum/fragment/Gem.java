@@ -2,8 +2,8 @@ package museum.fragment;
 
 import lombok.Getter;
 import lombok.val;
-import me.func.mod.data.LootDrop;
-import me.func.protocol.DropRare;
+import me.func.mod.conversation.data.LootDrop;
+import me.func.protocol.data.rare.DropRare;
 import museum.util.MessageUtil;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Material;

@@ -2,14 +2,14 @@ package museum.client_conversation;
 
 import lombok.val;
 import me.func.mod.Anime;
-import me.func.mod.Glow;
 import me.func.mod.conversation.ModTransfer;
-import me.func.protocol.GlowColor;
+import me.func.mod.ui.Glow;
+import me.func.protocol.data.color.GlowColor;
 import museum.player.User;
-import museum.player.prepare.BeforePacketHandler;
 import museum.util.LevelSystem;
 import museum.util.MessageUtil;
 import org.bukkit.Bukkit;
+import museum.player.prepare.BeforePacketHandler;
 import ru.cristalix.core.realm.IRealmService;
 
 import java.text.DecimalFormat;

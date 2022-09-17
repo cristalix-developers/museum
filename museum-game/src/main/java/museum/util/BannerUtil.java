@@ -2,9 +2,9 @@ package museum.util;
 
 import lombok.val;
 import lombok.var;
-import me.func.mod.Banners;
-import me.func.protocol.element.Banner;
-import me.func.protocol.element.MotionType;
+import me.func.mod.world.Banners;
+import me.func.protocol.data.element.Banner;
+import me.func.protocol.data.element.MotionType;
 import museum.App;
 import museum.museum.subject.*;
 import org.bukkit.Location;

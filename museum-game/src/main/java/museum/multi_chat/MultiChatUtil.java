@@ -1,8 +1,8 @@
 package museum.multi_chat;
 
 import lombok.val;
-import me.func.mod.MultiChat;
-import me.func.protocol.ModChat;
+import me.func.mod.ui.MultiChat;
+import me.func.protocol.data.chat.ModChat;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;

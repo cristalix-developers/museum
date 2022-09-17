@@ -2,13 +2,17 @@
 package museum.config.listener
 
 import me.func.mod.Anime
-import me.func.protocol.Marker
+import me.func.mod.conversation.ModTransfer
 import me.func.protocol.MarkerSign
 import museum.util.SubjectLogoUtil
+import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemHeldEvent
+
 import static museum.App.app
 
 on PlayerItemHeldEvent, {
+    def player = getPlayer() as Player
+
     def newSubject = SubjectLogoUtil.decodeItemStackToSubject(app.getUser(player), player.inventory.getItem(newSlot))
     def previousSubject = SubjectLogoUtil.decodeItemStackToSubject(app.getUser(player), player.inventory.getItem(previousSlot))
 
@@ -36,11 +40,19 @@ on PlayerItemHeldEvent, {
                     }
                 }
             }
-
             def markerLocation = location.toCenterLocation()
             markerLocation.setY(location.y + 3)
 
-            if (!found) Anime.marker(player, new Marker(markerLocation.x, markerLocation.y, markerLocation.z, 50, MarkerSign.ARROW_DOWN))
+            if (!found) {
+                new ModTransfer()
+                        .string(UUID.randomUUID().toString())
+                        .putDouble(markerLocation.x)
+                        .putDouble(markerLocation.y)
+                        .putDouble(markerLocation.z)
+                        .putDouble(40)
+                        .string(MarkerSign.ARROW_DOWN.texture)
+                        .send("func:marker-new", player)
+            }
         }
     }
 }

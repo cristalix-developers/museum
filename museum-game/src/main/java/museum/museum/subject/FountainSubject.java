@@ -40,7 +40,7 @@ public class FountainSubject extends Subject {
 
 	@Override
 	public double getIncome() {
-		return ((Museum) getAllocation().getState()).getIncome() * 0.05;
+		return ((Museum) getAllocation().getState()).getIncome() * 0.01;
 	}
 
 	@Override

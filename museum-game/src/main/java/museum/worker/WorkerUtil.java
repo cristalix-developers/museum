@@ -1,24 +1,19 @@
 package museum.worker;
 
-import clepto.bukkit.item.Items;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import lombok.val;
-import me.func.mod.Npc;
-import me.func.mod.data.NpcSmart;
-import me.func.protocol.npc.NpcBehaviour;
-import me.func.protocol.npc.NpcData;
+import me.func.mod.conversation.data.NpcSmart;
+import me.func.mod.world.Npc;
+import me.func.protocol.world.npc.NpcBehaviour;
+import me.func.protocol.world.npc.NpcData;
 import museum.App;
 import museum.cosmos.Cosmos;
-import museum.player.User;
-import museum.player.prepare.PreparePlayerBrain;
 import museum.util.StandHelper;
 import net.minecraft.server.v1_12_R1.EnumItemSlot;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Collections;
 import java.util.UUID;
