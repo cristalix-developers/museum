@@ -574,21 +574,7 @@ public class MuseumCommands {
 		val userHaveLastPickaxe = user.getPickaxeType().equals(PickaxeType.LEGENDARY);
 		val userPickaxeType = user.getPickaxeType();
 
-		long cost = -1;
-		switch (userPickaxeType) {
-			case DEFAULT:
-				cost = 50000;
-				break;
-			case PROFESSIONAL:
-				cost = 3000000;
-				break;
-			case PRESTIGE:
-				cost = 100000000;
-				break;
-			case LEGENDARY:
-				break;
-		}
-		long finalPickaxeUpgradeTypeCost = cost;
+		long cost = userPickaxeType.getPrice();
 
 		val menu = Selection.builder()
 				.title("Улучшения кирки")
@@ -599,7 +585,7 @@ public class MuseumCommands {
 				.storage(
 						new ReactiveButton()
 								.item(PreparePlayerBrain.getPickaxeImage(userPickaxeType))
-								.price(finalPickaxeUpgradeTypeCost)
+								.price(cost)
 								.hint(userHaveLastPickaxe ? "" : "Улучшить")
 								.title("§fУ вас:")
 								.description(getPickaxeColor(userPickaxeType) + userPickaxeType.getName() + " §fкирка.")
@@ -607,11 +593,11 @@ public class MuseumCommands {
 									if (!userHaveLastPickaxe) {
 										val clickUser = App.getApp().getUser(clickPlayer);
 
-										if (checkNotEnoughMoney(clickUser, finalPickaxeUpgradeTypeCost)) {
+										if (checkNotEnoughMoney(clickUser, cost)) {
 											return;
 										}
 
-										clickUser.giveMoney(-finalPickaxeUpgradeTypeCost);
+										clickUser.giveMoney(-cost);
 										clickUser.setPickaxeType(userPickaxeType.getNext());
 										Anime.close(player);
 

@@ -7,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PickaxeType {
 
-	DEFAULT("любительская", 0),
-	PROFESSIONAL("профессиональная", 90000),
-	PRESTIGE("престижная", 8000000),
-	LEGENDARY("легендарная", 200000000);
+	DEFAULT("любительская", 0L),
+	PROFESSIONAL("профессиональная", 100000L),
+	PRESTIGE("престижная", 500000000L),
+	LEGENDARY("легендарная", 10000000000L);
 
 	private final String name;
-	private final double price;
+	private final Long price;
 
 	public PickaxeType getNext() {
 		return ordinal() >= PickaxeType.values().length - 1 ? null : PickaxeType.values()[ordinal() + 1];

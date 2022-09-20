@@ -68,7 +68,7 @@ public class Gem extends LootDrop implements Fragment {
 
 	@Override
 	public int getPrice() {
-		return Math.round(rarity * 106 * type.getMultiplier()) * 100 / 2;
+		return Math.round(rarity * 57 * type.getMultiplier()) * 100 / 2;
 	}
 
 	public void setPrice(int price) {
