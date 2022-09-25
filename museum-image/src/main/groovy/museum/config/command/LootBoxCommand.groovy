@@ -7,8 +7,8 @@ import museum.config.gui.LootBox
 
 registerCommand 'lootboxopen' handle {
     def user = App.app.getUser player
-    if (user.money > 10000000) {
-        user.giveMoney(-10000000)
+    if (user.money > 100000000) {
+        user.giveMoney(-100000000)
         LootBox.giveMeteorite(user)
         LootBox.giveGem(user)
     } else {

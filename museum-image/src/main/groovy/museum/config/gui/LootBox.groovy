@@ -3,9 +3,9 @@ package museum.config.gui
 
 import implario.ListUtils
 import me.func.mod.Anime
-import me.func.mod.Glow
-import me.func.protocol.GlowColor
 import me.func.mod.conversation.ModTransfer
+import me.func.mod.ui.Glow
+import me.func.protocol.data.color.GlowColor
 import museum.data.PickaxeType
 import museum.fragment.Gem
 import museum.fragment.GemType

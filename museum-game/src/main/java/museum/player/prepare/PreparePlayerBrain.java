@@ -1,6 +1,5 @@
 package museum.player.prepare;
 
-import clepto.bukkit.Cycle;
 import clepto.bukkit.item.Items;
 import clepto.bukkit.world.Label;
 import com.destroystokyo.paper.Title;
@@ -18,7 +17,6 @@ import museum.fragment.GemType;
 import museum.fragment.Meteorite;
 import museum.multi_chat.ChatType;
 import museum.multi_chat.MultiChatUtil;
-import museum.museum.Museum;
 import museum.player.User;
 import museum.player.pickaxe.PickaxeUpgrade;
 import museum.util.LocationUtil;
@@ -32,8 +30,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static clepto.bukkit.Cycle.exit;
-
 /**
  * @author func 26.08.2020
  * @project museum
@@ -41,7 +37,7 @@ import static clepto.bukkit.Cycle.exit;
 public class PreparePlayerBrain implements Prepare {
 
     public static final Prepare INSTANCE = new PreparePlayerBrain();
-    public static final int EXPERIENCE = 3;
+    public static final int EXPERIENCE = 0;
     public static final long REWARD_DELAY_HOURS = 18;
 
     private final List<Label> dots;

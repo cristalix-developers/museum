@@ -574,13 +574,14 @@ public class MuseumCommands {
 		val userHaveLastPickaxe = user.getPickaxeType().equals(PickaxeType.LEGENDARY);
 		val userPickaxeType = user.getPickaxeType();
 
-		long cost = userPickaxeType.getPrice();
+		val next = userPickaxeType.getNext();
+		long cost = next == null ? -1 : next.getPrice();
 
 		val menu = Selection.builder()
 				.title("Улучшения кирки")
 				.money("Монет " + MessageUtil.toMoneyFormat(user.getMoney()))
-				.rows(3)
-				.columns(3)
+				.rows(4)
+				.columns(2)
 				.vault("\uE03F")
 				.storage(
 						new ReactiveButton()
@@ -622,7 +623,7 @@ public class MuseumCommands {
 					.price(userHaveMaxLevelOfUpgrade ? -1 : pickaxeUpgrade.getCost())
 					.hint(userHaveMaxLevelOfUpgrade ? "" : "Улучшить")
 					.title(pickaxeUpgrade.getTitle())
-					.description("\n" + currentLevelOfUpgrade + "/" + pickaxeUpgrade.getMaxLevel())
+					.description(currentLevelOfUpgrade + " из " + pickaxeUpgrade.getMaxLevel())
 					.onClick((clickPlayer, index, ReactiveButton) -> {
 						if (!userHaveMaxLevelOfUpgrade) {
 							val clickUser = App.getApp().getUser(clickPlayer);
@@ -783,7 +784,7 @@ public class MuseumCommands {
 		return null;
 	}
 
-	private static final int PRICE = 25000;
+	private static final int PRICE = 300000;
 	private static final double CHANCE = 0.40;
 
 	private String cmdPolishing(Player player, String[] args) {
@@ -916,7 +917,7 @@ public class MuseumCommands {
 				.storage(
 						new ReactiveButton()
 								.material(Material.END_CRYSTAL)
-								.price(10000000)
+								.price(100000000)
 								.hint(userHaveEnoughMoney ? "Открыть" : "")
 								.title("§aСлучайный префикс")
 								.description("Такой префикс уже был?\n" +
@@ -931,7 +932,7 @@ public class MuseumCommands {
 								}),
 						new ReactiveButton()
 								.material(Material.ENDER_CHEST)
-								.price(10000000)
+								.price(100000000)
 								.hint(userHaveEnoughMoney ? "Открыть" : "")
 								.title("Случайная посылка")
 								.description("Вы §dгарантированно §fполучите случайный драгоценный камень 60%-100% качества и " +
@@ -964,7 +965,7 @@ public class MuseumCommands {
 		val menu = Selection.builder()
 				.title("Лутбоксы")
 				.hint("Открыть")
-				.columns(3)
+				.columns(2)
 				.rows(2)
 				.storage(
 						new ReactiveButton()

@@ -1,7 +1,7 @@
 package museum.config.gui
 
 import implario.humanize.Humanize
-import me.func.mod.Glow
+import me.func.mod.ui.Glow
 import museum.client_conversation.AnimationUtil
 import museum.cosmos.boer.Boer
 import museum.cosmos.boer.BoerType
@@ -63,7 +63,7 @@ register 'boer-upgrade', { player ->
         nbt.other = 'guild_members_add'
     } leftClick {
         if (boer.type.next != null && user.money >= boer.type.next.price) {
-            Glow.animate(user.handle(), 3.0,0, 0, 100)
+            Glow.animate(user.handle(), 0.4,0, 0, 100)
             user.giveMoney(-boer.type.next.price)
             boer.type = boer.type.next
             if (!boer.stands.isEmpty())

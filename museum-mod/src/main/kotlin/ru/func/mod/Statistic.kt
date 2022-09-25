@@ -57,7 +57,7 @@ object Statistic {
             when (channel) {
                 "museum:balance" -> balanceText.content = "Баланс §a${NetUtil.readUtf8(data)}"
                 "museum:online" -> online.content = "Онлайн §b${data.readInt()}"
-                "museum:income" -> income.content = "Доход в секунду §e${NetUtil.readUtf8(data)}"
+                "museum:income" -> income.content = "Доход в 5 сек. §e${NetUtil.readUtf8(data)}"
                 "museum:hitcount" -> {
                     val hit = data.readInt()
                     if (hit > 0) {

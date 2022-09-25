@@ -138,8 +138,10 @@ public class BeforePacketHandler implements Prepare {
 					else {
 						subject.acceptClick();
 						//Guis.open(user.getPlayer(), "manipulator", subject.getCachedInfo().getUuid());
-						if (subject instanceof SkeletonSubject) SubjectGui.showSketelonGui(user, (SkeletonSubject)subject);
-						else if (subject instanceof RelicShowcaseSubject) SubjectGui.showRelicGui(user, (RelicShowcaseSubject)subject);
+						if (subject instanceof SkeletonSubject)
+							SubjectGui.showSketelonGui(user, (SkeletonSubject) subject);
+						else if (subject instanceof RelicShowcaseSubject)
+							SubjectGui.showRelicGui(user, (RelicShowcaseSubject) subject);
 						else SubjectGui.showSimpleGui(user.getPlayer(), subject);
 					}
 					break;
@@ -172,12 +174,14 @@ public class BeforePacketHandler implements Prepare {
 		}
 
 		user.getInventory().setItemInMainHand(AIR_ITEM);
+
 		subject.getAllocation().perform(Allocation.Action.UPDATE_BLOCKS, Allocation.Action.SPAWN_PIECES, Allocation.Action.SPAWN_DISPLAYABLE);
 
 		for (User viewer : museum.getUsers())
 			viewer.getPlayer().playSound(origin, Sound.BLOCK_STONE_PLACE, 1, 1);
 
 		MessageUtil.find("placed").send(user);
+		Anime.clearMarkers(user.handle());
 	}
 
 	private boolean tryReturnPlayer(User user, boolean force) {
@@ -273,16 +277,16 @@ public class BeforePacketHandler implements Prepare {
 			Skeleton skeleton = user.getSkeletons().supply(proto);
 
 			if (skeleton.getUnlockedFragments().contains(fragment)) {
-				double prize = (proto.getPrice() + (proto.getPrice() * PickaxeUpgrade.DUPLICATE.convert(user)))
-						* (7.5 + Math.random() * 5.0) / 30;
+				double price = (proto.getPrice() + (proto.getPrice() * PickaxeUpgrade.DUPLICATE.convert(user)))
+						* (7.5 + Math.random() * 5.0);
 				Anime.cursorMessage(
 						user.handle(),
 						String.format("%s §6§l+%.2f$",
 								fragment.getAddress(),
-								prize * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)
+								price * App.getApp().getPlayerDataManager().calcMultiplier(user.getUuid(), BoosterType.COINS)
 						)
 				);
-				user.depositMoneyWithBooster(prize);
+				user.depositMoneyWithBooster(price);
 			} else {
 				Anime.cursorMessage(user.handle(), "§lNEW! §b" + fragment.getAddress() + " §f㦶");
 				skeleton.getUnlockedFragments().add(fragment);

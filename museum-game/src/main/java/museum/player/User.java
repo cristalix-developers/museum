@@ -185,7 +185,7 @@ public class User implements PlayerWrapper {
 			Anime.cursorMessage(handle(), "§b§l+" + (int) getExp + " §f" + Humanize.plurals("опыт", "опыта", "опыта", (int) getExp));
 		}
 		if (newLevel != prevLevel) {
-			Glow.animate(handle(), 3.0, GlowColor.BLUE);
+			Glow.animate(handle(), 0.4, GlowColor.BLUE);
 			if (newLevel % 50 == 0) {
 				TextComponent message = new TextComponent("" +
 						"§cВНИМАНИЕ! §e" + getName() +

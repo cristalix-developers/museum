@@ -87,7 +87,7 @@ class Museum : KotlinMod() {
                     val a = it.min
                     val b = it.max
                     if (a.x <= x && x <= b.x && a.y <= y && y <= b.y && a.z <= z && z <= b.z) {
-                        shoptext.content = "${it.title} ${it.cost.toInt()}$"
+                        shoptext.content = "${it.title} ${it.cost.toInt()}\uE03F"
                         activeSubject = it
                         shopbox.enabled = true
                         shown = true

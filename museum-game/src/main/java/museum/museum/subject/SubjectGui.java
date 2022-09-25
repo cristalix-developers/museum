@@ -250,13 +250,13 @@ public class SubjectGui {
 		else {
 			button.description(
 					"&b" + (subject.getLevel()) + " &fуровень ➠ &b" + (subject.getLevel() + 1) +
-					"&a+" + subject.getLevel() * upgradePercent + "% ▲▲▲");
+					"\n&a+" + subject.getLevel() * upgradePercent + "% ▲▲▲");
 			button.hint("Купить");
 
 			button.onClick((click, index, __) -> {
 				user.giveMoney(-upgradeCost);
 				subject.setLevel(subject.getLevel() + 1);
-				Glow.animate(user.handle(), 3.0, GlowColor.GREEN);
+				Glow.animate(user.handle(), 0.4, GlowColor.GREEN);
 				MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, Formatting.fine("Вы улучшили витрину до §b" + subject.getLevel() + "§f уровня!"));
 				BannerUtil.updateBanners(subject);
 				user.updateIncome();

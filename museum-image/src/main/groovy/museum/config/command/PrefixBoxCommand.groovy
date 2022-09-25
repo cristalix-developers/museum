@@ -7,8 +7,8 @@ import museum.config.gui.PrefixBox
 
 registerCommand 'prefixbox' handle {
     def user = App.app.getUser player
-    if (user.money > 10000000) {
-        user.giveMoney(-10000000)
+    if (user.money > 100000000) {
+        user.giveMoney(-100000000)
         PrefixBox.givePrefix(user)
     } else {
         AnimationUtil.buyFailure(user)

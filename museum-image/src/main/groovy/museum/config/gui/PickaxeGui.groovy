@@ -2,8 +2,8 @@ package museum.config.gui
 
 import clepto.bukkit.item.Items
 import clepto.bukkit.menu.Guis
-import me.func.mod.Glow
-import me.func.protocol.GlowColor
+import me.func.mod.ui.Glow
+import me.func.protocol.data.color.GlowColor
 import museum.App
 import museum.client_conversation.AnimationUtil
 import museum.player.pickaxe.PickaxeUpgrade
@@ -18,6 +18,8 @@ Items.register 'pickaxe-template', {
     nbt.CanDestroy = [
             'minecraft:stained_glass',
             'minecraft:dirt',
+            'minecraft:stone',
+            'minecraft:cobblestone',
             'minecraft:sand',
             'minecraft:soul_sand',
             'minecraft:grass',
@@ -145,7 +147,7 @@ Guis.register 'pickaxe', { player ->
             if (user.money >= upgrade.cost && !has) {
                 user.giveMoney(-upgrade.cost)
                 user.pickaxeImprovements.replace(upgrade, currentLevel + 1)
-                Glow.animate(user.handle(), 3.0, GlowColor.GREEN)
+                Glow.animate(user.handle(), 0.4, GlowColor.GREEN)
                 Guis.open(player, 'pickaxe', player)
             } else {
                 AnimationUtil.buyFailure user

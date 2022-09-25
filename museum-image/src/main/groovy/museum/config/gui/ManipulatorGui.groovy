@@ -1,8 +1,8 @@
 package museum.config.gui
 
 import clepto.bukkit.menu.Guis
-import me.func.mod.Glow
-import me.func.protocol.GlowColor
+import me.func.mod.ui.Glow
+import me.func.protocol.data.color.GlowColor
 import museum.App
 import museum.config.command.WagonConfig
 import museum.fragment.GemType
@@ -251,7 +251,7 @@ Guis.register 'manipulator', { player ->
                     if (user.money >= upgradeCost) {
                         user.giveMoney(-upgradeCost)
                         subject.level = subject.level + 1
-                        Glow.animate(user.handle(), 3.0, GlowColor.GREEN)
+                        Glow.animate(user.handle(), 0.4, GlowColor.GREEN)
                         MultiChatUtil.sendMessage(user.getPlayer(), ChatType.SYSTEM, Formatting.fine("Вы улучшили витрину до §b$subject.level§f уровня!"))
                         Guis.open(delegate, 'manipulator', abstractSubject.cachedInfo.uuid)
                         BannerUtil.updateBanners(subject)
