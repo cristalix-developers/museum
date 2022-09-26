@@ -276,7 +276,6 @@ public class User implements PlayerWrapper {
 			museum.updateIncrease();
 			setIncome(getIncome() + museum.getIncome());
 		}
-		AnimationUtil.updateIncome(this);
 	}
 
 	public void depositMoneyWithBooster(double income) {
@@ -285,7 +284,6 @@ public class User implements PlayerWrapper {
 
 	public void giveMoney(double money) {
 		setMoney(getMoney() + money);
-		AnimationUtil.updateMoney(this);
 	}
 
 	public void giveCosmoCrystal(int crystal, boolean notification) {

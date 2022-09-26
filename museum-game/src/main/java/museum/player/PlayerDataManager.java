@@ -209,7 +209,6 @@ public class PlayerDataManager implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
         leave(event.getPlayer());
-        AnimationUtil.updateOnlineAll();
         if (event.getPlayer().getUniqueId().equals(advertising)) {
             advertising = null;
             Bukkit.getOnlinePlayers().forEach(onlinePlayer -> Npc.hide(WorkerUtil.getNpc().getData().getId(), onlinePlayer));

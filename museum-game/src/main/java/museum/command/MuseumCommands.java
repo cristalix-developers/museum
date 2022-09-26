@@ -1021,7 +1021,8 @@ public class MuseumCommands {
 						new ReactiveButton()
 								.texture("minecraft:textures/items/compass_00.png")
 								.title("Экспедиции")
-								.description("Исследования! Реликвии! Метеориты! Останки динозавров!")
+								.special(true)
+								.description("Реликвии! Метеориты! Останки динозавров!")
 								.onClick((click, index, ReactiveButton) -> click.performCommand("excavationmenu")),
 						new ReactiveButton()
 								.texture("minecraft:mcpatcher/cit/others/hub/guild_shop.png")

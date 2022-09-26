@@ -6,13 +6,8 @@ import me.func.mod.conversation.ModTransfer;
 import me.func.mod.ui.Glow;
 import me.func.protocol.data.color.GlowColor;
 import museum.player.User;
-import museum.util.LevelSystem;
-import museum.util.MessageUtil;
-import org.bukkit.Bukkit;
 import museum.player.prepare.BeforePacketHandler;
-import ru.cristalix.core.realm.IRealmService;
-
-import java.text.DecimalFormat;
+import museum.util.LevelSystem;
 
 /**
  * @author func 02.01.2021
@@ -34,23 +29,6 @@ public class AnimationUtil {
 				.integer((int) (user.getExperience() - beforeExperience))
 				.integer((int) (LevelSystem.getRequiredExperience(level) - beforeExperience))
 				.send("museum:levelbar", user.handle());
-	}
-
-	public static void updateMoney(User user) {
-		new ModTransfer()
-				.string(MessageUtil.toMoneyFormat(user.getMoney()))
-				.send("museum:balance", user.handle());
-	}
-
-	public static void updateOnlineAll() {
-		val online = IRealmService.get().getOnlineOnRealms("MUSM");
-		Bukkit.getOnlinePlayers().forEach(player -> new ModTransfer().integer(online).send("museum:online", player));
-	}
-
-	public static void updateIncome(User user) {
-		new ModTransfer()
-				.string(new DecimalFormat("#00.0").format(user.getIncome()))
-				.send("museum:income", user.handle());
 	}
 
 	public static void updateCosmoCrystal(User user) {
